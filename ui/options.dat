@@ -53,6 +53,7 @@ Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n
 Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
 #endif
 Checkbox, uSo(u)rce, usource, INPUT_KEY_u
+Checkbox, C(o)vox interface, covox, INPUT_KEY_o
 Postcheck, periph_postcheck
 Posthook, periph_posthook
 
@@ -93,6 +94,7 @@ Combo, Speaker (t)ype, speaker_type, INPUT_KEY_t, *TV speaker|Beeper|Unfiltered
 Entry, A(Y) volume, volume_ay, INPUT_KEY_y, 3, %
 Entry, B(e)eper volume, volume_beeper, INPUT_KEY_e, 3, %
 Entry, Spec(D)rum volume, volume_specdrum, INPUT_KEY_d, 3, %
+Entry, (C)ovox volume, volume_covox, INPUT_KEY_c, 3, %
 
 diskoptions
 Drives Setup

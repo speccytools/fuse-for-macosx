@@ -30,6 +30,7 @@
 
 #include "display.h"
 #include "peripherals/ay.h"
+#include "peripherals/covox.h"
 #include "peripherals/specdrum.h"
 #include "spectrum.h"
 
@@ -78,6 +79,8 @@ typedef struct fuse_machine_info {
   ayinfo ay;		/* The AY-8-3912 chip */
 
   specdrum_info specdrum; /* SpecDrum settings */
+
+  covox_info covox; /* Covox settings */
 
   int (*shutdown)( void );
 

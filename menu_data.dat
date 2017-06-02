@@ -30,7 +30,9 @@ File/Recording/_Continue recording..., Item
 File/Recording/separator, Separator
 File/Recording/_Insert snapshot, Item, Insert
 File/Recording/Roll_back, Item, Delete
+#ifndef USE_WIDGET
 File/Recording/Rollback _to..., Item
+#endif
 File/Recording/separator, Separator
 File/Recording/_Play..., Item
 File/Recording/_Stop, Item

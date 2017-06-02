@@ -1,4 +1,4 @@
-The Free Unix Spectrum Emulator (Fuse) 1.3.5
+The Free Unix Spectrum Emulator (Fuse) 1.3.6
 ============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
@@ -24,11 +24,13 @@ What Fuse does have:
 * Emulation of some of the printers you could attach to a Spectrum.
 * Support for the RZX input recording file format, including
   rollback and 'competition mode'.
-* Emulation of the Currah µSource, DivIDE, Fuller audio box, Interface 1,
-  Kempston mouse, SpecDrum, Spectrum +3e, ZXATASP and ZXCF interfaces.
-* Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery
+* Emulation of the Currah µSource, DivIDE, Interface 1, Kempston mouse,
+  Spectrum +3e, ZXATASP and ZXCF interfaces.
+* Emulation of the Covox, Fuller audio box, Melodik and SpecDrum audio
   interfaces.
-* Emulation of the Spectranet and SpeccyBoot interfaces.
+* Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery
+  disk interfaces.
+* Emulation of the Spectranet and SpeccyBoot network interfaces.
 
 Help! <xyz> doesn't work
 ------------------------
@@ -108,4 +110,4 @@ Usenet newsgroup `comp.sys.sinclair' or the World of Spectrum forums
 <http://www.worldofspectrum.org/forums/>.
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-28th April, 2017
+1st June, 2017

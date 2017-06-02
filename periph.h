@@ -41,6 +41,8 @@ typedef enum periph_type {
   PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
   PERIPH_TYPE_BETA128_PENTAGON, /* Beta128 disk interface as found on the original Pentagon */
   PERIPH_TYPE_BETA128_PENTAGON_LATE, /* Beta128 disk interface as found on later Pentagons */
+  PERIPH_TYPE_COVOX_DD,       /* Covox interface on port #dd */
+  PERIPH_TYPE_COVOX_FB,       /* Covox interface on port #fb */
   PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
   PERIPH_TYPE_PLUSD,          /* +D disk interface */
   PERIPH_TYPE_DIDAKTIK80,     /* Didaktik 40/80 disk interface */

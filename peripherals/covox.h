@@ -1,5 +1,5 @@
-/* specdrum.h: Routines for handling the Specdrum Drum Kit
-   Copyright (c) 2011-2016 Jon Mitchell, Philip Kendall
+/* covox.h: Routines for handling the Covox
+   Copyright (c) 2011-2017 Jon Mitchell, Philip Kendall, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@
 
 */
 
-#ifndef FUSE_SPECDRUM_H
-#define FUSE_SPECDRUM_H
+#ifndef FUSE_COVOX_H
+#define FUSE_COVOX_H
 
 #include <libspectrum.h>
 
-typedef struct specdrum_info {
-  libspectrum_signed_byte specdrum_dac; /* Current byte in the SpecDrum 8bit DAC */
-} specdrum_info;
+typedef struct covox_info {
+  libspectrum_byte covox_dac; /* Current byte in the Covox 8bit DAC */
+} covox_info;
 
-void specdrum_register_startup( void );
-void specdrum_write( libspectrum_word port, libspectrum_byte val );
+void covox_register_startup( void );
+void covox_write( libspectrum_word port, libspectrum_byte val );
 
-#endif                          /* #ifndef FUSE_SPECDRUM_H */
+#endif                          /* #ifndef FUSE_COVOX_H */
