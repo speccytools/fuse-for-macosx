@@ -1062,6 +1062,10 @@ WIN32_DLL libspectrum_byte * libspectrum_snap_didaktik80_rom( libspectrum_snap *
 WIN32_DLL void libspectrum_snap_set_didaktik80_rom( libspectrum_snap *snap, int idx, libspectrum_byte* didaktik80_rom );
 WIN32_DLL libspectrum_byte * libspectrum_snap_didaktik80_ram( libspectrum_snap *snap, int idx );
 WIN32_DLL void libspectrum_snap_set_didaktik80_ram( libspectrum_snap *snap, int idx, libspectrum_byte* didaktik80_ram );
+WIN32_DLL int libspectrum_snap_covox_active( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_covox_active( libspectrum_snap *snap, int covox_active );
+WIN32_DLL libspectrum_byte libspectrum_snap_covox_dac( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_covox_dac( libspectrum_snap *snap, libspectrum_byte covox_dac );
 
 /*
  * Tape handling routines

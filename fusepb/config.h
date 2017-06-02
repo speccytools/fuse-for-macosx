@@ -166,8 +166,8 @@
 /* Defined if we're using a widget-based UI */
 /* #undef USE_WIDGET */
 
-/* Version number of package */
-#define VERSION "1.3.5"
+/* Version number of libspectrum package (encoded in snapshots etc.)*/
+#define VERSION "1.3.4"
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
