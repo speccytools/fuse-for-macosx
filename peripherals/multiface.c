@@ -46,6 +46,11 @@
 #include "utils.h"
 #include "z80/z80.h"
 
+/* 8KB ROM */
+#define MULTIFACE_ROM_SIZE 0x2000
+/* 8KB RAM */
+#define MULTIFACE_RAM_SIZE 0x2000
+
 #define MF_MASK( a ) ( 1 << a )
 #ifdef IS
 #undef IS
@@ -118,12 +123,18 @@ static void multiface_port_out3( libspectrum_word port, libspectrum_byte val );
 static libspectrum_byte multiface_port_last_byte( libspectrum_word port,
                                                   libspectrum_byte *attached );
 
+static void multiface_enabled_snapshot( libspectrum_snap *snap );
+static void multiface_from_snapshot( libspectrum_snap *snap );
+static void multiface_to_snapshot( libspectrum_snap *snap );
+
 static module_info_t multiface_module_info = {
-  multiface_reset,
-  multiface_memory_map,
-  NULL,
-  NULL,
-  NULL
+
+  /* .reset = */ multiface_reset,
+  /* .romcs = */ multiface_memory_map,
+  /* .snapshot_enabled = */ multiface_enabled_snapshot,
+  /* .snapshot_from = */ multiface_from_snapshot,
+  /* .snapshot_to = */ multiface_to_snapshot,
+
 };
 
 static const periph_port_t multiface_ports_1[] = {
@@ -527,32 +538,70 @@ multiface_unittest( void )
   return r;
 }
 
-/*
 static void
 multiface_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_multiface_active( snap ) )
-    settings_current.multiface = 1;
+  if( !libspectrum_snap_multiface_active( snap ) ) return;
+
+  if( libspectrum_snap_multiface_model_one( snap ) )
+    settings_current.multiface1 = 1;
+  else if( libspectrum_snap_multiface_model_128( snap ) )
+    settings_current.multiface128 = 1;
+  else if( libspectrum_snap_multiface_model_3( snap ) )
+    settings_current.multiface3 = 1;
 }
 
 static void
 multiface_from_snapshot( libspectrum_snap *snap )
 {
+  int idx;
+
   if( !libspectrum_snap_multiface_active( snap ) ) return;
 
-  if( libspectrum_snap_multiface_custom_rom( snap ) &&
-      libspectrum_snap_multiface_rom( snap, 0 ) &&
-      machine_load_rom_bank_from_buffer(
-                             mf1_memory_map_romcs, 0,
-                             libspectrum_snap_multiface_rom( snap, 0 ),
-                             libspectrum_snap_multiface_rom_length( snap, 0 ),
-                             1 ) )
+  if( libspectrum_snap_multiface_model_one( snap ) )
+    idx = MF_1;
+  else if( libspectrum_snap_multiface_model_128( snap ) )
+    idx = MF_128;
+  else if( libspectrum_snap_multiface_model_3( snap ) )
+    idx = MF_3;
+  else
     return;
 
+  if( !IS( multiface_available, idx ) ) return;
+
+  /* Multiface with 16 Kb RAM not supported */
+  if( libspectrum_snap_multiface_ram_length( snap, 0 ) != MULTIFACE_RAM_SIZE ) {
+    ui_error( UI_ERROR_ERROR, "Only supported Multiface with 8 Kb RAM" );
+    return;
+  }
+
+  if( libspectrum_snap_multiface_ram( snap, 0 ) ) {
+    memcpy( mf[idx].ram,
+            libspectrum_snap_multiface_ram( snap, 0 ), MULTIFACE_RAM_SIZE );
+  }
+
   if( libspectrum_snap_multiface_paged( snap ) ) {
-    multiface_page();
+    multiface_page( idx );
+    mf[idx].IC8a_Q = ( idx == MF_3 )? 1 : 0;
   } else {
-    multiface_unpage();
+    multiface_unpage( idx );
+  }
+
+  /* Restore status of software lockout (128/3) or physical switch (One) */
+  switch( idx ) {
+  case MF_1:
+    mf[MF_1].J2 = !libspectrum_snap_multiface_disabled( snap );
+    settings_current.multiface_stealth = !mf[MF_1].J2;
+    break;
+  case MF_128:
+  case MF_3:
+    mf[idx].J2 = !libspectrum_snap_multiface_software_lockout( snap );
+    break;
+  }
+
+  /* Red button status */
+  if( libspectrum_snap_multiface_red_button_disabled( snap ) ) {
+    mf[idx].IC8b_Q = 0;
   }
 }
 
@@ -560,37 +609,45 @@ static void
 multiface_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
+  int idx, i;
 
-  if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) return;
+  if( periph_is_active( PERIPH_TYPE_MULTIFACE_1 ) ) {
+    libspectrum_snap_set_multiface_model_one( snap, 1 );
+    idx = MF_1;
+  } else if( periph_is_active( PERIPH_TYPE_MULTIFACE_128 ) ) {
+    libspectrum_snap_set_multiface_model_128( snap, 1 );
+    idx = MF_128;
+  } else if( periph_is_active( PERIPH_TYPE_MULTIFACE_3 ) ) {
+    libspectrum_snap_set_multiface_model_3( snap, 1 );
+    idx = MF_3;
+  } else {
+    return;
+  }
 
   libspectrum_snap_set_multiface_active( snap, 1 );
-  libspectrum_snap_set_multiface_paged ( snap, multiface_active );
-  libspectrum_snap_set_multiface_drive_count( snap, 8 );
+  libspectrum_snap_set_multiface_paged( snap, IS( multiface_active, idx ) );
 
-  if( if1_memory_map_romcs[0].save_to_snapshot ) {
-    size_t rom_length = MEMORY_PAGE_SIZE;
-
-    if( if1_memory_map_romcs[1].save_to_snapshot ) {
-      rom_length <<= 1;
-    }
-
-    libspectrum_snap_set_multiface_custom_rom( snap, 1 );
-    libspectrum_snap_set_multiface_rom_length( snap, 0, rom_length );
-
-    buffer = malloc( rom_length );
-    if( !buffer ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return;
-    }
-
-    memcpy( buffer, if1_memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
-
-    if( rom_length == MEMORY_PAGE_SIZE*2 ) {
-      memcpy( buffer + MEMORY_PAGE_SIZE, multiface_memory_map_romcs[1].page,
-              MEMORY_PAGE_SIZE );
-    }
-
-    libspectrum_snap_set_multiface_rom( snap, 0, buffer );
+  /* Store status of software lockout (128/3) or physical switch (One) */
+  switch( idx ) {
+  case MF_1:
+    libspectrum_snap_set_multiface_disabled( snap, !mf[MF_1].J2 );
+    break;
+  case MF_128:
+  case MF_3:
+    libspectrum_snap_set_multiface_software_lockout( snap, !mf[idx].J2 );
+    break;
   }
+
+  /* Store red button status */
+  if( !mf[idx].IC8b_Q ) {
+    libspectrum_snap_set_multiface_red_button_disabled( snap, 1 );
+  }
+
+  buffer = libspectrum_new( libspectrum_byte, MULTIFACE_RAM_SIZE );
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    memcpy( buffer + i * MEMORY_PAGE_SIZE,
+            multiface_memory_map_romcs_ram[i].page, MEMORY_PAGE_SIZE );
+
+  libspectrum_snap_set_multiface_ram( snap, 0, buffer );
+  libspectrum_snap_set_multiface_ram_length( snap, 0, MULTIFACE_RAM_SIZE );
 }
-*/
