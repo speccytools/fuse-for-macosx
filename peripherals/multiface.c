@@ -306,7 +306,7 @@ multiface_status_update( void )
     mf[MF_1].J2 = settings_current.multiface_stealth ? 0 : 1;
   }
 /*
-  if( !multiface_available || mf.type != multiface_get_type() )
+  if( mf.type != multiface_get_type() )
     multiface_reset( 0 );
 */
 }
