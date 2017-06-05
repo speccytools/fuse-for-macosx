@@ -64,7 +64,7 @@ interface2, boolean, 1
 multiface1, boolean, 0
 multiface128, boolean, 0
 multiface3, boolean, 0
-multiface_stealth, boolean, 0
+multiface1_stealth, boolean, 0
 snapsasz80, null, 0
 opus, boolean, 0
 pal_tv2x, boolean, 0

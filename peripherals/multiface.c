@@ -248,7 +248,7 @@ multiface_reset_real( int idx, int hard_reset )
   mf[idx].J1 = 0;		/* Joystick always disabled :-( */
 
   if( mf[idx].type == PERIPH_TYPE_MULTIFACE_1 )
-    mf[idx].J2 = settings_current.multiface_stealth ? 0 : 1;
+    mf[idx].J2 = settings_current.multiface1_stealth ? 0 : 1;
   else
     mf[idx].J2 = 0;
 
@@ -302,8 +302,8 @@ multiface_status_update( void )
 
   ui_menu_activate( UI_MENU_ITEM_MACHINE_MULTIFACE, 1 );
   if( IS( multiface_available, MF_1 ) &&
-      mf[MF_1].J2 == settings_current.multiface_stealth ) {
-    mf[MF_1].J2 = settings_current.multiface_stealth ? 0 : 1;
+      mf[MF_1].J2 == settings_current.multiface1_stealth ) {
+    mf[MF_1].J2 = settings_current.multiface1_stealth ? 0 : 1;
   }
 /*
   if( mf.type != multiface_get_type() )
@@ -587,7 +587,7 @@ multiface_from_snapshot( libspectrum_snap *snap )
   switch( idx ) {
   case MF_1:
     mf[MF_1].J2 = !libspectrum_snap_multiface_disabled( snap );
-    settings_current.multiface_stealth = !mf[MF_1].J2;
+    settings_current.multiface1_stealth = !mf[MF_1].J2;
     break;
   case MF_128:
   case MF_3:
