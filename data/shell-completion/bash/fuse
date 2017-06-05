@@ -127,6 +127,7 @@ _fuse()
         --rom-pentagon-[0-2]|--rom-pentagon512-[0-3]| \
         --rom-pentagon1024-[0-3]|--rom-scorpion-[0-3]|--rom-spec-se-[0-1]| \
         --rom-beta128|--rom-didaktik80|--rom-disciple|--rom-interface-1| \
+        --rom-multiface1|--rom-multiface128|--rom-multiface3| \
         --rom-opus|--rom-plusd|--rom-speccyboot|--rom-usource)
             _filedir '@(rom|ROM)'
             return 0
@@ -208,6 +209,7 @@ _fuse()
             --microdrive-4-file --microdrive-5-file --microdrive-6-file
             --microdrive-7-file --microdrive-8-file --mouse-swap-buttons
             --movie-compr --movie-start --movie-stop-after-rzx
+            --multiface1 --multiface128 --multiface3 --multiface1-stealth
             --no-accelerate-loader --no-aspect-hint --no-auto-load
             --no-autosave-settings --no-beta128 --no-beta128-48boot
             --no-bw-tv --no-cmos-z80 --no-competition-mode
@@ -219,8 +221,9 @@ _fuse()
             --no-interface2 --no-issue2 --no-joystick-prompt
             --no-kempston --no-kempston-mouse --no-keyboard-arrows-shifted
             --no-late-timings --no-loading-sound --no-mdr-random-len
-            --no-melodik --no-mouse-swap-buttons
-            --no-movie-stop-after-rzx --no-opus --no-pal-tv2x
+            --no-melodik --no-mouse-swap-buttons --no-movie-stop-after-rzx
+            --no-multiface1 --no-multiface128 --no-multiface3
+            --no-multiface1-stealth --no-opus --no-pal-tv2x
             --no-plus3-detect-speedlock --no-plusd --no-printer
             --no-raw-s-net --no-recreated-spectrum --no-rs232-handshake
             --no-rzx-autosaves --no-simpleide --no-slt --no-sound
@@ -234,7 +237,8 @@ _fuse()
             --printer --rate --raw-s-net --record --recreated-spectrum
             --rom-128-0 --rom-128-1
             --rom-16 --rom-48 --rom-beta128 --rom-didaktik80 --rom-disciple
-            --rom-interface-1 --rom-opus
+            --rom-interface-1 --rom-multiface1 --rom-multiface128
+            --rom-multiface3 --rom-opus
             --rom-pentagon-0 --rom-pentagon-1 --rom-pentagon-2
             --rom-pentagon512-0 --rom-pentagon512-1 --rom-pentagon512-2
             --rom-pentagon512-3 --rom-pentagon1024-0 --rom-pentagon1024-1
