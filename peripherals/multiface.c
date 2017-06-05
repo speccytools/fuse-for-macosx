@@ -418,14 +418,10 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
 
   /* Multiface 3 */
   /* The MF3 user guide say nothing about paging memory :-( */
-  /*  but in www.breezer.co.uk/spec/tech/hware.html I found: */
-  /*  IN A, (191) -> page in, and IN A, (63) page out */
-  /*  let see: */
-  /* xxxxxxxx 10111111 ok, may a0 don't care, so */
-  /* xxxxxxxx 1011111x and may have some other don't care bit, but how know? */
-  /**/
-  /* xxxxxxxx 00111111 ok, may a0 don't care, so */
-  /* xxxxxxxx 0011111x and may have some other don't care bit, but how know? */
+  /* The following links say */
+  /*  http://x128.speccy.cz/multiface/multiface.htm */
+  /*  https://www.worldofspectrum.org/forums/discussion/comment/303231/#Comment_303231 */
+  /*  IN A, (63) -> page in, and IN A, (191) page out */
 
   a7 = port & 0x0080;
   if( a7 )			/* a7 == 1 */
