@@ -24,10 +24,6 @@
 #ifndef FUSE_RZX_H
 #define FUSE_RZX_H
 
-#ifdef HAVE_LIB_GLIB
-#include <glib.h>
-#endif			/* #ifdef HAVE_LIB_GLIB */
-
 #include <libspectrum.h>
 
 /* The offset used to get the count of instructions from the R register */
