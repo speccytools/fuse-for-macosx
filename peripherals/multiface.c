@@ -305,10 +305,6 @@ multiface_status_update( void )
       mf[MF_1].J2 == settings_current.multiface1_stealth ) {
     mf[MF_1].J2 = settings_current.multiface1_stealth ? 0 : 1;
   }
-/*
-  if( mf.type != multiface_get_type() )
-    multiface_reset( 0 );
-*/
 }
 
 static void
@@ -352,6 +348,7 @@ multiface_port_in1( libspectrum_word port, libspectrum_byte *attached )
 
   if( !IS( multiface_available, MF_1 ) ) return ret;
 
+  /* TODO: check if this value should be set to 0xff */
   *attached = 1;
 
   /* in () */
@@ -360,15 +357,24 @@ multiface_port_in1( libspectrum_word port, libspectrum_byte *attached )
   /* xxxxxxxx 0001xx1x page out IN A, (31)  00011111*/
 
   a7 = port & 0x0080;
-  if( mf[MF_1].J1 ) {
-      /* READ joy */
-  }
-  if( a7 )
-    multiface_page( MF_1 );
-  else
-    multiface_unpage( MF_1 );		/* a7 == 0 */
 
-  mf[MF_1].IC8a_Q = ( !a7 );
+  /* TODO: read joystick */
+  /*
+  if( mf[MF_1].J1 ) {
+  }
+  */
+
+  if( a7 ) {
+    if( mf[MF_1].J2 ) {
+      multiface_page( MF_1 );
+      mf[MF_1].IC8a_Q = 0;
+    }
+  }
+  else {
+    multiface_unpage( MF_1 );		/* a7 == 0 */
+    mf[MF_1].IC8a_Q = 1;
+  }
+
   return ret;
 }
 
@@ -380,6 +386,7 @@ multiface_port_in128( libspectrum_word port, libspectrum_byte *attached )
 
   if( !IS( multiface_available, MF_128 ) ) return ret;
 
+  /* TODO: check if this value should be set to 0xff */
   *attached = 1;
 
   /* Multiface 128 */
@@ -414,6 +421,7 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
 
   if( !IS( multiface_available, MF_3 ) ) return ret;
 
+  /* TODO: check if this value should be set to 0xff */
   *attached = 1;
 
   /* Multiface 3 */
@@ -473,6 +481,7 @@ multiface_port_last_byte( libspectrum_word port, libspectrum_byte *attached )
   if( !multiface_available || !mf[MF_3].J2 )
     return ret;
 
+  /* TODO: check if this value should be set to 0xff */
   *attached = 1;
 
   if( port & 0x4000 )		/* 7f3f */
@@ -491,6 +500,14 @@ multiface_red_button( void )
 */
   for( i = MF_1; i <= MF_3; i++ ) {
     if( !IS( multiface_available, i ) || mf[i].IC8b_Q == 0 ) continue;
+
+    /* Note: AFAIK the Multiface One schematics show that the physical switch
+       (J2) disables paging in OFF state and has no effect on NMI generation.
+       But the manual states that the interface is unusable while switched OFF.
+       Until better understanding, NMI generation is disabled to avoid a freeze
+       in the spectrum machine.
+    */
+    if( i == MF_1 && !mf[MF_1].J2 ) continue;
 
     mf[i].IC8b_Q = 0;
     SET( multiface_activated, i, 1 );
