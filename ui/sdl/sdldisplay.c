@@ -353,8 +353,9 @@ sdldisplay_load_gfx_mode( void )
     fuse_abort();
   }
 
-  sdldisplay_is_full_screen =
-      settings_current.full_screen = !!(sdldisplay_gc->flags & SDL_FULLSCREEN);
+  settings_current.full_screen =
+      !!( sdldisplay_gc->flags & ( SDL_FULLSCREEN | SDL_NOFRAME ) );
+  sdldisplay_is_full_screen = settings_current.full_screen;
 
   /* Distinguish 555 and 565 mode */
   if( sdldisplay_gc->format->Gmask >> sdldisplay_gc->format->Gshift == 0x1f )

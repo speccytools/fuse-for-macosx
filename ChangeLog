@@ -1,3 +1,22 @@
+2017-06-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.6 released.
+
+        * Emulation core improvements:
+          * Add Covox interface emulation (Fredrick Meunier).
+          * Disable accelerate loader while recording RZX files (thanks,
+            windale) (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Fix typo in Opus Discovery option (thanks, Stuart) (Sergio Baldoví).
+          * WidgetUI: Disable RollbackTo menu option for widget UIs (thanks,
+            Ian) (Sergio Baldoví).
+          * Update description of speed option (Sergio Baldoví).
+          * List Melodik as supported interface and rearrange audio interfaces
+            as a separate item (Sergio Baldoví).
+          * Document --volume-covox option and update bash completion
+            (Sergio Baldoví).
+
 2017-04-28  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.5 released.
