@@ -41,8 +41,8 @@ AC_CONFIG_HEADERS(config.h)
 AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE([foreign subdir-objects -Wall])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AM_INIT_AUTOMAKE([1.11 foreign subdir-objects -Wall])
+AM_SILENT_RULES([yes])
 
 dnl Substitutions for .in files
 FUSE_FULL_VERSION=fuse_full_version
