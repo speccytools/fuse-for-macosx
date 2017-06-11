@@ -191,7 +191,7 @@ multiface_register_startup( void )
 }
 
 static int
-multiface_init( void *context )
+multiface_init( void *context GCC_UNUSED )
 {
   int i;
 
@@ -441,7 +441,8 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
 }
 
 static void
-multiface_port_out1( libspectrum_word port, libspectrum_byte val )
+multiface_port_out1( libspectrum_word port GCC_UNUSED,
+                     libspectrum_byte val GCC_UNUSED )
 {
   if( !IS( multiface_available, MF_1 ) ) return;
 
@@ -462,13 +463,13 @@ multiface_port_out128_3( int idx, libspectrum_word port )
 }
 
 static void
-multiface_port_out128( libspectrum_word port, libspectrum_byte val )
+multiface_port_out128( libspectrum_word port, libspectrum_byte val GCC_UNUSED )
 {
   multiface_port_out128_3( MF_128, port );
 }
 
 static void
-multiface_port_out3( libspectrum_word port, libspectrum_byte val )
+multiface_port_out3( libspectrum_word port, libspectrum_byte val GCC_UNUSED )
 {
   multiface_port_out128_3( MF_3, port );
 }
