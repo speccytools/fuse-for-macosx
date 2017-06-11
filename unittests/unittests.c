@@ -40,6 +40,7 @@
 #include "peripherals/ide/zxcf.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
+#include "peripherals/multiface.h"
 #include "peripherals/speccyboot.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
@@ -753,6 +754,7 @@ paging_test( void )
   {
     r += if1_unittest();
     r += if2_unittest();
+    r += multiface_unittest();
     r += speccyboot_unittest();
     r += usource_unittest();
 

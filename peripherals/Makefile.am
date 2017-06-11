@@ -2,6 +2,7 @@
 ## Copyright (c) 2011 Philip Kendall
 ## Copyright (c) 2015 Stuart Brady
 ## Copyright (c) 2015 Sergio Baldoví
+## Copyright (c) 2017 Fredrick Meunier
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -31,6 +32,7 @@ fuse_SOURCES += \
                 peripherals/joystick.c \
                 peripherals/kempmouse.c \
                 peripherals/melodik.c \
+                peripherals/multiface.c \
                 peripherals/printer.c \
                 peripherals/scld.c \
                 peripherals/speccyboot.c \
@@ -76,6 +78,7 @@ noinst_HEADERS += \
                   peripherals/joystick.h \
                   peripherals/kempmouse.h \
                   peripherals/melodik.h \
+                  peripherals/multiface.h \
                   peripherals/printer.h \
                   peripherals/scld.h \
                   peripherals/speccyboot.h \

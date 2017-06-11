@@ -889,6 +889,38 @@ See also the
 section.
 .RE
 .PP
+.B \-\-multiface1
+.RS
+Emulate a Romantic Robot Multiface One interface. Same as the General
+Peripherals Options dialog's
+.I "Multiface One"
+option.
+.RE
+.PP
+.B \-\-multiface128
+.RS
+Emulate a Romantic Robot Multiface\ 128 interface. Same as the General
+Peripherals Options dialog's
+.I "Multiface\ 128"
+option.
+.RE
+.PP
+.B \-\-multiface3
+.RS
+Emulate a Romantic Robot Multiface\ 3 interface. Same as the General
+Peripherals Options dialog's
+.I "Multiface\ 3"
+option.
+.RE
+.PP
+.B \-\-multiface1-stealth
+.RS
+Set Multiface One stealth/invisible mode. Same as the General Peripherals
+Options dialog's
+.I "Stealth Multiface One"
+option.
+.RE
+.PP
 .B \-\-opus
 .RS
 Emulate an Opus Discovery interface. Same as the Disk Peripherals Options
@@ -1162,6 +1194,15 @@ are not.
 .B \-\-rom\-disciple
 .I file
 .br
+.B \-\-rom\-multiface1
+.I file
+.br
+.B \-\-rom\-multiface128
+.I file
+.br
+.B \-\-rom\-multiface3
+.I file
+.br
 .B \-\-rom\-opus
 .I file
 .br
@@ -1183,6 +1224,12 @@ the Didaktik\ 80 ROM
 .RI ( didaktik80.rom ),
 the DISCiPLE ROM
 .RI ( disciple.rom ),
+the Multiface\ One ROM
+.RI ( mf1.rom ),
+the Multiface\ 128 ROM
+.RI ( mf128.rom ),
+the Multiface\ 3 ROM
+.RI ( mf3.rom ),
 the Opus Discovery ROM
 .RI ( opus.rom ),
 the SpeccyBoot ROM
@@ -2505,6 +2552,30 @@ extended features, so only one of these should be selected at once or
 unpredictable behaviour will occur.
 .RE
 .PP
+.I "Multiface One"
+.RS
+If this option is selected, Fuse will emulate the Romantic Robot
+Multiface One. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+.RE
+.PP
+.I "Multiface\ 128"
+.RS
+If this option is selected, Fuse will emulate the Romantic Robot
+Multiface\ 128. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+.RE
+.PP
+.I "Multiface\ 3"
+.RS
+If this option is selected, Fuse will emulate the Romantic Robot
+Multiface\ 3. Available for +2A, +3 and +3e machines.
+.RE
+.PP
+.I "Stealth Multiface One"
+.RS
+This option controls the `invisible' or `stealth' mode of Multiface One,
+as the physical switch on the side of the interface.
+.RE
+.PP
 .I "Emulate printers"
 .RS
 If this option is selected, Fuse will emulate a printer. See the
@@ -3242,6 +3313,11 @@ pressing the NMI button.  For some UIs, this may be tricky, or even
 impossible to do.  Note that GDOS on the DISCiPLE contains a bug which
 causes corruption of saved snapshots, and a failure to return from the
 NMI menu correctly.  This bug is not present in G+DOS on the +D.
+.RE
+.PP
+.I "Machine, Multiface Red Button"
+.RS
+Presses the Multiface One/128/3 red button to active the interface.
 .RE
 .PP
 .I "Machine, Didaktik SNAP"
@@ -4413,6 +4489,13 @@ if1:unpage
 The Interface\ 1 shadow ROM is paged into or out of memory.
 .RE
 .br
+multiface:page
+.br
+multiface:unpage
+.RS
+The Multiface One/128/3 is paged into or out of memory respectively.
+.RE
+.br
 opus:page
 .br
 opus:unpage
@@ -4679,6 +4762,8 @@ Other available sources are:
 .RI ` "DivIDE RAM" "',"
 .RI ` If1 "',"
 .RI ` If2 "',"
+.RI ` "Multiface RAM" "',"
+.RI ` "Multiface ROM" "',"
 .RI ` "Opus RAM" "',"
 .RI ` "Opus ROM" "',"
 .RI ` "PlusD RAM" "',"

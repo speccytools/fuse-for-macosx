@@ -1,5 +1,5 @@
 # settings.dat: configuration options for Fuse
-# Copyright (c) 2002-2015 Philip Kendall
+# Copyright (c) 2002-2017 Philip Kendall
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -61,6 +61,10 @@ interface1, boolean, 0
 mdr_len, numeric, 180
 mdr_random_len, boolean, 1
 interface2, boolean, 1
+multiface1, boolean, 0
+multiface128, boolean, 0
+multiface3, boolean, 0
+multiface1_stealth, boolean, 0
 snapsasz80, null, 0
 opus, boolean, 0
 pal_tv2x, boolean, 0
@@ -242,6 +246,9 @@ rom_beta128, string, "trdos.rom",
 rom_plusd, string, "plusd.rom",
 rom_didaktik80, string, "didaktik80.rom",
 rom_disciple, string, "disciple.rom",
+rom_multiface1, string, "mf1.rom",
+rom_multiface128, string, "mf128.rom",
+rom_multiface3, string, "mf3.rom",
 rom_opus, string, "opus.rom",
 rom_speccyboot, string, "speccyboot-1.4.rom",
 rom_usource, string, "usource.rom",

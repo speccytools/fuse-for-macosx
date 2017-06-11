@@ -58,6 +58,9 @@ typedef enum periph_type {
 
   PERIPH_TYPE_KEMPSTON_MOUSE, /* Kempston mouse */
   PERIPH_TYPE_MELODIK,        /* Melodik interface */
+  PERIPH_TYPE_MULTIFACE_1,    /* Multiface 1 */
+  PERIPH_TYPE_MULTIFACE_128,  /* Multiface 128 */
+  PERIPH_TYPE_MULTIFACE_3,    /* Multiface 3 */
   PERIPH_TYPE_OPUS,           /* Opus disk interface */
   PERIPH_TYPE_PARALLEL_PRINTER, /* +2A/+3 parallel printer */
   PERIPH_TYPE_PENTAGON1024_MEMORY, /* Pentagon 1024-style memory paging */
