@@ -139,7 +139,7 @@ get_1ffd( void )
 static void
 set_1ffd( libspectrum_dword value )
 {
-  specplus3_memoryport2_write( 0, value );
+  specplus3_memoryport2_write_internal( 0, value );
 }
 
 static int
