@@ -31,6 +31,7 @@ What Fuse does have:
 * Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery
   disk interfaces.
 * Emulation of the Spectranet and SpeccyBoot network interfaces.
+* Support for the Recreated ZX Spectrum Bluetooth keyboard.
 
 Help! <xyz> doesn't work
 ------------------------
