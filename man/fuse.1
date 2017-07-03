@@ -814,6 +814,23 @@ General Peripherals Options dialog's
 option.
 .RE
 .PP
+.B \-\-mdr\-len
+.I length
+.RS
+This option controls the number of blocks in a new Microdrive cartridge.
+Same as the Media Options dialog's
+.I "MDR cartridge len"
+option.
+.RE
+.PP
+.B \-\-mdr\-random\-len
+.RS
+If this option is set, Fuse will use a random Microdrive cartridge
+length. Same as the Media Options dialog's
+.I "Random length MDR cartridge"
+option.
+.RE
+.PP
 .B \-\-microdrive\-file
 .I file
 .br
@@ -2382,13 +2399,14 @@ the trap or not.
 .I "MDR cartridge len"
 .RS
 This option controls the number of blocks in a new Microdrive cartridge.
-If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
+If the value smaller than 10 or greater than 254 Fuse assumes 10 or 254.
+Average real capacity is around 180 blocks (90 Kb).
 .RE
 .PP
 .I "Random length MDR cartridge"
 .RS
 If this option is enabled, Fuse will use a random Microdrive cartridge
-length instead of the length specified in the
+length (around 180 blocks) instead of the length specified in the
 .I "MDR cartridge len"
 option.
 .RE
