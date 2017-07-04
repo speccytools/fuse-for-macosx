@@ -17,6 +17,7 @@
 		B61159C90EEE9A140029FEA3 /* Select_ROMs.png in Resources */ = {isa = PBXBuildFile; fileRef = B61159C80EEE9A140029FEA3 /* Select_ROMs.png */; };
 		B61159CB0EEE9A1E0029FEA3 /* Sound.png in Resources */ = {isa = PBXBuildFile; fileRef = B61159CA0EEE9A1E0029FEA3 /* Sound.png */; };
 		B615BFE80B4261E50082D535 /* HIDJoysticks.m in Sources */ = {isa = PBXBuildFile; fileRef = B615BFE60B4261E50082D535 /* HIDJoysticks.m */; };
+		B6168CE91F0BC0AC008C99E6 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = B6168CE81F0BC0AC008C99E6 /* buffer.c */; };
 		B61700F4163EAF8D00142336 /* PokeMemory.xib in Resources */ = {isa = PBXBuildFile; fileRef = B61700F3163EAF8D00142336 /* PokeMemory.xib */; };
 		B61700F7163EAFC600142336 /* PokeMemoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = B61700F6163EAFC600142336 /* PokeMemoryController.m */; };
 		B61F459409121DF100C8096C /* disk_plus3.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F2076596C700DE7E81 /* disk_plus3.szx */; };
@@ -427,6 +428,7 @@
 		B61159CA0EEE9A1E0029FEA3 /* Sound.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sound.png; sourceTree = "<group>"; };
 		B615BFE50B4261E50082D535 /* HIDJoysticks.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = HIDJoysticks.h; path = content_arrays/HIDJoysticks.h; sourceTree = "<group>"; };
 		B615BFE60B4261E50082D535 /* HIDJoysticks.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = HIDJoysticks.m; path = content_arrays/HIDJoysticks.m; sourceTree = "<group>"; };
+		B6168CE81F0BC0AC008C99E6 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
 		B61700F3163EAF8D00142336 /* PokeMemory.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PokeMemory.xib; sourceTree = "<group>"; };
 		B61700F5163EAFC600142336 /* PokeMemoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PokeMemoryController.h; path = controllers/PokeMemoryController.h; sourceTree = "<group>"; };
 		B61700F6163EAFC600142336 /* PokeMemoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PokeMemoryController.m; path = controllers/PokeMemoryController.m; sourceTree = "<group>"; };
@@ -1328,6 +1330,7 @@
 				B6DCBC14114FA19F00DC9A11 /* tape_accessors.txt */,
 				B6DCBC16114FA1AF00DC9A11 /* snap_accessors.txt */,
 				B6DCBB80114FA0E700DC9A11 /* myglib */,
+				B6168CE81F0BC0AC008C99E6 /* buffer.c */,
 				B6DCBB62114FA0E700DC9A11 /* bzip2.c */,
 				B6DCBB67114FA0E700DC9A11 /* creator.c */,
 				B6DCBB68114FA0E700DC9A11 /* crypto.c */,
@@ -1934,6 +1937,7 @@
 				B684A1A20E93A8FC00A5B097 /* file.c in Sources */,
 				B69D8D501D6B388A0031BAFC /* trdos.c in Sources */,
 				B6374FA50F178298003CE6E2 /* timer.c in Sources */,
+				B6168CE91F0BC0AC008C99E6 /* buffer.c in Sources */,
 				B64BD10C0FF6EE4E000B82AE /* timer.c in Sources */,
 				B64BD1140FF6EE77000B82AE /* dir.c in Sources */,
 				B64BD1170FF6EEB6000B82AE /* melodik.c in Sources */,
