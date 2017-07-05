@@ -48,6 +48,8 @@ MENU|SHORTCUT|DESCRIPTION
 *Media > Tape > Rewind*||Rewind the current virtual tape, so it can be read again from the beginning.
 *Media > Tape > Close*||Close the current virtual tape file. This is particularly useful when you want a 'clean slate' to add newly-saved files to, before doing *Tape, Save As…*
 *Media > Tape > Save As…*||Write the current virtual-tape contents to a TZX file. The virtual-tape contents are the contents of the previously-loaded tape (if any has been loaded since you last did a Tape, Close), followed by anything you've saved from the emulated machine since. These newly-saved files are not written to any tape file until you choose this option!
+*Media > Tape > Record*||Starts directly recording the output from the emulated Spectrum to the current virtual-tape. This is useful when you want to record using a non-standard ROM or from a custom save routine. Most tape operations are disabled during recording. Stop recording with the *Media > Tape > Stop Recording* menu option.
+*Media > Tape > Stop Recording*||Stops the direct recording and places the new recording into the virtual-tape.
 *Media > Microdrive*||Virtual Microdrive images are accessible only when the Interface I is active from the [Preferences > Peripherals](peripherals.html) menu. Note that any changes to the Microdrive image will not be written to the file on disk until the appropriate 'eject and write' option is used. Each Microdrive cartridge has it's own version of the following menus:
 *Media > Microdrive 1 > Insert New*||Insert a new (unformatted) Microdrive cartridge into emulated Microdrive 1.
 *Media > Microdrive 1 > Insert…*||Select a Microdrive cartridge image file to read/write into emulated Microdrive 1.
@@ -77,4 +79,4 @@ MENU|SHORTCUT|DESCRIPTION
 *Media > IDE Master > Eject*||Eject the virtual hard disk from the current IDE interface's master channel. Note that any writes to the virtual hard disk will be lost unless the *Media > IDE Master > Commit* option is used before the disk is ejected.
 *Media > IDE Slave > Insert…*||The same as the *Media > IDE Master* entries above, but for the current IDE interface's slave channel.
 *Media > IDE Slave > Commit*||The same as the *Media > IDE Master* entries above, but for the current IDE interface's slave channel.
-*Media > IDE Slave > Eject*||The same as the Media, IDE Master entries above, but for the current IDE interface's slave channel.
+*Media > IDE Slave > Eject*||The same as the *Media > IDE Master* entries above, but for the current IDE interface's slave channel.
