@@ -38,6 +38,7 @@
 #include "menu.h"
 #include "movie.h"
 #include "peripherals/disk/didaktik.h"
+#include "peripherals/multiface.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -846,5 +847,9 @@ static Emulator *instance = nil;
   event_add( 0, z80_nmi_event );
 }
 
+-(void) multifaceRedButton
+{
+  multiface_red_button();
+}
 
 @end

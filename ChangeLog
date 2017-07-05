@@ -1,3 +1,24 @@
+2017-07-02  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.7 released.
+
+        * New features:
+          * Add Multiface One/128/3 interface emulation (Gergely Szasz and
+            Sergio Baldoví).
+
+        * Machine specific improvements:
+          * Restore +2A/+3 ALL_RAM mode from snapshots (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * SDL: Hide cursor when UI runs on a console (Raspberry Pi) (Sergio
+            Baldoví).
+          * Switch to using autoreconf (Fredrick Meunier).
+          * Use silent builds by default when available (Fredrick Meunier).
+          * Use explicit AM_SILENT_RULES macro as libspectrum does (Sergio
+            Baldoví).
+          * AC_PROG_RANLIB is rendered obsolete by LT_INIT (Sergio Baldoví).
+          * Remove unnecessary include glib.h (Sergio Baldoví).
+
 2017-06-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.6 released.

@@ -180,5 +180,7 @@
 
 -(void) didaktik80Snap;
 
+-(void) multifaceRedButton;
+
 @property (getter=isEmulating,readonly) BOOL isEmulating;
 @end

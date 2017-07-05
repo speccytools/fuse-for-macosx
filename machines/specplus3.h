@@ -45,6 +45,8 @@ int specplus3_shutdown( void );
 
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );
+void specplus3_memoryport2_write_internal( libspectrum_word port,
+                                           libspectrum_byte b );
 
 libspectrum_byte specplus3_fdc_status( libspectrum_word port, libspectrum_byte *attached );
 libspectrum_byte specplus3_fdc_read( libspectrum_word port, libspectrum_byte *attached );

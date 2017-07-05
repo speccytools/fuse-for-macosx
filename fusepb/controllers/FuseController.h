@@ -142,6 +142,7 @@
 - (IBAction)movie_pause:(id)sender;
 - (IBAction)movie_stop:(id)sender;
 - (IBAction)didaktik80_snap:(id)sender;
+- (IBAction)multiface_red_button:(id)sender;
 
 - (IBAction)quit:(id)sender;
 - (IBAction)hide:(id)sender;

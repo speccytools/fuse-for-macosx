@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2657" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -271,6 +271,12 @@
                                     <action selector="nmi:" target="346" id="460"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Multiface Red Button" tag="175" id="ncw-iv-4qT">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="multiface_red_button:" target="-1" id="mhc-RW-iXN"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Didaktik SNAP" tag="174" id="pU6-Mj-mxj">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -315,6 +321,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="qPY-gL-QTK"/>
                             <menuItem title="Bind Keys to Joystick" keyEquivalent="j" id="965">
                                 <connections>
                                     <action selector="joystick_keyboard:" target="346" id="967"/>

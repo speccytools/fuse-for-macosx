@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -478,15 +478,15 @@
             </subviews>
             <point key="canvasLocation" x="132" y="885"/>
         </customView>
-        <customView id="1432" userLabel="Peripherals">
-            <rect key="frame" x="0.0" y="0.0" width="627" height="472"/>
+        <customView misplaced="YES" id="1432" userLabel="Peripherals">
+            <rect key="frame" x="0.0" y="0.0" width="637" height="472"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="External sound interface" id="1833">
-                    <rect key="frame" x="398" y="312" width="212" height="140"/>
+                    <rect key="frame" x="398" y="312" width="222" height="140"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="3G9-p5-WYZ">
-                        <rect key="frame" x="1" y="1" width="210" height="124"/>
+                        <rect key="frame" x="1" y="1" width="220" height="124"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="1836">
@@ -762,35 +762,13 @@
                         </subviews>
                     </view>
                 </box>
-                <box title="Printers" id="1433">
-                    <rect key="frame" x="17" y="16" width="591" height="134"/>
+                <box misplaced="YES" title="Printers" id="1433">
+                    <rect key="frame" x="17" y="16" width="603" height="134"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <view key="contentView" id="ojx-X9-Ioy">
-                        <rect key="frame" x="2" y="2" width="587" height="117"/>
+                        <rect key="frame" x="2" y="2" width="599" height="117"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button verticalHuggingPriority="750" tag="1" id="1466">
-                                <rect key="frame" x="476" y="6" width="100" height="32"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" tag="1" inset="2" id="1467">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="chooseFile:" target="-2" id="1487"/>
-                                </connections>
-                            </button>
-                            <button verticalHuggingPriority="750" id="1465">
-                                <rect key="frame" x="476" y="36" width="100" height="32"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1468">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="chooseFile:" target="-2" id="1486"/>
-                                </connections>
-                            </button>
                             <button id="1463">
                                 <rect key="frame" x="18" y="91" width="138" height="18"/>
                                 <autoresizingMask key="autoresizingMask"/>
@@ -831,8 +809,8 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="LuR-Lj-xFi">
-                                <rect key="frame" x="157" y="44" width="317" height="22"/>
+                            <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="LuR-Lj-xFi">
+                                <rect key="frame" x="157" y="44" width="326" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="xTs-kP-Vfd">
                                     <font key="font" metaFont="system"/>
@@ -843,8 +821,8 @@
                                     <binding destination="270" name="value" keyPath="values.graphicsfile" id="kps-HD-1Jz"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="YFe-FE-BDr">
-                                <rect key="frame" x="157" y="14" width="317" height="22"/>
+                            <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="YFe-FE-BDr">
+                                <rect key="frame" x="157" y="14" width="326" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="y2D-9H-b0V">
                                     <font key="font" metaFont="system"/>
@@ -855,11 +833,87 @@
                                     <binding destination="270" name="value" keyPath="values.textfile" id="k3o-QR-kcC"/>
                                 </connections>
                             </textField>
+                            <button verticalHuggingPriority="750" misplaced="YES" tag="1" id="1466">
+                                <rect key="frame" x="485" y="6" width="100" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" tag="1" inset="2" id="1467">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chooseFile:" target="-2" id="1487"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" misplaced="YES" id="1465">
+                                <rect key="frame" x="485" y="36" width="100" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1468">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chooseFile:" target="-2" id="1486"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                </box>
+                <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Romantic Robot Multiface" id="6eE-xu-7vV">
+                    <rect key="frame" x="398" y="154" width="222" height="150"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <view key="contentView" id="4mh-bA-ptt">
+                        <rect key="frame" x="1" y="1" width="220" height="134"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button misplaced="YES" id="PpX-At-ePd">
+                                <rect key="frame" x="18" y="86" width="191" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Multiface One Stealth Mode" bezelStyle="regularSquare" imagePosition="left" inset="2" id="e65-Hx-R93">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.multiface1stealth" id="Ied-8R-8Pm"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="FqM-mt-oZY">
+                                <rect key="frame" x="18" y="106" width="107" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Multiface One" bezelStyle="regularSquare" imagePosition="left" inset="2" id="q14-DC-VBz">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.multiface1" id="B5O-Lb-mKH"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="s4Z-DD-Fkj">
+                                <rect key="frame" x="18" y="66" width="104" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Multiface 128" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Jck-W8-hfI">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.multiface128" id="O4f-bi-2x9"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="thB-vf-OT8">
+                                <rect key="frame" x="18" y="46" width="90" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Multiface 3" bezelStyle="regularSquare" imagePosition="left" inset="2" id="WJE-Cw-4V7">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.multiface3" id="2Pr-4B-J3Q"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                 </box>
             </subviews>
-            <point key="canvasLocation" x="325.5" y="-570"/>
+            <point key="canvasLocation" x="330.5" y="-570"/>
         </customView>
         <customView id="1488" userLabel="RZX">
             <rect key="frame" x="0.0" y="0.0" width="627" height="146"/>

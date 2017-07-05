@@ -119,6 +119,7 @@ static int movieRecord = 1;
 static int movieRecordFromSnapshot = 1;
 static int movieStop = 0;
 static int moviePause = 0;
+static int multiface = 0;
 static int recordPsg = 1;
 static int stopPsg = 0;
 static int ideDivideEjectMaster = 0;
@@ -1103,6 +1104,11 @@ save_as_exit:
   [[DisplayOpenGLView instance] didaktik80Snap];
 }
 
+- (IBAction)multiface_red_button:(id)sender
+{
+  [[DisplayOpenGLView instance] multifaceRedButton];
+}
+
 - (IBAction)quit:(id)sender
 {
   if( !settings_current.full_screen ) {
@@ -1920,6 +1926,11 @@ save_as_exit:
   didaktik80Snap = [active boolValue];
 }
 
+- (void)ui_menu_activate_multiface:(NSNumber*)active
+{
+  multiface = [active boolValue];
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
   switch( [menuItem tag] ) {
@@ -2067,6 +2078,9 @@ save_as_exit:
     break;
   case 174:
     return didaktik80Snap == 0 ? NO : YES;
+    break;
+  case 175:
+    return multiface == 0 ? NO : YES;
     break;
   default:
     return YES;
@@ -3193,11 +3207,15 @@ ui_menu_activate( ui_menu_item item, int active )
     
   case UI_MENU_ITEM_FILE_SVG_CAPTURE:
     break;
-      
+
   case UI_MENU_ITEM_MACHINE_DIDAKTIK80_SNAP:
     method = @selector(ui_menu_activate_didaktik80_snap:);
     break;
 
+  case UI_MENU_ITEM_MACHINE_MULTIFACE:
+    method = @selector(ui_menu_activate_multiface:);
+    break;
+      
   default:
     ui_error( UI_ERROR_ERROR, "Attempt to activate unknown menu item %d",
               item );

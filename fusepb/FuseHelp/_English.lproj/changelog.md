@@ -3,10 +3,27 @@ title: What's New In Fuse?
 description: This section describes the changes for version 1.3.6 of the Fuse emulator.
 ---
 
+## What's new in Fuse for macOS 1.3.7
+
+### New features:
+* Add Multiface One/128/3 interface emulation (Gergely Szasz and Sergio
+  Baldoví).
+
+### Machine specific improvements:
+* Restore +2A/+3 ALL_RAM mode from snapshots (Sergio Baldoví).
+
+### Miscellaneous improvements:
+* Fix crash when saving CSW tapes (thanks, Nicholas Naime and Fredrick Meunier)
+  (Sergio Baldoví).
+
+### Various other minor bugfixes.
+
 ## What's new in Fuse for macOS 1.3.6
 
-### Emulation core improvements:
+### New features:
 * Add Covox interface emulation (Fredrick Meunier).
+
+### Emulation core improvements:
 * Disable accelerate loader while recording RZX files (thanks, windale) (Sergio
   Baldoví).
 * Fix releasing captured Kempston mouse (thanks, Robert Uttley) (Fredrick

@@ -1,10 +1,10 @@
 ---
 title: Spotlight Importer
-description: This section describes Fuses support of the Spotlight feature of Mac OS X 10.4 and newer.
+description: This section describes Fuses support of the Spotlight feature of macOSX 10.4 and newer.
 order: 240
 ---
 
-On Mac OS X 10.4 and newer, the Fuse Spotlight importer allows Spotlight to find
+On macOSX 10.4 and newer, the Fuse Spotlight importer allows Spotlight to find
 ZX Spectrum emulation related files based on metadata in the files. The metadata
 supported is:
 

@@ -156,6 +156,8 @@
 
 -(void) didaktik80Snap;
 
+-(void) multifaceRedButton;
+
 -(void) if1MdrNew:(int)drive;
 -(void) if1MdrInsert:(const char *)filename inDrive:(int)drive;
 -(void) if1MdrCartEject:(int)drive;

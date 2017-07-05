@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2016 Philip Kendall and others
+   Copyright (c) 1999-2017 Philip Kendall and others
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@
 #include "peripherals/if2.h"
 #include "peripherals/kempmouse.h"
 #include "peripherals/melodik.h"
+#include "peripherals/multiface.h"
 #include "peripherals/printer.h"
 #include "peripherals/scld.h"
 #include "peripherals/speccyboot.h"
@@ -301,6 +302,7 @@ run_startup_manager( int *argc, char ***argv )
   melodik_register_startup();
   memory_register_startup();
   mempool_register_startup();
+  multiface_register_startup();
   opus_register_startup();
   plusd_register_startup();
   printer_register_startup();

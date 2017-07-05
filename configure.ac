@@ -19,12 +19,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.3.6])
+m4_define([fuse_version], [1.3.7])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
 m4_define([fuse_minor_version], [3])
-m4_define([fuse_micro_version], [6])
+m4_define([fuse_micro_version], [7])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
@@ -41,8 +41,8 @@ AC_CONFIG_HEADERS(config.h)
 AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE([foreign subdir-objects -Wall])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+AM_INIT_AUTOMAKE([1.11 foreign subdir-objects -Wall])
+AM_SILENT_RULES([yes])
 
 dnl Substitutions for .in files
 FUSE_FULL_VERSION=fuse_full_version
@@ -60,7 +60,6 @@ AC_DEFINE([FUSE_COPYRIGHT], [fuse_copyright], [Define copyright of Fuse])
 dnl Checks for programs.
 AC_PROG_CC
 AM_PROG_CC_C_O
-AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 AM_PROG_LEX

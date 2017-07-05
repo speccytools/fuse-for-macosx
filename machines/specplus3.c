@@ -288,12 +288,9 @@ select_special_map( int page1, int page2, int page3, int page4 )
 }
 
 void
-specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
-			     libspectrum_byte b )
+specplus3_memoryport2_write_internal( libspectrum_word port GCC_UNUSED,
+                                      libspectrum_byte b )
 {
-  /* Do nothing else if we've locked the RAM configuration */
-  if( machine_current->ram.locked ) return;
-
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x10 );
 
@@ -310,6 +307,15 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
   machine_current->ram.last_byte2 = b;
 
   machine_current->memory_map();
+}
+
+void
+specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b )
+{
+  /* Do nothing else if we've locked the RAM configuration */
+  if( machine_current->ram.locked ) return;
+
+  specplus3_memoryport2_write_internal( port, b );
 }
 
 int

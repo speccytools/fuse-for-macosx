@@ -903,6 +903,11 @@ static DisplayOpenGLView *instance = nil;
   [proxy_emulator didaktik80Snap];
 }
 
+-(void) multifaceRedButton
+{
+  [proxy_emulator multifaceRedButton];
+}
+
 -(void) if1MdrNew:(int)drive
 {
   [proxy_emulator if1MdrNew:drive];

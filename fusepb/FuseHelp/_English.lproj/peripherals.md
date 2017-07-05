@@ -24,7 +24,7 @@ OPTION | DESCRIPTION
 *DISCiPLE* | If this option is selected, Fuse will emulate the DISCiPLE interface, which provides both a floppy drive and a printer interface. See the [DISCiPLE Emulation](disciple.html) section for more details.
 *Spectranet* | If this option is selected, Fuse will emulate the Spectranet interface, which provides an ethernet interface for the Spectrum. See the [Spectranet Emulation](spectranet.html) section for more details.
 *Didaktik 80 interface* | If this option is selected, Fuse will emulate the Didaktik 80 (or Didaktik 40) interface.  See the [Didaktik 80 Emulation](didaktik80.html) section for more details.
-*Currah µSource* | If this option is selected, Fuse will emulate a Currah µSource interface. See the [World of Spectrum Infoseek web page](http://www.worldofspectrum.org/infoseekid.cgi?id=1000080) for the manual. The required ROM file is not supplied with Fuse for Mac OS X and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named usource.rom and placed in the Fuse packages Contents/Resources directory.
+*Currah µSource* | If this option is selected, Fuse will emulate a Currah µSource interface. See the [World of Spectrum Infoseek web page](http://www.worldofspectrum.org/infoseekid.cgi?id=1000080) for the manual. The required ROM file is not supplied with Fuse for macOSX and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named usource.rom and placed in the Fuse packages Contents/Resources directory.
 
 <br>
 ### +3 options
@@ -110,3 +110,13 @@ OPTION | DESCRIPTION
 *Melodik* | If this option is selected, Fuse will emulate a Melodik AY sound interface. These interfaces and many similar ones were produced to make the 48K Spectrum compatible with the same AY music as the 128K Spectrum. This emulation is only  available  for  the  16k,  48k  and  TC2048 machines.
 *SpecDrum* | If this option is selected, Fuse will emulate a Cheetah SpecDrum sound interface.  See the [World of Spectrum Infoseek web page](http://www.worldofspectrum.org/infoseekid.cgi?id=1000062) for manuals, software and more. This emulation is only available for the 48k, 128k and TC2048 machines.
 *Covox* | If this option is selected, Fuse will emulate a Covox digital sound interface. This emulation is only available for the Pentagon, Pentagon 512k, Pentagon 1024k and Scorpion machines. The Pentagon variants use port 0xfb and the Scorpion version uses port 0xdd.
+
+<br>
+### Romantic Robot Multiface options
+
+OPTION | DESCRIPTION
+:--- | :---
+*Multiface One* | If this option is selected, Fuse will emulate the Multiface One. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+*Multiface One Stealth Mode* | This option controls the 'invisible' or 'stealth' mode of Multiface One, as the physical switch on the side of the interface.
+*Multiface 128* | If this option is selected, Fuse will emulate the Multiface 128. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+*Multiface 3* | If this option is selected, Fuse will emulate the Multiface 3. Available for +2A, +3 and +3e machines. 
