@@ -16,7 +16,8 @@
                 <outlet property="machinePrefsView" destination="1686" id="1776"/>
                 <outlet property="machineRomsController" destination="533" id="991"/>
                 <outlet property="massStorageType" destination="1446" id="1781"/>
-                <outlet property="peripheralsPrefsView" destination="1432" id="1777"/>
+                <outlet property="multifaceType" destination="Ed3-I0-kNs" id="7IJ-rT-6Hg"/>
+                <outlet property="peripheralsPrefsView" destination="1432" id="PWK-Rn-Ckh"/>
                 <outlet property="rom0Filename" destination="1628" id="1782"/>
                 <outlet property="rom1Filename" destination="1627" id="1783"/>
                 <outlet property="rom2Filename" destination="1629" id="1784"/>
@@ -33,11 +34,11 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5" userLabel="Preferences" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="24" y="202" width="627" height="403"/>
+            <rect key="contentRect" x="24" y="202" width="632" height="403"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <value key="minSize" type="size" width="213" height="107"/>
-            <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="627" height="403"/>
+            <view key="contentView" misplaced="YES" id="6">
+                <rect key="frame" x="0.0" y="0.0" width="632" height="403"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
             <toolbar key="toolbar" implicitIdentifier="2B5EC7EB-5A6C-4F96-8405-91E5B21A019C" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="1279">
@@ -101,6 +102,7 @@
                 <outlet property="delegate" destination="-2" id="504"/>
                 <outlet property="initialFirstResponder" destination="6" id="1305"/>
             </connections>
+            <point key="canvasLocation" x="-560" y="133.5"/>
         </window>
         <customView id="1347" userLabel="General">
             <rect key="frame" x="0.0" y="0.0" width="627" height="265"/>
@@ -865,48 +867,58 @@
                         <rect key="frame" x="1" y="1" width="220" height="134"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button misplaced="YES" id="PpX-At-ePd">
-                                <rect key="frame" x="18" y="86" width="191" height="18"/>
+                            <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="Ed3-I0-kNs">
+                                <rect key="frame" x="20" y="44" width="117" height="78"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Multiface One Stealth Mode" bezelStyle="regularSquare" imagePosition="left" inset="2" id="e65-Hx-R93">
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="117" height="18"/>
+                                <size key="intercellSpacing" width="4" height="2"/>
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="h7t-n5-uzw">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <cells>
+                                    <column>
+                                        <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" inset="2" id="6Tg-ch-EUi">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="multifaceTypeClicked:" target="-2" id="Z6E-2l-Ffe"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Multiface One" imagePosition="left" alignment="left" tag="1" inset="2" id="Ugs-VI-8w0">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="multifaceTypeClicked:" target="-2" id="nWg-wA-gfQ"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Multiface 128" imagePosition="left" alignment="left" tag="2" inset="2" id="OKv-Xl-0vR">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="multifaceTypeClicked:" target="-2" id="0c6-ts-WJX"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Multiface 3" imagePosition="left" alignment="left" tag="3" inset="2" id="GO6-uk-yd6">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="multifaceTypeClicked:" target="-2" id="1ea-US-H6Q"/>
+                                            </connections>
+                                        </buttonCell>
+                                    </column>
+                                </cells>
+                            </matrix>
+                            <button misplaced="YES" id="PpX-At-ePd">
+                                <rect key="frame" x="21" y="20" width="151" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Multiface One stealth" bezelStyle="regularSquare" imagePosition="left" alignment="center" inset="2" id="e65-Hx-R93">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <binding destination="270" name="value" keyPath="values.multiface1stealth" id="Ied-8R-8Pm"/>
-                                </connections>
-                            </button>
-                            <button misplaced="YES" id="FqM-mt-oZY">
-                                <rect key="frame" x="18" y="106" width="107" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Multiface One" bezelStyle="regularSquare" imagePosition="left" inset="2" id="q14-DC-VBz">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.multiface1" id="B5O-Lb-mKH"/>
-                                </connections>
-                            </button>
-                            <button misplaced="YES" id="s4Z-DD-Fkj">
-                                <rect key="frame" x="18" y="66" width="104" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Multiface 128" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Jck-W8-hfI">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.multiface128" id="O4f-bi-2x9"/>
-                                </connections>
-                            </button>
-                            <button misplaced="YES" id="thB-vf-OT8">
-                                <rect key="frame" x="18" y="46" width="90" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Multiface 3" bezelStyle="regularSquare" imagePosition="left" inset="2" id="WJE-Cw-4V7">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.multiface3" id="2Pr-4B-J3Q"/>
                                 </connections>
                             </button>
                         </subviews>

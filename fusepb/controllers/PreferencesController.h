@@ -36,6 +36,7 @@
   IBOutlet NSArrayController *machineRomsController;
   IBOutlet NSMatrix *massStorageType;
   IBOutlet NSMatrix *externalSoundType;
+  IBOutlet NSMatrix *multifaceType;
   IBOutlet NSTabView *tabView;
   IBOutlet NSToolbar *toolbar;
   IBOutlet NSView *generalPrefsView;
@@ -71,6 +72,7 @@
 - (IBAction)resetUserDefaults:(id)sender;
 - (IBAction)massStorageTypeClicked:(id)sender;
 - (IBAction)externalSoundTypeClicked:(id)sender;
+- (IBAction)multifaceTypeClicked:(id)sender;
 - (IBAction)selectPrefPanel:(id)item;
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)bar;
 - (void)setMassStorageType;

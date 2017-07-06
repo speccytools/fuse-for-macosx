@@ -116,7 +116,7 @@ OPTION | DESCRIPTION
 
 OPTION | DESCRIPTION
 :--- | :---
-*Multiface One* | If this option is selected, Fuse will emulate the Multiface One. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
-*Multiface One Stealth Mode* | This option controls the 'invisible' or 'stealth' mode of Multiface One, as the physical switch on the side of the interface.
-*Multiface 128* | If this option is selected, Fuse will emulate the Multiface 128. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
-*Multiface 3* | If this option is selected, Fuse will emulate the Multiface 3. Available for +2A, +3 and +3e machines. 
+*Multiface One* | If this option is selected, Fuse will emulate the Multiface One. Available for 16K, 48K and Timex TC2048 machines. The required ROM file is not supplied with Fuse for macOSX and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named mf1.rom and placed in the Fuse packages Contents/Resources directory.
+*Multiface 128* | If this option is selected, Fuse will emulate the Multiface 128. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines. The required ROM file is not supplied with Fuse for macOSX and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named mf128.rom and placed in the Fuse packages Contents/Resources directory.
+*Multiface 3* | If this option is selected, Fuse will emulate the Multiface 3. Available for +2A, +3 and +3e machines. The required ROM file is not supplied with Fuse for macOSX and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named mf3.rom and placed in the Fuse packages Contents/Resources directory.
+*Multiface One Stealth* | This option controls the 'invisible' or 'stealth' mode of Multiface One, as the physical switch on the side of the interface.

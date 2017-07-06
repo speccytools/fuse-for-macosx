@@ -453,6 +453,38 @@
   [currentValues synchronize];
 }
 
+- (IBAction)multifaceTypeClicked:(id)sender
+{
+  NSUserDefaults *currentValues = [NSUserDefaults standardUserDefaults];
+
+  settings_current.multiface1 = 0;
+  settings_current.multiface128 = 0;
+  settings_current.multiface3 = 0;
+
+  // Read external sound interface type box and set text boxes appropriately
+  switch( [[multifaceType selectedCell] tag] ) {
+    case 0: // None
+      break;
+    case 1: // Multiface One
+      settings_current.multiface1 = 1;
+      break;
+    case 2: // Multiface 128
+      settings_current.multiface128 = 1;
+      break;
+    case 3: // Multiface 3
+      settings_current.multiface3 = 1;
+      break;
+    default: // WTF?
+      break;
+  }
+
+  [self setCurrentValue:settings_current.multiface1 forKey:@"multiface1" inValues:currentValues];
+  [self setCurrentValue:settings_current.multiface128 forKey:@"multiface128" inValues:currentValues];
+  [self setCurrentValue:settings_current.multiface3 forKey:@"multiface3" inValues:currentValues];
+
+  [currentValues synchronize];
+}
+
 - (IBAction)selectPrefPanel:(id)item
 {
   NSString *sender;
