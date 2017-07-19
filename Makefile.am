@@ -57,7 +57,7 @@ fuse_SOURCES = display.c \
 
 fuse_LDADD = \
              $(PTHREAD_LIBS) \
-             $(LIBSPEC_LIBS) \
+             $(LIBSPECTRUM_LIBS) \
              $(GTK_LIBS) \
              $(GLIB_LIBS) \
              $(PNG_LIBS) \
@@ -83,7 +83,7 @@ options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@OPTIONS_DIR@/option
 AM_CPPFLAGS = \
               $(GLIB_CFLAGS) \
               $(GTK_CFLAGS) \
-              $(LIBSPEC_CFLAGS) \
+              $(LIBSPECTRUM_CFLAGS) \
               $(XML_CFLAGS) \
               -DFUSEDATADIR="\"${pkgdatadir}\"" \
               $(SDL_CFLAGS) \
@@ -157,7 +157,7 @@ fuse_LDADD += windres.o
 fuse_DEPENDENCIES += windres.o
 
 windres.o: windres.rc data/win32/winfuse.ico data/win32/fuse.manifest $(ui_win32_res)
-	$(AM_V_GEN)$(WINDRES) -I$(srcdir) -I. $(srcdir)/windres.rc $(LIBSPEC_CFLAGS) $(CPPFLAGS) windres.o
+	$(AM_V_GEN)$(WINDRES) -I$(srcdir) -I. $(srcdir)/windres.rc $(LIBSPECTRUM_CFLAGS) $(CPPFLAGS) windres.o
 
 endif
 
