@@ -113,39 +113,13 @@ if test "$prefix" != "NONE"; then
   CPPFLAGS="$CPPFLAGS -I$prefix/include"; LDFLAGS="$LDFLAGS -L$prefix/lib"
 fi)
 
-dnl Check that libspectrum is available
-AC_ARG_WITH(libspectrum-prefix,
-[  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
-LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
-LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS $GLIB_CFLAGS"
-AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum",
-	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
-CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(LIBSPEC_CFLAGS)
-AC_SUBST(LIBSPEC_LIBS)
-
-dnl Check that libspectrum is new enough
-AC_MSG_CHECKING(whether libspectrum is new enough)
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
-AC_COMPILE_IFELSE(
-  [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
-    [[
-      int test = LIBSPECTRUM_HAS_GLIB_REPLACEMENT;
-    ]])
-  ],
-  [AC_MSG_RESULT(yes)],
-  [AC_MSG_RESULT(no)
-   AC_MSG_ERROR(Sorry - I need a newer libspectrum)]
-)
-CPPFLAGS="$ac_save_CPPFLAGS"
+dnl Check that libspectrum is available and that it is new enough
+PKG_CHECK_MODULES([LIBSPECTRUM], [libspectrum >= 1.3.5])
 
 dnl Check if supplied libspectrum has its own internal GLib replacement
 AC_MSG_CHECKING(whether libspectrum has its own internal GLib replacement)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_PREPROC_IFELSE(
   [AC_LANG_SOURCE([
 #include <libspectrum.h>
@@ -172,7 +146,7 @@ AS_IF([test "$fakeglib" = no], [
 dnl Check if supplied libspectrum has support for compressed szx files
 AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
     [[
