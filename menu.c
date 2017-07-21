@@ -1,11 +1,6 @@
 /* menu.c: general menu callbacks
-   Copyright (c) 2004-2013 Philip Kendall
-   Copyright (c) 2013 Alex Badea
-   Copyright (c) 2014-2015 Sergio Baldoví
-   Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015-2017 Gergely Szasz
-   Copyright (c) 2015 Stefano Bodrato
-   Copyright (c) 2017 Fredrick Meunier
+   Copyright (c) 2004-2017 Philip Kendall, Alex Badea, Sergio Baldoví,
+     Stuart Brady, Gergely Szasz, Stefano Bodrato, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,6 +38,7 @@
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
+#include "peripherals/ide/divmmc.h"
 #include "peripherals/ide/simpleide.h"
 #include "peripherals/ide/zxatasp.h"
 #include "peripherals/ide/zxcf.h"
@@ -629,6 +625,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
   case 5: zxcf_insert( filename ); break;
   case 6: divide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 8: divmmc_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
+  case 9: divmmc_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   libspectrum_free( filename );
@@ -648,6 +646,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit )
   case 5: zxcf_commit(); break;
   case 6: divide_commit( LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 8: divmmc_commit( LIBSPECTRUM_IDE_MASTER ); break;
+  case 9: divmmc_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   fuse_emulation_unpause();
@@ -667,6 +667,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
   case 5: zxcf_eject(); break;
   case 6: divide_eject( LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 8: divmmc_eject( LIBSPECTRUM_IDE_MASTER ); break;
+  case 9: divmmc_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   fuse_emulation_unpause();
@@ -1015,6 +1017,16 @@ menu_check_media_changed( void )
 
   if( settings_current.divide_slave_file ) {
     confirm = divide_eject( LIBSPECTRUM_IDE_SLAVE );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.divmmc_master_file ) {
+    confirm = divmmc_eject( LIBSPECTRUM_IDE_MASTER );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.divmmc_slave_file ) {
+    confirm = divmmc_eject( LIBSPECTRUM_IDE_SLAVE );
     if( confirm ) return 1;
   }
 

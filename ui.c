@@ -631,6 +631,16 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/IDE/DivIDE/Slave/Commit",
     "/Media/IDE/DivIDE/Slave/Eject", 0 },
 
+  { UI_MENU_ITEM_MEDIA_IDE_DIVMMC, "/Media/IDE/DivMMC" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
+    "/Media/IDE/DivMMC/Master/Commit",
+    "/Media/IDE/DivMMC/Master/Eject", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT,
+    "/Media/IDE/DivMMC/Slave/Commit",
+    "/Media/IDE/DivMMC/Slave/Eject", 0 },
+
   { UI_MENU_ITEM_RECORDING,
     "/File/Recording/Stop", 
     "/File/Recording/Record...", 1,

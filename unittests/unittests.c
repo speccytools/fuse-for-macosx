@@ -36,6 +36,7 @@
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
+#include "peripherals/ide/divmmc.h"
 #include "peripherals/ide/zxatasp.h"
 #include "peripherals/ide/zxcf.h"
 #include "peripherals/if1.h"
@@ -765,6 +766,7 @@ paging_test( void )
     r += plusd_unittest();
 
     r += divide_unittest();
+    r += divmmc_unittest();
     r += zxatasp_unittest();
     r += zxcf_unittest();
   }

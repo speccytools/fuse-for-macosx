@@ -44,6 +44,7 @@ typedef enum periph_type {
   PERIPH_TYPE_COVOX_DD,       /* Covox interface on port #dd */
   PERIPH_TYPE_COVOX_FB,       /* Covox interface on port #fb */
   PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
+  PERIPH_TYPE_DIVMMC,         /* DivMMC interface */
   PERIPH_TYPE_PLUSD,          /* +D disk interface */
   PERIPH_TYPE_DIDAKTIK80,     /* Didaktik 40/80 disk interface */
   PERIPH_TYPE_DISCIPLE,       /* DISCiPLE disk interface */

@@ -52,6 +52,7 @@ fuse_SOURCES += \
                 peripherals/disk/upd_fdc.c \
                 peripherals/disk/wd_fdc.c \
                 peripherals/ide/divide.c \
+                peripherals/ide/divmmc.c \
                 peripherals/ide/ide.c \
                 peripherals/ide/simpleide.c \
                 peripherals/ide/zxatasp.c \
@@ -98,6 +99,7 @@ noinst_HEADERS += \
                   peripherals/disk/upd_fdc.h \
                   peripherals/disk/wd_fdc.h \
                   peripherals/ide/divide.h \
+                  peripherals/ide/divmmc.h \
                   peripherals/ide/ide.h \
                   peripherals/ide/simpleide.h \
                   peripherals/ide/zxatasp.h \
