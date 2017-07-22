@@ -499,7 +499,7 @@ multiface_red_button( void )
 /*
   One RED button for all ;-)
 */
-  for( i = MF_1; i <= MF_3; i++ ) {
+  for( i = MF_3; i >= MF_1; i-- ) {
     if( !IS( multiface_available, i ) || mf[i].IC8b_Q == 0 ) continue;
 
     /* Note: AFAIK the Multiface One schematics show that the physical switch
@@ -513,6 +513,7 @@ multiface_red_button( void )
     mf[i].IC8b_Q = 0;
     SET( multiface_activated, i, 1 );
     event_add( 0, z80_nmi_event );	/* pull /NMI */
+    break;
   }
 }
 
@@ -523,12 +524,13 @@ multiface_setic8( void )
 /*
   activate all at once...
 */
-  for( i = MF_1; i <= MF_3; i++ ) {
+  for( i = MF_3; i >= MF_1; i-- ) {
     if( !IS( multiface_available, i ) || mf[i].IC8b_Q == 1 ) continue;
 
     mf[i].IC8a_Q = 0;
     SET( multiface_activated, i, 0 );
     multiface_page( i );
+    break;
   }
 }
 
