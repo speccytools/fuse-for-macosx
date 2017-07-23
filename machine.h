@@ -76,7 +76,7 @@ typedef struct fuse_machine_info {
 						  from a port which isn't
 						  attached to anything */
 
-  ayinfo ay;		/* The AY-8-3912 chip */
+  ayinfo ay;		/* The AY-3-8912 chip */
 
   specdrum_info specdrum; /* SpecDrum settings */
 
