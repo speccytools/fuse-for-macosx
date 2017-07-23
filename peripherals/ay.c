@@ -1,4 +1,4 @@
-/* ay.c: AY-8-3912 routines
+/* ay.c: AY-3-8912 routines
    Copyright (c) 1999-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
