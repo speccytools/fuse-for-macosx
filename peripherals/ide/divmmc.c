@@ -41,20 +41,21 @@
 
 /* Private function prototypes */
 
-static libspectrum_byte divmmc_ide_read( libspectrum_word port, libspectrum_byte *attached );
-static void divmmc_ide_write( libspectrum_word port, libspectrum_byte data );
 static void divmmc_control_write( libspectrum_word port, libspectrum_byte data );
 static void divmmc_control_write_internal( libspectrum_byte data );
+static void divmmc_card_select( libspectrum_word port, libspectrum_byte data );
+static libspectrum_byte divmmc_mmc_read( libspectrum_word port, libspectrum_byte *attached );
+static void divmmc_mmc_write( libspectrum_word port, libspectrum_byte data );
 static void divmmc_page( void );
 static void divmmc_unpage( void );
-static libspectrum_ide_register port_to_ide_register( libspectrum_byte port );
 static void divmmc_activate( void );
 
 /* Data */
 
 static const periph_port_t divmmc_ports[] = {
-  { 0x00e3, 0x00a3, divmmc_ide_read, divmmc_ide_write },
   { 0x00ff, 0x00e3, NULL, divmmc_control_write },
+  { 0x00ff, 0x00e7, NULL, divmmc_card_select },
+  { 0x00ff, 0x00eb, divmmc_mmc_read, divmmc_mmc_write },
   { 0, 0, NULL, NULL }
 };
 
@@ -80,7 +81,8 @@ static int divmmc_automap = 0;
 static libspectrum_ide_channel *divmmc_idechn0;
 static libspectrum_ide_channel *divmmc_idechn1;
 
-#define DIVMMC_PAGES 4
+/* *Our* DivMMC has 128 Kb of RAM - this is all that ESXDOS needs */
+#define DIVMMC_PAGES 16
 #define DIVMMC_PAGE_LENGTH 0x2000
 static libspectrum_byte *divmmc_ram[ DIVMMC_PAGES ];
 static libspectrum_byte *divmmc_eprom;
@@ -230,50 +232,6 @@ divmmc_eject( libspectrum_ide_unit unit )
 
 /* Port read/writes */
 
-static libspectrum_ide_register
-port_to_ide_register( libspectrum_byte port )
-{
-  switch( port & 0xff ) {
-    case 0xa3:
-      return LIBSPECTRUM_IDE_REGISTER_DATA;
-    case 0xa7:
-      return LIBSPECTRUM_IDE_REGISTER_ERROR_FEATURE;
-    case 0xab:
-      return LIBSPECTRUM_IDE_REGISTER_SECTOR_COUNT;
-    case 0xaf:
-      return LIBSPECTRUM_IDE_REGISTER_SECTOR;
-    case 0xb3:
-      return LIBSPECTRUM_IDE_REGISTER_CYLINDER_LOW;
-    case 0xb7:
-      return LIBSPECTRUM_IDE_REGISTER_CYLINDER_HIGH;
-    case 0xbb:
-      return LIBSPECTRUM_IDE_REGISTER_HEAD_DRIVE;
-    default: /* 0xbf */
-      return LIBSPECTRUM_IDE_REGISTER_COMMAND_STATUS;
-  }
-}
-
-libspectrum_byte
-divmmc_ide_read( libspectrum_word port, libspectrum_byte *attached )
-{
-  int ide_register;
-
-  *attached = 0xff; /* TODO: check this */
-  ide_register = port_to_ide_register( port );
-
-  return libspectrum_ide_read( divmmc_idechn0, ide_register );
-}
-
-static void
-divmmc_ide_write( libspectrum_word port, libspectrum_byte data )
-{
-  int ide_register;
-  
-  ide_register = port_to_ide_register( port );
-  
-  libspectrum_ide_write( divmmc_idechn0, ide_register, data );
-}
-
 static void
 divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
@@ -289,6 +247,25 @@ divmmc_control_write_internal( libspectrum_byte data )
 {
   divmmc_control = data;
   divmmc_refresh_page_state();
+}
+
+static void
+divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
+{
+  /* TODO */
+}
+
+static libspectrum_byte
+divmmc_mmc_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
+{
+  /* TODO */
+  return 0xff;
+}
+
+static void
+divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
+{
+  /* TODO */
 }
 
 void
@@ -515,6 +492,15 @@ divmmc_unittest( void )
   divmmc_control_write( 0x00e3, 0x02 );
   r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_ram, 3 );
   r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 2 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  /* We have only 128 Kb of RAM (16 x 8 Kb pages), so setting all of bits 0-5
+     results in page 15 being selected */
+  divmmc_control_write( 0x00e3, 0x3f );
+  r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_ram, 3 );
+  r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 15 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
