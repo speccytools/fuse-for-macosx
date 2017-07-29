@@ -2055,14 +2055,16 @@ save_as_exit:
   case 152:
   case 153:
   case 154:
-    return diskPlus3EjectA || diskTrdosEjectA || diskPlusDEjectA || diskDiscipleEjectA ? YES : NO;
+    return diskPlus3EjectA || diskTrdosEjectA || diskOpusEjectA ||
+      diskPlusDEjectA || diskDiscipleEjectA || diskDidaktikEjectA ? YES : NO;
     break;
   case 160:
   case 161:
   case 162:
   case 163:
   case 164:
-    return diskPlus3EjectB || diskTrdosEjectB || diskPlusDEjectB || diskDiscipleEjectB ? YES : NO;
+    return diskPlus3EjectB || diskTrdosEjectB || diskOpusEjectB ||
+      diskPlusDEjectB || diskDiscipleEjectB || diskDidaktikEjectB ? YES : NO;
     break;
   case 170:
     return movieRecord == 0 ? NO : YES;
