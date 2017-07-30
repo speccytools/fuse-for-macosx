@@ -78,8 +78,7 @@ static libspectrum_byte divmmc_control;
    flags allowed it */
 static int divmmc_automap = 0;
 
-static libspectrum_ide_channel *divmmc_idechn0;
-static libspectrum_ide_channel *divmmc_idechn1;
+static libspectrum_mmc_card *card;
 
 /* *Our* DivMMC has 128 Kb of RAM - this is all that ESXDOS needs */
 #define DIVMMC_PAGES 16
@@ -117,17 +116,19 @@ static int page_event, unpage_event;
 static int
 divmmc_init( void *context )
 {
-  int error, i, j;
+  int i, j;
 
-  divmmc_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
-  divmmc_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
-  
+  card = libspectrum_mmc_alloc();
+
+  /*
+   TODO
   error = ide_init( divmmc_idechn0,
 		    settings_current.divmmc_master_file,
 		    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
 		    settings_current.divmmc_slave_file,
 		    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT );
   if( error ) return error;
+  */
 
   module_register( &divmmc_module_info );
 
@@ -158,8 +159,7 @@ divmmc_init( void *context )
 static void
 divmmc_end( void )
 {
-  libspectrum_ide_free( divmmc_idechn0 );
-  libspectrum_ide_free( divmmc_idechn1 );
+  libspectrum_mmc_free( card );
 }
 
 void
@@ -194,40 +194,54 @@ divmmc_reset( int hard_reset )
   divmmc_automap = 0;
   divmmc_refresh_page_state();
 
+  /*
+   TODO
   libspectrum_ide_reset( divmmc_idechn0 );
   libspectrum_ide_reset( divmmc_idechn1 );
+  */
 }
 
 int
 divmmc_insert( const char *filename, libspectrum_ide_unit unit )
 {
+  /*
+   TODO
   return ide_master_slave_insert(
     divmmc_idechn0, unit, filename,
     &settings_current.divmmc_master_file,
     UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
     &settings_current.divmmc_slave_file,
     UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT );
+  */
+
+  return 0;
 }
 
 int
 divmmc_commit( libspectrum_ide_unit unit )
 {
-  int error;
-
+  /*
+   TODO
   error = libspectrum_ide_commit( divmmc_idechn0, unit );
+  */
 
-  return error;
+  return 0;
 }
 
 int
 divmmc_eject( libspectrum_ide_unit unit )
 {
+  /*
+   TODO
   return ide_master_slave_eject(
     divmmc_idechn0, unit,
     &settings_current.divmmc_master_file,
     UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
     &settings_current.divmmc_slave_file,
     UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT );
+  */
+
+  return 0;
 }
 
 /* Port read/writes */
@@ -252,7 +266,7 @@ divmmc_control_write_internal( libspectrum_byte data )
 static void
 divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  libspectrum_mmc_card_select( data );
+  libspectrum_mmc_card_select( card, data );
 }
 
 static libspectrum_byte
@@ -260,13 +274,13 @@ divmmc_mmc_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
   *attached = 0xff;
 
-  return libspectrum_mmc_read();
+  return libspectrum_mmc_read( card );
 }
 
 static void
 divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  libspectrum_mmc_write( data );
+  libspectrum_mmc_write( card, data );
 }
 
 void
