@@ -252,20 +252,21 @@ divmmc_control_write_internal( libspectrum_byte data )
 static void
 divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  /* TODO */
+  libspectrum_mmc_card_select( data );
 }
 
 static libspectrum_byte
 divmmc_mmc_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  /* TODO */
-  return 0xff;
+  *attached = 0xff;
+
+  return libspectrum_mmc_read();
 }
 
 static void
 divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  /* TODO */
+  libspectrum_mmc_write( data );
 }
 
 void
