@@ -306,7 +306,8 @@ mark_row( GtkTreeModel *model, int row )
 static void
 browse_done( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  gtk_widget_hide( dialog );
+  dialog_created = 0;
+  gtk_widget_destroy( dialog );
 }
 
 /* Catch attempts to delete the window and just hide it instead */
@@ -314,6 +315,7 @@ static gboolean
 delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
 	       gpointer user_data GCC_UNUSED )
 {
-  gtk_widget_hide( widget );
+  dialog_created = 0;
+  gtk_widget_destroy( dialog );
   return TRUE;
 }
