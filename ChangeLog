@@ -1,3 +1,25 @@
+2017-07-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.8 released.
+
+        * Emulation core improvements:
+          * Add workaround for Multiface One and 128 clash (thanks, Fredrick
+            Meunier) (Sergio Baldoví).
+          * Limit RZX sentinel warning to once per playback (Sergio Baldoví).
+          * Disable Melodik interface on 128K machines (Sergio Baldoví).
+          * Correct the list of machines for Multiface One (Fredrick Meunier).
+
+        * Miscellaneous improvements:
+          * Update compile instructions for win32 UI (Sergio Baldoví).
+          * Check required version of libspectrum is available (Fredrick
+            Meunier).
+          * Document --mdr-len and --mdr-random-len options (thanks, Philip
+            Kendall and Gergely Szasz) (Sergio Baldoví).
+          * Document support for the Recreated ZX Spectrum (Sergio Baldoví).
+          * Fix transposed description of AY-3-8912 (Sergio Baldoví).
+          * GTK UI: Destroy tape browser dialog on close (thanks, Alberto
+            Garcia) (Sergio Baldoví).
+
 2017-07-02  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.7 released.
