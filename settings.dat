@@ -59,7 +59,7 @@ printer, boolean, 0
 statusbar, boolean, 0
 interface1, boolean, 0
 mdr_len, numeric, 180
-mdr_random_len, boolean, 1
+mdr_random_len, boolean, 0
 interface2, boolean, 1
 multiface1, boolean, 0
 multiface128, boolean, 0
