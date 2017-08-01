@@ -210,7 +210,7 @@ utils_open_file( const char *filename, int autoload,
     } else if( settings_current.divide_enabled ) {
       error = divide_insert( filename, LIBSPECTRUM_IDE_MASTER );
     } else {
-      error = divmmc_insert( filename, LIBSPECTRUM_IDE_MASTER );
+      error = divmmc_insert( filename );
     }
     if( error ) return error;
     

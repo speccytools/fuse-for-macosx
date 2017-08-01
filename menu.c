@@ -625,8 +625,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
   case 5: zxcf_insert( filename ); break;
   case 6: divide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
-  case 8: divmmc_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
-  case 9: divmmc_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 8: divmmc_insert( filename ); break;
   }
 
   libspectrum_free( filename );
@@ -646,8 +645,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit )
   case 5: zxcf_commit(); break;
   case 6: divide_commit( LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
-  case 8: divmmc_commit( LIBSPECTRUM_IDE_MASTER ); break;
-  case 9: divmmc_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 8: divmmc_commit(); break;
   }
 
   fuse_emulation_unpause();
@@ -667,8 +665,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
   case 5: zxcf_eject(); break;
   case 6: divide_eject( LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
-  case 8: divmmc_eject( LIBSPECTRUM_IDE_MASTER ); break;
-  case 9: divmmc_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 8: divmmc_eject(); break;
   }
 
   fuse_emulation_unpause();
@@ -1021,12 +1018,7 @@ menu_check_media_changed( void )
   }
 
   if( settings_current.divmmc_master_file ) {
-    confirm = divmmc_eject( LIBSPECTRUM_IDE_MASTER );
-    if( confirm ) return 1;
-  }
-
-  if( settings_current.divmmc_slave_file ) {
-    confirm = divmmc_eject( LIBSPECTRUM_IDE_SLAVE );
+    confirm = divmmc_eject();
     if( confirm ) return 1;
   }
 

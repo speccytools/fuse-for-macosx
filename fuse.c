@@ -912,14 +912,7 @@ do_start_files( start_files_t *start_files )
   }
 
   if( start_files->divmmc_master ) {
-    error = divmmc_insert( start_files->divmmc_master,
-			    LIBSPECTRUM_IDE_MASTER );
-    if( error ) return error;
-  }
-
-  if( start_files->divmmc_slave ) {
-    error = divmmc_insert( start_files->divmmc_slave,
-			    LIBSPECTRUM_IDE_SLAVE );
+    error = divmmc_insert( start_files->divmmc_master );
     if( error ) return error;
   }
 

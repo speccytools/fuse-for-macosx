@@ -78,7 +78,11 @@ static libspectrum_byte divmmc_control;
    flags allowed it */
 static int divmmc_automap = 0;
 
+/* The card inserted into the DivMMC. For now, we emulate only one card. */
 static libspectrum_mmc_card *card;
+
+/* The card currently selected via the "card select" call */
+static libspectrum_mmc_card *current_card;
 
 /* *Our* DivMMC has 128 Kb of RAM - this is all that ESXDOS needs */
 #define DIVMMC_PAGES 16
@@ -194,6 +198,8 @@ divmmc_reset( int hard_reset )
   divmmc_automap = 0;
   divmmc_refresh_page_state();
 
+  current_card = NULL;
+
   /*
    TODO
   libspectrum_ide_reset( divmmc_idechn0 );
@@ -201,47 +207,66 @@ divmmc_reset( int hard_reset )
   */
 }
 
-int
-divmmc_insert( const char *filename, libspectrum_ide_unit unit )
+/* TODO: merge this with ide_eject() */
+static int
+mmc_eject( libspectrum_mmc_card *card )
 {
-  /*
-   TODO
-  return ide_master_slave_insert(
-    divmmc_idechn0, unit, filename,
-    &settings_current.divmmc_master_file,
-    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
-    &settings_current.divmmc_slave_file,
-    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT );
-  */
+  int error;
+
+  if( libspectrum_mmc_dirty( card ) ) {
+    
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Card has been modified.\nDo you want to save it?"
+    );
+  
+    switch( confirm ) {
+
+    case UI_CONFIRM_SAVE_SAVE: libspectrum_mmc_commit( card ); break;
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
+
+    }
+  }
+
+  libspectrum_free( settings_current.divmmc_master_file );
+  settings_current.divmmc_master_file = NULL;
+  
+  libspectrum_mmc_eject( card );
+
+  error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 0 );
+  if( error ) return error;
 
   return 0;
 }
 
 int
-divmmc_commit( libspectrum_ide_unit unit )
+divmmc_insert( const char *filename )
 {
-  /*
-   TODO
-  error = libspectrum_ide_commit( divmmc_idechn0, unit );
-  */
+  int error;
 
-  return 0;
+  /* Remove any currently inserted card; abort if we want to keep the current
+     card */
+  if( settings_current.divmmc_master_file )
+    if( mmc_eject( card ) )
+      return 0;
+
+  settings_set_string( &settings_current.divmmc_master_file, filename );
+
+  error = libspectrum_mmc_insert( card, filename );
+  if( error ) return error;
+  return ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 1 );
+}
+  
+void
+divmmc_commit( void )
+{
+  libspectrum_mmc_commit( card );
 }
 
 int
-divmmc_eject( libspectrum_ide_unit unit )
+divmmc_eject( void )
 {
-  /*
-   TODO
-  return ide_master_slave_eject(
-    divmmc_idechn0, unit,
-    &settings_current.divmmc_master_file,
-    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
-    &settings_current.divmmc_slave_file,
-    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT );
-  */
-
-  return 0;
+  return mmc_eject( card );
 }
 
 /* Port read/writes */
@@ -266,7 +291,16 @@ divmmc_control_write_internal( libspectrum_byte data )
 static void
 divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  libspectrum_mmc_card_select( card, data );
+  printf("divmmc_card_select( 0x%02x )\n", data );
+
+  switch( data ) {
+    case 0xf6:
+      current_card = card;
+      break;
+    default:
+      current_card = NULL;
+      break;
+  }
 }
 
 static libspectrum_byte
@@ -274,13 +308,13 @@ divmmc_mmc_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
   *attached = 0xff;
 
-  return libspectrum_mmc_read( card );
+  return current_card ? libspectrum_mmc_read( card ) : 0xff;
 }
 
 static void
 divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  libspectrum_mmc_write( card, data );
+  if( current_card ) libspectrum_mmc_write( card, data );
 }
 
 void

@@ -40,9 +40,9 @@ void divmmc_set_automap( int state );
 void divmmc_refresh_page_state( void );
 
 void divmmc_register_startup( void );
-int divmmc_insert( const char *filename, libspectrum_ide_unit unit );
-int divmmc_commit( libspectrum_ide_unit unit );
-int divmmc_eject( libspectrum_ide_unit unit );
+int divmmc_insert( const char *filename );
+void divmmc_commit( void );
+int divmmc_eject( void );
 
 int divmmc_unittest( void );
 
