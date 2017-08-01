@@ -58,7 +58,7 @@ OPTION | DESCRIPTION
 
 OPTION | DESCRIPTION
 :--- | :---
-*MDR cartridge len* | This option controls the number of blocks in a new microdrive cartridge. If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
+*MDR cartridge len* | This option controls the number of blocks in a new microdrive cartridge. If the value smaller than 10 or greater than 254 Fuse assumes 10 or 254. Average real capacity is around 180 blocks (90 Kb).
 
 <br>
 ### Spectranet options

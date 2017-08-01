@@ -3,6 +3,19 @@ title: What's New In Fuse?
 description: This section describes the changes for version 1.3.6 of the Fuse emulator.
 ---
 
+## What's new in Fuse for macOS 1.3.8
+
+### Emulation core improvements:
+* Add workaround for Multiface One and 128 clash (thanks, Fredrick Meunier)
+  (Sergio Baldoví).
+* Limit RZX sentinel warning to once per playback (Sergio Baldoví).
+* Disable Melodik interface on 128K machines (Sergio Baldoví).
+* Correct the list of machines for Multiface One (Fredrick Meunier).
+* Fix Z80 snapshot writing when +D is enabled (thanks, Fredrick Meunier) (Sergio Baldoví).
+* Fix offset of keyboard mappings in Z80 v3 snaphots (Sergio Baldoví).
+
+### Various other minor bugfixes.
+
 ## What's new in Fuse for macOS 1.3.7
 
 ### New features:
