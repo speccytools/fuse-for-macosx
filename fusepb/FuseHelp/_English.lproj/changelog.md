@@ -11,8 +11,12 @@ description: This section describes the changes for version 1.3.6 of the Fuse em
 * Limit RZX sentinel warning to once per playback (Sergio Baldoví).
 * Disable Melodik interface on 128K machines (Sergio Baldoví).
 * Correct the list of machines for Multiface One (Fredrick Meunier).
-* Fix Z80 snapshot writing when +D is enabled (thanks, Fredrick Meunier) (Sergio Baldoví).
+* Fix Z80 snapshot writing when +D is enabled (thanks, Fredrick Meunier) (Sergio
+  Baldoví).
 * Fix offset of keyboard mappings in Z80 v3 snaphots (Sergio Baldoví).
+* Don't use MDR random length by default (Fredrick Meunier).
+* Also include Eject options for Opus and Didaktik disk interfaces (thanks,
+  Alain Vezes) (Fredrick Meunier).
 
 ### Various other minor bugfixes.
 
