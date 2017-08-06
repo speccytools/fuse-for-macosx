@@ -38,16 +38,14 @@
 #include "ui/ui.h"
 #include "unittests/unittests.h"
 #include "divmmc.h"
+#include "divxxx.h"
 
 /* Private function prototypes */
 
 static void divmmc_control_write( libspectrum_word port, libspectrum_byte data );
-static void divmmc_control_write_internal( libspectrum_byte data );
 static void divmmc_card_select( libspectrum_word port, libspectrum_byte data );
 static libspectrum_byte divmmc_mmc_read( libspectrum_word port, libspectrum_byte *attached );
 static void divmmc_mmc_write( libspectrum_word port, libspectrum_byte data );
-static void divmmc_page( void );
-static void divmmc_unpage( void );
 static void divmmc_activate( void );
 
 /* Data */
@@ -65,9 +63,6 @@ static const periph_t divmmc_periph = {
   /* .hard_reset = */ 1,
   /* .activate = */ divmmc_activate,
 };
-
-static const libspectrum_byte DIVMMC_CONTROL_CONMEM = 0x80;
-static const libspectrum_byte DIVMMC_CONTROL_MAPRAM = 0x40;
 
 int divmmc_automapping_enabled = 0;
 int divmmc_active = 0;
@@ -186,19 +181,7 @@ divmmc_register_startup( void )
 static void
 divmmc_reset( int hard_reset )
 {
-  divmmc_active = 0;
-
-  if( !settings_current.divmmc_enabled ) return;
-
-  if( hard_reset ) {
-    divmmc_control = 0;
-  } else {
-    divmmc_control &= DIVMMC_CONTROL_MAPRAM;
-  }
-  divmmc_automap = 0;
-  divmmc_refresh_page_state();
-
-  current_card = NULL;
+  divxxx_reset( settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset, &divmmc_active, &divmmc_control, &divmmc_automap, page_event, unpage_event );
 
   /*
    TODO
@@ -274,18 +257,7 @@ divmmc_eject( void )
 static void
 divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  int old_mapram;
-
-  /* MAPRAM bit cannot be reset, only set */
-  old_mapram = divmmc_control & DIVMMC_CONTROL_MAPRAM;
-  divmmc_control_write_internal( data | old_mapram );
-}
-
-static void
-divmmc_control_write_internal( libspectrum_byte data )
-{
-  divmmc_control = data;
-  divmmc_refresh_page_state();
+  divxxx_control_write( &divmmc_control, data, divmmc_automap, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
 }
 
 static void
@@ -320,89 +292,19 @@ divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 void
 divmmc_set_automap( int state )
 {
-  divmmc_automap = state;
-  divmmc_refresh_page_state();
+  divxxx_set_automap( &divmmc_automap, state, divmmc_control, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
 }
 
 void
 divmmc_refresh_page_state( void )
 {
-  if( divmmc_control & DIVMMC_CONTROL_CONMEM ) {
-    /* always paged in if conmem enabled */
-    divmmc_page();
-  } else if( settings_current.divmmc_wp
-    || ( divmmc_control & DIVMMC_CONTROL_MAPRAM ) ) {
-    /* automap in effect */
-    if( divmmc_automap ) {
-      divmmc_page();
-    } else {
-      divmmc_unpage();
-    }
-  } else {
-    divmmc_unpage();
-  }
-}
-
-static void
-divmmc_page( void )
-{
-  divmmc_active = 1;
-  machine_current->ram.romcs = 1;
-  machine_current->memory_map();
-
-  debugger_event( page_event );
-}
-
-static void
-divmmc_unpage( void )
-{
-  divmmc_active = 0;
-  machine_current->ram.romcs = 0;
-  machine_current->memory_map();
-
-  debugger_event( unpage_event );
+  divxxx_refresh_page_state( divmmc_control, divmmc_automap, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
 }
 
 void
 divmmc_memory_map( void )
 {
-  int i;
-  int upper_ram_page;
-  int lower_page_writable, upper_page_writable;
-  memory_page *lower_page, *upper_page;
-
-  if( !divmmc_active ) return;
-
-  /* low bits of divmmc_control register give page number to use in upper
-     bank; only lowest two bits on original 32K model */
-  upper_ram_page = divmmc_control & (DIVMMC_PAGES - 1);
-  
-  if( divmmc_control & DIVMMC_CONTROL_CONMEM ) {
-    lower_page = divmmc_memory_map_eprom;
-    lower_page_writable = !settings_current.divmmc_wp;
-    upper_page = divmmc_memory_map_ram[ upper_ram_page ];
-    upper_page_writable = 1;
-  } else {
-    if( divmmc_control & DIVMMC_CONTROL_MAPRAM ) {
-      lower_page = divmmc_memory_map_ram[3];
-      lower_page_writable = 0;
-      upper_page = divmmc_memory_map_ram[ upper_ram_page ];
-      upper_page_writable = ( upper_ram_page != 3 );
-    } else {
-      lower_page = divmmc_memory_map_eprom;
-      lower_page_writable = 0;
-      upper_page = divmmc_memory_map_ram[ upper_ram_page ];
-      upper_page_writable = 1;
-    }
-  }
-
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    lower_page[i].writable = lower_page_writable;
-    upper_page[i].writable = upper_page_writable;
-  }
-
-  memory_map_romcs_8k( 0x0000, lower_page );
-  memory_map_romcs_8k( 0x2000, upper_page );
+  divxxx_memory_map( divmmc_active, divmmc_control, settings_current.divmmc_wp, DIVMMC_PAGES, divmmc_memory_map_eprom, divmmc_memory_map_ram );
 }
 
 static void

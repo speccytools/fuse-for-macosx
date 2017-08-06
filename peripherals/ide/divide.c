@@ -38,15 +38,13 @@
 #include "ui/ui.h"
 #include "unittests/unittests.h"
 #include "divide.h"
+#include "divxxx.h"
 
 /* Private function prototypes */
 
 static libspectrum_byte divide_ide_read( libspectrum_word port, libspectrum_byte *attached );
 static void divide_ide_write( libspectrum_word port, libspectrum_byte data );
 static void divide_control_write( libspectrum_word port, libspectrum_byte data );
-static void divide_control_write_internal( libspectrum_byte data );
-static void divide_page( void );
-static void divide_unpage( void );
 static libspectrum_ide_register port_to_ide_register( libspectrum_byte port );
 static void divide_activate( void );
 
@@ -64,9 +62,6 @@ static const periph_t divide_periph = {
   /* .hard_reset = */ 1,
   /* .activate = */ divide_activate,
 };
-
-static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
-static const libspectrum_byte DIVIDE_CONTROL_MAPRAM = 0x40;
 
 int divide_automapping_enabled = 0;
 int divide_active = 0;
@@ -180,17 +175,7 @@ divide_register_startup( void )
 static void
 divide_reset( int hard_reset )
 {
-  divide_active = 0;
-
-  if( !settings_current.divide_enabled ) return;
-
-  if( hard_reset ) {
-    divide_control = 0;
-  } else {
-    divide_control &= DIVIDE_CONTROL_MAPRAM;
-  }
-  divide_automap = 0;
-  divide_refresh_page_state();
+  divxxx_reset( settings_current.divide_enabled, settings_current.divide_wp, hard_reset, &divide_active, &divide_control, &divide_automap, page_event, unpage_event );
 
   libspectrum_ide_reset( divide_idechn0 );
   libspectrum_ide_reset( divide_idechn1 );
@@ -277,106 +262,25 @@ divide_ide_write( libspectrum_word port, libspectrum_byte data )
 static void
 divide_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  int old_mapram;
-
-  /* MAPRAM bit cannot be reset, only set */
-  old_mapram = divide_control & DIVIDE_CONTROL_MAPRAM;
-  divide_control_write_internal( data | old_mapram );
-}
-
-static void
-divide_control_write_internal( libspectrum_byte data )
-{
-  divide_control = data;
-  divide_refresh_page_state();
+  divxxx_control_write( &divide_control, data, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_set_automap( int state )
 {
-  divide_automap = state;
-  divide_refresh_page_state();
+  divxxx_set_automap( &divide_automap, state, divide_control, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_refresh_page_state( void )
 {
-  if( divide_control & DIVIDE_CONTROL_CONMEM ) {
-    /* always paged in if conmem enabled */
-    divide_page();
-  } else if( settings_current.divide_wp
-    || ( divide_control & DIVIDE_CONTROL_MAPRAM ) ) {
-    /* automap in effect */
-    if( divide_automap ) {
-      divide_page();
-    } else {
-      divide_unpage();
-    }
-  } else {
-    divide_unpage();
-  }
-}
-
-static void
-divide_page( void )
-{
-  divide_active = 1;
-  machine_current->ram.romcs = 1;
-  machine_current->memory_map();
-
-  debugger_event( page_event );
-}
-
-static void
-divide_unpage( void )
-{
-  divide_active = 0;
-  machine_current->ram.romcs = 0;
-  machine_current->memory_map();
-
-  debugger_event( unpage_event );
+  divxxx_refresh_page_state( divide_control, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_memory_map( void )
 {
-  int i;
-  int upper_ram_page;
-  int lower_page_writable, upper_page_writable;
-  memory_page *lower_page, *upper_page;
-
-  if( !divide_active ) return;
-
-  /* low bits of divide_control register give page number to use in upper
-     bank; only lowest two bits on original 32K model */
-  upper_ram_page = divide_control & (DIVIDE_PAGES - 1);
-  
-  if( divide_control & DIVIDE_CONTROL_CONMEM ) {
-    lower_page = divide_memory_map_eprom;
-    lower_page_writable = !settings_current.divide_wp;
-    upper_page = divide_memory_map_ram[ upper_ram_page ];
-    upper_page_writable = 1;
-  } else {
-    if( divide_control & DIVIDE_CONTROL_MAPRAM ) {
-      lower_page = divide_memory_map_ram[3];
-      lower_page_writable = 0;
-      upper_page = divide_memory_map_ram[ upper_ram_page ];
-      upper_page_writable = ( upper_ram_page != 3 );
-    } else {
-      lower_page = divide_memory_map_eprom;
-      lower_page_writable = 0;
-      upper_page = divide_memory_map_ram[ upper_ram_page ];
-      upper_page_writable = 1;
-    }
-  }
-
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    lower_page[i].writable = lower_page_writable;
-    upper_page[i].writable = upper_page_writable;
-  }
-
-  memory_map_romcs_8k( 0x0000, lower_page );
-  memory_map_romcs_8k( 0x2000, upper_page );
+  divxxx_memory_map( divide_active, divide_control, settings_current.divide_wp, DIVIDE_PAGES, divide_memory_map_eprom, divide_memory_map_ram );
 }
 
 static void
@@ -395,7 +299,7 @@ divide_from_snapshot( libspectrum_snap *snap )
 
   settings_current.divide_wp =
     libspectrum_snap_divide_eprom_writeprotect( snap );
-  divide_control_write_internal( libspectrum_snap_divide_control( snap ) );
+  divxxx_control_write_internal( &divide_control, libspectrum_snap_divide_control( snap ), divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 
   if( libspectrum_snap_divide_eprom( snap, 0 ) ) {
     memcpy( divide_eprom,
@@ -408,9 +312,9 @@ divide_from_snapshot( libspectrum_snap *snap )
 	      DIVIDE_PAGE_LENGTH );
 
   if( libspectrum_snap_divide_paged( snap ) ) {
-    divide_page();
+    divxxx_page( &divide_active, page_event );
   } else {
-    divide_unpage();
+    divxxx_unpage( &divide_active, unpage_event );
   }
 }
 
