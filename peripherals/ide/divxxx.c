@@ -32,57 +32,81 @@
 static const libspectrum_byte DIVXXX_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVXXX_CONTROL_MAPRAM = 0x40;
 
+typedef struct divxxx_t {
+  libspectrum_byte control;
+} divxxx_t;
+
+divxxx_t*
+divxxx_alloc( void )
+{
+  divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
+
+  return divxxx;
+}
+
+void
+divxxx_free( divxxx_t *divxxx )
+{
+  libspectrum_free( divxxx );
+}
+
+libspectrum_byte
+divxxx_get_control( divxxx_t *divxxx )
+{
+  return divxxx->control;
+}
+
 /* DivIDE/DivMMC does not page in immediately on a reset condition (we do that by
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
 void
-divxxx_reset( int enabled, int write_protect, int hard_reset, int *is_active, libspectrum_byte *control, int *is_automapped, int page_event, int unpage_event )
+divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, int *is_active, int *is_automapped, int page_event, int unpage_event )
 {
   *is_active = 0;
 
   if( !enabled ) return;
 
   if( hard_reset ) {
-    *control = 0;
+    divxxx->control = 0;
   } else {
-    *control &= DIVXXX_CONTROL_MAPRAM;
+    divxxx->control &= DIVXXX_CONTROL_MAPRAM;
   }
   *is_automapped = 0;
-  divxxx_refresh_page_state( *control, *is_automapped, write_protect, is_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, *is_automapped, write_protect, is_active, page_event, unpage_event );
 }
 
 void
-divxxx_control_write( libspectrum_byte *control, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event )
 {
   int old_mapram;
 
   /* MAPRAM bit cannot be reset, only set */
-  old_mapram = *control & DIVXXX_CONTROL_MAPRAM;
-  divxxx_control_write_internal( control, data | old_mapram, is_automapped, write_protect, is_active, page_event, unpage_event );
+  old_mapram = divxxx->control & DIVXXX_CONTROL_MAPRAM;
+  divxxx_control_write_internal( divxxx, data | old_mapram, is_automapped, write_protect, is_active, page_event, unpage_event );
 }
 
 void
-divxxx_control_write_internal( libspectrum_byte *control, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event )
 {
-  *control = data;
-  divxxx_refresh_page_state( *control, is_automapped, write_protect, is_active, page_event, unpage_event );
+  divxxx->control = data;
+  divxxx_refresh_page_state( divxxx, is_automapped, write_protect, is_active, page_event, unpage_event );
 }
 
 void
-divxxx_set_automap( int *is_automapped, int automap, libspectrum_byte control, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_set_automap( divxxx_t *divxxx, int *is_automapped, int automap, int write_protect, int *is_active, int page_event, int unpage_event )
 {
   *is_automapped = automap;
-  divxxx_refresh_page_state( control, *is_automapped, write_protect, is_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, *is_automapped, write_protect, is_active, page_event, unpage_event );
 }
 
 void
-divxxx_refresh_page_state( libspectrum_byte control, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_refresh_page_state( divxxx_t *divxxx, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event )
 {
-  if( control & DIVXXX_CONTROL_CONMEM ) {
+  if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     /* always paged in if conmem enabled */
     divxxx_page( is_active, page_event );
   } else if( write_protect
-    || ( control & DIVXXX_CONTROL_MAPRAM ) ) {
+    || ( divxxx->control & DIVXXX_CONTROL_MAPRAM ) ) {
     /* automap in effect */
     if( is_automapped ) {
       divxxx_page( is_active, page_event );
@@ -95,7 +119,7 @@ divxxx_refresh_page_state( libspectrum_byte control, int is_automapped, int writ
 }
 
 void
-divxxx_memory_map( int is_active, libspectrum_byte control, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
+divxxx_memory_map( divxxx_t *divxxx, int is_active, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
 {
   int i;
   int upper_ram_page;
@@ -104,15 +128,15 @@ divxxx_memory_map( int is_active, libspectrum_byte control, int write_protect, s
 
   if( !is_active ) return;
 
-  upper_ram_page = control & (page_count - 1);
+  upper_ram_page = divxxx->control & (page_count - 1);
   
-  if( control & DIVXXX_CONTROL_CONMEM ) {
+  if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     lower_page = memory_map_eprom;
     lower_page_writable = !write_protect;
     upper_page = memory_map_ram[ upper_ram_page ];
     upper_page_writable = 1;
   } else {
-    if( control & DIVXXX_CONTROL_MAPRAM ) {
+    if( divxxx->control & DIVXXX_CONTROL_MAPRAM ) {
       lower_page = memory_map_ram[3];
       lower_page_writable = 0;
       upper_page = memory_map_ram[ upper_ram_page ];

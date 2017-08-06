@@ -65,7 +65,7 @@ static const periph_t divide_periph = {
 
 int divide_automapping_enabled = 0;
 int divide_active = 0;
-static libspectrum_byte divide_control;
+static divxxx_t *divide_state;
 
 /* divide_automap tracks opcode fetches to entry and exit points to determine
    whether DivIDE memory *would* be paged in at this moment if mapram / wp
@@ -145,12 +145,15 @@ divide_init( void *context )
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
 
+  divide_state = divxxx_alloc();
+
   return 0;
 }
 
 static void
 divide_end( void )
 {
+  divxxx_free( divide_state );
   libspectrum_ide_free( divide_idechn0 );
   libspectrum_ide_free( divide_idechn1 );
 }
@@ -175,7 +178,7 @@ divide_register_startup( void )
 static void
 divide_reset( int hard_reset )
 {
-  divxxx_reset( settings_current.divide_enabled, settings_current.divide_wp, hard_reset, &divide_active, &divide_control, &divide_automap, page_event, unpage_event );
+  divxxx_reset( divide_state, settings_current.divide_enabled, settings_current.divide_wp, hard_reset, &divide_active, &divide_automap, page_event, unpage_event );
 
   libspectrum_ide_reset( divide_idechn0 );
   libspectrum_ide_reset( divide_idechn1 );
@@ -262,25 +265,25 @@ divide_ide_write( libspectrum_word port, libspectrum_byte data )
 static void
 divide_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( &divide_control, data, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_control_write( divide_state, data, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_set_automap( int state )
 {
-  divxxx_set_automap( &divide_automap, state, divide_control, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_set_automap( divide_state, &divide_automap, state, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divide_control, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divide_state, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_memory_map( void )
 {
-  divxxx_memory_map( divide_active, divide_control, settings_current.divide_wp, DIVIDE_PAGES, divide_memory_map_eprom, divide_memory_map_ram );
+  divxxx_memory_map( divide_state, divide_active, settings_current.divide_wp, DIVIDE_PAGES, divide_memory_map_eprom, divide_memory_map_ram );
 }
 
 static void
@@ -299,7 +302,7 @@ divide_from_snapshot( libspectrum_snap *snap )
 
   settings_current.divide_wp =
     libspectrum_snap_divide_eprom_writeprotect( snap );
-  divxxx_control_write_internal( &divide_control, libspectrum_snap_divide_control( snap ), divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_control_write_internal( divide_state, libspectrum_snap_divide_control( snap ), divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 
   if( libspectrum_snap_divide_eprom( snap, 0 ) ) {
     memcpy( divide_eprom,
@@ -330,7 +333,7 @@ divide_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_divide_eprom_writeprotect( snap,
                                                   settings_current.divide_wp );
   libspectrum_snap_set_divide_paged( snap, divide_active );
-  libspectrum_snap_set_divide_control( snap, divide_control );
+  libspectrum_snap_set_divide_control( snap, divxxx_get_control( divide_state ) );
 
   buffer = libspectrum_new( libspectrum_byte, DIVIDE_PAGE_LENGTH );
 

@@ -26,23 +26,42 @@
 
 #include <libspectrum.h>
 
-void
-divxxx_reset( int enabled, int write_protect, int hard_reset, int *is_active, libspectrum_byte *control, int *is_automapped, int page_event, int unpage_event );
+/* Type definition */
+
+typedef struct divxxx_t divxxx_t;
+
+/* Allocation and deallocation */
+
+divxxx_t*
+divxxx_alloc( void );
 
 void
-divxxx_control_write( libspectrum_byte *control, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event );
+divxxx_free( divxxx_t *divxxx );
+
+/* Getters */
+
+libspectrum_byte
+divxxx_get_control( divxxx_t *divxxx );
+
+/* Actions */
 
 void
-divxxx_control_write_internal( libspectrum_byte *control, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event );
+divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, int *is_active, int *is_automapped, int page_event, int unpage_event );
 
 void
-divxxx_set_automap( int *is_automapped, int automap, libspectrum_byte control, int write_protect, int *is_active, int page_event, int unpage_event );
+divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event );
 
 void
-divxxx_refresh_page_state( libspectrum_byte control, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event );
+divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event );
 
 void
-divxxx_memory_map( int is_active, libspectrum_byte control, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
+divxxx_set_automap( divxxx_t *divxxx, int *is_automapped, int automap, int write_protect, int *is_active, int page_event, int unpage_event );
+
+void
+divxxx_refresh_page_state( divxxx_t *divxxx, int is_automapped, int write_protect, int *is_active, int page_event, int unpage_event );
+
+void
+divxxx_memory_map( divxxx_t *divxxx, int is_active, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
 
 void
 divxxx_page( int *is_active, int page_event );
