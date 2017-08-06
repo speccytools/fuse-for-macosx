@@ -68,11 +68,6 @@ int divmmc_automapping_enabled = 0;
 int divmmc_active = 0;
 static divxxx_t *divmmc_state;
 
-/* divmmc_automap tracks opcode fetches to entry and exit points to determine
-   whether DivMMC memory *would* be paged in at this moment if mapram / wp
-   flags allowed it */
-static int divmmc_automap = 0;
-
 /* The card inserted into the DivMMC. For now, we emulate only one card. */
 static libspectrum_mmc_card *card;
 
@@ -184,7 +179,7 @@ divmmc_register_startup( void )
 static void
 divmmc_reset( int hard_reset )
 {
-  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset, &divmmc_active, &divmmc_automap, page_event, unpage_event );
+  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset, &divmmc_active, page_event, unpage_event );
 
   /*
    TODO
@@ -260,7 +255,7 @@ divmmc_eject( void )
 static void
 divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( divmmc_state, data, divmmc_automap, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
+  divxxx_control_write( divmmc_state, data, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
 }
 
 static void
@@ -295,13 +290,13 @@ divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 void
 divmmc_set_automap( int state )
 {
-  divxxx_set_automap( divmmc_state, &divmmc_automap, state, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
+  divxxx_set_automap( divmmc_state, state, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
 }
 
 void
 divmmc_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divmmc_state, divmmc_automap, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divmmc_state, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
 }
 
 void

@@ -67,11 +67,6 @@ int divide_automapping_enabled = 0;
 int divide_active = 0;
 static divxxx_t *divide_state;
 
-/* divide_automap tracks opcode fetches to entry and exit points to determine
-   whether DivIDE memory *would* be paged in at this moment if mapram / wp
-   flags allowed it */
-static int divide_automap = 0;
-
 static libspectrum_ide_channel *divide_idechn0;
 static libspectrum_ide_channel *divide_idechn1;
 
@@ -178,7 +173,7 @@ divide_register_startup( void )
 static void
 divide_reset( int hard_reset )
 {
-  divxxx_reset( divide_state, settings_current.divide_enabled, settings_current.divide_wp, hard_reset, &divide_active, &divide_automap, page_event, unpage_event );
+  divxxx_reset( divide_state, settings_current.divide_enabled, settings_current.divide_wp, hard_reset, &divide_active, page_event, unpage_event );
 
   libspectrum_ide_reset( divide_idechn0 );
   libspectrum_ide_reset( divide_idechn1 );
@@ -265,19 +260,19 @@ divide_ide_write( libspectrum_word port, libspectrum_byte data )
 static void
 divide_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( divide_state, data, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_control_write( divide_state, data, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_set_automap( int state )
 {
-  divxxx_set_automap( divide_state, &divide_automap, state, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_set_automap( divide_state, state, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
 divide_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divide_state, divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divide_state, settings_current.divide_wp, &divide_active, page_event, unpage_event );
 }
 
 void
@@ -302,7 +297,7 @@ divide_from_snapshot( libspectrum_snap *snap )
 
   settings_current.divide_wp =
     libspectrum_snap_divide_eprom_writeprotect( snap );
-  divxxx_control_write_internal( divide_state, libspectrum_snap_divide_control( snap ), divide_automap, settings_current.divide_wp, &divide_active, page_event, unpage_event );
+  divxxx_control_write_internal( divide_state, libspectrum_snap_divide_control( snap ), settings_current.divide_wp, &divide_active, page_event, unpage_event );
 
   if( libspectrum_snap_divide_eprom( snap, 0 ) ) {
     memcpy( divide_eprom,
