@@ -65,7 +65,6 @@ static const periph_t divmmc_periph = {
 };
 
 int divmmc_automapping_enabled = 0;
-int divmmc_active = 0;
 static divxxx_t *divmmc_state;
 
 /* The card inserted into the DivMMC. For now, we emulate only one card. */
@@ -179,7 +178,7 @@ divmmc_register_startup( void )
 static void
 divmmc_reset( int hard_reset )
 {
-  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset, &divmmc_active, page_event, unpage_event );
+  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset, page_event, unpage_event );
 
   /*
    TODO
@@ -255,7 +254,7 @@ divmmc_eject( void )
 static void
 divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( divmmc_state, data, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
+  divxxx_control_write( divmmc_state, data, settings_current.divmmc_wp, page_event, unpage_event );
 }
 
 static void
@@ -290,19 +289,19 @@ divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 void
 divmmc_set_automap( int state )
 {
-  divxxx_set_automap( divmmc_state, state, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
+  divxxx_set_automap( divmmc_state, state, settings_current.divmmc_wp, page_event, unpage_event );
 }
 
 void
 divmmc_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divmmc_state, settings_current.divmmc_wp, &divmmc_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divmmc_state, settings_current.divmmc_wp, page_event, unpage_event );
 }
 
 void
 divmmc_memory_map( void )
 {
-  divxxx_memory_map( divmmc_state, divmmc_active, settings_current.divmmc_wp, DIVMMC_PAGES, divmmc_memory_map_eprom, divmmc_memory_map_ram );
+  divxxx_memory_map( divmmc_state, settings_current.divmmc_wp, DIVMMC_PAGES, divmmc_memory_map_eprom, divmmc_memory_map_ram );
 }
 
 static void

@@ -35,6 +35,8 @@ static const libspectrum_byte DIVXXX_CONTROL_MAPRAM = 0x40;
 typedef struct divxxx_t {
   libspectrum_byte control;
 
+  int active;
+
   /* automap tracks opcode fetches to entry and exit points to determine
      whether interface memory *would* be paged in at this moment if mapram / wp
      flags allowed it */
@@ -48,6 +50,7 @@ divxxx_alloc( void )
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
   divxxx->control = 0;
+  divxxx->active = 0;
   divxxx->automap = 0;
 
   return divxxx;
@@ -65,13 +68,19 @@ divxxx_get_control( divxxx_t *divxxx )
   return divxxx->control;
 }
 
+int
+divxxx_get_active( divxxx_t *divxxx )
+{
+  return divxxx->active;
+}
+
 /* DivIDE/DivMMC does not page in immediately on a reset condition (we do that by
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
 void
-divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, int *is_active, int page_event, int unpage_event )
+divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, int page_event, int unpage_event )
 {
-  *is_active = 0;
+  divxxx->active = 0;
 
   if( !enabled ) return;
 
@@ -81,61 +90,61 @@ divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, 
     divxxx->control &= DIVXXX_CONTROL_MAPRAM;
   }
   divxxx->automap = 0;
-  divxxx_refresh_page_state( divxxx, write_protect, is_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, write_protect, page_event, unpage_event );
 }
 
 void
-divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int page_event, int unpage_event )
 {
   int old_mapram;
 
   /* MAPRAM bit cannot be reset, only set */
   old_mapram = divxxx->control & DIVXXX_CONTROL_MAPRAM;
-  divxxx_control_write_internal( divxxx, data | old_mapram, write_protect, is_active, page_event, unpage_event );
+  divxxx_control_write_internal( divxxx, data | old_mapram, write_protect, page_event, unpage_event );
 }
 
 void
-divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int page_event, int unpage_event )
 {
   divxxx->control = data;
-  divxxx_refresh_page_state( divxxx, write_protect, is_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, write_protect, page_event, unpage_event );
 }
 
 void
-divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect, int page_event, int unpage_event )
 {
   divxxx->automap = automap;
-  divxxx_refresh_page_state( divxxx, write_protect, is_active, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, write_protect, page_event, unpage_event );
 }
 
 void
-divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect, int *is_active, int page_event, int unpage_event )
+divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect, int page_event, int unpage_event )
 {
   if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     /* always paged in if conmem enabled */
-    divxxx_page( is_active, page_event );
+    divxxx_page( divxxx, page_event );
   } else if( write_protect
     || ( divxxx->control & DIVXXX_CONTROL_MAPRAM ) ) {
     /* automap in effect */
     if( divxxx->automap ) {
-      divxxx_page( is_active, page_event );
+      divxxx_page( divxxx, page_event );
     } else {
-      divxxx_unpage( is_active, unpage_event );
+      divxxx_unpage( divxxx, unpage_event );
     }
   } else {
-    divxxx_unpage( is_active, unpage_event );
+    divxxx_unpage( divxxx, unpage_event );
   }
 }
 
 void
-divxxx_memory_map( divxxx_t *divxxx, int is_active, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
+divxxx_memory_map( divxxx_t *divxxx, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
 {
   int i;
   int upper_ram_page;
   int lower_page_writable, upper_page_writable;
   memory_page *lower_page, *upper_page;
 
-  if( !is_active ) return;
+  if( !divxxx->active ) return;
 
   upper_ram_page = divxxx->control & (page_count - 1);
   
@@ -168,9 +177,9 @@ divxxx_memory_map( divxxx_t *divxxx, int is_active, int write_protect, size_t pa
 }
 
 void
-divxxx_page( int *is_active, int page_event )
+divxxx_page( divxxx_t *divxxx, int page_event )
 {
-  *is_active = 1;
+  divxxx->active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
 
@@ -178,9 +187,9 @@ divxxx_page( int *is_active, int page_event )
 }
 
 void
-divxxx_unpage( int *is_active, int unpage_event )
+divxxx_unpage( divxxx_t *divxxx, int unpage_event )
 {
-  *is_active = 0;
+  divxxx->active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
 
