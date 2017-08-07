@@ -33,7 +33,7 @@ typedef struct divxxx_t divxxx_t;
 /* Allocation and deallocation */
 
 divxxx_t*
-divxxx_alloc( void );
+divxxx_alloc( const char *event_type_string );
 
 void
 divxxx_free( divxxx_t *divxxx );
@@ -49,27 +49,27 @@ divxxx_get_active( divxxx_t *divxxx );
 /* Actions */
 
 void
-divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, int page_event, int unpage_event );
+divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset );
 
 void
-divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int page_event, int unpage_event );
+divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect );
 
 void
-divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int page_event, int unpage_event );
+divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect );
 
 void
-divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect, int page_event, int unpage_event );
+divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect );
 
 void
-divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect, int page_event, int unpage_event );
+divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect );
 
 void
 divxxx_memory_map( divxxx_t *divxxx, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
 
 void
-divxxx_page( divxxx_t *divxxx, int page_event );
+divxxx_page( divxxx_t *divxxx );
 
 void
-divxxx_unpage( divxxx_t *divxxx, int page_event );
+divxxx_unpage( divxxx_t *divxxx );
 
 #endif			/* #ifndef FUSE_DIVXXX_H */

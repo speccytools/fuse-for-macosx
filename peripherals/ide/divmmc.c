@@ -102,7 +102,6 @@ static module_info_t divmmc_module_info = {
 
 /* Debugger events */
 static const char * const event_type_string = "divmmc";
-static int page_event, unpage_event;
 
 /* Housekeeping functions */
 
@@ -143,10 +142,8 @@ divmmc_init( void *context )
   }
 
   periph_register( PERIPH_TYPE_DIVMMC, &divmmc_periph );
-  periph_register_paging_events( event_type_string, &page_event,
-                                 &unpage_event );
 
-  divmmc_state = divxxx_alloc();
+  divmmc_state = divxxx_alloc( event_type_string );
 
   return 0;
 }
@@ -178,7 +175,7 @@ divmmc_register_startup( void )
 static void
 divmmc_reset( int hard_reset )
 {
-  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset, page_event, unpage_event );
+  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset );
 
   /*
    TODO
@@ -254,7 +251,7 @@ divmmc_eject( void )
 static void
 divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( divmmc_state, data, settings_current.divmmc_wp, page_event, unpage_event );
+  divxxx_control_write( divmmc_state, data, settings_current.divmmc_wp );
 }
 
 static void
@@ -289,13 +286,13 @@ divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 void
 divmmc_set_automap( int state )
 {
-  divxxx_set_automap( divmmc_state, state, settings_current.divmmc_wp, page_event, unpage_event );
+  divxxx_set_automap( divmmc_state, state, settings_current.divmmc_wp );
 }
 
 void
 divmmc_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divmmc_state, settings_current.divmmc_wp, page_event, unpage_event );
+  divxxx_refresh_page_state( divmmc_state, settings_current.divmmc_wp );
 }
 
 void

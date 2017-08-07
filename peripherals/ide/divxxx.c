@@ -28,6 +28,7 @@
 #include "debugger/debugger.h"
 #include "divxxx.h"
 #include "machine.h"
+#include "periph.h"
 
 static const libspectrum_byte DIVXXX_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVXXX_CONTROL_MAPRAM = 0x40;
@@ -42,16 +43,23 @@ typedef struct divxxx_t {
      flags allowed it */
   int automap;
 
+  /* The debugger paging events for this interface */
+  int page_event;
+  int unpage_event;
+
 } divxxx_t;
 
 divxxx_t*
-divxxx_alloc( void )
+divxxx_alloc( const char *event_type_string )
 {
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
   divxxx->control = 0;
   divxxx->active = 0;
   divxxx->automap = 0;
+
+  periph_register_paging_events( event_type_string, &divxxx->page_event,
+                                 &divxxx->unpage_event );
 
   return divxxx;
 }
@@ -78,7 +86,7 @@ divxxx_get_active( divxxx_t *divxxx )
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
 void
-divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, int page_event, int unpage_event )
+divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset )
 {
   divxxx->active = 0;
 
@@ -90,49 +98,49 @@ divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset, 
     divxxx->control &= DIVXXX_CONTROL_MAPRAM;
   }
   divxxx->automap = 0;
-  divxxx_refresh_page_state( divxxx, write_protect, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, write_protect );
 }
 
 void
-divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int page_event, int unpage_event )
+divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect )
 {
   int old_mapram;
 
   /* MAPRAM bit cannot be reset, only set */
   old_mapram = divxxx->control & DIVXXX_CONTROL_MAPRAM;
-  divxxx_control_write_internal( divxxx, data | old_mapram, write_protect, page_event, unpage_event );
+  divxxx_control_write_internal( divxxx, data | old_mapram, write_protect );
 }
 
 void
-divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect, int page_event, int unpage_event )
+divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect )
 {
   divxxx->control = data;
-  divxxx_refresh_page_state( divxxx, write_protect, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, write_protect );
 }
 
 void
-divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect, int page_event, int unpage_event )
+divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect )
 {
   divxxx->automap = automap;
-  divxxx_refresh_page_state( divxxx, write_protect, page_event, unpage_event );
+  divxxx_refresh_page_state( divxxx, write_protect );
 }
 
 void
-divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect, int page_event, int unpage_event )
+divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect )
 {
   if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     /* always paged in if conmem enabled */
-    divxxx_page( divxxx, page_event );
+    divxxx_page( divxxx );
   } else if( write_protect
     || ( divxxx->control & DIVXXX_CONTROL_MAPRAM ) ) {
     /* automap in effect */
     if( divxxx->automap ) {
-      divxxx_page( divxxx, page_event );
+      divxxx_page( divxxx );
     } else {
-      divxxx_unpage( divxxx, unpage_event );
+      divxxx_unpage( divxxx );
     }
   } else {
-    divxxx_unpage( divxxx, unpage_event );
+    divxxx_unpage( divxxx );
   }
 }
 
@@ -177,21 +185,21 @@ divxxx_memory_map( divxxx_t *divxxx, int write_protect, size_t page_count, memor
 }
 
 void
-divxxx_page( divxxx_t *divxxx, int page_event )
+divxxx_page( divxxx_t *divxxx )
 {
   divxxx->active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
 
-  debugger_event( page_event );
+  debugger_event( divxxx->page_event );
 }
 
 void
-divxxx_unpage( divxxx_t *divxxx, int unpage_event )
+divxxx_unpage( divxxx_t *divxxx )
 {
   divxxx->active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
 
-  debugger_event( unpage_event );
+  debugger_event( divxxx->unpage_event );
 }
