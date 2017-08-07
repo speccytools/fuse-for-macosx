@@ -143,7 +143,7 @@ divmmc_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVMMC, &divmmc_periph );
 
-  divmmc_state = divxxx_alloc( event_type_string );
+  divmmc_state = divxxx_alloc( event_type_string, &settings_current.divmmc_wp );
 
   return 0;
 }
@@ -175,7 +175,7 @@ divmmc_register_startup( void )
 static void
 divmmc_reset( int hard_reset )
 {
-  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, settings_current.divmmc_wp, hard_reset );
+  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, hard_reset );
 
   /*
    TODO
@@ -251,7 +251,7 @@ divmmc_eject( void )
 static void
 divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( divmmc_state, data, settings_current.divmmc_wp );
+  divxxx_control_write( divmmc_state, data );
 }
 
 static void
@@ -286,19 +286,19 @@ divmmc_mmc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 void
 divmmc_set_automap( int state )
 {
-  divxxx_set_automap( divmmc_state, state, settings_current.divmmc_wp );
+  divxxx_set_automap( divmmc_state, state );
 }
 
 void
 divmmc_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divmmc_state, settings_current.divmmc_wp );
+  divxxx_refresh_page_state( divmmc_state );
 }
 
 void
 divmmc_memory_map( void )
 {
-  divxxx_memory_map( divmmc_state, settings_current.divmmc_wp, DIVMMC_PAGES, divmmc_memory_map_eprom, divmmc_memory_map_ram );
+  divxxx_memory_map( divmmc_state, DIVMMC_PAGES, divmmc_memory_map_eprom, divmmc_memory_map_ram );
 }
 
 static void

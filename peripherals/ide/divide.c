@@ -136,7 +136,7 @@ divide_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
 
-  divide_state = divxxx_alloc( event_type_string );
+  divide_state = divxxx_alloc( event_type_string, &settings_current.divide_wp );
 
   return 0;
 }
@@ -169,7 +169,7 @@ divide_register_startup( void )
 static void
 divide_reset( int hard_reset )
 {
-  divxxx_reset( divide_state, settings_current.divide_enabled, settings_current.divide_wp, hard_reset );
+  divxxx_reset( divide_state, settings_current.divide_enabled, hard_reset );
 
   libspectrum_ide_reset( divide_idechn0 );
   libspectrum_ide_reset( divide_idechn1 );
@@ -256,25 +256,25 @@ divide_ide_write( libspectrum_word port, libspectrum_byte data )
 static void
 divide_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  divxxx_control_write( divide_state, data, settings_current.divide_wp );
+  divxxx_control_write( divide_state, data );
 }
 
 void
 divide_set_automap( int state )
 {
-  divxxx_set_automap( divide_state, state, settings_current.divide_wp );
+  divxxx_set_automap( divide_state, state );
 }
 
 void
 divide_refresh_page_state( void )
 {
-  divxxx_refresh_page_state( divide_state, settings_current.divide_wp );
+  divxxx_refresh_page_state( divide_state );
 }
 
 void
 divide_memory_map( void )
 {
-  divxxx_memory_map( divide_state, settings_current.divide_wp, DIVIDE_PAGES, divide_memory_map_eprom, divide_memory_map_ram );
+  divxxx_memory_map( divide_state, DIVIDE_PAGES, divide_memory_map_eprom, divide_memory_map_ram );
 }
 
 static void
@@ -293,7 +293,7 @@ divide_from_snapshot( libspectrum_snap *snap )
 
   settings_current.divide_wp =
     libspectrum_snap_divide_eprom_writeprotect( snap );
-  divxxx_control_write_internal( divide_state, libspectrum_snap_divide_control( snap ), settings_current.divide_wp );
+  divxxx_control_write_internal( divide_state, libspectrum_snap_divide_control( snap ) );
 
   if( libspectrum_snap_divide_eprom( snap, 0 ) ) {
     memcpy( divide_eprom,

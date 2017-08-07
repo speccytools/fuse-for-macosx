@@ -47,10 +47,13 @@ typedef struct divxxx_t {
   int page_event;
   int unpage_event;
 
+  /* References to the current settings for this interface */
+  const int *write_protect;
+
 } divxxx_t;
 
 divxxx_t*
-divxxx_alloc( const char *event_type_string )
+divxxx_alloc( const char *event_type_string, const int *write_protect )
 {
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
@@ -60,6 +63,8 @@ divxxx_alloc( const char *event_type_string )
 
   periph_register_paging_events( event_type_string, &divxxx->page_event,
                                  &divxxx->unpage_event );
+
+  divxxx->write_protect = write_protect;
 
   return divxxx;
 }
@@ -86,7 +91,7 @@ divxxx_get_active( divxxx_t *divxxx )
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
 void
-divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset )
+divxxx_reset( divxxx_t *divxxx, int enabled, int hard_reset )
 {
   divxxx->active = 0;
 
@@ -98,40 +103,40 @@ divxxx_reset( divxxx_t *divxxx, int enabled, int write_protect, int hard_reset )
     divxxx->control &= DIVXXX_CONTROL_MAPRAM;
   }
   divxxx->automap = 0;
-  divxxx_refresh_page_state( divxxx, write_protect );
+  divxxx_refresh_page_state( divxxx );
 }
 
 void
-divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data, int write_protect )
+divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data )
 {
   int old_mapram;
 
   /* MAPRAM bit cannot be reset, only set */
   old_mapram = divxxx->control & DIVXXX_CONTROL_MAPRAM;
-  divxxx_control_write_internal( divxxx, data | old_mapram, write_protect );
+  divxxx_control_write_internal( divxxx, data | old_mapram );
 }
 
 void
-divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data, int write_protect )
+divxxx_control_write_internal( divxxx_t *divxxx, libspectrum_byte data )
 {
   divxxx->control = data;
-  divxxx_refresh_page_state( divxxx, write_protect );
+  divxxx_refresh_page_state( divxxx );
 }
 
 void
-divxxx_set_automap( divxxx_t *divxxx, int automap, int write_protect )
+divxxx_set_automap( divxxx_t *divxxx, int automap )
 {
   divxxx->automap = automap;
-  divxxx_refresh_page_state( divxxx, write_protect );
+  divxxx_refresh_page_state( divxxx );
 }
 
 void
-divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect )
+divxxx_refresh_page_state( divxxx_t *divxxx )
 {
   if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     /* always paged in if conmem enabled */
     divxxx_page( divxxx );
-  } else if( write_protect
+  } else if( *divxxx->write_protect
     || ( divxxx->control & DIVXXX_CONTROL_MAPRAM ) ) {
     /* automap in effect */
     if( divxxx->automap ) {
@@ -145,7 +150,7 @@ divxxx_refresh_page_state( divxxx_t *divxxx, int write_protect )
 }
 
 void
-divxxx_memory_map( divxxx_t *divxxx, int write_protect, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
+divxxx_memory_map( divxxx_t *divxxx, size_t page_count, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
 {
   int i;
   int upper_ram_page;
@@ -158,7 +163,7 @@ divxxx_memory_map( divxxx_t *divxxx, int write_protect, size_t page_count, memor
   
   if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     lower_page = memory_map_eprom;
-    lower_page_writable = !write_protect;
+    lower_page_writable = !*divxxx->write_protect;
     upper_page = memory_map_ram[ upper_ram_page ];
     upper_page_writable = 1;
   } else {
