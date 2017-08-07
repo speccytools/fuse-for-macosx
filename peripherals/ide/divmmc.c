@@ -143,8 +143,8 @@ divmmc_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVMMC, &divmmc_periph );
 
-  divmmc_state = divxxx_alloc( event_type_string, &settings_current.divmmc_enabled,
-      &settings_current.divmmc_wp );
+  divmmc_state = divxxx_alloc( DIVMMC_PAGES, event_type_string,
+      &settings_current.divmmc_enabled, &settings_current.divmmc_wp );
 
   return 0;
 }
@@ -299,7 +299,7 @@ divmmc_refresh_page_state( void )
 void
 divmmc_memory_map( void )
 {
-  divxxx_memory_map( divmmc_state, DIVMMC_PAGES, divmmc_memory_map_eprom, divmmc_memory_map_ram );
+  divxxx_memory_map( divmmc_state, divmmc_memory_map_eprom, divmmc_memory_map_ram );
 }
 
 static void
