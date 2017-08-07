@@ -44,6 +44,7 @@ typedef struct divxxx_t {
   int automap;
 
   /* Memory pages */
+  memory_page *memory_map_eprom;
   size_t ram_page_count;
 
   /* The debugger paging events for this interface */
@@ -57,14 +58,16 @@ typedef struct divxxx_t {
 } divxxx_t;
 
 divxxx_t*
-divxxx_alloc( size_t ram_page_count, const char *event_type_string,
-    const int *enabled, const int *write_protect )
+divxxx_alloc( memory_page *memory_map_eprom, size_t ram_page_count,
+    const char *event_type_string, const int *enabled,
+    const int *write_protect )
 {
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
   divxxx->control = 0;
   divxxx->active = 0;
   divxxx->automap = 0;
+  divxxx->memory_map_eprom = memory_map_eprom;
   divxxx->ram_page_count = ram_page_count;
 
   periph_register_paging_events( event_type_string, &divxxx->page_event,
@@ -157,7 +160,7 @@ divxxx_refresh_page_state( divxxx_t *divxxx )
 }
 
 void
-divxxx_memory_map( divxxx_t *divxxx, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
+divxxx_memory_map( divxxx_t *divxxx, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
 {
   int i;
   int upper_ram_page;
@@ -169,7 +172,7 @@ divxxx_memory_map( divxxx_t *divxxx, memory_page *memory_map_eprom, memory_page 
   upper_ram_page = divxxx->control & (divxxx->ram_page_count - 1);
   
   if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
-    lower_page = memory_map_eprom;
+    lower_page = divxxx->memory_map_eprom;
     lower_page_writable = !*divxxx->write_protect;
     upper_page = memory_map_ram[ upper_ram_page ];
     upper_page_writable = 1;
@@ -180,7 +183,7 @@ divxxx_memory_map( divxxx_t *divxxx, memory_page *memory_map_eprom, memory_page 
       upper_page = memory_map_ram[ upper_ram_page ];
       upper_page_writable = ( upper_ram_page != 3 );
     } else {
-      lower_page = memory_map_eprom;
+      lower_page = divxxx->memory_map_eprom;
       lower_page_writable = 0;
       upper_page = memory_map_ram[ upper_ram_page ];
       upper_page_writable = 1;

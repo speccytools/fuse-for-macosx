@@ -33,8 +33,9 @@ typedef struct divxxx_t divxxx_t;
 /* Allocation and deallocation */
 
 divxxx_t*
-divxxx_alloc( size_t ram_page_count, const char *event_type_string,
-    const int *enabled, const int *write_protect );
+divxxx_alloc( memory_page *memory_map_eprom, size_t ram_page_count,
+    const char *event_type_string, const int *enabled,
+    const int *write_protect );
 
 void
 divxxx_free( divxxx_t *divxxx );
@@ -65,7 +66,7 @@ void
 divxxx_refresh_page_state( divxxx_t *divxxx );
 
 void
-divxxx_memory_map( divxxx_t *divxxx, memory_page *memory_map_eprom, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
+divxxx_memory_map( divxxx_t *divxxx, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
 
 void
 divxxx_page( divxxx_t *divxxx );

@@ -136,8 +136,9 @@ divide_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
 
-  divide_state = divxxx_alloc( DIVIDE_PAGES, event_type_string,
-      &settings_current.divide_enabled, &settings_current.divide_wp );
+  divide_state = divxxx_alloc( divide_memory_map_eprom, DIVIDE_PAGES,
+      event_type_string, &settings_current.divide_enabled,
+      &settings_current.divide_wp );
 
   return 0;
 }
@@ -275,7 +276,7 @@ divide_refresh_page_state( void )
 void
 divide_memory_map( void )
 {
-  divxxx_memory_map( divide_state, divide_memory_map_eprom, divide_memory_map_ram );
+  divxxx_memory_map( divide_state, divide_memory_map_ram );
 }
 
 static void
