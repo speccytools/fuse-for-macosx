@@ -55,6 +55,8 @@ typedef struct divxxx_t {
 
   /* RAM */
   size_t ram_page_count;
+  int ram_memory_source;
+  memory_page **memory_map_ram;
 
   /* The debugger paging events for this interface */
   int page_event;
@@ -68,10 +70,10 @@ typedef struct divxxx_t {
 
 divxxx_t*
 divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
-    const char *event_type_string, const int *enabled,
-    const int *write_protect )
+    const char *ram_source_name, const char *event_type_string,
+    const int *enabled, const int *write_protect )
 {
-  size_t i;
+  size_t i, j;
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
   divxxx->control = 0;
@@ -79,8 +81,8 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
   divxxx->automap = 0;
 
   divxxx->memory_allocated = 0;
-  divxxx->eprom_memory_source = memory_source_register( eprom_source_name );
 
+  divxxx->eprom_memory_source = memory_source_register( eprom_source_name );
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
     memory_page *page = &divxxx->memory_map_eprom[i];
     page->source = divxxx->eprom_memory_source;
@@ -88,6 +90,18 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
   }
 
   divxxx->ram_page_count = ram_page_count;
+  divxxx->ram_memory_source = memory_source_register( ram_source_name );
+  divxxx->memory_map_ram =
+    libspectrum_new( memory_page*, divxxx->ram_page_count );
+  for( i = 0; i < divxxx->ram_page_count; i++ ) {
+    divxxx->memory_map_ram[i] =
+      libspectrum_new( memory_page, MEMORY_PAGES_IN_8K );
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+      memory_page *page = &divxxx->memory_map_ram[i][j];
+      page->source = divxxx->ram_memory_source;
+      page->page_num = i;
+    }
+  }
 
   periph_register_paging_events( event_type_string, &divxxx->page_event,
                                  &divxxx->unpage_event );
@@ -101,6 +115,12 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
 void
 divxxx_free( divxxx_t *divxxx )
 {
+  size_t i;
+
+  for( i = 0; i < divxxx->ram_page_count; i++ )
+    libspectrum_free( divxxx->memory_map_ram[i] );
+  libspectrum_free( divxxx->memory_map_ram );
+
   libspectrum_free( divxxx );
 }
 
@@ -134,6 +154,12 @@ divxxx_get_eprom( divxxx_t *divxxx )
   return divxxx->eprom;
 }
 
+int
+divxxx_get_ram_memory_source( divxxx_t *divxxx )
+{
+  return divxxx->ram_memory_source;
+}
+
 /* DivIDE/DivMMC does not page in immediately on a reset condition (we do that by
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
@@ -154,7 +180,7 @@ divxxx_reset( divxxx_t *divxxx, int hard_reset )
 }
 
 void
-divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[], memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
+divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[] )
 {
   if( !divxxx->memory_allocated ) {
     int i, j;
@@ -164,7 +190,7 @@ divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[], memory_page memory_m
     for( i = 0; i < divxxx->ram_page_count; i++ ) {
       ram[i] = memory + i * DIVXXX_PAGE_LENGTH;
       for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-        memory_page *page = &memory_map_ram[i][j];
+        memory_page *page = &divxxx->memory_map_ram[i][j];
         page->page = ram[i] + j * MEMORY_PAGE_SIZE;
         page->offset = j * MEMORY_PAGE_SIZE;
       }
@@ -225,7 +251,7 @@ divxxx_refresh_page_state( divxxx_t *divxxx )
 }
 
 void
-divxxx_memory_map( divxxx_t *divxxx, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
+divxxx_memory_map( divxxx_t *divxxx )
 {
   int i;
   int upper_ram_page;
@@ -239,18 +265,18 @@ divxxx_memory_map( divxxx_t *divxxx, memory_page memory_map_ram[][ MEMORY_PAGES_
   if( divxxx->control & DIVXXX_CONTROL_CONMEM ) {
     lower_page = divxxx->memory_map_eprom;
     lower_page_writable = !*divxxx->write_protect;
-    upper_page = memory_map_ram[ upper_ram_page ];
+    upper_page = divxxx->memory_map_ram[ upper_ram_page ];
     upper_page_writable = 1;
   } else {
     if( divxxx->control & DIVXXX_CONTROL_MAPRAM ) {
-      lower_page = memory_map_ram[3];
+      lower_page = divxxx->memory_map_ram[3];
       lower_page_writable = 0;
-      upper_page = memory_map_ram[ upper_ram_page ];
+      upper_page = divxxx->memory_map_ram[ upper_ram_page ];
       upper_page_writable = ( upper_ram_page != 3 );
     } else {
       lower_page = divxxx->memory_map_eprom;
       lower_page_writable = 0;
-      upper_page = memory_map_ram[ upper_ram_page ];
+      upper_page = divxxx->memory_map_ram[ upper_ram_page ];
       upper_page_writable = 1;
     }
   }

@@ -34,8 +34,8 @@ typedef struct divxxx_t divxxx_t;
 
 divxxx_t*
 divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
-    const char *event_type_string, const int *enabled,
-    const int *write_protect );
+    const char *ram_source_name, const char *event_type_string,
+    const int *enabled, const int *write_protect );
 
 void
 divxxx_free( divxxx_t *divxxx );
@@ -57,13 +57,16 @@ divxxx_get_eprom_page( divxxx_t *divxxx, size_t which );
 libspectrum_byte*
 divxxx_get_eprom( divxxx_t *divxxx );
 
+int
+divxxx_get_ram_memory_source( divxxx_t *divxxx );
+
 /* Actions */
 
 void
 divxxx_reset( divxxx_t *divxxx, int hard_reset );
 
 void
-divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[], memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
+divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[] );
 
 void
 divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data );
@@ -78,7 +81,7 @@ void
 divxxx_refresh_page_state( divxxx_t *divxxx );
 
 void
-divxxx_memory_map( divxxx_t *divxxx, memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] );
+divxxx_memory_map( divxxx_t *divxxx );
 
 void
 divxxx_page( divxxx_t *divxxx );

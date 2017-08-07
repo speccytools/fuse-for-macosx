@@ -72,8 +72,6 @@ static libspectrum_ide_channel *divide_idechn1;
 #define DIVIDE_PAGES 4
 #define DIVIDE_PAGE_LENGTH 0x2000
 static libspectrum_byte *divide_ram[ DIVIDE_PAGES ];
-static memory_page divide_memory_map_ram[ DIVIDE_PAGES ][ MEMORY_PAGES_IN_8K ];
-static int divide_memory_source_ram;
 
 static void divide_reset( int hard_reset );
 static void divide_memory_map( void );
@@ -99,7 +97,7 @@ static const char * const event_type_string = "divide";
 static int
 divide_init( void *context )
 {
-  int error, i, j;
+  int error;
 
   divide_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   divide_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
@@ -113,20 +111,11 @@ divide_init( void *context )
 
   module_register( &divide_module_info );
 
-  divide_memory_source_ram = memory_source_register( "DivIDE RAM" );
-
-  for( i = 0; i < DIVIDE_PAGES; i++ ) {
-    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-      memory_page *page = &divide_memory_map_ram[i][j];
-      page->source = divide_memory_source_ram;
-      page->page_num = i;
-    }
-  }
-
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
 
-  divide_state = divxxx_alloc( "DivIDE EPROM", DIVIDE_PAGES, event_type_string,
-      &settings_current.divide_enabled, &settings_current.divide_wp );
+  divide_state = divxxx_alloc( "DivIDE EPROM", DIVIDE_PAGES, "DivIDE RAM",
+      event_type_string, &settings_current.divide_enabled,
+      &settings_current.divide_wp );
 
   return 0;
 }
@@ -264,7 +253,7 @@ divide_refresh_page_state( void )
 void
 divide_memory_map( void )
 {
-  divxxx_memory_map( divide_state, divide_memory_map_ram );
+  divxxx_memory_map( divide_state );
 }
 
 static void
@@ -335,7 +324,7 @@ divide_to_snapshot( libspectrum_snap *snap )
 static void
 divide_activate( void )
 {
-  divxxx_activate( divide_state, divide_ram, divide_memory_map_ram );
+  divxxx_activate( divide_state, divide_ram );
 }
 
 int
@@ -343,33 +332,34 @@ divide_unittest( void )
 {
   int r = 0;
   int eprom_memory_source = divxxx_get_eprom_memory_source( divide_state );
+  int ram_memory_source = divxxx_get_ram_memory_source( divide_state );
 
   divide_set_automap( 1 );
 
   divide_control_write( 0x00e3, 0x80 );
   r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
-  r += unittests_assert_8k_page( 0x2000, divide_memory_source_ram, 0 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divide_control_write( 0x00e3, 0x83 );
   r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
-  r += unittests_assert_8k_page( 0x2000, divide_memory_source_ram, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 3 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divide_control_write( 0x00e3, 0x40 );
-  r += unittests_assert_8k_page( 0x0000, divide_memory_source_ram, 3 );
-  r += unittests_assert_8k_page( 0x2000, divide_memory_source_ram, 0 );
+  r += unittests_assert_8k_page( 0x0000, ram_memory_source, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divide_control_write( 0x00e3, 0x02 );
-  r += unittests_assert_8k_page( 0x0000, divide_memory_source_ram, 3 );
-  r += unittests_assert_8k_page( 0x2000, divide_memory_source_ram, 2 );
+  r += unittests_assert_8k_page( 0x0000, ram_memory_source, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 2 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );

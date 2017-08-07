@@ -77,8 +77,6 @@ static libspectrum_mmc_card *current_card;
 #define DIVMMC_PAGES 16
 #define DIVMMC_PAGE_LENGTH 0x2000
 static libspectrum_byte *divmmc_ram[ DIVMMC_PAGES ];
-static memory_page divmmc_memory_map_ram[ DIVMMC_PAGES ][ MEMORY_PAGES_IN_8K ];
-static int divmmc_memory_source_ram;
 
 static void divmmc_reset( int hard_reset );
 static void divmmc_memory_map( void );
@@ -104,8 +102,6 @@ static const char * const event_type_string = "divmmc";
 static int
 divmmc_init( void *context )
 {
-  int i, j;
-
   card = libspectrum_mmc_alloc();
 
   /*
@@ -120,20 +116,11 @@ divmmc_init( void *context )
 
   module_register( &divmmc_module_info );
 
-  divmmc_memory_source_ram = memory_source_register( "DivMMC RAM" );
-
-  for( i = 0; i < DIVMMC_PAGES; i++ ) {
-    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-      memory_page *page = &divmmc_memory_map_ram[i][j];
-      page->source = divmmc_memory_source_ram;
-      page->page_num = i;
-    }
-  }
-
   periph_register( PERIPH_TYPE_DIVMMC, &divmmc_periph );
 
-  divmmc_state = divxxx_alloc( "DivMMC EPROM", DIVMMC_PAGES, event_type_string,
-      &settings_current.divmmc_enabled, &settings_current.divmmc_wp );
+  divmmc_state = divxxx_alloc( "DivMMC EPROM", DIVMMC_PAGES, "DivMMC RAM",
+      event_type_string, &settings_current.divmmc_enabled,
+      &settings_current.divmmc_wp );
 
   return 0;
 }
@@ -288,7 +275,7 @@ divmmc_refresh_page_state( void )
 void
 divmmc_memory_map( void )
 {
-  divxxx_memory_map( divmmc_state, divmmc_memory_map_ram );
+  divxxx_memory_map( divmmc_state );
 }
 
 static void
@@ -371,7 +358,7 @@ divmmc_to_snapshot( libspectrum_snap *snap )
 static void
 divmmc_activate( void )
 {
-  divxxx_activate( divmmc_state, divmmc_ram, divmmc_memory_map_ram );
+  divxxx_activate( divmmc_state, divmmc_ram );
 }
 
 int
@@ -379,33 +366,34 @@ divmmc_unittest( void )
 {
   int r = 0;
   int eprom_memory_source = divxxx_get_eprom_memory_source( divmmc_state );
+  int ram_memory_source = divxxx_get_ram_memory_source( divmmc_state );
 
   divmmc_set_automap( 1 );
 
   divmmc_control_write( 0x00e3, 0x80 );
   r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
-  r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 0 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divmmc_control_write( 0x00e3, 0x83 );
   r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
-  r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 3 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divmmc_control_write( 0x00e3, 0x40 );
-  r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_ram, 3 );
-  r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 0 );
+  r += unittests_assert_8k_page( 0x0000, ram_memory_source, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divmmc_control_write( 0x00e3, 0x02 );
-  r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_ram, 3 );
-  r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 2 );
+  r += unittests_assert_8k_page( 0x0000, ram_memory_source, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 2 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
@@ -413,8 +401,8 @@ divmmc_unittest( void )
   /* We have only 128 Kb of RAM (16 x 8 Kb pages), so setting all of bits 0-5
      results in page 15 being selected */
   divmmc_control_write( 0x00e3, 0x3f );
-  r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_ram, 3 );
-  r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 15 );
+  r += unittests_assert_8k_page( 0x0000, ram_memory_source, 3 );
+  r += unittests_assert_8k_page( 0x2000, ram_memory_source, 15 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
