@@ -373,29 +373,7 @@ divmmc_to_snapshot( libspectrum_snap *snap )
 static void
 divmmc_activate( void )
 {
-  if( !memory_allocated ) {
-    int i, j;
-    libspectrum_byte *memory =
-      memory_pool_allocate_persistent( DIVMMC_PAGES * DIVMMC_PAGE_LENGTH, 1 );
-
-    for( i = 0; i < DIVMMC_PAGES; i++ ) {
-      divmmc_ram[i] = memory + i * DIVMMC_PAGE_LENGTH;
-      for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-        memory_page *page = &divmmc_memory_map_ram[i][j];
-        page->page = divmmc_ram[i] + j * MEMORY_PAGE_SIZE;
-        page->offset = j * MEMORY_PAGE_SIZE;
-      }
-    }
-
-    divmmc_eprom = memory_pool_allocate_persistent( DIVMMC_PAGE_LENGTH, 1 );
-    for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-      memory_page *page = divxxx_get_eprom_page( divmmc_state, i );
-      page->page = divmmc_eprom + i * MEMORY_PAGE_SIZE;
-      page->offset = i * MEMORY_PAGE_SIZE;
-    }
-
-    memory_allocated = 1;
-  }
+  divxxx_activate( divmmc_state, &memory_allocated, divmmc_ram, divmmc_memory_map_ram, &divmmc_eprom );
 }
 
 int

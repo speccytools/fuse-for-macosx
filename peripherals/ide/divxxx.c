@@ -33,6 +33,8 @@
 static const libspectrum_byte DIVXXX_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVXXX_CONTROL_MAPRAM = 0x40;
 
+#define DIVXXX_PAGE_LENGTH 0x2000
+
 typedef struct divxxx_t {
   libspectrum_byte control;
 
@@ -136,6 +138,34 @@ divxxx_reset( divxxx_t *divxxx, int hard_reset )
   }
   divxxx->automap = 0;
   divxxx_refresh_page_state( divxxx );
+}
+
+void
+divxxx_activate( divxxx_t *divxxx, int *memory_allocated, libspectrum_byte *ram[], memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ], libspectrum_byte **eprom )
+{
+  if( !*memory_allocated ) {
+    int i, j;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( divxxx->ram_page_count * DIVXXX_PAGE_LENGTH, 1 );
+
+    for( i = 0; i < divxxx->ram_page_count; i++ ) {
+      ram[i] = memory + i * DIVXXX_PAGE_LENGTH;
+      for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+        memory_page *page = &memory_map_ram[i][j];
+        page->page = ram[i] + j * MEMORY_PAGE_SIZE;
+        page->offset = j * MEMORY_PAGE_SIZE;
+      }
+    }
+
+    *eprom = memory_pool_allocate_persistent( DIVXXX_PAGE_LENGTH, 1 );
+    for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+      memory_page *page = divxxx_get_eprom_page( divxxx, i );
+      page->page = *eprom + i * MEMORY_PAGE_SIZE;
+      page->offset = i * MEMORY_PAGE_SIZE;
+    }
+
+    *memory_allocated = 1;
+  }
 }
 
 void

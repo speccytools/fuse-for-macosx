@@ -60,6 +60,9 @@ void
 divxxx_reset( divxxx_t *divxxx, int hard_reset );
 
 void
+divxxx_activate( divxxx_t *divxxx, int *memory_allocated, libspectrum_byte *ram[], memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ], libspectrum_byte **eprom );
+
+void
 divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data );
 
 void
