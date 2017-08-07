@@ -143,7 +143,8 @@ divmmc_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVMMC, &divmmc_periph );
 
-  divmmc_state = divxxx_alloc( event_type_string, &settings_current.divmmc_wp );
+  divmmc_state = divxxx_alloc( event_type_string, &settings_current.divmmc_enabled,
+      &settings_current.divmmc_wp );
 
   return 0;
 }
@@ -175,7 +176,7 @@ divmmc_register_startup( void )
 static void
 divmmc_reset( int hard_reset )
 {
-  divxxx_reset( divmmc_state, settings_current.divmmc_enabled, hard_reset );
+  divxxx_reset( divmmc_state, hard_reset );
 
   /*
    TODO

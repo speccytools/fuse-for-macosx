@@ -48,12 +48,14 @@ typedef struct divxxx_t {
   int unpage_event;
 
   /* References to the current settings for this interface */
+  const int *enabled;
   const int *write_protect;
 
 } divxxx_t;
 
 divxxx_t*
-divxxx_alloc( const char *event_type_string, const int *write_protect )
+divxxx_alloc( const char *event_type_string, const int *enabled,
+    const int *write_protect )
 {
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
@@ -64,6 +66,7 @@ divxxx_alloc( const char *event_type_string, const int *write_protect )
   periph_register_paging_events( event_type_string, &divxxx->page_event,
                                  &divxxx->unpage_event );
 
+  divxxx->enabled = enabled;
   divxxx->write_protect = write_protect;
 
   return divxxx;
@@ -91,11 +94,11 @@ divxxx_get_active( divxxx_t *divxxx )
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
 void
-divxxx_reset( divxxx_t *divxxx, int enabled, int hard_reset )
+divxxx_reset( divxxx_t *divxxx, int hard_reset )
 {
   divxxx->active = 0;
 
-  if( !enabled ) return;
+  if( !*divxxx->enabled ) return;
 
   if( hard_reset ) {
     divxxx->control = 0;

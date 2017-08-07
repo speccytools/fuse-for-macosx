@@ -136,7 +136,8 @@ divide_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
 
-  divide_state = divxxx_alloc( event_type_string, &settings_current.divide_wp );
+  divide_state = divxxx_alloc( event_type_string, &settings_current.divide_enabled,
+      &settings_current.divide_wp );
 
   return 0;
 }
@@ -169,7 +170,7 @@ divide_register_startup( void )
 static void
 divide_reset( int hard_reset )
 {
-  divxxx_reset( divide_state, settings_current.divide_enabled, hard_reset );
+  divxxx_reset( divide_state, hard_reset );
 
   libspectrum_ide_reset( divide_idechn0 );
   libspectrum_ide_reset( divide_idechn1 );

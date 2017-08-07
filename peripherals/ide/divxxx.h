@@ -33,7 +33,8 @@ typedef struct divxxx_t divxxx_t;
 /* Allocation and deallocation */
 
 divxxx_t*
-divxxx_alloc( const char *event_type_string, const int *write_protect );
+divxxx_alloc( const char *event_type_string, const int *enabled,
+    const int *write_protect );
 
 void
 divxxx_free( divxxx_t *divxxx );
@@ -49,7 +50,7 @@ divxxx_get_active( divxxx_t *divxxx );
 /* Actions */
 
 void
-divxxx_reset( divxxx_t *divxxx, int enabled, int hard_reset );
+divxxx_reset( divxxx_t *divxxx, int hard_reset );
 
 void
 divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data );
