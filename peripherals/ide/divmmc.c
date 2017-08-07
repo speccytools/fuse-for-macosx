@@ -78,10 +78,8 @@ static libspectrum_mmc_card *current_card;
 #define DIVMMC_PAGE_LENGTH 0x2000
 static libspectrum_byte *divmmc_ram[ DIVMMC_PAGES ];
 static libspectrum_byte *divmmc_eprom;
-static memory_page divmmc_memory_map_eprom[ MEMORY_PAGES_IN_8K ];
 static memory_page divmmc_memory_map_ram[ DIVMMC_PAGES ][ MEMORY_PAGES_IN_8K ];
 static int memory_allocated = 0;
-static int divmmc_memory_source_eprom;
 static int divmmc_memory_source_ram;
 
 static void divmmc_reset( int hard_reset );
@@ -124,14 +122,7 @@ divmmc_init( void *context )
 
   module_register( &divmmc_module_info );
 
-  divmmc_memory_source_eprom = memory_source_register( "DivMMC EPROM" );
   divmmc_memory_source_ram = memory_source_register( "DivMMC RAM" );
-
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    memory_page *page = &divmmc_memory_map_eprom[i];
-    page->source = divmmc_memory_source_eprom;
-    page->page_num = 0;
-  }
 
   for( i = 0; i < DIVMMC_PAGES; i++ ) {
     for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
@@ -143,9 +134,8 @@ divmmc_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVMMC, &divmmc_periph );
 
-  divmmc_state = divxxx_alloc( divmmc_memory_map_eprom, DIVMMC_PAGES,
-      event_type_string, &settings_current.divmmc_enabled,
-      &settings_current.divmmc_wp );
+  divmmc_state = divxxx_alloc( "DivMMC EPROM", DIVMMC_PAGES, event_type_string,
+      &settings_current.divmmc_enabled, &settings_current.divmmc_wp );
 
   return 0;
 }
@@ -399,7 +389,7 @@ divmmc_activate( void )
 
     divmmc_eprom = memory_pool_allocate_persistent( DIVMMC_PAGE_LENGTH, 1 );
     for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-      memory_page *page = &divmmc_memory_map_eprom[i];
+      memory_page *page = divxxx_get_eprom_page( divmmc_state, i );
       page->page = divmmc_eprom + i * MEMORY_PAGE_SIZE;
       page->offset = i * MEMORY_PAGE_SIZE;
     }
@@ -412,18 +402,19 @@ int
 divmmc_unittest( void )
 {
   int r = 0;
+  int eprom_memory_source = divxxx_get_eprom_memory_source( divmmc_state );
 
   divmmc_set_automap( 1 );
 
   divmmc_control_write( 0x00e3, 0x80 );
-  r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_eprom, 0 );
+  r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
   r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divmmc_control_write( 0x00e3, 0x83 );
-  r += unittests_assert_8k_page( 0x0000, divmmc_memory_source_eprom, 0 );
+  r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
   r += unittests_assert_8k_page( 0x2000, divmmc_memory_source_ram, 3 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );

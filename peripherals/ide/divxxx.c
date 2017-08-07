@@ -44,7 +44,8 @@ typedef struct divxxx_t {
   int automap;
 
   /* Memory pages */
-  memory_page *memory_map_eprom;
+  int eprom_memory_source;
+  memory_page memory_map_eprom[ MEMORY_PAGES_IN_8K ];
   size_t ram_page_count;
 
   /* The debugger paging events for this interface */
@@ -58,16 +59,25 @@ typedef struct divxxx_t {
 } divxxx_t;
 
 divxxx_t*
-divxxx_alloc( memory_page *memory_map_eprom, size_t ram_page_count,
+divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
     const char *event_type_string, const int *enabled,
     const int *write_protect )
 {
+  size_t i;
   divxxx_t *divxxx = libspectrum_new( divxxx_t, 1 );
 
   divxxx->control = 0;
   divxxx->active = 0;
   divxxx->automap = 0;
-  divxxx->memory_map_eprom = memory_map_eprom;
+
+  divxxx->eprom_memory_source = memory_source_register( eprom_source_name );
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    memory_page *page = &divxxx->memory_map_eprom[i];
+    page->source = divxxx->eprom_memory_source;
+    page->page_num = 0;
+  }
+
   divxxx->ram_page_count = ram_page_count;
 
   periph_register_paging_events( event_type_string, &divxxx->page_event,
@@ -95,6 +105,18 @@ int
 divxxx_get_active( divxxx_t *divxxx )
 {
   return divxxx->active;
+}
+
+int
+divxxx_get_eprom_memory_source( divxxx_t *divxxx )
+{
+  return divxxx->eprom_memory_source;
+}
+
+memory_page*
+divxxx_get_eprom_page( divxxx_t *divxxx, size_t which )
+{
+  return &divxxx->memory_map_eprom[ which ];
 }
 
 /* DivIDE/DivMMC does not page in immediately on a reset condition (we do that by

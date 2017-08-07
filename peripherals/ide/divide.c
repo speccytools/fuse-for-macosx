@@ -73,10 +73,8 @@ static libspectrum_ide_channel *divide_idechn1;
 #define DIVIDE_PAGE_LENGTH 0x2000
 static libspectrum_byte *divide_ram[ DIVIDE_PAGES ];
 static libspectrum_byte *divide_eprom;
-static memory_page divide_memory_map_eprom[ MEMORY_PAGES_IN_8K ];
 static memory_page divide_memory_map_ram[ DIVIDE_PAGES ][ MEMORY_PAGES_IN_8K ];
 static int memory_allocated = 0;
-static int divide_memory_source_eprom;
 static int divide_memory_source_ram;
 
 static void divide_reset( int hard_reset );
@@ -117,14 +115,7 @@ divide_init( void *context )
 
   module_register( &divide_module_info );
 
-  divide_memory_source_eprom = memory_source_register( "DivIDE EPROM" );
   divide_memory_source_ram = memory_source_register( "DivIDE RAM" );
-
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    memory_page *page = &divide_memory_map_eprom[i];
-    page->source = divide_memory_source_eprom;
-    page->page_num = 0;
-  }
 
   for( i = 0; i < DIVIDE_PAGES; i++ ) {
     for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
@@ -136,9 +127,8 @@ divide_init( void *context )
 
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
 
-  divide_state = divxxx_alloc( divide_memory_map_eprom, DIVIDE_PAGES,
-      event_type_string, &settings_current.divide_enabled,
-      &settings_current.divide_wp );
+  divide_state = divxxx_alloc( "DivIDE EPROM", DIVIDE_PAGES, event_type_string,
+      &settings_current.divide_enabled, &settings_current.divide_wp );
 
   return 0;
 }
@@ -363,7 +353,7 @@ divide_activate( void )
 
     divide_eprom = memory_pool_allocate_persistent( DIVIDE_PAGE_LENGTH, 1 );
     for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-      memory_page *page = &divide_memory_map_eprom[i];
+      memory_page *page = divxxx_get_eprom_page( divide_state, i );
       page->page = divide_eprom + i * MEMORY_PAGE_SIZE;
       page->offset = i * MEMORY_PAGE_SIZE;
     }
@@ -376,18 +366,19 @@ int
 divide_unittest( void )
 {
   int r = 0;
+  int eprom_memory_source = divxxx_get_eprom_memory_source( divide_state );
 
   divide_set_automap( 1 );
 
   divide_control_write( 0x00e3, 0x80 );
-  r += unittests_assert_8k_page( 0x0000, divide_memory_source_eprom, 0 );
+  r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
   r += unittests_assert_8k_page( 0x2000, divide_memory_source_ram, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   divide_control_write( 0x00e3, 0x83 );
-  r += unittests_assert_8k_page( 0x0000, divide_memory_source_eprom, 0 );
+  r += unittests_assert_8k_page( 0x0000, eprom_memory_source, 0 );
   r += unittests_assert_8k_page( 0x2000, divide_memory_source_ram, 3 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );

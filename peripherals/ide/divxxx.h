@@ -33,7 +33,7 @@ typedef struct divxxx_t divxxx_t;
 /* Allocation and deallocation */
 
 divxxx_t*
-divxxx_alloc( memory_page *memory_map_eprom, size_t ram_page_count,
+divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
     const char *event_type_string, const int *enabled,
     const int *write_protect );
 
@@ -47,6 +47,12 @@ divxxx_get_control( divxxx_t *divxxx );
 
 int
 divxxx_get_active( divxxx_t *divxxx );
+
+int
+divxxx_get_eprom_memory_source( divxxx_t *divxxx );
+
+memory_page*
+divxxx_get_eprom_page( divxxx_t *divxxx, size_t which );
 
 /* Actions */
 
