@@ -45,9 +45,15 @@ typedef struct divxxx_t {
      flags allowed it */
   int automap;
 
-  /* Memory pages */
+  /* True once memory has been allocated for this interface */
+  int memory_allocated;
+
+  /* EPROM */
   int eprom_memory_source;
   memory_page memory_map_eprom[ MEMORY_PAGES_IN_8K ];
+  libspectrum_byte *eprom;
+
+  /* RAM */
   size_t ram_page_count;
 
   /* The debugger paging events for this interface */
@@ -72,6 +78,7 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
   divxxx->active = 0;
   divxxx->automap = 0;
 
+  divxxx->memory_allocated = 0;
   divxxx->eprom_memory_source = memory_source_register( eprom_source_name );
 
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
@@ -121,6 +128,12 @@ divxxx_get_eprom_page( divxxx_t *divxxx, size_t which )
   return &divxxx->memory_map_eprom[ which ];
 }
 
+libspectrum_byte*
+divxxx_get_eprom( divxxx_t *divxxx )
+{
+  return divxxx->eprom;
+}
+
 /* DivIDE/DivMMC does not page in immediately on a reset condition (we do that by
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
@@ -141,9 +154,9 @@ divxxx_reset( divxxx_t *divxxx, int hard_reset )
 }
 
 void
-divxxx_activate( divxxx_t *divxxx, int *memory_allocated, libspectrum_byte *ram[], memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ], libspectrum_byte **eprom )
+divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[], memory_page memory_map_ram[][ MEMORY_PAGES_IN_8K ] )
 {
-  if( !*memory_allocated ) {
+  if( !divxxx->memory_allocated ) {
     int i, j;
     libspectrum_byte *memory =
       memory_pool_allocate_persistent( divxxx->ram_page_count * DIVXXX_PAGE_LENGTH, 1 );
@@ -157,14 +170,14 @@ divxxx_activate( divxxx_t *divxxx, int *memory_allocated, libspectrum_byte *ram[
       }
     }
 
-    *eprom = memory_pool_allocate_persistent( DIVXXX_PAGE_LENGTH, 1 );
+    divxxx->eprom = memory_pool_allocate_persistent( DIVXXX_PAGE_LENGTH, 1 );
     for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
       memory_page *page = divxxx_get_eprom_page( divxxx, i );
-      page->page = *eprom + i * MEMORY_PAGE_SIZE;
+      page->page = divxxx->eprom + i * MEMORY_PAGE_SIZE;
       page->offset = i * MEMORY_PAGE_SIZE;
     }
 
-    *memory_allocated = 1;
+    divxxx->memory_allocated = 1;
   }
 }
 

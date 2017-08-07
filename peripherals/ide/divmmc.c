@@ -77,9 +77,7 @@ static libspectrum_mmc_card *current_card;
 #define DIVMMC_PAGES 16
 #define DIVMMC_PAGE_LENGTH 0x2000
 static libspectrum_byte *divmmc_ram[ DIVMMC_PAGES ];
-static libspectrum_byte *divmmc_eprom;
 static memory_page divmmc_memory_map_ram[ DIVMMC_PAGES ][ MEMORY_PAGES_IN_8K ];
-static int memory_allocated = 0;
 static int divmmc_memory_source_ram;
 
 static void divmmc_reset( int hard_reset );
@@ -373,7 +371,7 @@ divmmc_to_snapshot( libspectrum_snap *snap )
 static void
 divmmc_activate( void )
 {
-  divxxx_activate( divmmc_state, &memory_allocated, divmmc_ram, divmmc_memory_map_ram, &divmmc_eprom );
+  divxxx_activate( divmmc_state, divmmc_ram, divmmc_memory_map_ram );
 }
 
 int
