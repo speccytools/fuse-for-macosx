@@ -71,7 +71,6 @@ static libspectrum_ide_channel *divide_idechn1;
 
 #define DIVIDE_PAGES 4
 #define DIVIDE_PAGE_LENGTH 0x2000
-static libspectrum_byte *divide_ram[ DIVIDE_PAGES ];
 
 static void divide_reset( int hard_reset );
 static void divide_memory_map( void );
@@ -280,9 +279,10 @@ divide_from_snapshot( libspectrum_snap *snap )
   }
 
   for( i = 0; i < libspectrum_snap_divide_pages( snap ); i++ )
-    if( libspectrum_snap_divide_ram( snap, i ) )
-      memcpy( divide_ram[ i ], libspectrum_snap_divide_ram( snap, i ),
-	      DIVIDE_PAGE_LENGTH );
+    if( libspectrum_snap_divide_ram( snap, i ) ) {
+      libspectrum_byte *ram = divxxx_get_ram( divide_state, i );
+      memcpy( ram, libspectrum_snap_divide_ram( snap, i ), DIVIDE_PAGE_LENGTH );
+    }
 
   if( libspectrum_snap_divide_paged( snap ) ) {
     divxxx_page( divide_state );
@@ -316,7 +316,7 @@ divide_to_snapshot( libspectrum_snap *snap )
 
     buffer = libspectrum_new( libspectrum_byte, DIVIDE_PAGE_LENGTH );
 
-    memcpy( buffer, divide_ram[ i ], DIVIDE_PAGE_LENGTH );
+    memcpy( buffer, divxxx_get_ram( divide_state, i ), DIVIDE_PAGE_LENGTH );
     libspectrum_snap_set_divide_ram( snap, i, buffer );
   }
 }
@@ -324,7 +324,7 @@ divide_to_snapshot( libspectrum_snap *snap )
 static void
 divide_activate( void )
 {
-  divxxx_activate( divide_state, divide_ram );
+  divxxx_activate( divide_state );
 }
 
 int

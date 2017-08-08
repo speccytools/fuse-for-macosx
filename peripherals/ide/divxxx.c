@@ -57,6 +57,7 @@ typedef struct divxxx_t {
   size_t ram_page_count;
   int ram_memory_source;
   memory_page **memory_map_ram;
+  libspectrum_byte **ram;
 
   /* The debugger paging events for this interface */
   int page_event;
@@ -102,6 +103,7 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
       page->page_num = i;
     }
   }
+  divxxx->ram = NULL;
 
   periph_register_paging_events( event_type_string, &divxxx->page_event,
                                  &divxxx->unpage_event );
@@ -120,6 +122,7 @@ divxxx_free( divxxx_t *divxxx )
   for( i = 0; i < divxxx->ram_page_count; i++ )
     libspectrum_free( divxxx->memory_map_ram[i] );
   libspectrum_free( divxxx->memory_map_ram );
+  libspectrum_free( divxxx->ram );
 
   libspectrum_free( divxxx );
 }
@@ -160,6 +163,12 @@ divxxx_get_ram_memory_source( divxxx_t *divxxx )
   return divxxx->ram_memory_source;
 }
 
+libspectrum_byte*
+divxxx_get_ram( divxxx_t *divxxx, size_t which )
+{
+  return divxxx->ram[ which ];
+}
+
 /* DivIDE/DivMMC does not page in immediately on a reset condition (we do that by
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
@@ -180,18 +189,20 @@ divxxx_reset( divxxx_t *divxxx, int hard_reset )
 }
 
 void
-divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[] )
+divxxx_activate( divxxx_t *divxxx )
 {
   if( !divxxx->memory_allocated ) {
     int i, j;
     libspectrum_byte *memory =
       memory_pool_allocate_persistent( divxxx->ram_page_count * DIVXXX_PAGE_LENGTH, 1 );
 
+    divxxx->ram = libspectrum_new( libspectrum_byte*, divxxx->ram_page_count );
+
     for( i = 0; i < divxxx->ram_page_count; i++ ) {
-      ram[i] = memory + i * DIVXXX_PAGE_LENGTH;
+      divxxx->ram[i] = memory + i * DIVXXX_PAGE_LENGTH;
       for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
         memory_page *page = &divxxx->memory_map_ram[i][j];
-        page->page = ram[i] + j * MEMORY_PAGE_SIZE;
+        page->page = divxxx->ram[i] + j * MEMORY_PAGE_SIZE;
         page->offset = j * MEMORY_PAGE_SIZE;
       }
     }

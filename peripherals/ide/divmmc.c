@@ -76,7 +76,6 @@ static libspectrum_mmc_card *current_card;
 /* *Our* DivMMC has 128 Kb of RAM - this is all that ESXDOS needs */
 #define DIVMMC_PAGES 16
 #define DIVMMC_PAGE_LENGTH 0x2000
-static libspectrum_byte *divmmc_ram[ DIVMMC_PAGES ];
 
 static void divmmc_reset( int hard_reset );
 static void divmmc_memory_map( void );
@@ -358,7 +357,7 @@ divmmc_to_snapshot( libspectrum_snap *snap )
 static void
 divmmc_activate( void )
 {
-  divxxx_activate( divmmc_state, divmmc_ram );
+  divxxx_activate( divmmc_state );
 }
 
 int

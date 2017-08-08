@@ -60,13 +60,16 @@ divxxx_get_eprom( divxxx_t *divxxx );
 int
 divxxx_get_ram_memory_source( divxxx_t *divxxx );
 
+libspectrum_byte*
+divxxx_get_ram( divxxx_t *divxxx, size_t which );
+
 /* Actions */
 
 void
 divxxx_reset( divxxx_t *divxxx, int hard_reset );
 
 void
-divxxx_activate( divxxx_t *divxxx, libspectrum_byte *ram[] );
+divxxx_activate( divxxx_t *divxxx );
 
 void
 divxxx_control_write( divxxx_t *divxxx, libspectrum_byte data );
