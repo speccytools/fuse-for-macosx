@@ -73,8 +73,8 @@ static libspectrum_mmc_card *card;
 /* The card currently selected via the "card select" call */
 static libspectrum_mmc_card *current_card;
 
-/* *Our* DivMMC has 128 Kb of RAM - this is all that ESXDOS needs */
-#define DIVMMC_PAGES 16
+/* *Our* DivMMC has 256 Kb of RAM */
+#define DIVMMC_PAGES 32
 #define DIVMMC_PAGE_LENGTH 0x2000
 
 static void divmmc_reset( int hard_reset );
@@ -233,7 +233,7 @@ divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 static void
 divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  printf("divmmc_card_select( 0x%02x )\n", data );
+//  printf("divmmc_card_select( 0x%02x )\n", data );
 
   switch( data ) {
     case 0xf6:
