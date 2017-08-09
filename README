@@ -1,4 +1,4 @@
-The Free Unix Spectrum Emulator (Fuse) 1.3.6
+The Free Unix Spectrum Emulator (Fuse) 1.3.8
 ============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
@@ -31,6 +31,7 @@ What Fuse does have:
 * Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery
   disk interfaces.
 * Emulation of the Spectranet and SpeccyBoot network interfaces.
+* Support for the Recreated ZX Spectrum Bluetooth keyboard.
 
 Help! <xyz> doesn't work
 ------------------------
@@ -110,4 +111,4 @@ Usenet newsgroup `comp.sys.sinclair' or the World of Spectrum forums
 <http://www.worldofspectrum.org/forums/>.
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-1st June, 2017
+31st July, 2017

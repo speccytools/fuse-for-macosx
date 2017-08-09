@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "1st June, 2017" "Version 1.3.6" "Emulators"
+.TH fuse 1 "31st July, 2017" "Version 1.3.8" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -811,6 +811,23 @@ and
 Emulate a Melodik AY\ interface for 16/48k\ Spectrums. Same as the
 General Peripherals Options dialog's
 .I "Melodik"
+option.
+.RE
+.PP
+.B \-\-mdr\-len
+.I length
+.RS
+This option controls the number of blocks in a new Microdrive cartridge.
+Same as the Media Options dialog's
+.I "MDR cartridge len"
+option.
+.RE
+.PP
+.B \-\-mdr\-random\-len
+.RS
+If this option is set, Fuse will use a random Microdrive cartridge
+length. Same as the Media Options dialog's
+.I "Random length MDR cartridge"
 option.
 .RE
 .PP
@@ -2382,13 +2399,14 @@ the trap or not.
 .I "MDR cartridge len"
 .RS
 This option controls the number of blocks in a new Microdrive cartridge.
-If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
+If the value smaller than 10 or greater than 254 Fuse assumes 10 or 254.
+Average real capacity is around 180 blocks (90 Kb).
 .RE
 .PP
 .I "Random length MDR cartridge"
 .RS
 If this option is enabled, Fuse will use a random Microdrive cartridge
-length instead of the length specified in the
+length (around 180 blocks) instead of the length specified in the
 .I "MDR cartridge len"
 option.
 .RE
@@ -2554,8 +2572,8 @@ unpredictable behaviour will occur.
 .PP
 .I "Multiface One"
 .RS
-If this option is selected, Fuse will emulate the Romantic Robot
-Multiface One. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+If this option is selected, Fuse will emulate the Romantic Robot Multiface\ One.
+Available for 16K, 48K and Timex TC2048 machines.
 .RE
 .PP
 .I "Multiface\ 128"

@@ -80,6 +80,8 @@ static char *rzx_filename;
 /* Are we currently playing back a .rzx file? */
 int rzx_playback;
 
+int sentinel_warning;
+
 /* The number of instructions in the current .rzx playback frame */
 size_t rzx_instruction_count;
 
@@ -126,6 +128,7 @@ rzx_init( void *context )
   rzx_in_bytes = NULL;
   rzx_in_allocated = 0;
 
+  sentinel_warning = 0;
   sentinel_event = event_register( rzx_sentinel, "RZX sentinel" );
 
   end_event = debugger_event_register( event_type_string, end_event_detail_string );
@@ -355,6 +358,7 @@ start_playback( libspectrum_rzx *from_rzx )
   /* Add a sentinel event to prevent tstates overrun (bug #25) */
   event_add( RZX_SENTINEL_TIME, sentinel_event );
 
+  sentinel_warning = 0;
   tstates = libspectrum_rzx_tstates( from_rzx );
   rzx_instruction_count = libspectrum_rzx_instructions( from_rzx );
   rzx_playback = 1;
@@ -862,8 +866,13 @@ static void
 rzx_sentinel( libspectrum_dword ts GCC_UNUSED, int type GCC_UNUSED,
               void *user_data GCC_UNUSED )
 {
-  ui_error( UI_ERROR_WARNING, "RZX frame is longer than %u tstates",
-	    RZX_SENTINEL_TIME );
+  if( !sentinel_warning ) {
+    /* This message could pop up very often. Limited to once per playback */
+    ui_error( UI_ERROR_WARNING, "RZX frame is longer than %u tstates",
+              RZX_SENTINEL_TIME );
+    sentinel_warning = 1;
+  }
+
   tstates -= RZX_SENTINEL_TIME_REDUCE;
   z80.interrupts_enabled_at -= RZX_SENTINEL_TIME_REDUCE;
 
