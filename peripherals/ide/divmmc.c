@@ -160,36 +160,34 @@ divmmc_reset( int hard_reset )
   */
 }
 
-/* TODO: merge this with ide_eject() */
+static int
+dirty_fn_wrapper( void *context )
+{
+  return libspectrum_mmc_dirty( (libspectrum_mmc_card*)context );
+}
+
+static libspectrum_error
+commit_fn_wrapper( void *context )
+{
+  libspectrum_mmc_commit( (libspectrum_mmc_card*)context );
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+eject_fn_wrapper( void *context )
+{
+  libspectrum_mmc_eject( (libspectrum_mmc_card*)context );
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 static int
 mmc_eject( libspectrum_mmc_card *card )
 {
-  int error;
-
-  if( libspectrum_mmc_dirty( card ) ) {
-    
-    ui_confirm_save_t confirm = ui_confirm_save(
-      "Card has been modified.\nDo you want to save it?"
-    );
-  
-    switch( confirm ) {
-
-    case UI_CONFIRM_SAVE_SAVE: libspectrum_mmc_commit( card ); break;
-    case UI_CONFIRM_SAVE_DONTSAVE: break;
-    case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-    }
-  }
-
-  libspectrum_free( settings_current.divmmc_master_file );
-  settings_current.divmmc_master_file = NULL;
-  
-  libspectrum_mmc_eject( card );
-
-  error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 0 );
-  if( error ) return error;
-
-  return 0;
+  return ide_eject_mass_storage( dirty_fn_wrapper, commit_fn_wrapper,
+      eject_fn_wrapper, card,
+      "Card has been modified.\nDo you want to save it?",
+      &settings_current.divmmc_master_file,
+      UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT );
 }
 
 int
