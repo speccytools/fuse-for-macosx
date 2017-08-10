@@ -103,15 +103,18 @@ divmmc_init( void *context )
 {
   card = libspectrum_mmc_alloc();
 
-  /*
-   TODO
-  error = ide_init( divmmc_idechn0,
-		    settings_current.divmmc_master_file,
-		    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT,
-		    settings_current.divmmc_slave_file,
-		    UI_MENU_ITEM_MEDIA_IDE_DIVMMC_SLAVE_EJECT );
-  if( error ) return error;
-  */
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 0 );
+
+  if( settings_current.divmmc_master_file ) {
+    int error;
+
+    error =
+      libspectrum_mmc_insert( card, settings_current.divmmc_master_file );
+    if( error ) return error;
+
+    error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 1 );
+    if( error ) return error;
+  }
 
   module_register( &divmmc_module_info );
 
@@ -145,19 +148,11 @@ divmmc_register_startup( void )
                             divmmc_end );
 }
 
-/* DivMMC does not page in immediately on a reset condition (we do that by
-   trapping PC instead); however, it needs to perform housekeeping tasks upon
-   reset */
 static void
 divmmc_reset( int hard_reset )
 {
   divxxx_reset( divmmc_state, hard_reset );
-
-  /*
-   TODO
-  libspectrum_ide_reset( divmmc_idechn0 );
-  libspectrum_ide_reset( divmmc_idechn1 );
-  */
+  libspectrum_mmc_reset( card );
 }
 
 static int
