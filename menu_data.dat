@@ -491,14 +491,9 @@ Media/IDE/DivIDE/Slave/_Commit, Item,, menu_media_ide_commit,, 7
 Media/IDE/DivIDE/Slave/_Eject, Item,, menu_media_ide_eject,, 7
 
 Media/IDE/_DivMMC, Branch
-Media/IDE/DivMMC/_Master, Branch
-Media/IDE/DivMMC/Master/_Insert..., Item,, menu_media_ide_insert,, 8
-Media/IDE/DivMMC/Master/_Commit, Item,, menu_media_ide_commit,, 8
-Media/IDE/DivMMC/Master/_Eject, Item,, menu_media_ide_eject,, 8
-Media/IDE/DivMMC/_Slave, Branch
-Media/IDE/DivMMC/Slave/_Insert..., Item,, menu_media_ide_insert,, 9
-Media/IDE/DivMMC/Slave/_Commit, Item,, menu_media_ide_commit,, 9
-Media/IDE/DivMMC/Slave/_Eject, Item,, menu_media_ide_eject,, 9
+Media/IDE/DivMMC/_Insert..., Item,, menu_media_ide_insert,, 8
+Media/IDE/DivMMC/_Commit, Item,, menu_media_ide_commit,, 8
+Media/IDE/DivMMC/_Eject, Item,, menu_media_ide_eject,, 8
 
 _Help, Branch
 Help/_Keyboard..., Item

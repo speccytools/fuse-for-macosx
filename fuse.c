@@ -142,7 +142,7 @@ typedef struct start_files_t {
   const char *zxatasp_master, *zxatasp_slave;
   const char *zxcf;
   const char *divide_master, *divide_slave;
-  const char *divmmc_master, *divmmc_slave;
+  const char *divmmc;
   const char *mdr[8];
 
 } start_files_t;
@@ -600,10 +600,8 @@ setup_start_files( start_files_t *start_files )
   start_files->divide_slave =
     utils_safe_strdup( settings_current.divide_slave_file );
 
-  start_files->divmmc_master =
-    utils_safe_strdup( settings_current.divmmc_master_file );
-  start_files->divmmc_slave =
-    utils_safe_strdup( settings_current.divmmc_slave_file );
+  start_files->divmmc =
+    utils_safe_strdup( settings_current.divmmc_file );
 
   start_files->mdr[0] = settings_current.mdr_file;
   start_files->mdr[1] = settings_current.mdr_file2;
@@ -666,7 +664,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       } else if( settings_current.divide_enabled ) {
 	start_files->divide_master = filename;
       } else if( settings_current.divmmc_enabled ) {
-	start_files->divmmc_master = filename;
+	start_files->divmmc = filename;
       } else {
 	/* No IDE interface active, so activate the ZXCF */
 	settings_current.zxcf_active = 1;
@@ -911,8 +909,8 @@ do_start_files( start_files_t *start_files )
     if( error ) return error;
   }
 
-  if( start_files->divmmc_master ) {
-    error = divmmc_insert( start_files->divmmc_master );
+  if( start_files->divmmc ) {
+    error = divmmc_insert( start_files->divmmc );
     if( error ) return error;
   }
 

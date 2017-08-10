@@ -96,6 +96,9 @@ static module_info_t divmmc_module_info = {
 /* Debugger events */
 static const char * const event_type_string = "divmmc";
 
+/* Eject menu item */
+static const ui_menu_item eject_menu_item = UI_MENU_ITEM_MEDIA_IDE_DIVMMC_EJECT;
+
 /* Housekeeping functions */
 
 static int
@@ -103,16 +106,16 @@ divmmc_init( void *context )
 {
   card = libspectrum_mmc_alloc();
 
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 0 );
+  ui_menu_activate( eject_menu_item, 0 );
 
-  if( settings_current.divmmc_master_file ) {
+  if( settings_current.divmmc_file ) {
     int error;
 
     error =
-      libspectrum_mmc_insert( card, settings_current.divmmc_master_file );
+      libspectrum_mmc_insert( card, settings_current.divmmc_file );
     if( error ) return error;
 
-    error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 1 );
+    error = ui_menu_activate( eject_menu_item, 1 );
     if( error ) return error;
   }
 
@@ -181,8 +184,8 @@ mmc_eject( libspectrum_mmc_card *card )
   return ide_eject_mass_storage( dirty_fn_wrapper, commit_fn_wrapper,
       eject_fn_wrapper, card,
       "Card has been modified.\nDo you want to save it?",
-      &settings_current.divmmc_master_file,
-      UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT );
+      &settings_current.divmmc_file,
+      eject_menu_item );
 }
 
 int
@@ -192,15 +195,15 @@ divmmc_insert( const char *filename )
 
   /* Remove any currently inserted card; abort if we want to keep the current
      card */
-  if( settings_current.divmmc_master_file )
+  if( settings_current.divmmc_file )
     if( mmc_eject( card ) )
       return 0;
 
-  settings_set_string( &settings_current.divmmc_master_file, filename );
+  settings_set_string( &settings_current.divmmc_file, filename );
 
   error = libspectrum_mmc_insert( card, filename );
   if( error ) return error;
-  return ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC_MASTER_EJECT, 1 );
+  return ui_menu_activate( eject_menu_item, 1 );
 }
   
 void

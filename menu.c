@@ -1017,7 +1017,7 @@ menu_check_media_changed( void )
     if( confirm ) return 1;
   }
 
-  if( settings_current.divmmc_master_file ) {
+  if( settings_current.divmmc_file ) {
     confirm = divmmc_eject();
     if( confirm ) return 1;
   }
