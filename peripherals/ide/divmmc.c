@@ -64,7 +64,6 @@ static const periph_t divmmc_periph = {
   /* .activate = */ divmmc_activate,
 };
 
-int divmmc_automapping_enabled = 0;
 static divxxx_t *divmmc_state;
 
 /* The card inserted into the DivMMC. For now, we emulate only one card. */
