@@ -150,7 +150,7 @@ ide_eject_mass_storage(
 
   if( is_dirty_fn( context ) ) {
     
-    ui_confirm_save_t confirm = ui_confirm_save( message );
+    ui_confirm_save_t confirm = ui_confirm_save( "%s", message );
   
     switch( confirm ) {
 

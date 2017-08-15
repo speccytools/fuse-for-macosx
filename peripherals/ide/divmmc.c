@@ -64,7 +64,6 @@ static const periph_t divmmc_periph = {
   /* .activate = */ divmmc_activate,
 };
 
-int divmmc_automapping_enabled = 0;
 static divxxx_t *divmmc_state;
 
 /* The card inserted into the DivMMC. For now, we emulate only one card. */
@@ -231,9 +230,15 @@ divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
 //  printf("divmmc_card_select( 0x%02x )\n", data );
 
-  switch( data ) {
-    case 0xf6:
+  /* D0 = MMC0, D1 = MMC1, active LOW
+     somehow logic prevents enabling both cards at the same time */
+  switch( data & 0x03 ) {
+    case 0x02:
       current_card = card;
+      break;
+    case 0x01:
+      /* TODO: select second card */
+      current_card = NULL;
       break;
     default:
       current_card = NULL;

@@ -691,13 +691,6 @@ MENU_CALLBACK( menu_media_ide_zxcf_upload )
   ui_widget_finish();
 }
 
-MENU_CALLBACK( menu_media_ide_divide_writeprotect )
-{
-  settings_current.divide_wp = !settings_current.divide_wp;
-  divide_refresh_page_state();
-  ui_widget_finish();
-}
-
 MENU_CALLBACK( menu_file_savesnapshot )
 {
   char *filename;
