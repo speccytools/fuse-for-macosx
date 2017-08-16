@@ -281,51 +281,42 @@ divmmc_memory_map( void )
 static void
 divmmc_enabled_snapshot( libspectrum_snap *snap )
 {
-  /* TODO: not going to work yet!
-
   if( libspectrum_snap_divmmc_active( snap ) )
     settings_current.divmmc_enabled = 1;
-
-  */
 }
 
 static void
 divmmc_from_snapshot( libspectrum_snap *snap )
 {
-  /* TODO: not going to work yet!
-
   size_t i;
 
   if( !libspectrum_snap_divmmc_active( snap ) ) return;
 
   settings_current.divmmc_wp =
     libspectrum_snap_divmmc_eprom_writeprotect( snap );
-  divmmc_control_write_internal( libspectrum_snap_divmmc_control( snap ) );
+  divxxx_control_write_internal( divmmc_state, libspectrum_snap_divmmc_control( snap ) );
 
   if( libspectrum_snap_divmmc_eprom( snap, 0 ) ) {
-    memcpy( divmmc_eprom,
+    memcpy( divxxx_get_eprom( divmmc_state ),
 	    libspectrum_snap_divmmc_eprom( snap, 0 ), DIVMMC_PAGE_LENGTH );
   }
 
   for( i = 0; i < libspectrum_snap_divmmc_pages( snap ); i++ )
-    if( libspectrum_snap_divmmc_ram( snap, i ) )
-      memcpy( divmmc_ram[ i ], libspectrum_snap_divmmc_ram( snap, i ),
-	      DIVMMC_PAGE_LENGTH );
+    if( libspectrum_snap_divmmc_ram( snap, i ) ) {
+      libspectrum_byte *ram = divxxx_get_ram( divmmc_state, i );
+      memcpy( ram, libspectrum_snap_divmmc_ram( snap, i ), DIVMMC_PAGE_LENGTH );
+    }
 
   if( libspectrum_snap_divmmc_paged( snap ) ) {
-    divmmc_page();
+    divxxx_page( divmmc_state );
   } else {
-    divmmc_unpage();
+    divxxx_unpage( divmmc_state );
   }
-
-  */
 }
 
 static void
 divmmc_to_snapshot( libspectrum_snap *snap )
 {
-  /* TODO: not going to work yet!
-
   size_t i;
   libspectrum_byte *buffer;
 
@@ -334,12 +325,12 @@ divmmc_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_divmmc_active( snap, 1 );
   libspectrum_snap_set_divmmc_eprom_writeprotect( snap,
                                                   settings_current.divmmc_wp );
-  libspectrum_snap_set_divmmc_paged( snap, divmmc_active );
-  libspectrum_snap_set_divmmc_control( snap, divmmc_control );
+  libspectrum_snap_set_divmmc_paged( snap, divxxx_get_active( divmmc_state ) );
+  libspectrum_snap_set_divmmc_control( snap, divxxx_get_control( divmmc_state ) );
 
   buffer = libspectrum_new( libspectrum_byte, DIVMMC_PAGE_LENGTH );
 
-  memcpy( buffer, divmmc_eprom, DIVMMC_PAGE_LENGTH );
+  memcpy( buffer, divxxx_get_eprom( divmmc_state ), DIVMMC_PAGE_LENGTH );
   libspectrum_snap_set_divmmc_eprom( snap, 0, buffer );
 
   libspectrum_snap_set_divmmc_pages( snap, DIVMMC_PAGES );
@@ -348,11 +339,9 @@ divmmc_to_snapshot( libspectrum_snap *snap )
 
     buffer = libspectrum_new( libspectrum_byte, DIVMMC_PAGE_LENGTH );
 
-    memcpy( buffer, divmmc_ram[ i ], DIVMMC_PAGE_LENGTH );
+    memcpy( buffer, divxxx_get_ram( divmmc_state, i ), DIVMMC_PAGE_LENGTH );
     libspectrum_snap_set_divmmc_ram( snap, i, buffer );
   }
-
-  */
 }
 
 static void
