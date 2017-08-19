@@ -47,6 +47,8 @@ static void divmmc_card_select( libspectrum_word port, libspectrum_byte data );
 static libspectrum_byte divmmc_mmc_read( libspectrum_word port, libspectrum_byte *attached );
 static void divmmc_mmc_write( libspectrum_word port, libspectrum_byte data );
 static void divmmc_activate( void );
+static libspectrum_dword get_control_register( void );
+static void set_control_register( libspectrum_dword value );
 
 /* Data */
 
@@ -95,6 +97,10 @@ static module_info_t divmmc_module_info = {
 /* Debugger events */
 static const char * const event_type_string = "divmmc";
 
+/* Debugger system variables */
+static const char * const debugger_type_string = "divmmc";
+static const char * const control_register_detail_string = "control";
+
 /* Eject menu item */
 static const ui_menu_item eject_menu_item = UI_MENU_ITEM_MEDIA_IDE_DIVMMC_EJECT;
 
@@ -125,6 +131,10 @@ divmmc_init( void *context )
   divmmc_state = divxxx_alloc( "DivMMC EPROM", DIVMMC_PAGES, "DivMMC RAM",
       event_type_string, &settings_current.divmmc_enabled,
       &settings_current.divmmc_wp );
+
+  debugger_system_variable_register(
+    debugger_type_string, control_register_detail_string, get_control_register,
+    set_control_register );
 
   return 0;
 }
@@ -348,6 +358,18 @@ static void
 divmmc_activate( void )
 {
   divxxx_activate( divmmc_state );
+}
+
+static libspectrum_dword
+get_control_register( void )
+{
+  return divxxx_get_control( divmmc_state );
+}
+
+static void
+set_control_register( libspectrum_dword value )
+{
+  divxxx_control_write_internal( divmmc_state, value & 0xff );
 }
 
 int
