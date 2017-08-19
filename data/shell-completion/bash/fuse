@@ -63,7 +63,7 @@ _fuse()
             _fuse_drive_type
             return 0
             ;;
-        --divide-masterfile|--divide-slavefile| \
+        --divide-masterfile|--divide-slavefile|--divmmc-file| \
         --simpleide-masterfile|--simpleide-slavefile| \
         --zxatasp-masterfile|--zxatasp-slavefile|--zxcf-cffile)
             _filedir '@(hdf|HDF)'
@@ -174,7 +174,8 @@ _fuse()
             --debugger-command --detect-loader --didaktik80
             --didaktik80disk --disciple --discipledisk --disk-ask-merge
             --disk-try-merge --divide --divide-masterfile
-            --divide-slavefile --divide-write-protect --dock
+            --divide-slavefile --divide-write-protect --divmmc --divmmc-file
+            --divmmc-write-protect --dock
             --doublescan-mode --drive-40-max-track
             --drive-80-max-track --drive-beta128a-type
             --drive-beta128b-type --drive-beta128c-type
@@ -216,7 +217,8 @@ _fuse()
             --no-compress-rzx --no-confirm-actions --no-covox
             --no-detect-loader
             --no-didaktik80 --no-disciple --no-disk-ask-merge
-            --no-divide --no-divide-write-protect --no-embed-snapshot
+            --no-divide --no-divide-write-protect --no-divmmc
+            --no-divmmc-write-protect --no-embed-snapshot
             --no-fastload --no-fuller --no-full-screen --no-interface1
             --no-interface2 --no-issue2 --no-joystick-prompt
             --no-kempston --no-kempston-mouse --no-keyboard-arrows-shifted
