@@ -325,6 +325,29 @@ considered set. The same as the Disk Peripherals Options dialog's
 option.
 .RE
 .PP
+.B \-\-divmmc
+.RS
+Emulate the DivMMC interface. The same as the Disk Peripherals Options
+dialog's
+.I "DivMMC interface"
+option.
+.RE
+.PP
+.B \-\-divmmc\-file
+.I file
+.RS
+Specify an HDF image to be loaded into the DivMMC's emulated memory card.
+.RE
+.PP
+.B \-\-divmmc\-write\-protect
+.RS
+Specify that the emulated DivMMC's write protect jumper that protects
+EEPROM should be considered set. The same as the Disk Peripherals Options
+dialog's
+.I "DivMMC write protect"
+option.
+.RE
+.PP
 .B \-\-dock
 .I file
 .RS
@@ -2736,6 +2759,22 @@ jumper. See the
 section for more details.
 .RE
 .PP
+.I "DivMMC interface"
+.RS
+If this option is selected, Fuse will emulate the DivMMC
+interface. See the
+.B "DIVMMC"
+section for more details.
+.RE
+.PP
+.I "DivMMC write protect"
+.RS
+This option controls the state of the DivMMC write protection
+jumper that prevents flashing the EEPROM chip. See the
+.B "DIVMMC"
+section for more details.
+.RE
+.PP
 .I "+D interface"
 .RS
 If this option is selected, Fuse will emulate the +D interface.  See the
@@ -3790,17 +3829,28 @@ entries above, but for the ZXCF interface's CompactFlash slot.
 .br
 .I "Media, IDE, DivIDE, Master, Commit"
 .br
-.I "Media, IDE, DivIDE, Eject"
+.I "Media, IDE, DivIDE, Master, Eject"
 .br
 .I "Media, IDE, DivIDE, Slave, Insert..."
 .br
 .I "Media, IDE, DivIDE, Slave, Commit"
 .br
-.I "Media, IDE, DivIDE, Eject"
+.I "Media, IDE, DivIDE, Slave, Eject"
 .RS
 The same as the
 .I "Media, IDE, Simple 8-bit"
 entries above, but for the two channels of the DivIDE interface.
+.RE
+.PP
+.I "Media, IDE, DivMMC, Insert..."
+.br
+.I "Media, IDE, DivMMC, Commit"
+.br
+.I "Media, IDE, DivMMC, Eject"
+.RS
+The same as the
+.I "Media, IDE, Simple 8-bit"
+entries above, but for the memory card slot of the DivMMC interface.
 .RE
 .PP
 .I "Help, Keyboard picture..."
@@ -4135,6 +4185,31 @@ dialog, and the state of its write protect jumper controlled via the
 .IR "DivIDE write protect option" .
 If you're going to be using the DivIDE, you'll probably want one of
 the firmwares available from the DivIDE homepage.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "DIVMMC"
+The DivMMC is a MMC interface for the Spectrum. Originally designed by
+Alessandro Dorigatti for the V6Z80P+ FPGA board as the fusion of DivIDE
+and ZXMMC+ interfaces, later assembled as an interface for real spectrums
+by Mario Prato. Currently there are variants with different RAM size,
+one/two memory cards slots, optional kempston jostick, etc.
+.PP
+The interface can be activated via the
+.I "DivMMC interface"
+option from the
+.I "Options, Peripherals, Disk..."
+dialog, and the state of its EEPROM write protect jumper controlled via the
+.IR "DivMMC write protect option" .
+If you're going to be using the DivMMC, you'll need to load the ESXDOS
+firmware at
+.IR "http://www.esxdos.org/
+or use the ZX Spectrum +3e ROMs by Garry Lancaster.
+.PP
+You'll also need a HDF image to store the contents of the memory card.
+There are several tools to create and manipulate this file format, e.g.,
+hdfmonkey at
+.IR "https://github.com/gasman/hdfmonkey" .
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -4500,6 +4575,13 @@ divide:unpage
 The DivIDE interface is paged into or out of memory respectively.
 .RE
 .br
+divmmc:page
+.br
+divmmc:unpage
+.RS
+The DivIDE interface is paged into or out of memory respectively.
+.RE
+.br
 if1:page
 .br
 if1:unpage
@@ -4778,6 +4860,8 @@ Other available sources are:
 .RI ` "DISCiPLE ROM" "',"
 .RI ` "DivIDE EPROM" "',"
 .RI ` "DivIDE RAM" "',"
+.RI ` "DivMMC EPROM" "',"
+.RI ` "DivMMC RAM" "',"
 .RI ` If1 "',"
 .RI ` If2 "',"
 .RI ` "Multiface RAM" "',"
@@ -4821,6 +4905,10 @@ syntax. The available system variables are:
 ay:current
 .RS
 The current AY-3-8912 register.
+.RE
+divmmc:control
+.RS
+The last byte written to DivMMC control port.
 .RE
 ula:last
 .RS
