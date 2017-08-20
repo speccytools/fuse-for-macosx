@@ -100,6 +100,7 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
     for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
       memory_page *page = &divxxx->memory_map_ram[i][j];
       page->source = divxxx->ram_memory_source;
+      page->contended = 0;
       page->page_num = i;
     }
   }
@@ -175,12 +176,19 @@ divxxx_get_ram( divxxx_t *divxxx, size_t which )
 void
 divxxx_reset( divxxx_t *divxxx, int hard_reset )
 {
+  int i;
+
   divxxx->active = 0;
 
   if( !*divxxx->enabled ) return;
 
   if( hard_reset ) {
     divxxx->control = 0;
+
+    if( divxxx->ram ) {
+      for( i = 0; i < divxxx->ram_page_count; i++ )
+        memset( divxxx->ram[i], 0, DIVXXX_PAGE_LENGTH );
+    }
   } else {
     divxxx->control &= DIVXXX_CONTROL_MAPRAM;
   }
