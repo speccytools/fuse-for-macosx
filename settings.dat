@@ -190,6 +190,8 @@ divide_slave_file, string, NULL,, divide-slavefile
 divmmc_enabled, boolean, 0,, divmmc
 divmmc_wp, boolean, 0,, divmmc-write-protect
 divmmc_file, string, NULL,, divmmc-file
+zxmmc_enabled, boolean, 0,, zxmmc
+zxmmc_file, string, NULL,, zxmmc-file
 
 printer_graphics_filename, string, "printout.pbm",, graphicsfile
 printer_text_filename, string, "printout.txt",, textfile

@@ -42,6 +42,7 @@
 #include "peripherals/ide/simpleide.h"
 #include "peripherals/ide/zxatasp.h"
 #include "peripherals/ide/zxcf.h"
+#include "peripherals/ide/zxmmc.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
 #include "peripherals/joystick.h"
@@ -643,6 +644,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
   case 6: divide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
   case 8: divmmc_insert( filename ); break;
+  case 9: zxmmc_insert( filename ); break;
   }
 
   libspectrum_free( filename );
@@ -663,6 +665,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit )
   case 6: divide_commit( LIBSPECTRUM_IDE_MASTER ); break;
   case 7: divide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
   case 8: divmmc_commit(); break;
+  case 9: zxmmc_commit(); break;
   }
 
   fuse_emulation_unpause();
@@ -1054,6 +1057,11 @@ menu_check_media_changed( void )
 
   if( settings_current.divmmc_file ) {
     confirm = divmmc_eject();
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.zxmmc_file ) {
+    confirm = zxmmc_eject();
     if( confirm ) return 1;
   }
 

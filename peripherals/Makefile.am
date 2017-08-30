@@ -57,7 +57,8 @@ fuse_SOURCES += \
                 peripherals/ide/ide.c \
                 peripherals/ide/simpleide.c \
                 peripherals/ide/zxatasp.c \
-                peripherals/ide/zxcf.c
+                peripherals/ide/zxcf.c \
+                peripherals/ide/zxmmc.c
 
 if BUILD_SPECCYBOOT
 fuse_SOURCES += peripherals/nic/enc28j60.c
@@ -106,6 +107,7 @@ noinst_HEADERS += \
                   peripherals/ide/simpleide.h \
                   peripherals/ide/zxatasp.h \
                   peripherals/ide/zxcf.h \
+                  peripherals/ide/zxmmc.h \
                   peripherals/flash/am29f010.h \
                   peripherals/nic/enc28j60.h \
                   peripherals/nic/w5100.h \

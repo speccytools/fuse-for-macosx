@@ -4,6 +4,7 @@
 
         * New features:
           * Add DivMMC emulation (Philip Kendall and Sergio Baldoví).
+          * Add ZXMMC emulation (Philip Kendall and Sergio Baldoví).
 
         * Miscellaneous improvements:
           * Add support for MLT format screenshots (Fredrick Meunier).

@@ -238,6 +238,7 @@ machines_periph_plus3( void )
   periph_set_present( PERIPH_TYPE_MULTIFACE_3, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_PARALLEL_PRINTER, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_ZXMMC, PERIPH_PRESENT_OPTIONAL );
 }
 
 /* The set of peripherals available on the TC2068 and TS2068 */

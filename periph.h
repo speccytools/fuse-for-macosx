@@ -78,6 +78,7 @@ typedef enum periph_type {
   PERIPH_TYPE_USOURCE,        /* Currah uSource interface */
   PERIPH_TYPE_ZXATASP,        /* ZXATASP IDE interface */
   PERIPH_TYPE_ZXCF,           /* ZXCF IDE interface */
+  PERIPH_TYPE_ZXMMC,          /* ZXMMC interface */
   PERIPH_TYPE_ZXPRINTER,      /* ZX Printer */
   PERIPH_TYPE_ZXPRINTER_FULL_DECODE, /* ZX Printer responding only to 0xfb */
 } periph_type;

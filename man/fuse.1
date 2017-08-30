@@ -1929,6 +1929,20 @@ option.
 Specify a HDF file to connect to the emulated ZXCF interface.
 .RE
 .PP
+.B \-\-zxmmc
+.RS
+Emulate the ZXMMC interface. The same as the Disk Peripherals Options
+dialog's
+.I "ZXMMC interface"
+option.
+.RE
+.PP
+.B \-\-zxmmc\-file
+.I file
+.RS
+Specify an HDF image to be loaded into the ZXMMC's emulated memory card.
+.RE
+.PP
 .B \-\-zxprinter
 .RS
 Emulate the ZX Printer. Same as the General Peripherals Options dialog's
@@ -2758,6 +2772,12 @@ section for more details.
 This option controls the state of the ZXCF upload jumper. See the
 .B "ZXATASP AND ZXCF"
 section for more details.
+.RE
+.PP
+.I "ZXMMC interface"
+.RS
+If this option is selected, Fuse will emulate the ZXMMC interface.
+Available for +2A, +3 and +3e machines.
 .RE
 .PP
 .I "DivIDE interface"
@@ -3840,6 +3860,17 @@ entries above, but for the two channels of the ZXATASP interface.
 The same as the
 .I "Media, IDE, Simple 8-bit, Master"
 entries above, but for the ZXCF interface's CompactFlash slot.
+.RE
+.PP
+.I "Media, IDE, ZXMMC, Insert..."
+.br
+.I "Media, IDE, ZXMMC, Commit"
+.br
+.I "Media, IDE, ZXMMC, Eject"
+.RS
+The same as the
+.I "Media, IDE, Simple 8-bit"
+entries above, but for the memory card slot of the ZXMMC interface.
 .RE
 .PP
 .I "Media, IDE, DivIDE, Master, Insert..."

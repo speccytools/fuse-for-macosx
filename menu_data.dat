@@ -498,6 +498,11 @@ Media/IDE/DivMMC/_Insert..., Item,, menu_media_ide_insert,, 8
 Media/IDE/DivMMC/_Commit, Item,, menu_media_ide_commit,, 8
 Media/IDE/DivMMC/_Eject, Item,, menu_media_ide_eject,, 8
 
+Media/IDE/_ZXMMC, Branch
+Media/IDE/ZXMMC/_Insert..., Item,, menu_media_ide_insert,, 9
+Media/IDE/ZXMMC/_Commit, Item,, menu_media_ide_commit,, 9
+Media/IDE/ZXMMC/_Eject, Item,, menu_media_ide_eject,, 9
+
 _Help, Branch
 Help/_Keyboard..., Item
 Help/_About..., Item

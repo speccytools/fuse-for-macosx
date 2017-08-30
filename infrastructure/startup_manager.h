@@ -76,6 +76,7 @@ typedef enum startup_manager_module {
   STARTUP_MANAGER_MODULE_Z80,
   STARTUP_MANAGER_MODULE_ZXATASP,
   STARTUP_MANAGER_MODULE_ZXCF,
+  STARTUP_MANAGER_MODULE_ZXMMC,
  
 } startup_manager_module;
 

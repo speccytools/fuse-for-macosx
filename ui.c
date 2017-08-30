@@ -637,6 +637,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/IDE/DivMMC/Commit",
     "/Media/IDE/DivMMC/Eject", 0 },
 
+  { UI_MENU_ITEM_MEDIA_IDE_ZXMMC, "/Media/IDE/ZXMMC" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_ZXMMC_EJECT,
+    "/Media/IDE/ZXMMC/Commit",
+    "/Media/IDE/ZXMMC/Eject", 0 },
+
   { UI_MENU_ITEM_RECORDING,
     "/File/Recording/Stop", 
     "/File/Recording/Record...", 1,
