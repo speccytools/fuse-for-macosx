@@ -62,7 +62,8 @@ MENU_CALLBACK( menu_file_recording_play );
 MENU_CALLBACK( menu_file_recording_stop );
 MENU_CALLBACK( menu_file_recording_finalise );
 MENU_CALLBACK( menu_file_aylogging_stop );
-MENU_CALLBACK( menu_file_openscrscreenshot );
+MENU_CALLBACK( menu_file_screenshot_openscrscreenshot );
+MENU_CALLBACK( menu_file_screenshot_openmltscreenshot );
 
 MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureinlinemode );
 MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureindotmode );
@@ -131,8 +132,9 @@ MENU_CALLBACK( menu_file_exit );
 
 MENU_CALLBACK( menu_file_aylogging_record );
 
-MENU_CALLBACK( menu_file_savescreenasscr );
-MENU_CALLBACK( menu_file_savescreenaspng );
+MENU_CALLBACK( menu_file_screenshot_savescreenasscr );
+MENU_CALLBACK( menu_file_screenshot_savescreenaspng );
+MENU_CALLBACK( menu_file_screenshot_savescreenasmlt );
 
 MENU_CALLBACK( menu_file_movie_record );
 MENU_CALLBACK( menu_file_movie_record_recordfromrzx );

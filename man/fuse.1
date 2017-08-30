@@ -2101,7 +2101,7 @@ file. You will be prompted for a filename to save the recording to.
 Stop any current AY logging.
 .RE
 .PP
-.I "File, Open SCR Screenshot..."
+.I "File, Screenshot, Open SCR Screenshot..."
 .RS
 Load an SCR screenshot (essentially just a binary dump of the
 Spectrum's video memory) onto the current screen. Fuse supports
@@ -2110,14 +2110,31 @@ screenshots saved in the Timex hi-colour and hi-res modes as well as
 hi-colour or hi-res screenshot is loaded onto a non-Timex machine.
 .RE
 .PP
-.I "File, Save Screen as SCR..."
+.I "File, Screenshot, Save Screen as SCR..."
 .RS
 Save a copy of whatever's currently displayed on the Spectrum's screen
 as an SCR file. You will be prompted for a filename to save the
 screenshot to.
 .RE
 .PP
-.I "File, Save Screen as PNG..."
+.I "File, Screenshot, Open MLT Screenshot..."
+.RS
+Load an MLT screenshot onto the current screen. The MLT format is similar
+to the SCR format but additionally supports capturing images that use
+techniques to display more than two colours in each Spectrum attribute
+square. Fuse will only load the bitmap version of an image on a Sinclair
+machine but on a Timex clone it can show the full colour detail captured
+in the image by using the hi-colour mode.
+.RE
+.PP
+.I "File, Screenshot, Save Screen as MLT..."
+.RS
+Save a copy of whatever's currently displayed on the Spectrum's screen
+as an MLT file. You will be prompted for a filename to save the
+screenshot to.
+.RE
+.PP
+.I "File, Screenshot, Save Screen as PNG..."
 .RS
 Save the current screen as a PNG file. You will be prompted for a
 filename to save the screenshot to.

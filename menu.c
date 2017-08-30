@@ -46,6 +46,7 @@
 #include "peripherals/if2.h"
 #include "peripherals/joystick.h"
 #include "peripherals/multiface.h"
+#include "peripherals/scld.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -204,7 +205,7 @@ MENU_CALLBACK( menu_file_aylogging_stop )
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
 }
 
-MENU_CALLBACK( menu_file_openscrscreenshot )
+MENU_CALLBACK( menu_file_screenshot_openscrscreenshot )
 {
   char *filename;
 
@@ -214,6 +215,22 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_scr_read( filename );
+
+  libspectrum_free( filename );
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_file_screenshot_openmltscreenshot )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = ui_get_open_filename( "Fuse - Open MLT Screenshot" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_mlt_read( filename );
 
   libspectrum_free( filename );
 
@@ -709,7 +726,7 @@ MENU_CALLBACK( menu_file_savesnapshot )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK( menu_file_savescreenasscr )
+MENU_CALLBACK( menu_file_screenshot_savescreenasscr )
 {
   char *filename;
 
@@ -727,9 +744,34 @@ MENU_CALLBACK( menu_file_savescreenasscr )
   fuse_emulation_unpause();
 }
 
+MENU_CALLBACK( menu_file_screenshot_savescreenasmlt )
+{
+  char *filename;
+
+  ui_widget_finish();
+
+  fuse_emulation_pause();
+
+  if( machine_current->timex && scld_last_dec.name.hires ) {
+    ui_error( UI_ERROR_ERROR,
+              "MLT format not supported for Timex hi-res screen mode" );
+    fuse_emulation_unpause();
+    return;
+  }
+
+  filename = ui_get_save_filename( "Fuse - Save Screenshot as MLT" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_mlt_write( filename );
+
+  libspectrum_free( filename );
+
+  fuse_emulation_unpause();
+}
+
 #ifdef USE_LIBPNG
 
-MENU_CALLBACK( menu_file_savescreenaspng )
+MENU_CALLBACK( menu_file_screenshot_savescreenaspng )
 {
   scaler_type scaler;
   char *filename;
