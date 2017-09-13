@@ -441,6 +441,10 @@ typedef enum libspectrum_id_t {
 
   LIBSPECTRUM_ID_SCREEN_SCR,		/* .scr screen file */
 
+  /* Below here, present only in 1.3.6 and later */
+
+  LIBSPECTRUM_ID_SCREEN_MLT,		/* .mlt screen file */
+
 } libspectrum_id_t;
 
 /* And 'classes' of file */
@@ -1006,6 +1010,20 @@ WIN32_DLL libspectrum_byte * libspectrum_snap_divide_eprom( libspectrum_snap *sn
 WIN32_DLL void libspectrum_snap_set_divide_eprom( libspectrum_snap *snap, int idx, libspectrum_byte* divide_eprom );
 WIN32_DLL libspectrum_byte * libspectrum_snap_divide_ram( libspectrum_snap *snap, int idx );
 WIN32_DLL void libspectrum_snap_set_divide_ram( libspectrum_snap *snap, int idx, libspectrum_byte* divide_ram );
+WIN32_DLL int libspectrum_snap_divmmc_active( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_divmmc_active( libspectrum_snap *snap, int divmmc_active );
+WIN32_DLL int libspectrum_snap_divmmc_eprom_writeprotect( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_divmmc_eprom_writeprotect( libspectrum_snap *snap, int divmmc_eprom_writeprotect );
+WIN32_DLL int libspectrum_snap_divmmc_paged( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_divmmc_paged( libspectrum_snap *snap, int divmmc_paged );
+WIN32_DLL libspectrum_byte libspectrum_snap_divmmc_control( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_divmmc_control( libspectrum_snap *snap, libspectrum_byte divmmc_control );
+WIN32_DLL size_t libspectrum_snap_divmmc_pages( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_divmmc_pages( libspectrum_snap *snap, size_t divmmc_pages );
+WIN32_DLL libspectrum_byte * libspectrum_snap_divmmc_eprom( libspectrum_snap *snap, int idx );
+WIN32_DLL void libspectrum_snap_set_divmmc_eprom( libspectrum_snap *snap, int idx, libspectrum_byte* divmmc_eprom );
+WIN32_DLL libspectrum_byte * libspectrum_snap_divmmc_ram( libspectrum_snap *snap, int idx );
+WIN32_DLL void libspectrum_snap_set_divmmc_ram( libspectrum_snap *snap, int idx, libspectrum_byte* divmmc_ram );
 WIN32_DLL int libspectrum_snap_fuller_box_active( libspectrum_snap *snap );
 WIN32_DLL void libspectrum_snap_set_fuller_box_active( libspectrum_snap *snap, int fuller_box_active );
 WIN32_DLL int libspectrum_snap_melodik_active( libspectrum_snap *snap );
@@ -1116,6 +1134,16 @@ WIN32_DLL int libspectrum_snap_covox_active( libspectrum_snap *snap );
 WIN32_DLL void libspectrum_snap_set_covox_active( libspectrum_snap *snap, int covox_active );
 WIN32_DLL libspectrum_byte libspectrum_snap_covox_dac( libspectrum_snap *snap );
 WIN32_DLL void libspectrum_snap_set_covox_dac( libspectrum_snap *snap, libspectrum_byte covox_dac );
+WIN32_DLL int libspectrum_snap_ulaplus_active( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_ulaplus_active( libspectrum_snap *snap, int ulaplus_active );
+WIN32_DLL int libspectrum_snap_ulaplus_palette_enabled( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_ulaplus_palette_enabled( libspectrum_snap *snap, int ulaplus_palette_enabled );
+WIN32_DLL libspectrum_byte libspectrum_snap_ulaplus_current_register( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_ulaplus_current_register( libspectrum_snap *snap, libspectrum_byte ulaplus_current_register );
+WIN32_DLL libspectrum_byte * libspectrum_snap_ulaplus_palette( libspectrum_snap *snap, int idx );
+WIN32_DLL void libspectrum_snap_set_ulaplus_palette( libspectrum_snap *snap, int idx, libspectrum_byte* ulaplus_palette );
+WIN32_DLL libspectrum_byte libspectrum_snap_ulaplus_ff_register( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_ulaplus_ff_register( libspectrum_snap *snap, libspectrum_byte ulaplus_ff_register );
 WIN32_DLL int libspectrum_snap_multiface_active( libspectrum_snap *snap );
 WIN32_DLL void libspectrum_snap_set_multiface_active( libspectrum_snap *snap, int multiface_active );
 WIN32_DLL int libspectrum_snap_multiface_paged( libspectrum_snap *snap );
@@ -1136,6 +1164,8 @@ WIN32_DLL libspectrum_byte * libspectrum_snap_multiface_ram( libspectrum_snap *s
 WIN32_DLL void libspectrum_snap_set_multiface_ram( libspectrum_snap *snap, int idx, libspectrum_byte* multiface_ram );
 WIN32_DLL size_t libspectrum_snap_multiface_ram_length( libspectrum_snap *snap, int idx );
 WIN32_DLL void libspectrum_snap_set_multiface_ram_length( libspectrum_snap *snap, int idx, size_t multiface_ram_length );
+WIN32_DLL int libspectrum_snap_zxmmc_active( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_zxmmc_active( libspectrum_snap *snap, int zxmmc_active );
 
 /*
  * Tape handling routines
@@ -1720,6 +1750,37 @@ WIN32_DLL void
 libspectrum_ide_write( libspectrum_ide_channel *chn,
 		       libspectrum_ide_register reg,
 		       libspectrum_byte data );
+
+/* MMC handling routines */
+
+typedef struct libspectrum_mmc_card libspectrum_mmc_card;
+
+WIN32_DLL libspectrum_mmc_card*
+libspectrum_mmc_alloc( void );
+
+WIN32_DLL void
+libspectrum_mmc_free( libspectrum_mmc_card *card );
+
+WIN32_DLL libspectrum_error
+libspectrum_mmc_insert( libspectrum_mmc_card *card, const char *filename );
+
+WIN32_DLL void
+libspectrum_mmc_eject( libspectrum_mmc_card *card );
+
+WIN32_DLL void
+libspectrum_mmc_reset( libspectrum_mmc_card *card );
+
+WIN32_DLL int
+libspectrum_mmc_dirty( libspectrum_mmc_card *card );
+
+WIN32_DLL void
+libspectrum_mmc_commit( libspectrum_mmc_card *card );
+
+WIN32_DLL libspectrum_byte
+libspectrum_mmc_read( libspectrum_mmc_card *card );
+
+WIN32_DLL void
+libspectrum_mmc_write( libspectrum_mmc_card *card, libspectrum_byte data );
 
 #ifdef __cplusplus
 };

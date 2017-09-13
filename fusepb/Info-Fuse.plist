@@ -562,6 +562,23 @@
 				<string>net.sourceforge.projects.fuse-emulator.d80</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mlt</string>
+				<string>MLT</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>blank</string>
+			<key>CFBundleTypeName</key>
+			<string>ZX Spectrum Screen Image</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>net.sourceforge.projects.fuse-emulator.mlt</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>Fuse</string>
@@ -1085,6 +1102,25 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>opu</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.image</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>ZX Spectrum Screen Image</string>
+			<key>UTTypeIconFile</key>
+			<string>blank</string>
+			<key>UTTypeIdentifier</key>
+			<string>net.sourceforge.projects.fuse-emulator.mlt</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>mlt</string>
 				</array>
 			</dict>
 		</dict>
