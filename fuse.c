@@ -198,13 +198,12 @@ int main(int argc, char **argv)
       z80_do_opcodes();
       event_do_events();
     }
-    r = 0;
+    r = debugger_get_exit_code();
   }
 
   fuse_end();
   
   return r;
-
 }
 
 static int

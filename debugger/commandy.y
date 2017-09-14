@@ -176,7 +176,7 @@ command:   BASE number { debugger_output_base = $2; }
 	 | DEBUGGER_DELETE { debugger_breakpoint_remove_all(); }
 	 | DEBUGGER_DELETE number { debugger_breakpoint_remove( $2 ); }
 	 | DISASSEMBLE number { ui_debugger_disassemble( $2 ); }
-	 | EXIT     { debugger_exit_emulator(); }
+	 | EXIT expressionornull { debugger_exit_emulator( $2 ); }
 	 | FINISH   { debugger_breakpoint_exit(); }
 	 | DEBUGGER_IGNORE NUMBER number {
 	     debugger_breakpoint_ignore( $2, $3 );

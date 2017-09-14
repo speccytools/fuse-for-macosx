@@ -407,7 +407,7 @@ menu_file_exit( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 
     /* Ensure we break out of the main Z80 loop, there could be active
        breakpoints before the next event */
-    debugger_exit_emulator();
+    debugger_exit_emulator( NULL );
   }
 }
 

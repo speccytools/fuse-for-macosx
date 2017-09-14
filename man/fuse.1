@@ -4771,8 +4771,14 @@ Set the centre panel disassembly to begin at
 .RE
 .PP
 ex{it}
+.RI [ expression ]
 .RS
-Exit the emulator immediately.
+Exit the emulator immediately, using the exit code resulting from the
+evaluation of
+.IR expression ,
+or 0 if
+.I expression
+is omitted.
 .RE
 .PP
 fi{nish}
