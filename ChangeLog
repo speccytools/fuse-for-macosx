@@ -2,6 +2,10 @@
 
         * Fuse 1.4.1 released.
 
+        * Debugger improvements:
+          * Allow an exit code to be specified when using the "exit" command
+            (Philip Kendall).
+
         * Deprecated features removed:
           * All Z80 variables in the debugger must now be referenced as
             "z80:NAME" rather than just "NAME" e.g. "set z80:af 0x1234"
