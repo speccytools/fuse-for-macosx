@@ -443,7 +443,7 @@ fi
 dnl Check if supplied libspectrum has support for bz2 compressed files
 AC_MSG_CHECKING(whether libspectrum supports compressed bz2 files)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
     [[
@@ -459,7 +459,7 @@ AC_SUBST(LIBSPEC_HAVE_BZ2)
 dnl Check if supplied libspectrum has support for wav files
 AC_MSG_CHECKING(whether libspectrum supports wav files)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
     [[
@@ -759,7 +759,7 @@ AM_CONDITIONAL(BUILD_SPECTRANET, test "$build_spectranet" = yes)
 dnl See if Linux TAP devices are supported
 AC_MSG_CHECKING(whether Linux TAP devices are supported)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[
       #include <linux/if_tun.h>
