@@ -101,14 +101,3 @@ yyerror( const char *s )
 {
   ui_error( UI_ERROR_ERROR, "Invalid debugger command: %s", s );
 }
-
-/* Set the value of a register
- 
-   Now just a pass through to the appropriate system variable.
-   This function should be removed in Fuse 1.4 */
-void
-debugger_register_set( const char *which, libspectrum_word value )
-{
-  debugger_system_variable_set( debugger_z80_system_variable_type, which,
-                                value );
-}

@@ -4830,26 +4830,6 @@ into memory at
 .RE
 .PP
 se{t}
-.I "register value"
-.RS
-Set the value of the Z80 register
-.I register
-to
-.IR value .
-.RE
-.PP
-se{t}
-.I "[im|iff1|iff2] value"
-.RS
-Set the interrupt mode or interrupt flip flops
-.I register
-to
-.IR value .
-If the im mode is not 0, 1 or 2 it will be ignored, while non-zero iff values
-will be converted to one.
-.RE
-.PP
-se{t}
 .RI $ variable
 .I value
 .RS
@@ -4995,10 +4975,6 @@ z80:iff2
 1 if the specified interrupt flip-flop is currently set, or 0 if it is
 not set.
 .RE
-.PP
-The Z80 registers, interrupt mode and interrupt flip-flops can also be
-specified without the `z80:' prefix, but this syntax is deprecated and
-will be removed in Fuse 1.4.
 .\"
 .\"------------------------------------------------------------------
 .\"

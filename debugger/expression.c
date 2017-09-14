@@ -161,17 +161,6 @@ debugger_expression_new_number( libspectrum_dword number, int pool )
   return exp;
 }
 
-/* Create a new expression representing a Z80 register
-
-   Now just a pass through to the appropriate system variable.
-   This function should be removed in Fuse 1.4 */
-debugger_expression*
-debugger_expression_new_register( const char *which, int pool )
-{
-  return debugger_expression_new_system_variable(
-    debugger_z80_system_variable_type, which, pool );
-}
-
 debugger_expression*
 debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 				  debugger_expression *operand2, int pool )

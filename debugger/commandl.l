@@ -1,6 +1,5 @@
 /* commandl.l: Debugger command lexical scanner
-   Copyright (c) 2002-2016 Philip Kendall
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2002-2017 Philip Kendall, Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,7 +44,7 @@
 
 %}
 
-ID	[a-z]([a-z0-9]|\\[ ])*
+ID	[a-z]([a-z0-9']|\\[ ])*
 
 %option caseless
 
@@ -80,10 +79,6 @@ t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
 							       return TBREAK; }
 ti|tim|time { return TIME; }
 w|wr|wri|writ|write { return WRITE; }
-
-a|b|c|d|e|f|h|l|af|bc|de|hl|sp|pc|ix|iy|i|r|im|iff1|iff2|"a'"|"b'"|"c'"|"d'"|"e'"|"f'"|"h'"|"l'"|"af\'"|"bc\'"|"de\'"|"hl\'" {
-  yylval.string = mempool_strdup( debugger_memory_pool, yytext );
-  return DEBUGGER_REGISTER; }
 
 "("		{ return '('; }
 ")"		{ return ')'; }

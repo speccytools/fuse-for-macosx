@@ -32,9 +32,6 @@ extern int debugger_memory_pool;
 /* The event type used to trigger time breakpoints */
 extern int debugger_breakpoint_event;
 
-/* The system variable type used for Z80 registers */
-extern const char *debugger_z80_system_variable_type;
-
 void debugger_breakpoint_time_fn( libspectrum_dword tstates, int type, void *user_data );
 
 int debugger_breakpoint_remove( size_t id );
@@ -49,8 +46,6 @@ int debugger_breakpoint_trigger( debugger_breakpoint *bp );
 
 int debugger_poke( libspectrum_word address, libspectrum_byte value );
 int debugger_port_write( libspectrum_word address, libspectrum_byte value );
-
-void debugger_register_set( const char *which, libspectrum_word value );
 
 void debugger_exit_emulator( void );
 
@@ -83,7 +78,6 @@ typedef enum debugger_token {
 
 debugger_expression*
 debugger_expression_new_number( libspectrum_dword number, int pool );
-debugger_expression* debugger_expression_new_register( const char *which, int pool );
 debugger_expression*
 debugger_expression_new_unaryop( int operation, debugger_expression *operand, int pool );
 debugger_expression*
