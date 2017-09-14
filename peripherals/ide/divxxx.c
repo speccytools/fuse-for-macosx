@@ -37,7 +37,7 @@ static const libspectrum_byte DIVXXX_CONTROL_MAPRAM = 0x40;
 
 #define DIVXXX_PAGE_LENGTH 0x2000
 
-typedef struct divxxx_t {
+struct divxxx_t {
   libspectrum_byte control;
 
   int active;
@@ -69,7 +69,7 @@ typedef struct divxxx_t {
   const int *enabled;
   const int *write_protect;
 
-} divxxx_t;
+};
 
 divxxx_t*
 divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
