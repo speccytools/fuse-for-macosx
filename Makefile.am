@@ -179,6 +179,7 @@ include timer/Makefile.am
 include ui/Makefile.am
 include ui/fb/Makefile.am
 include ui/gtk/Makefile.am
+include ui/null/Makefile.am
 include ui/scaler/Makefile.am
 include ui/sdl/Makefile.am
 include ui/svga/Makefile.am

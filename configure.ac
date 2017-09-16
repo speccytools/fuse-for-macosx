@@ -370,6 +370,20 @@ if test "$UI" = gtk; then
   AC_PATH_XTRA
 fi
 
+dnl Look for null UI (default=no)
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether null UI requested)
+  AC_ARG_WITH(null-ui,
+  [  --with-null-ui          use null user interface],
+  if test "$withval" = no; then null_ui=no; else null_ui=yes; fi,
+  null_ui=no)
+  AC_MSG_RESULT($null_ui)
+  if test "$null_ui" = yes; then
+    AC_DEFINE([UI_NULL], 1, [Defined if null UI is in use])
+    UI=null
+  fi
+fi
+
 dnl Look for Xlib UI (default=yes)
 if test -z "$UI"; then
   if test "$with_x" = no; then
@@ -409,6 +423,7 @@ fi
 
 AM_CONDITIONAL(UI_FB, test "$UI" = fb)
 AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
+AM_CONDITIONAL(UI_NULL, test "$UI" = null)
 AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
 AM_CONDITIONAL(UI_SVGA, test "$UI" = svga)
 AM_CONDITIONAL(UI_WII, test "$UI" = wii)
