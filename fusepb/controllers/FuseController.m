@@ -1746,7 +1746,10 @@ save_as_exit:
 - (void)ui_menu_activate_media_ide:(NSNumber*)active
 {
   [ideMaster setEnabled:[active boolValue]];
-  [ideSlave setEnabled:[active boolValue]];
+  [ideSlave setEnabled:NO];
+  if( settings_current.simpleide_active || settings_current.zxatasp_active ||
+      settings_current.divide_enabled )
+    [ideSlave setEnabled:[active boolValue]];
 }
 
 - (void)ui_menu_activate_media_ide_divide:(NSNumber*)active
@@ -1969,31 +1972,13 @@ save_as_exit:
     break;
   case 51:
   case 61:
-    return ideSimple8BitEjectMaster == 0 ? NO : YES;
+    return ideSimple8BitEjectMaster || ideZxataspEjectMaster || ideZxcfEject ||
+      ideDivideEjectMaster ? YES : NO;
     break;
   case 52:
   case 62:
-    return ideSimple8BitEjectSlave == 0 ? NO : YES;
-    break;
-  case 53:
-  case 63:
-    return ideZxataspEjectMaster == 0 ? NO : YES;
-    break;
-  case 54:
-  case 64:
-    return ideZxataspEjectSlave == 0 ? NO : YES;
-    break;
-  case 55:
-  case 65:
-    return ideZxcfEject == 0 ? NO : YES;
-    break;
-  case 56:
-  case 66:
-    return ideDivideEjectMaster == 0 ? NO : YES;
-    break;
-  case 57:
-  case 67:
-    return ideDivideEjectSlave == 0 ? NO : YES;
+    return ideSimple8BitEjectSlave || ideZxataspEjectSlave ||
+      ideDivideEjectSlave ? YES : NO;
     break;
   case 70:
     return profileStart == 0 ? NO : YES;
