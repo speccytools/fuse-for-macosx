@@ -249,6 +249,10 @@
 - (void)ui_menu_activate_media_ide_zxatasp_slave_eject:(NSNumber*)active;
 - (void)ui_menu_activate_media_ide_zxcf:(NSNumber*)active;
 - (void)ui_menu_activate_media_ide_zxcf_eject:(NSNumber*)active;
+- (void)ui_menu_activate_media_ide_divmmc:(NSNumber*)active;
+- (void)ui_menu_activate_media_ide_divmmc_eject:(NSNumber*)active;
+- (void)ui_menu_activate_media_ide_zxmmc:(NSNumber*)active;
+- (void)ui_menu_activate_media_ide_zxmmc_eject:(NSNumber*)active;
 - (void)ui_menu_activate_recording:(NSNumber*)active;
 - (void)ui_menu_activate_recording_rollback:(NSNumber*)active;
 - (void)ui_menu_activate_ay_logging:(NSNumber*)active;

@@ -355,6 +355,8 @@
   settings_current.spectranet = 0;
   settings_current.didaktik80 = 0;
   settings_current.usource = 0;
+  settings_current.divmmc_enabled = 0;
+  settings_current.zxmmc_enabled = 0;
 
   // Read mass storage type box and set text boxes appropriately
   switch( [[massStorageType selectedCell] tag] ) {
@@ -396,6 +398,12 @@
   case 12: // Currah µSource
     settings_current.usource = 1;
     break;
+  case 13: // DivMMC
+    settings_current.divmmc_enabled = 1;
+    break;
+  case 14: // ZXMMC
+    settings_current.zxmmc_enabled = 1;
+    break;
   default: // WTF?
     break;
   }
@@ -412,6 +420,8 @@
   [self setCurrentValue:settings_current.spectranet forKey:@"spectranet" inValues:currentValues];
   [self setCurrentValue:settings_current.didaktik80 forKey:@"didaktik80" inValues:currentValues];
   [self setCurrentValue:settings_current.usource forKey:@"usource" inValues:currentValues];
+  [self setCurrentValue:settings_current.divmmc_enabled forKey:@"divmmc" inValues:currentValues];
+  [self setCurrentValue:settings_current.zxmmc_enabled forKey:@"zxmmc" inValues:currentValues];
 
   [currentValues synchronize];
 }
@@ -576,6 +586,10 @@
     value = 11;
   } else if ( settings_current.usource ) {
     value = 12;
+  } else if ( settings_current.divmmc_enabled ) {
+    value = 13;
+  } else if ( settings_current.zxmmc_enabled ) {
+    value = 14;
   }
 
   [massStorageType selectCellWithTag:value];

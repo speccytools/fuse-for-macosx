@@ -239,6 +239,10 @@
 		B6D65C3718A6431500170B64 /* gcrypt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; };
 		B6D65C3818A645A100170B64 /* gcrypt.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; };
 		B6D670501DD6D2440014914E /* FuseHelp.help in Resources */ = {isa = PBXBuildFile; fileRef = B6D670451DD6CB6B0014914E /* FuseHelp.help */; };
+		B6D71DD21F6A94750000D666 /* divmmc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DCC1F6A94750000D666 /* divmmc.c */; };
+		B6D71DD31F6A94750000D666 /* divxxx.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DCE1F6A94750000D666 /* divxxx.c */; };
+		B6D71DD41F6A94750000D666 /* zxmmc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DD01F6A94750000D666 /* zxmmc.c */; };
+		B6D71DD61F6AA1E70000D666 /* mmc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DD51F6AA1E70000D666 /* mmc.c */; };
 		B6DCBBBF114FA0E700DC9A11 /* bzip2.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB62114FA0E700DC9A11 /* bzip2.c */; };
 		B6DCBBC4114FA0E700DC9A11 /* creator.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB67114FA0E700DC9A11 /* creator.c */; };
 		B6DCBBC5114FA0E700DC9A11 /* crypto.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB68114FA0E700DC9A11 /* crypto.c */; };
@@ -675,6 +679,13 @@
 		B6D65C3618A6431500170B64 /* gcrypt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gcrypt.framework; path = ../../libgcrypt/build/Deployment/gcrypt.framework; sourceTree = "<group>"; };
 		B6D670451DD6CB6B0014914E /* FuseHelp.help */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuseHelp.help; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6D670471DD6CB6B0014914E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6D71DCC1F6A94750000D666 /* divmmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = divmmc.c; sourceTree = "<group>"; };
+		B6D71DCD1F6A94750000D666 /* divmmc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = divmmc.h; sourceTree = "<group>"; };
+		B6D71DCE1F6A94750000D666 /* divxxx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = divxxx.c; sourceTree = "<group>"; };
+		B6D71DCF1F6A94750000D666 /* divxxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = divxxx.h; sourceTree = "<group>"; };
+		B6D71DD01F6A94750000D666 /* zxmmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zxmmc.c; sourceTree = "<group>"; };
+		B6D71DD11F6A94750000D666 /* zxmmc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zxmmc.h; sourceTree = "<group>"; };
+		B6D71DD51F6AA1E70000D666 /* mmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mmc.c; sourceTree = "<group>"; };
 		B6DCBB62114FA0E700DC9A11 /* bzip2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bzip2.c; sourceTree = "<group>"; };
 		B6DCBB67114FA0E700DC9A11 /* creator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = creator.c; sourceTree = "<group>"; };
 		B6DCBB68114FA0E700DC9A11 /* crypto.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypto.c; sourceTree = "<group>"; };
@@ -1105,6 +1116,10 @@
 			children = (
 				B6825547091817F30014B5EE /* divide.c */,
 				B6825548091817F30014B5EE /* divide.h */,
+				B6D71DCC1F6A94750000D666 /* divmmc.c */,
+				B6D71DCD1F6A94750000D666 /* divmmc.h */,
+				B6D71DCE1F6A94750000D666 /* divxxx.c */,
+				B6D71DCF1F6A94750000D666 /* divxxx.h */,
 				B6E811F4084B5148008CF718 /* ide.c */,
 				B6E811F5084B5148008CF718 /* ide.h */,
 				B6AD90550622B59200C70D75 /* simpleide.c */,
@@ -1113,6 +1128,8 @@
 				B601847A065A586900B0BE59 /* zxatasp.h */,
 				B601847B065A586900B0BE59 /* zxcf.c */,
 				B601847C065A586900B0BE59 /* zxcf.h */,
+				B6D71DD01F6A94750000D666 /* zxmmc.c */,
+				B6D71DD11F6A94750000D666 /* zxmmc.h */,
 			);
 			path = ide;
 			sourceTree = "<group>";
@@ -1344,6 +1361,7 @@
 				B6DCBB79114FA0E700DC9A11 /* libspectrum.c */,
 				B6DCBB7E114FA0E700DC9A11 /* memory.c */,
 				B6DCBB7F114FA0E700DC9A11 /* microdrive.c */,
+				B6D71DD51F6AA1E70000D666 /* mmc.c */,
 				B6DCBB86114FA0E700DC9A11 /* plusd.c */,
 				B6E1F19B14F6527300600EB0 /* pzx_read.c */,
 				B6DCBB88114FA0E700DC9A11 /* rzx.c */,
@@ -1827,6 +1845,7 @@
 				B61F463A09121DF100C8096C /* z80.c in Sources */,
 				B61F463B09121DF100C8096C /* ay.c in Sources */,
 				B61F463C09121DF100C8096C /* display.c in Sources */,
+				B6D71DD31F6A94750000D666 /* divxxx.c in Sources */,
 				B61F463D09121DF100C8096C /* event.c in Sources */,
 				B61F463E09121DF100C8096C /* keyboard.c in Sources */,
 				B68C32991D3BBF620082CBD4 /* z80_debugger_variables.c in Sources */,
@@ -1839,6 +1858,7 @@
 				B61F464509121DF100C8096C /* spec48.c in Sources */,
 				B61F464609121DF100C8096C /* spec128.c in Sources */,
 				B61F464709121DF100C8096C /* specplus2.c in Sources */,
+				B6D71DD41F6A94750000D666 /* zxmmc.c in Sources */,
 				B68C32921D3BBEC20082CBD4 /* system_variable.c in Sources */,
 				B61F464809121DF100C8096C /* specplus2a.c in Sources */,
 				B61F464909121DF100C8096C /* specplus3.c in Sources */,
@@ -1854,6 +1874,7 @@
 				B61F465509121DF100C8096C /* KeyboardController.m in Sources */,
 				B61F465609121DF100C8096C /* spec16.c in Sources */,
 				B61F465709121DF100C8096C /* pentagon.c in Sources */,
+				B6D71DD21F6A94750000D666 /* divmmc.c in Sources */,
 				B61F465909121DF100C8096C /* command.c in Sources */,
 				B61F465B09121DF100C8096C /* commandy.y in Sources */,
 				B61F465A09121DF100C8096C /* commandl.l in Sources */,
@@ -1955,6 +1976,7 @@
 				B6DCBBC4114FA0E700DC9A11 /* creator.c in Sources */,
 				B6DCBBC5114FA0E700DC9A11 /* crypto.c in Sources */,
 				B6DCBBC6114FA0E700DC9A11 /* csw.c in Sources */,
+				B6D71DD61F6AA1E70000D666 /* mmc.c in Sources */,
 				B6DCBBC7114FA0E700DC9A11 /* dck.c in Sources */,
 				B6DCBBD2114FA0E700DC9A11 /* ide.c in Sources */,
 				B6DCBBD4114FA0E700DC9A11 /* libspectrum.c in Sources */,

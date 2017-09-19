@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
@@ -481,11 +481,11 @@
             <point key="canvasLocation" x="132" y="885"/>
         </customView>
         <customView misplaced="YES" id="1432" userLabel="Peripherals">
-            <rect key="frame" x="0.0" y="0.0" width="637" height="472"/>
+            <rect key="frame" x="0.0" y="0.0" width="637" height="509"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="External sound interface" id="1833">
-                    <rect key="frame" x="398" y="312" width="222" height="140"/>
+                    <rect key="frame" x="398" y="349" width="222" height="140"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="3G9-p5-WYZ">
                         <rect key="frame" x="1" y="1" width="220" height="124"/>
@@ -536,226 +536,6 @@
                                             <font key="font" metaFont="system"/>
                                             <connections>
                                                 <action selector="externalSoundTypeClicked:" target="-2" id="bXf-Sd-y1O"/>
-                                            </connections>
-                                        </buttonCell>
-                                    </column>
-                                </cells>
-                            </matrix>
-                        </subviews>
-                    </view>
-                </box>
-                <box title="Mass storage/ROM Interfaces" id="1434">
-                    <rect key="frame" x="18" y="154" width="378" height="298"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <view key="contentView" id="y0s-Gg-gqJ">
-                        <rect key="frame" x="2" y="2" width="374" height="281"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button id="1445">
-                                <rect key="frame" x="156" y="123" width="138" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="ZXCF upload" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1456">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.zxcfupload" id="1476"/>
-                                </connections>
-                            </button>
-                            <button id="1444">
-                                <rect key="frame" x="156" y="145" width="163" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="ZXATASP write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1457">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.zxataspwriteprotect" id="1475"/>
-                                </connections>
-                            </button>
-                            <button id="1443">
-                                <rect key="frame" x="156" y="167" width="138" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="ZXATASP upload" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1458">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.zxataspupload" id="1474"/>
-                                </connections>
-                            </button>
-                            <button id="1442">
-                                <rect key="frame" x="156" y="211" width="163" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="DivIDE write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1459">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.dividewriteprotect" id="1477"/>
-                                </connections>
-                            </button>
-                            <button id="1910">
-                                <rect key="frame" x="156" y="233" width="155" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="Beta autoboot in 48K" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1911">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.beta12848boot" id="1913"/>
-                                </connections>
-                            </button>
-                            <button id="1954">
-                                <rect key="frame" x="156" y="255" width="154" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <buttonCell key="cell" type="check" title="+3 Detect Speedlock" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1955">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.plus3detectspeedlock" id="1957"/>
-                                </connections>
-                            </button>
-                            <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="1441">
-                                <rect key="frame" x="158" y="95" width="196" height="22"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                <size key="cellSize" width="196" height="22"/>
-                                <size key="intercellSpacing" width="1" height="8"/>
-                                <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1461">
-                                    <font key="font" metaFont="system"/>
-                                    <font key="titleFont" metaFont="system"/>
-                                </formCell>
-                                <cells>
-                                    <column>
-                                        <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="justified" title="MDR cartridge len:" id="1460">
-                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1793" customClass="NumberFormatter">
-                                                <nil key="negativeInfinitySymbol"/>
-                                                <nil key="positiveInfinitySymbol"/>
-                                                <real key="minimum" value="1"/>
-                                            </numberFormatter>
-                                            <font key="font" metaFont="system"/>
-                                            <font key="titleFont" metaFont="system"/>
-                                            <connections>
-                                                <binding destination="270" name="value" keyPath="values.mdrlen" id="1478"/>
-                                            </connections>
-                                        </formCell>
-                                    </column>
-                                </cells>
-                            </form>
-                            <button id="1916">
-                                <rect key="frame" x="156" y="189" width="138" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Spectranet disable" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1917">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <binding destination="270" name="value" keyPath="values.spectranetdisable" id="1922"/>
-                                </connections>
-                            </button>
-                            <matrix verticalHuggingPriority="750" selectionByRect="NO" allowsEmptySelection="NO" autosizesCells="NO" id="1446">
-                                <rect key="frame" x="17" y="13" width="138" height="258"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                <size key="cellSize" width="138" height="18"/>
-                                <size key="intercellSpacing" width="4" height="2"/>
-                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="1455">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <cells>
-                                    <column>
-                                        <buttonCell type="radio" title="None" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1447">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1823"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Interface 1" imagePosition="left" alignment="left" tag="1" inset="2" id="1448">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1824"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Simple 8-bit IDE" imagePosition="left" alignment="left" tag="2" inset="2" id="1449">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1825"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="ZXATASP interface" imagePosition="left" alignment="left" tag="3" inset="2" id="1450">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1826"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="ZXCF interface" imagePosition="left" alignment="left" tag="4" inset="2" id="1451">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1827"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="DivIDE" imagePosition="left" alignment="left" tag="5" inset="2" id="1452">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1828"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="+D" imagePosition="left" alignment="left" tag="6" inset="2" id="1453">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1829"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Beta 128" imagePosition="left" alignment="left" tag="7" inset="2" id="1454">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1830"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Opus Discovery" imagePosition="left" alignment="left" tag="8" inset="2" id="1880">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1881"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="DISCiPLE" imagePosition="left" alignment="left" tag="9" inset="2" id="1909">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1924"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Spectranet" imagePosition="left" alignment="left" tag="10" inset="2" id="1923">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="1925"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Didaktik 80" imagePosition="left" alignment="left" tag="11" inset="2" id="NEM-h4-5OZ">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="cie-qX-d57"/>
-                                            </connections>
-                                        </buttonCell>
-                                        <buttonCell type="radio" title="Currah µSource" imagePosition="left" alignment="left" tag="12" inset="2" id="4UJ-Mb-bdD">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <connections>
-                                                <action selector="massStorageTypeClicked:" target="-2" id="ZIm-ih-xIE"/>
                                             </connections>
                                         </buttonCell>
                                     </column>
@@ -861,7 +641,7 @@
                     </view>
                 </box>
                 <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Romantic Robot Multiface" id="6eE-xu-7vV">
-                    <rect key="frame" x="398" y="154" width="222" height="150"/>
+                    <rect key="frame" x="398" y="191" width="222" height="150"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="4mh-bA-ptt">
                         <rect key="frame" x="1" y="1" width="220" height="134"/>
@@ -924,8 +704,253 @@
                         </subviews>
                     </view>
                 </box>
+                <box misplaced="YES" title="Mass storage/ROM Interfaces" id="1434">
+                    <rect key="frame" x="18" y="154" width="378" height="335"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <view key="contentView" id="y0s-Gg-gqJ">
+                        <rect key="frame" x="2" y="2" width="374" height="318"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button misplaced="YES" id="1445">
+                                <rect key="frame" x="162" y="150" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="ZXCF upload" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1456">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxcfupload" id="1476"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1443">
+                                <rect key="frame" x="162" y="192" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="ZXATASP upload" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1458">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxataspupload" id="1474"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1442">
+                                <rect key="frame" x="162" y="252" width="163" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="DivIDE write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1459">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.dividewriteprotect" id="1477"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="cmU-13-Umz">
+                                <rect key="frame" x="162" y="232" width="163" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="DivMMC write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="v2q-fU-XHH">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.divmmcwriteprotect" id="xNL-jf-Eab"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1910">
+                                <rect key="frame" x="162" y="272" width="155" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Beta autoboot in 48K" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1911">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.beta12848boot" id="1913"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1954">
+                                <rect key="frame" x="162" y="292" width="154" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="+3 Detect Speedlock" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1955">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.plus3detectspeedlock" id="1957"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1916">
+                                <rect key="frame" x="162" y="212" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Spectranet disable" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1917">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.spectranetdisable" id="1922"/>
+                                </connections>
+                            </button>
+                            <matrix verticalHuggingPriority="750" misplaced="YES" selectionByRect="NO" allowsEmptySelection="NO" autosizesCells="NO" id="1446">
+                                <rect key="frame" x="12" y="10" width="138" height="298"/>
+                                <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="138" height="18"/>
+                                <size key="intercellSpacing" width="4" height="2"/>
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="1455">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <cells>
+                                    <column>
+                                        <buttonCell type="radio" title="None" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1447">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1823"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Beta 128" imagePosition="left" alignment="left" tag="7" inset="2" id="1448">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1824"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Currah µSource" imagePosition="left" alignment="left" tag="12" inset="2" id="1449">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1825"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="DISCiPLE" imagePosition="left" alignment="left" tag="9" inset="2" id="1450">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1826"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Didaktik 80" imagePosition="left" alignment="left" tag="11" inset="2" id="1451">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1827"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="DivIDE" imagePosition="left" alignment="left" tag="5" inset="2" id="1452">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1828"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="DivMMC" imagePosition="left" alignment="left" tag="14" inset="2" id="1453">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1829"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Interface 1" imagePosition="left" alignment="left" tag="1" inset="2" id="1454">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1830"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Opus Discovery" imagePosition="left" alignment="left" tag="8" inset="2" id="1880">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1881"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="+D" imagePosition="left" alignment="left" tag="6" inset="2" id="1909">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1924"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Simple 8-bit IDE" imagePosition="left" alignment="left" tag="2" inset="2" id="1923">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1925"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Spectranet" imagePosition="left" alignment="left" tag="10" inset="2" id="NEM-h4-5OZ">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="cie-qX-d57"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="ZXATASP interface" imagePosition="left" alignment="left" tag="3" inset="2" id="4UJ-Mb-bdD">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="ZIm-ih-xIE"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="ZXCF interface" imagePosition="left" alignment="left" tag="4" inset="2" id="0yf-Lu-fVC">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-1" id="FeK-58-SVi"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="ZXMMC interface" imagePosition="left" alignment="left" tag="14" inset="2" id="EsV-AO-16o">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-1" id="ALy-dB-ZRq"/>
+                                            </connections>
+                                        </buttonCell>
+                                    </column>
+                                </cells>
+                            </matrix>
+                            <form verticalHuggingPriority="750" misplaced="YES" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="1441">
+                                <rect key="frame" x="164" y="130" width="196" height="22"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="196" height="22"/>
+                                <size key="intercellSpacing" width="1" height="8"/>
+                                <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1461">
+                                    <font key="font" metaFont="system"/>
+                                    <font key="titleFont" metaFont="system"/>
+                                </formCell>
+                                <cells>
+                                    <column>
+                                        <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="justified" title="MDR cartridge len:" id="1460">
+                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1793" customClass="NumberFormatter">
+                                                <nil key="negativeInfinitySymbol"/>
+                                                <nil key="positiveInfinitySymbol"/>
+                                                <real key="minimum" value="1"/>
+                                            </numberFormatter>
+                                            <font key="font" metaFont="system"/>
+                                            <font key="titleFont" metaFont="system"/>
+                                            <connections>
+                                                <binding destination="270" name="value" keyPath="values.mdrlen" id="1478"/>
+                                            </connections>
+                                        </formCell>
+                                    </column>
+                                </cells>
+                            </form>
+                            <button misplaced="YES" id="1444">
+                                <rect key="frame" x="162" y="172" width="163" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="ZXATASP write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1457">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxataspwriteprotect" id="1475"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                </box>
             </subviews>
-            <point key="canvasLocation" x="330.5" y="-570"/>
+            <point key="canvasLocation" x="330.5" y="-551.5"/>
         </customView>
         <customView id="1488" userLabel="RZX">
             <rect key="frame" x="0.0" y="0.0" width="627" height="146"/>
@@ -1336,7 +1361,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="RVo-Sg-mDk">
                         <rect key="frame" x="1" y="0.0" width="135" height="302"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1631" id="1634">
                                 <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
@@ -1478,7 +1503,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="7ih-tq-3PK">
                         <rect key="frame" x="1" y="0.0" width="135" height="302"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1612" id="1615">
                                 <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>

@@ -69,7 +69,7 @@ br{eakpoint} (re{ad}\|w{rite}) [address] [if condition] | Set a breakpoint to tr
 *t{breakpoint} [options]* | This is the same as the `breakpoint` command in its various forms, except that the breakpoint is temporary: it will trigger once and once only, and then be removed.
 
 <br>
-Addresses can be specified in one of two forms: either an absolute addresses, specifed by an integer in the range 0x0000 to 0xFFFF or as a 'source:page:offset' combination, which refers to a location offset bytes into the memory bank page, independent of where that bank is currently paged into memory. RAM and ROM pages are indicated, respectively, by 'RAM' and 'ROM' sources (e.g. offset 0x1234 in ROM 1 is specified as `ROM:1:0x1234`). Other available sources are: 'Betadisk', '"Didaktik 80 RAM"', '"Didaktik 80 ROM"', '"DISCiPLE RAM"', '"DISCiPLE ROM"', '"DivIDE EPROM"', '"DivIDE RAM"', 'If1', 'If2', '"Multiface RAM"', '"Multiface ROM"', '"Opus RAM"', '"Opus ROM"', 'PlusD RAM', 'PlusD ROM', 'SpeccyBoot', 'Spectranet', '"Timex Dock"', '"Timex EXROM"', 'ZXATASP' and 'ZXCF'. 
+Addresses can be specified in one of two forms: either an absolute addresses, specifed by an integer in the range 0x0000 to 0xFFFF or as a 'source:page:offset' combination, which refers to a location offset bytes into the memory bank page, independent of where that bank is currently paged into memory. RAM and ROM pages are indicated, respectively, by 'RAM' and 'ROM' sources (e.g. offset 0x1234 in ROM 1 is specified as `ROM:1:0x1234`). Other available sources are: 'Betadisk', '"Didaktik 80 RAM"', '"Didaktik 80 ROM"', '"DISCiPLE RAM"', '"DISCiPLE ROM"', '"DivIDE EPROM"', '"DivIDE RAM"', '"DivMMC EPROM"', '"DivMMC RAM"', 'If1', 'If2', '"Multiface RAM"', '"Multiface ROM"', '"Opus RAM"', '"Opus ROM"', 'PlusD RAM', 'PlusD ROM', 'SpeccyBoot', 'Spectranet', '"Timex Dock"', '"Timex EXROM"', 'ZXATASP' and 'ZXCF'.
 
 Please, note that spaces in memory sources should be escaped, e.g.,`break Didaktik\ 80\ ROM:0:0x1234`. The 48K machines are treated as having a permanent mapping of page 5 at 0x4000, page 2 at 0x8000 and page 0 at 0xC000; the 16K Spectrum is treated as having page 5 at 0x4000 and no page at 0x8000 and 0xC000.
 
@@ -87,6 +87,8 @@ EVENT | DESCRIPTION
 *disciple:unpage* | The DISCiPLE interface is paged out of memory.
 *divide:page* | The DivIDE interface is paged into memory.
 *divide:unpage* | The DivIDE interface is paged out of memory.
+*divmmc:page* | The DivMMC interface is paged into memory.
+*divmmc:unpage* | The DivMMC interface is paged out of memory.
 *if1:page* | The Interface 1 shadow ROM is paged into memory.
 *if1:unpage* | The Interface 1 shadow ROM is paged out of memory.  
 *multiface:page* | The Multiface One/128/3 is paged into memory.
@@ -118,6 +120,7 @@ System variables are specified via an ‘area:detail’ syntax. The available sy
 SYSTEM VARIABLE | DESCRIPTION
 :--- | :---
 *ay:current* | The current AY‐3‐8912 register.
+*divmmc:control* | The last byte written to DivMMC control port.
 *ula:last* | The last byte written to the ULA. Note that this variable can only be read, not written to.
 *ula:mem1ffd* | The last byte written to memory control port used by the ZX Spectrum +2A/3; normally addressed at 0x1ffd, hence the name.
 *ula:mem7ffd* | The last byte written to primary memory control port used by the ZX Spectrum 128 and later; normally addressed at 0x7ffd, hence the name.

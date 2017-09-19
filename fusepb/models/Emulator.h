@@ -148,6 +148,14 @@
 -(int) divideCommit:(libspectrum_ide_unit)unit;
 -(int) divideEject:(libspectrum_ide_unit)unit;
 
+-(int) divmmcInsert:(const char *)filename;
+-(int) divmmcCommit;
+-(int) divmmcEject;
+
+-(int) zxmmcInsert:(const char *)filename;
+-(int) zxmmcCommit;
+-(int) zxmmcEject;
+
 -(void) mouseMoved:(NSEvent *)theEvent;
 -(void) mouseDown:(NSEvent *)theEvent;
 -(void) mouseUp:(NSEvent *)theEvent;

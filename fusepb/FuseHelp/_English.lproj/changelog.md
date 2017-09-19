@@ -1,7 +1,18 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.3.6 of the Fuse emulator.
+description: This section describes the changes for version 1.4.0 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.4.0
+
+### New features:
+* Add DivMMC emulation (Philip Kendall and Sergio Baldoví).
+* Add ZXMMC emulation (Philip Kendall and Sergio Baldoví).
+
+### Miscellaneous improvements:
+* Add support for MLT format screenshots (Fredrick Meunier).
+
+### Various other minor bugfixes.
 
 ## What's new in Fuse for macOS 1.3.8
 

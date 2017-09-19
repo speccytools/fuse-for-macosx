@@ -8,9 +8,9 @@ On macOSX 10.5 and newer, the Fuse Quick Look generator allows viewing
 thumbnails and previews of ZX Spectrum emulation related files. The supported
 types are:
 
-## SCR Screen dumps
+## SCR and MLT Screen dumps
 
-Preview and thumbnails for SCR screen dumps in all graphics modes.
+Preview and thumbnails for SCR and MLT screen dumps in all graphics modes.
 
 ## Snapshots (SZX, Z80, SNA, etc.)
 

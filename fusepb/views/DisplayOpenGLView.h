@@ -189,6 +189,14 @@
 -(int) divideCommit:(libspectrum_ide_unit)unit;
 -(int) divideEject:(libspectrum_ide_unit)unit;
 
+-(int) divmmcInsert:(const char *)filename;
+-(int) divmmcCommit;
+-(int) divmmcEject;
+
+-(int) zxmmcInsert:(const char *)filename;
+-(int) zxmmcCommit;
+-(int) zxmmcEject;
+
 -(void) setDiskState:(NSNumber*)state;
 -(void) setTapeState:(NSNumber*)state;
 -(void) setMdrState:(NSNumber*)state;

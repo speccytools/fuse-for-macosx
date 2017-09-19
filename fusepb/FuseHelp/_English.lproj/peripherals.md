@@ -13,18 +13,20 @@ which Fuse will consider to be attached to the emulated machines.
 OPTION | DESCRIPTION
 :--- | :---
 *None* | If this option is selected, Fuse will not emulate any mass storage device (except for the integrated disk devices on the +3, Pentagon and Scorpion).
+*Beta 128* | If this option is selected, Fuse will emulate the Beta 128 interface, which provides a floppy drive interface. See the [Beta 128 Emulation](trdos.html) section for more details. Beta 128 emulation is enabled for the Pentagon and Scorpion machines regardless of this option.
+*Currah µSource* | If this option is selected, Fuse will emulate a Currah µSource interface. See the [World of Spectrum Infoseek web page](http://www.worldofspectrum.org/infoseekid.cgi?id=1000080) for the manual. The required ROM file is not supplied with Fuse for macOSX and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named usource.rom and placed in the Fuse packages Contents/Resources directory.
+*DISCiPLE* | If this option is selected, Fuse will emulate the DISCiPLE interface, which provides both a floppy drive and a printer interface. See the [DISCiPLE Emulation](disciple.html) section for more details.
+*Didaktik 80 interface* | If this option is selected, Fuse will emulate the Didaktik 80 (or Didaktik 40) interface.  See the [Didaktik 80 Emulation](didaktik80.html) section for more details.
+*DivIDE interface* | If this option is selected, Fuse will emulate the DivIDE interface, which provides both additional RAM and a IDE interface. See the [DivIDE Emulation](divide.html) section for more details.
+*DivMMC interface* | If this option is selected, Fuse will emulate the DivMMC interface. See the [DIVMMC Emulation](divmmc.html) section for more details.
 *Interface I* | If this option is selected, Fuse will emulate the Sinclair Interface I, and allow microdrive cartridges to be inserted and removed via the *Media > Microdrive* menus.
+*Opus Discovery* | If this option is selected, Fuse will emulate the Opus Discovery interface, which provides both a floppy drive and a printer interface. See the [Opus Discovery Emulation](opus.html) section for more details.
+*+D interface* | If this option is selected, Fuse will emulate the +D interface, which provides both a floppy drive and a printer interface. See the [+D Emulation](plusd.html) section for more details.
 *Simple 8-bit IDE* | If this option is selected, Fuse will emulate the simple 8-bit IDE interface as used by the Spectrum +3e, and allow hard disks to be connected and disconnected via the *Media > IDE* menu.
+*Spectranet* | If this option is selected, Fuse will emulate the Spectranet interface, which provides an ethernet interface for the Spectrum. See the [Spectranet Emulation](spectranet.html) section for more details.
 *ZXATASP interface* | If this option is selected, Fuse will emulate the ZXATASP interface, which provides both additional RAM and an IDE interface. See the [ZXATASP and ZXCF Emulation](zxatasp.html) section for more details.
 *ZXCF interface* | If this option is selected, Fuse will emulate the ZXCF interface, which provides both additional RAM and a CompactFlash interface. See the [ZXATASP and ZXCF Emulation](zxatasp.html) section for more details.
-*DivIDE interface* | If this option is selected, Fuse will emulate the DivIDE interface, which provides both additional RAM and a IDE interface. See the [DivIDE Emulation](divide.html) section for more details.
-*+D interface* | If this option is selected, Fuse will emulate the +D interface, which provides both a floppy drive and a printer interface. See the [+D Emulation](plusd.html) section for more details.
-*Beta 128* | If this option is selected, Fuse will emulate the Beta 128 interface, which provides a floppy drive interface. See the [Beta 128 Emulation](trdos.html) section for more details. Beta 128 emulation is enabled for the Pentagon and Scorpion machines regardless of this option.
-*Opus Discovery* | If this option is selected, Fuse will emulate the Opus Discovery interface, which provides both a floppy drive and a printer interface. See the [Opus Discovery Emulation](opus.html) section for more details.
-*DISCiPLE* | If this option is selected, Fuse will emulate the DISCiPLE interface, which provides both a floppy drive and a printer interface. See the [DISCiPLE Emulation](disciple.html) section for more details.
-*Spectranet* | If this option is selected, Fuse will emulate the Spectranet interface, which provides an ethernet interface for the Spectrum. See the [Spectranet Emulation](spectranet.html) section for more details.
-*Didaktik 80 interface* | If this option is selected, Fuse will emulate the Didaktik 80 (or Didaktik 40) interface.  See the [Didaktik 80 Emulation](didaktik80.html) section for more details.
-*Currah µSource* | If this option is selected, Fuse will emulate a Currah µSource interface. See the [World of Spectrum Infoseek web page](http://www.worldofspectrum.org/infoseekid.cgi?id=1000080) for the manual. The required ROM file is not supplied with Fuse for macOSX and so must be installed before the interface can be used. The expected file is an 8KB dump of the interface ROM named usource.rom and placed in the Fuse packages Contents/Resources directory.
+*ZXMMC interface* | If this option is selected, Fuse will emulate the ZXMMC interface. Available for +2A, +3 and +3e machines.
 
 <br>
 ### +3 options
@@ -52,6 +54,15 @@ See the [DivIDE Emulation](divide.html) section for more details.
 OPTION | DESCRIPTION
 :--- | :---
 *DivIDE write protect* | This option controls the state of the DivIDE EEPROM write protect jumper (E).
+
+<br>
+### DivMMC options
+
+See the [DivMMC Emulation](divmmc.html) section for more details.
+
+OPTION | DESCRIPTION
+:--- | :---
+*DivMMC write protect* | This option controls the state of the DivMMC write protection jumper that prevents flashing the EEPROM chip.
 
 <br>
 ### Interface I options

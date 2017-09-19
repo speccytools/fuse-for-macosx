@@ -1023,6 +1023,36 @@ static DisplayOpenGLView *instance = nil;
   return [proxy_emulator divideEject:unit];
 }
 
+-(int) divmmcInsert:(const char *)filename
+{
+  return [proxy_emulator divmmcInsert:filename];
+}
+
+-(int) divmmcCommit
+{
+  return [proxy_emulator divmmcCommit];
+}
+
+-(int) divmmcEject
+{
+  return [proxy_emulator divmmcEject];
+}
+
+-(int) zxmmcInsert:(const char *)filename
+{
+  return [proxy_emulator zxmmcInsert:filename];
+}
+
+-(int) zxmmcCommit
+{
+  return [proxy_emulator zxmmcCommit];
+}
+
+-(int) zxmmcEject
+{
+  return [proxy_emulator zxmmcEject];
+}
+
 -(void) setDiskState:(NSNumber*)state
 {
   disk_state = [state unsignedCharValue];

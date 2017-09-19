@@ -27,6 +27,7 @@
 #include "dck.h"
 #include "debugger/debugger.h"
 #include "divide.h"
+#include "divmmc.h"
 #include "event.h"
 #include "fuse.h"
 #include "fusepb/main.h"
@@ -56,6 +57,7 @@
 #include "z80/z80.h"
 #include "zxatasp.h"
 #include "zxcf.h"
+#include "zxmmc.h"
 
 extern keysyms_map_t unicode_keysyms_map[];
 extern keysyms_map_t recreated_keysyms_map[];
@@ -343,12 +345,46 @@ static Emulator *instance = nil;
 
 -(void) screenshotScrRead:(const char *)filename
 {
-  screenshot_scr_read( filename );
+  libspectrum_id_t type;
+  libspectrum_class_t class;
+  int error;
+
+  /* Work out what sort of file we want from the filename; default to
+     .scr if we couldn't guess */
+  error = libspectrum_identify_file_with_class( &type, &class, filename, NULL,
+						0 );
+  if( error ) return;
+
+  if( class != LIBSPECTRUM_CLASS_SCREENSHOT || type == LIBSPECTRUM_ID_UNKNOWN )
+    type = LIBSPECTRUM_ID_SCREEN_SCR;
+
+  if( type == LIBSPECTRUM_ID_SCREEN_SCR ) {
+    screenshot_scr_read( filename );
+  } else {
+    screenshot_mlt_read( filename );
+  }
 }
 
 -(void) screenshotScrWrite:(const char *)filename
 {
-  screenshot_scr_write( filename );
+  libspectrum_id_t type;
+  libspectrum_class_t class;
+  int error;
+
+  /* Work out what sort of file we want from the filename; default to
+     .scr if we couldn't guess */
+  error = libspectrum_identify_file_with_class( &type, &class, filename, NULL,
+						0 );
+  if( error ) return;
+
+  if( class != LIBSPECTRUM_CLASS_SCREENSHOT || type == LIBSPECTRUM_ID_UNKNOWN )
+    type = LIBSPECTRUM_ID_SCREEN_SCR;
+
+  if( type == LIBSPECTRUM_ID_SCREEN_SCR ) {
+    screenshot_scr_write( filename );
+  } else {
+    screenshot_mlt_write( filename );
+  }
 }
 
 -(void) screenshotWrite:(const char *)filename
@@ -575,6 +611,38 @@ static Emulator *instance = nil;
 -(int) divideEject:(libspectrum_ide_unit)unit
 {
   return divide_eject( unit );
+}
+
+-(int) divmmcInsert:(const char *)filename
+{
+  return divmmc_insert( filename );
+}
+
+-(int) divmmcCommit
+{
+  divmmc_commit();
+  return 0;
+}
+
+-(int) divmmcEject
+{
+  return divmmc_eject();
+}
+
+-(int) zxmmcInsert:(const char *)filename
+{
+  return zxmmc_insert( filename );
+}
+
+-(int) zxmmcCommit
+{
+  zxmmc_commit();
+  return 0;
+}
+
+-(int) zxmmcEject
+{
+  return zxmmc_eject();
 }
 
 -(void) startEmulationTimer

@@ -25,8 +25,8 @@ MENU|SHORTCUT|DESCRIPTION
 *File > Emulator Recording > Finalise Recording…*||Compact an RZX file. Any interspersed snapshots will be removed and the recording cannot be continued. All action replays submitted to the RZX Archive should be finalised.
 *File > AY Sound Recording > Record…*||Start recording the bytes output via the AY-3-8912 sound chip to a PSG file.
 *File > AY Sound Recording > Stop*||Stop any current AY logging.
-*File > Open Screenshot…*||Load an SCR screenshot (essentially just a binary dump of the Spectrum's video memory) onto the current screen. Fuse supports screenshots saved in the Timex hi-colour and hi-res modes as well as 'normal' Spectrum screens, and will make a simple conversion if a hi-colour or hi-res screenshot is loaded onto a non-Timex machine.
-*File > Save Screenshot As…*||Save a copy of whatever's currently displayed on the Spectrum's screen as an SCR file.
+*File > Open Screenshot…*||Load a SCR or MLT screenshot (essentially just a binary dump of the Spectrum's video memory) onto the current screen.  The MLT format is similar to the SCR format but additionally supports capturing images that use techniques to display more than two colours in each Spectrum attribute square. Fuse supports screenshots saved in the Timex hi-colour and hi-res modes as well as 'normal' Spectrum screens, and will make a simple conversion if a hi-colour or hi-res screenshot is loaded onto a non-Timex machine.
+*File > Save Screenshot As…*||Save a copy of whatever's currently displayed on the Spectrum's screen as a SCR or MLT file.
 *File > Export Screenshot…*||Save the current screen as any supported format (currently PNG, TIFF, BMP, JPG and GIF).
 *File > Import Binary Data…*||Load binary data from a file into the Spectrum's memory. After selecting the file to load data from, you can choose where to load the data and how much data to load.
 *File > Export Binary Data…*||Save an arbitrary chunk of the Spectrum's memory to a file. Select the file you wish to save to, followed by the location and length of data you wish to save.

@@ -129,6 +129,8 @@ static int ideSimple8BitEjectSlave = 0;
 static int ideZxataspEjectMaster = 0;
 static int ideZxataspEjectSlave = 0;
 static int ideZxcfEject = 0;
+static int ideDivmmcEject = 0;
+static int ideZxmmcEject = 0;
 static int if1M1Eject = 0;
 static int if1M2Eject = 0;
 static int if1M3Eject = 0;
@@ -151,7 +153,7 @@ static NSMutableArray *mdrFileTypes = nil;
 static NSMutableArray *plus3FileTypes = nil;
 static NSMutableArray *romFileTypes = nil;
 static NSMutableArray *rzxFileTypes = nil;
-static NSMutableArray *scrFileType = nil;
+static NSMutableArray *scrFileTypes = nil;
 static NSMutableArray *snapFileTypes = nil;
 static NSMutableArray *tapeFileTypes = nil;
 static NSMutableArray *betaFileTypes = nil;
@@ -249,8 +251,9 @@ static NSMutableArray *recentSnapFileNames = nil;
     rzxFileTypes = [NSMutableArray arrayWithObjects:@"rzx", @"RZX", nil];
     [rzxFileTypes retain];
 
-    scrFileType = [NSMutableArray arrayWithObjects:@"scr", @"SCR", nil];
-    [scrFileType retain];
+    scrFileTypes = [NSMutableArray arrayWithObjects:@"scr", @"SCR", @"mlt",
+                    @"MLT", nil];
+    [scrFileTypes retain];
 
     tapeFileTypes = [NSMutableArray arrayWithObjects:@"csw", @"ltp", @"pzx",
                       @"raw", @"spc", @"sta", @"tap", @"tzx", @"wav", @"CSW",
@@ -288,7 +291,7 @@ static NSMutableArray *recentSnapFileNames = nil;
     [allFileTypes addObjectsFromArray:ideFileTypes];
     [allFileTypes addObjectsFromArray:mdrFileTypes];
     [allFileTypes addObjectsFromArray:rzxFileTypes];
-    [allFileTypes addObjectsFromArray:scrFileType];
+    [allFileTypes addObjectsFromArray:scrFileTypes];
     [allFileTypes addObjectsFromArray:tapeFileTypes];
     [allFileTypes addObjectsFromArray:plus3FileTypes];
     [allFileTypes addObjectsFromArray:betaFileTypes];
@@ -304,7 +307,7 @@ static NSMutableArray *recentSnapFileNames = nil;
     [ideFileTypes addObjectsFromArray:compressedFileTypes];
     [mdrFileTypes addObjectsFromArray:compressedFileTypes];
     [rzxFileTypes addObjectsFromArray:compressedFileTypes];
-    [scrFileType addObjectsFromArray:compressedFileTypes];
+    [scrFileTypes addObjectsFromArray:compressedFileTypes];
     [tapeFileTypes addObjectsFromArray:compressedFileTypes];
     [plus3FileTypes addObjectsFromArray:compressedFileTypes];
     [betaFileTypes addObjectsFromArray:compressedFileTypes];
@@ -527,6 +530,10 @@ error:
     error = [[DisplayOpenGLView instance] zxataspInsert:filename inUnit:unit];
   } else if( settings_current.zxcf_active ) {
     error = [[DisplayOpenGLView instance] zxcfInsert:filename];
+  } else if( settings_current.divmmc_enabled ) {
+    error = [[DisplayOpenGLView instance] divmmcInsert:filename];
+  } else if( settings_current.zxmmc_enabled ) {
+    error = [[DisplayOpenGLView instance] zxmmcInsert:filename];
   }
 
   if(error) goto error;
@@ -863,7 +870,7 @@ save_as_exit:
 
   [[DisplayOpenGLView instance] pause];
 
-  filename = cocoaui_openpanel_get_filename( @"Open SCR Screenshot", scrFileType );
+  filename = cocoaui_openpanel_get_filename( @"Open Screenshot", scrFileTypes );
 
   if( !filename ) { [[DisplayOpenGLView instance] unpause]; return; }
 
@@ -929,7 +936,8 @@ save_as_exit:
 
   [[DisplayOpenGLView instance] pause];
 
-  filename = cocoaui_savepanel_get_filename( @"Save Screenshot As", @[@"scr"] );
+  filename = cocoaui_savepanel_get_filename( @"Save Screenshot As",
+                                             @[@"scr", @"mlt"] );
 
   if( !filename ) { [[DisplayOpenGLView instance] unpause]; return; }
 
@@ -1803,6 +1811,24 @@ save_as_exit:
   ideZxcfEject = [active boolValue];
 }
 
+- (void)ui_menu_activate_media_ide_divmmc:(NSNumber*)active
+{
+}
+
+- (void)ui_menu_activate_media_ide_divmmc_eject:(NSNumber*)active
+{
+  ideDivmmcEject = [active boolValue];
+}
+
+- (void)ui_menu_activate_media_ide_zxmmc:(NSNumber*)active
+{
+}
+
+- (void)ui_menu_activate_media_ide_zxmmc_eject:(NSNumber*)active
+{
+  ideZxmmcEject = [active boolValue];
+}
+
 - (void)ui_menu_activate_media_if1:(NSNumber*)active
 {
   [mdr1 setEnabled:[active boolValue]];
@@ -1973,7 +1999,7 @@ save_as_exit:
   case 51:
   case 61:
     return ideSimple8BitEjectMaster || ideZxataspEjectMaster || ideZxcfEject ||
-      ideDivideEjectMaster ? YES : NO;
+      ideDivideEjectMaster || ideZxmmcEject || ideDivmmcEject ? YES : NO;
     break;
   case 52:
   case 62:
@@ -2642,6 +2668,12 @@ save_as_exit:
         settings_current.zxatasp_master_file = strdup( fsrep );
       } else if( settings_current.simpleide_active ) {
         settings_current.simpleide_master_file = strdup( fsrep );
+      } else if( settings_current.divmmc_enabled ) {
+        settings_current.divmmc_file = strdup( fsrep );
+      } else if( settings_current.divide_enabled ) {
+        settings_current.divide_master_file = strdup( fsrep );
+      } else if( settings_current.zxmmc_enabled ) {
+        settings_current.zxmmc_file = strdup( fsrep );
       } else {
         /* No IDE interface active, so activate the ZXCF */
         settings_current.zxcf_active = 1;
@@ -3097,6 +3129,22 @@ ui_menu_activate( ui_menu_item item, int active )
 
   case UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT:
     method = @selector(ui_menu_activate_media_ide_zxcf_eject:);
+    break;
+
+  case UI_MENU_ITEM_MEDIA_IDE_DIVMMC:
+    method = @selector(ui_menu_activate_media_ide_divmmc:);
+    break;
+
+  case UI_MENU_ITEM_MEDIA_IDE_DIVMMC_EJECT:
+    method = @selector(ui_menu_activate_media_ide_divmmc_eject:);
+    break;
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXMMC:
+    method = @selector(ui_menu_activate_media_ide_zxmmc:);
+    break;
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXMMC_EJECT:
+    method = @selector(ui_menu_activate_media_ide_zxmmc_eject:);
     break;
 
   case UI_MENU_ITEM_MEDIA_IF1:

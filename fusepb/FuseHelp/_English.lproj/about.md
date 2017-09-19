@@ -16,10 +16,10 @@ loading of the old DAT-file variant is not.
 
 DSK, UDI, FDI, TD0, MGT, IMG, D40, D80, SAD, TRD, SCL and OPD disk images are
 supported when a disk interface is being emulated, including the integrated disk
-drives on +3, Pentagon or Scorpion machines as well as the +D, DISCiPLE, Opus
-Discovery, Beta 128 and Didaktik 80 interfaces. DCK cartridge images are
-supported when emulating a Timex 2068 variant. Interface 2 ROM cartridges are
-also supported.
+drives on +3, Pentagon or Scorpion machines as well as the +D, DISCiPLE, DivIDE,
+DivMMC, ZXMMC, Opus Discovery, Beta 128 and Didaktik 80 interfaces. DCK
+cartridge images are supported when emulating a Timex 2068 variant. Interface 2
+ROM cartridges are also supported.
 
 Finally, there is also support for reading and writing the RZX input recording
 format.
