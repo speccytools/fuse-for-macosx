@@ -81,6 +81,8 @@ typedef struct multiface_t {
   int J2;			/* Jumper 2 to disable software paging, or
 				   the software on/off state for 128/3 */
   int J1;			/* Jumper 1 to disable joystick (always 0) */
+  libspectrum_byte xfdd_reg[4]; /* 74LS670 chip store low 4 bits of
+                                   0x1ffd, 0x3ffd, 0x5ffd and 0x7ffd */
   periph_type type;		/* type of multiface: one/128/3 */
   libspectrum_byte ram[8192];	/* 8k RAM */
   int *c_settings;		/* ptr to current_settings.multiface### */
@@ -120,8 +122,8 @@ static void multiface_port_out128( libspectrum_word port,
                                    libspectrum_byte val );
 static void multiface_port_out3( libspectrum_word port, libspectrum_byte val );
 
-static libspectrum_byte multiface_port_last_byte( libspectrum_word port,
-                                                  libspectrum_byte *attached );
+static void multiface_port_xffd_write( libspectrum_word port,
+                                       libspectrum_byte val );
 
 static void multiface_enabled_snapshot( libspectrum_snap *snap );
 static void multiface_from_snapshot( libspectrum_snap *snap );
@@ -152,7 +154,7 @@ static const periph_port_t multiface_ports_128[] = {
 static const periph_port_t multiface_ports_3[] = {
 /* ---- ----  x011 --1-  */
   { 0x0072, 0x0032, multiface_port_in3, multiface_port_out3 },
-  { 0x1f3f, 0x1f3f, multiface_port_last_byte, NULL },
+  { 0x90ff, 0x10fd, NULL, multiface_port_xffd_write },
   { 0, 0, NULL, NULL }
 };
 
@@ -252,6 +254,8 @@ multiface_reset_real( int idx, int hard_reset )
   else
     mf[idx].J2 = 0;
 
+  memset( mf[idx].xfdd_reg, 0x00, 4 );
+
   *mf[idx].c_settings = 0;
   periph_activate_type( mf[idx].type, 0 );
 
@@ -349,7 +353,7 @@ multiface_port_in1( libspectrum_word port, libspectrum_byte *attached )
   if( !IS( multiface_available, MF_1 ) ) return ret;
 
   /* TODO: check if this value should be set to 0xff */
-  *attached = 1;
+  *attached = 0xff;
 
   /* in () */
   /* Multiface one */
@@ -387,7 +391,7 @@ multiface_port_in128( libspectrum_word port, libspectrum_byte *attached )
   if( !IS( multiface_available, MF_128 ) ) return ret;
 
   /* TODO: check if this value should be set to 0xff */
-  *attached = 1;
+  *attached = 0xff;
 
   /* Multiface 128 */
   /* I have only the MF128 user guide which say: */
@@ -422,7 +426,7 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
   if( !IS( multiface_available, MF_3 ) ) return ret;
 
   /* TODO: check if this value should be set to 0xff */
-  *attached = 1;
+  *attached = 0xff;
 
   /* Multiface 3 */
   /* The MF3 user guide say nothing about paging memory :-( */
@@ -432,11 +436,18 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
   /*  IN A, (63) -> page in, and IN A, (191) page out */
 
   a7 = port & 0x0080;
-  if( a7 )			/* a7 == 1 */
+  if( a7 ) {			/* a7 == 1 */
     multiface_unpage( MF_3 );
-  else
+    mf[MF_3].IC8a_Q = 0;
+  } else if( mf[MF_3].J2 ) {
     multiface_page( MF_3 );	/* a7 == 0 */
-  mf[MF_3].IC8a_Q = ( !a7 );
+    mf[MF_3].IC8a_Q = 1;
+  }
+
+  /* Return last data written to port 0x1ffd, 0x3ffd, 0x5ffd or 0x7ffd */
+  if( mf[MF_3].J2 )
+    ret = mf[MF_3].xfdd_reg[ ( port & 0x6000 ) >> 13 ] | 0xf0;
+
   return ret;
 }
 
@@ -474,22 +485,10 @@ multiface_port_out3( libspectrum_word port, libspectrum_byte val GCC_UNUSED )
   multiface_port_out128_3( MF_3, port );
 }
 
-static libspectrum_byte
-multiface_port_last_byte( libspectrum_word port, libspectrum_byte *attached )
+static void
+multiface_port_xffd_write( libspectrum_word port, libspectrum_byte val )
 {
-  libspectrum_byte ret = 0xff;
-
-  if( !multiface_available || !mf[MF_3].J2 )
-    return ret;
-
-  /* TODO: check if this value should be set to 0xff */
-  *attached = 1;
-
-  if( port & 0x4000 )		/* 7f3f */
-    ret = machine_current->ram.last_byte;
-  else
-    ret =  machine_current->ram.last_byte2;
-  return ret;
+  mf[MF_3].xfdd_reg[ ( port & 0x6000 ) >> 13 ] = val & 0x0f;
 }
 
 void
@@ -618,6 +617,14 @@ multiface_from_snapshot( libspectrum_snap *snap )
   /* Red button status */
   if( libspectrum_snap_multiface_red_button_disabled( snap ) ) {
     mf[idx].IC8b_Q = 0;
+  }
+
+  /* Multiface 3 - 4x4 bit register */
+  if( idx == MF_3 ) {
+    mf[MF_3].xfdd_reg[ 0 ] =
+      libspectrum_snap_out_plus3_memoryport( snap ) & 0x0f;
+    mf[MF_3].xfdd_reg[ 3 ] =
+      libspectrum_snap_out_128_memoryport( snap ) & 0x0f;
   }
 }
 
