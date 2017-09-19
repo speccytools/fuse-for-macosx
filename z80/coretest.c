@@ -35,6 +35,7 @@
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
+#include "peripherals/ide/divmmc.h"
 #include "peripherals/if1.h"
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
@@ -552,6 +553,12 @@ divide_set_automap( int state GCC_UNUSED )
   abort();
 }
 
+void
+divmmc_set_automap( int state GCC_UNUSED )
+{
+  abort();
+}
+
 int spectranet_available = 0;
 
 void
@@ -659,6 +666,7 @@ init_dummies( void )
   scld_last_dec.name.intdisable = 0;
   settings_current.slt_traps = 0;
   settings_current.divide_enabled = 0;
+  settings_current.divmmc_enabled = 0;
   settings_current.z80_is_cmos = 0;
   beta_pc_mask = 0xfe00;
   beta_pc_value = 0x3c00;

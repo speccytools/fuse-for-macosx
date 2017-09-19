@@ -52,10 +52,13 @@ fuse_SOURCES += \
                 peripherals/disk/upd_fdc.c \
                 peripherals/disk/wd_fdc.c \
                 peripherals/ide/divide.c \
+                peripherals/ide/divmmc.c \
+                peripherals/ide/divxxx.c \
                 peripherals/ide/ide.c \
                 peripherals/ide/simpleide.c \
                 peripherals/ide/zxatasp.c \
-                peripherals/ide/zxcf.c
+                peripherals/ide/zxcf.c \
+                peripherals/ide/zxmmc.c
 
 if BUILD_SPECCYBOOT
 fuse_SOURCES += peripherals/nic/enc28j60.c
@@ -98,10 +101,13 @@ noinst_HEADERS += \
                   peripherals/disk/upd_fdc.h \
                   peripherals/disk/wd_fdc.h \
                   peripherals/ide/divide.h \
+                  peripherals/ide/divmmc.h \
+                  peripherals/ide/divxxx.h \
                   peripherals/ide/ide.h \
                   peripherals/ide/simpleide.h \
                   peripherals/ide/zxatasp.h \
                   peripherals/ide/zxcf.h \
+                  peripherals/ide/zxmmc.h \
                   peripherals/flash/am29f010.h \
                   peripherals/nic/enc28j60.h \
                   peripherals/nic/w5100.h \

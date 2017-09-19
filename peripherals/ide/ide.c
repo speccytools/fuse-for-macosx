@@ -140,21 +140,22 @@ ide_master_slave_eject(
 }
 
 int
-ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
-	   char **setting, ui_menu_item item )
+ide_eject_mass_storage(
+    int (*is_dirty_fn)( void *context ),
+    libspectrum_error (*commit_fn)( void *context ),
+    libspectrum_error (*eject_fn)( void *context ),
+    void *context, const char *message, char **setting, ui_menu_item item )
 {
   int error;
 
-  if( libspectrum_ide_dirty( chn, unit ) ) {
+  if( is_dirty_fn( context ) ) {
     
-    ui_confirm_save_t confirm = ui_confirm_save(
-      "Hard disk has been modified.\nDo you want to save it?"
-    );
+    ui_confirm_save_t confirm = ui_confirm_save( "%s", message );
   
     switch( confirm ) {
 
     case UI_CONFIRM_SAVE_SAVE:
-      error = libspectrum_ide_commit( chn, unit ); if( error ) return error;
+      error = commit_fn( context ); if( error ) return error;
       break;
 
     case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -165,11 +166,48 @@ ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
 
   libspectrum_free( *setting ); *setting = NULL;
   
-  error = libspectrum_ide_eject( chn, unit );
+  error = eject_fn( context );
   if( error ) return error;
 
   error = ui_menu_activate( item, 0 );
   if( error ) return error;
 
   return 0;
+}
+
+struct eject_fn_context {
+  libspectrum_ide_channel *chn;
+  libspectrum_ide_unit unit;
+};
+
+static int
+dirty_fn_wrapper( void *context )
+{
+  struct eject_fn_context *ctx = (struct eject_fn_context*)context;
+  return libspectrum_ide_dirty( ctx->chn, ctx->unit );
+}
+
+static libspectrum_error
+commit_fn_wrapper( void *context )
+{
+  struct eject_fn_context *ctx = (struct eject_fn_context*)context;
+  return libspectrum_ide_commit( ctx->chn, ctx->unit );
+}
+
+static libspectrum_error
+eject_fn_wrapper( void *context )
+{
+  struct eject_fn_context *ctx = (struct eject_fn_context*)context;
+  return libspectrum_ide_eject( ctx->chn, ctx->unit );
+}
+
+int
+ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
+	   char **setting, ui_menu_item item )
+{
+  struct eject_fn_context ctx = { chn, unit };
+  return ide_eject_mass_storage( dirty_fn_wrapper, commit_fn_wrapper,
+      eject_fn_wrapper, &ctx,
+      "Hard disk has been modified.\nDo you want to save it?",
+      setting, item );
 }

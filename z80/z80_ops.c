@@ -39,6 +39,7 @@
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
+#include "peripherals/ide/divmmc.h"
 #include "peripherals/if1.h"
 #include "peripherals/multiface.h"
 #include "peripherals/spectranet.h"
@@ -239,6 +240,14 @@ z80_do_opcodes( void )
     
     END_CHECK
 
+    CHECK( divmmc_early, settings_current.divmmc_enabled )
+    
+    if( ( PC & 0xff00 ) == 0x3d00 ) {
+      divmmc_set_automap( 1 );
+    }
+    
+    END_CHECK
+
     CHECK( spectranet_page, spectranet_available && !settings_current.spectranet_disable )
 
     if( PC == 0x0008 || ((PC & 0xfff8) == 0x3ff8) )
@@ -285,6 +294,17 @@ z80_do_opcodes( void )
     } else if( (PC == 0x0000) || (PC == 0x0008) || (PC == 0x0038)
       || (PC == 0x0066) || (PC == 0x04c6) || (PC == 0x0562) ) {
       divide_set_automap( 1 );
+    }
+    
+    END_CHECK
+
+    CHECK( divmmc_late, settings_current.divmmc_enabled )
+
+    if( ( PC & 0xfff8 ) == 0x1ff8 ) {
+      divmmc_set_automap( 0 );
+    } else if( (PC == 0x0000) || (PC == 0x0008) || (PC == 0x0038)
+      || (PC == 0x0066) || (PC == 0x04c6) || (PC == 0x0562) ) {
+      divmmc_set_automap( 1 );
     }
     
     END_CHECK

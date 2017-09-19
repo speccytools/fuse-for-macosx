@@ -40,6 +40,7 @@
 
 #define MONO_BITMAP_SIZE 6144
 #define HICOLOUR_SCR_SIZE (2 * MONO_BITMAP_SIZE)
+#define MLT_SIZE (2 * MONO_BITMAP_SIZE)
 #define HIRES_ATTR HICOLOUR_SCR_SIZE
 #define HIRES_SCR_SIZE (HICOLOUR_SCR_SIZE + 1)
 
@@ -289,6 +290,11 @@ screenshot_scr_write( const char *filename )
 {
   libspectrum_byte scr_data[HIRES_SCR_SIZE];
   int scr_length;
+  int x, y;
+  int beam_x, beam_y;
+  int index;
+  libspectrum_word offset;
+  libspectrum_byte data, data2;
 
   memset( scr_data, 0, HIRES_SCR_SIZE );
 
@@ -304,12 +310,25 @@ screenshot_scr_write( const char *filename )
     scr_length = HIRES_SCR_SIZE;
   }
   else if( scld_last_dec.name.b1 ) {
-    memcpy( scr_data,
-            &RAM[ memory_current_screen ][display_get_addr(0,0)],
-            MONO_BITMAP_SIZE );
-    memcpy( scr_data + MONO_BITMAP_SIZE,
-            &RAM[ memory_current_screen ][display_get_addr(0,0) +
-            ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
+    for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
+      for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
+        offset = display_get_addr( x, y );
+        beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+        beam_y = y + DISPLAY_BORDER_HEIGHT;
+
+        /* Read byte, atrr/byte, and screen mode */
+        index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+
+        data = display_last_screen[ index ] & 0xff;
+        data2 = (display_last_screen[ index ] & 0xff00)>>8;
+
+        /* write pixel data to offset into mlt data */
+        scr_data[offset] = data;
+        /* write attribute into bitmap order buffer following bitmap */
+        scr_data[MONO_BITMAP_SIZE + offset] = data2;
+      }
+    }
+
     scr_length = HICOLOUR_SCR_SIZE;
   }
   else { /* ALTDFILE and default */
@@ -320,6 +339,46 @@ screenshot_scr_write( const char *filename )
   }
 
   return utils_write_file( filename, scr_data, scr_length );
+}
+
+int
+screenshot_mlt_write( const char *filename )
+{
+  libspectrum_byte mlt_data[ MLT_SIZE ];
+  int x, y;
+  int beam_x, beam_y;
+  int index;
+  libspectrum_word offset;
+  libspectrum_byte data, data2;
+
+  memset( mlt_data, 0, MLT_SIZE );
+
+  if( machine_current->timex && scld_last_dec.name.hires ) {
+    ui_error( UI_ERROR_ERROR,
+              "MLT format not supported for Timex hi-res screen mode" );
+    return 1;
+  }
+
+  for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
+    for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
+      offset = display_get_addr( x, y );
+      beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+      beam_y = y + DISPLAY_BORDER_HEIGHT;
+
+      /* Read byte, atrr/byte, and screen mode */
+      index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+
+      data = display_last_screen[ index ] & 0xff;
+      data2 = (display_last_screen[ index ] & 0xff00)>>8;
+
+      /* write pixel data to offset into mlt data */
+      mlt_data[offset] = data;
+      /* write attribute into linear buffer following bitmap */
+      mlt_data[MONO_BITMAP_SIZE + x + y * DISPLAY_WIDTH_COLS] = data2;
+    }
+  }
+
+  return utils_write_file( filename, mlt_data, HICOLOUR_SCR_SIZE );
 }
 
 #ifdef WORDS_BIGENDIAN
@@ -451,6 +510,49 @@ screenshot_scr_read( const char *filename )
     ui_error( UI_ERROR_ERROR, "'%s' is not a valid scr file", filename );
     error = 1;
   }
+
+  utils_close_file( &screen );
+
+  display_refresh_all();
+
+  return error;
+}
+
+int
+screenshot_mlt_read( const char *filename )
+{
+  int error = 0;
+  int x, y;
+  utils_file screen;
+
+  error =  utils_read_file( filename, &screen );
+  if( error ) return error;
+
+  if( screen.length != MLT_SIZE ) {
+    ui_error( UI_ERROR_ERROR, "MLT picture ('%s') is not %d bytes long",
+	      filename, MLT_SIZE );
+    return 1;
+  }
+
+  /* If it is a Timex and it is not in hi colour mode, copy screen and switch
+      mode if neccesary */
+  /* If it is not a Timex copy the mono bitmap and raise an error */
+  if( machine_current->timex ) {
+    if( !scld_last_dec.name.b1 )
+      scld_dec_write( 0xff, ( scld_last_dec.byte & ~HIRESATTR ) | EXTCOLOUR );
+
+    for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
+      for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
+        RAM[ memory_current_screen ][display_get_addr(x,y) + ALTDFILE_OFFSET] =
+          *(screen.buffer + MONO_BITMAP_SIZE + x + y * DISPLAY_WIDTH_COLS);
+      }
+    }
+  } else
+    ui_error( UI_ERROR_INFO,
+          "The file contained a MLT high-colour screen, loaded as mono");
+
+  memcpy( &RAM[ memory_current_screen ][display_get_addr(0,0)],
+            screen.buffer, MONO_BITMAP_SIZE );
 
   utils_close_file( &screen );
 

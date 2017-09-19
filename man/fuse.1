@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "31st July, 2017" "Version 1.3.8" "Emulators"
+.TH fuse 1 "3rd September, 2017" "Version 1.4.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -322,6 +322,29 @@ and slave drives respectively.
 Specify that the emulated DivIDE's write protect jumper should be
 considered set. The same as the Disk Peripherals Options dialog's
 .I "DivIDE write protect"
+option.
+.RE
+.PP
+.B \-\-divmmc
+.RS
+Emulate the DivMMC interface. The same as the Disk Peripherals Options
+dialog's
+.I "DivMMC interface"
+option.
+.RE
+.PP
+.B \-\-divmmc\-file
+.I file
+.RS
+Specify an HDF image to be loaded into the DivMMC's emulated memory card.
+.RE
+.PP
+.B \-\-divmmc\-write\-protect
+.RS
+Specify that the emulated DivMMC's write protect jumper that protects
+EEPROM should be considered set. The same as the Disk Peripherals Options
+dialog's
+.I "DivMMC write protect"
 option.
 .RE
 .PP
@@ -1906,6 +1929,20 @@ option.
 Specify a HDF file to connect to the emulated ZXCF interface.
 .RE
 .PP
+.B \-\-zxmmc
+.RS
+Emulate the ZXMMC interface. The same as the Disk Peripherals Options
+dialog's
+.I "ZXMMC interface"
+option.
+.RE
+.PP
+.B \-\-zxmmc\-file
+.I file
+.RS
+Specify an HDF image to be loaded into the ZXMMC's emulated memory card.
+.RE
+.PP
 .B \-\-zxprinter
 .RS
 Emulate the ZX Printer. Same as the General Peripherals Options dialog's
@@ -2078,7 +2115,7 @@ file. You will be prompted for a filename to save the recording to.
 Stop any current AY logging.
 .RE
 .PP
-.I "File, Open SCR Screenshot..."
+.I "File, Screenshot, Open SCR Screenshot..."
 .RS
 Load an SCR screenshot (essentially just a binary dump of the
 Spectrum's video memory) onto the current screen. Fuse supports
@@ -2087,14 +2124,31 @@ screenshots saved in the Timex hi-colour and hi-res modes as well as
 hi-colour or hi-res screenshot is loaded onto a non-Timex machine.
 .RE
 .PP
-.I "File, Save Screen as SCR..."
+.I "File, Screenshot, Save Screen as SCR..."
 .RS
 Save a copy of whatever's currently displayed on the Spectrum's screen
 as an SCR file. You will be prompted for a filename to save the
 screenshot to.
 .RE
 .PP
-.I "File, Save Screen as PNG..."
+.I "File, Screenshot, Open MLT Screenshot..."
+.RS
+Load an MLT screenshot onto the current screen. The MLT format is similar
+to the SCR format but additionally supports capturing images that use
+techniques to display more than two colours in each Spectrum attribute
+square. Fuse will only load the bitmap version of an image on a Sinclair
+machine but on a Timex clone it can show the full colour detail captured
+in the image by using the hi-colour mode.
+.RE
+.PP
+.I "File, Screenshot, Save Screen as MLT..."
+.RS
+Save a copy of whatever's currently displayed on the Spectrum's screen
+as an MLT file. You will be prompted for a filename to save the
+screenshot to.
+.RE
+.PP
+.I "File, Screenshot, Save Screen as PNG..."
 .RS
 Save the current screen as a PNG file. You will be prompted for a
 filename to save the screenshot to.
@@ -2720,6 +2774,12 @@ This option controls the state of the ZXCF upload jumper. See the
 section for more details.
 .RE
 .PP
+.I "ZXMMC interface"
+.RS
+If this option is selected, Fuse will emulate the ZXMMC interface.
+Available for +2A, +3 and +3e machines.
+.RE
+.PP
 .I "DivIDE interface"
 .RS
 If this option is selected, Fuse will emulate the DivIDE
@@ -2733,6 +2793,22 @@ section for more details.
 This option controls the state of the DivIDE write protection
 jumper. See the
 .B "DIVIDE"
+section for more details.
+.RE
+.PP
+.I "DivMMC interface"
+.RS
+If this option is selected, Fuse will emulate the DivMMC
+interface. See the
+.B "DIVMMC"
+section for more details.
+.RE
+.PP
+.I "DivMMC write protect"
+.RS
+This option controls the state of the DivMMC write protection
+jumper that prevents flashing the EEPROM chip. See the
+.B "DIVMMC"
 section for more details.
 .RE
 .PP
@@ -3786,21 +3862,43 @@ The same as the
 entries above, but for the ZXCF interface's CompactFlash slot.
 .RE
 .PP
+.I "Media, IDE, ZXMMC, Insert..."
+.br
+.I "Media, IDE, ZXMMC, Commit"
+.br
+.I "Media, IDE, ZXMMC, Eject"
+.RS
+The same as the
+.I "Media, IDE, Simple 8-bit"
+entries above, but for the memory card slot of the ZXMMC interface.
+.RE
+.PP
 .I "Media, IDE, DivIDE, Master, Insert..."
 .br
 .I "Media, IDE, DivIDE, Master, Commit"
 .br
-.I "Media, IDE, DivIDE, Eject"
+.I "Media, IDE, DivIDE, Master, Eject"
 .br
 .I "Media, IDE, DivIDE, Slave, Insert..."
 .br
 .I "Media, IDE, DivIDE, Slave, Commit"
 .br
-.I "Media, IDE, DivIDE, Eject"
+.I "Media, IDE, DivIDE, Slave, Eject"
 .RS
 The same as the
 .I "Media, IDE, Simple 8-bit"
 entries above, but for the two channels of the DivIDE interface.
+.RE
+.PP
+.I "Media, IDE, DivMMC, Insert..."
+.br
+.I "Media, IDE, DivMMC, Commit"
+.br
+.I "Media, IDE, DivMMC, Eject"
+.RS
+The same as the
+.I "Media, IDE, Simple 8-bit"
+entries above, but for the memory card slot of the DivMMC interface.
 .RE
 .PP
 .I "Help, Keyboard picture..."
@@ -4135,6 +4233,31 @@ dialog, and the state of its write protect jumper controlled via the
 .IR "DivIDE write protect option" .
 If you're going to be using the DivIDE, you'll probably want one of
 the firmwares available from the DivIDE homepage.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "DIVMMC"
+The DivMMC is a MMC interface for the Spectrum. Originally designed by
+Alessandro Dorigatti for the V6Z80P+ FPGA board as the fusion of DivIDE
+and ZXMMC+ interfaces, later assembled as an interface for real spectrums
+by Mario Prato. Currently there are variants with different RAM size,
+one/two memory cards slots, optional kempston jostick, etc.
+.PP
+The interface can be activated via the
+.I "DivMMC interface"
+option from the
+.I "Options, Peripherals, Disk..."
+dialog, and the state of its EEPROM write protect jumper controlled via the
+.IR "DivMMC write protect option" .
+If you're going to be using the DivMMC, you'll need to load the ESXDOS
+firmware at
+.IR "http://www.esxdos.org/
+or use the ZX Spectrum +3e ROMs by Garry Lancaster.
+.PP
+You'll also need a HDF image to store the contents of the memory card.
+There are several tools to create and manipulate this file format, e.g.,
+hdfmonkey at
+.IR "https://github.com/gasman/hdfmonkey" .
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -4500,6 +4623,13 @@ divide:unpage
 The DivIDE interface is paged into or out of memory respectively.
 .RE
 .br
+divmmc:page
+.br
+divmmc:unpage
+.RS
+The DivIDE interface is paged into or out of memory respectively.
+.RE
+.br
 if1:page
 .br
 if1:unpage
@@ -4778,6 +4908,8 @@ Other available sources are:
 .RI ` "DISCiPLE ROM" "',"
 .RI ` "DivIDE EPROM" "',"
 .RI ` "DivIDE RAM" "',"
+.RI ` "DivMMC EPROM" "',"
+.RI ` "DivMMC RAM" "',"
 .RI ` If1 "',"
 .RI ` If2 "',"
 .RI ` "Multiface RAM" "',"
@@ -4821,6 +4953,10 @@ syntax. The available system variables are:
 ay:current
 .RS
 The current AY-3-8912 register.
+.RE
+divmmc:control
+.RS
+The last byte written to DivMMC control port.
 .RE
 ula:last
 .RS

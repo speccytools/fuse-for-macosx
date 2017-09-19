@@ -72,9 +72,11 @@
 #include "peripherals/disk/fdd.h"
 #include "peripherals/fuller.h"
 #include "peripherals/ide/divide.h"
+#include "peripherals/ide/divmmc.h"
 #include "peripherals/ide/simpleide.h"
 #include "peripherals/ide/zxatasp.h"
 #include "peripherals/ide/zxcf.h"
+#include "peripherals/ide/zxmmc.h"
 #include "peripherals/joystick.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
@@ -141,6 +143,8 @@ typedef struct start_files_t {
   const char *zxatasp_master, *zxatasp_slave;
   const char *zxcf;
   const char *divide_master, *divide_slave;
+  const char *divmmc;
+  const char *zxmmc;
   const char *mdr[8];
 
 } start_files_t;
@@ -287,6 +291,7 @@ run_startup_manager( int *argc, char ***argv )
   disciple_register_startup();
   display_register_startup( &display_context );
   divide_register_startup();
+  divmmc_register_startup();
   event_register_startup();
   fdd_register_startup();
   fuller_register_startup();
@@ -326,6 +331,7 @@ run_startup_manager( int *argc, char ***argv )
   z80_register_startup();
   zxatasp_register_startup();
   zxcf_register_startup();
+  zxmmc_register_startup();
 
   return startup_manager_run();
 }
@@ -587,6 +593,11 @@ setup_start_files( start_files_t *start_files )
   start_files->divide_slave =
     utils_safe_strdup( settings_current.divide_slave_file );
 
+  start_files->divmmc =
+    utils_safe_strdup( settings_current.divmmc_file );
+
+  start_files->zxmmc = utils_safe_strdup( settings_current.zxmmc_file );
+
   start_files->mdr[0] = settings_current.mdr_file;
   start_files->mdr[1] = settings_current.mdr_file2;
   start_files->mdr[2] = settings_current.mdr_file3;
@@ -647,6 +658,10 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 	start_files->simpleide_master = filename;
       } else if( settings_current.divide_enabled ) {
 	start_files->divide_master = filename;
+      } else if( settings_current.divmmc_enabled ) {
+	start_files->divmmc = filename;
+      } else if( settings_current.zxmmc_enabled ) {
+	start_files->zxmmc = filename;
       } else {
 	/* No IDE interface active, so activate the ZXCF */
 	settings_current.zxcf_active = 1;
@@ -888,6 +903,16 @@ do_start_files( start_files_t *start_files )
   if( start_files->divide_slave ) {
     error = divide_insert( start_files->divide_slave,
 			    LIBSPECTRUM_IDE_SLAVE );
+    if( error ) return error;
+  }
+
+  if( start_files->divmmc ) {
+    error = divmmc_insert( start_files->divmmc );
+    if( error ) return error;
+  }
+
+  if( start_files->zxmmc ) {
+    error = zxmmc_insert( start_files->zxmmc );
     if( error ) return error;
   }
 

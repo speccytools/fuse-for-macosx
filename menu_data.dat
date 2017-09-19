@@ -43,11 +43,14 @@ File/AY Logging/_Record..., Item
 File/AY Logging/_Stop, Item
 
 File/separator, Separator
-File/O_pen SCR Screenshot..., Item
-File/S_ave Screen as SCR..., Item
+File/S_creenshot, Branch
+File/Screenshot/O_pen SCR Screenshot..., Item
+File/Screenshot/S_ave Screen as SCR..., Item
+File/Screenshot/Op_en MLT Screenshot..., Item
+File/Screenshot/Sa_ve Screen as MLT..., Item
 
 #ifdef USE_LIBPNG
-File/Save S_creen as PNG..., Item
+File/Screenshot/Save S_creen as PNG..., Item
 #endif
 
 #ifdef HAVE_LIB_XML2
@@ -489,6 +492,16 @@ Media/IDE/DivIDE/_Slave, Branch
 Media/IDE/DivIDE/Slave/_Insert..., Item,, menu_media_ide_insert,, 7
 Media/IDE/DivIDE/Slave/_Commit, Item,, menu_media_ide_commit,, 7
 Media/IDE/DivIDE/Slave/_Eject, Item,, menu_media_ide_eject,, 7
+
+Media/IDE/_DivMMC, Branch
+Media/IDE/DivMMC/_Insert..., Item,, menu_media_ide_insert,, 8
+Media/IDE/DivMMC/_Commit, Item,, menu_media_ide_commit,, 8
+Media/IDE/DivMMC/_Eject, Item,, menu_media_ide_eject,, 8
+
+Media/IDE/_ZXMMC, Branch
+Media/IDE/ZXMMC/_Insert..., Item,, menu_media_ide_insert,, 9
+Media/IDE/ZXMMC/_Commit, Item,, menu_media_ide_commit,, 9
+Media/IDE/ZXMMC/_Eject, Item,, menu_media_ide_eject,, 9
 
 _Help, Branch
 Help/_Keyboard..., Item

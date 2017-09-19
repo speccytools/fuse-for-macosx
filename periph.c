@@ -411,20 +411,24 @@ update_cartridge_menu( void )
 static void
 update_ide_menu( void )
 {
-  int ide, simpleide, zxatasp, zxcf, divide;
+  int ide, simpleide, zxatasp, zxcf, divide, divmmc, zxmmc;
 
   simpleide = settings_current.simpleide_active;
   zxatasp = settings_current.zxatasp_active;
   zxcf = settings_current.zxcf_active;
   divide = settings_current.divide_enabled;
+  divmmc = settings_current.divmmc_enabled;
+  zxmmc = settings_current.zxmmc_enabled;
 
-  ide = simpleide || zxatasp || zxcf || divide;
+  ide = simpleide || zxatasp || zxcf || divide || divmmc || zxmmc;
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE, ide );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT, simpleide );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP, zxatasp );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF, zxcf );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE, divide );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVMMC, divmmc );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXMMC, zxmmc );
 }
 
 int

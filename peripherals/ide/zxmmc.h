@@ -1,5 +1,5 @@
-/* screenshot.h: Routines for saving .png screenshots
-   Copyright (c) 2002 Philip Kendall
+/* zxmmc.h: ZXMMC interface routines
+   Copyright (c) 2017 Philip Kendall, Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,30 +17,18 @@
 
    Author contact information:
 
-   E-mail: philip-fuse@shadowmagic.org.uk
+   E-mail: Philip Kendall <philip-fuse@shadowmagic.org.uk>
 
 */
 
-#ifndef FUSE_SCREENSHOT_H
-#define FUSE_SCREENSHOT_H
+#ifndef FUSE_ZXMMC_H
+#define FUSE_ZXMMC_H
 
-#ifndef SCALER_H
-#include "ui/scaler/scaler.h"
-#endif				/* #ifndef SCALER_H */
+#include <libspectrum.h>
 
-#ifdef USE_LIBPNG
+void zxmmc_register_startup( void );
+int zxmmc_insert( const char *filename );
+void zxmmc_commit( void );
+int zxmmc_eject( void );
 
-int screenshot_write( const char *filename, scaler_type scaler );
-int screenshot_available_scalers( scaler_type scaler );
-
-#endif				/* #ifdef USE_LIBPNG */
-
-int screenshot_scr_write( const char *filename );
-int screenshot_scr_read( const char *filename );
-
-int screenshot_mlt_write( const char *filename );
-int screenshot_mlt_read( const char *filename );
-
-#define STANDARD_SCR_SIZE 6912
-
-#endif				/* #ifndef FUSE_SCREENSHOT_H */
+#endif			/* #ifndef FUSE_ZXMMC_H */

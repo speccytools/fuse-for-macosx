@@ -53,4 +53,11 @@ int
 ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
 	   char **setting, ui_menu_item item );
 
+int
+ide_eject_mass_storage(
+    int (*is_dirty_fn)( void *context ),
+    libspectrum_error (*commit_fn)( void *context ),
+    libspectrum_error (*eject_fn)( void *context ),
+    void *context, const char *message, char **setting, ui_menu_item item );
+
 #endif			/* #ifndef FUSE_IDE_H */
