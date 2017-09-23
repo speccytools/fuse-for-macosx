@@ -66,12 +66,14 @@ static int tape_autoplay;
 /* Is there a high input to the EAR socket? */
 int tape_microphone;
 
-/* Debugger events */
-static const char * const event_type_string = "tape";
+/* Debugger integration */
+static const char * const debugger_type_string = "tape";
 
 static const char * const play_event_detail_string = "play",
   * const stop_event_detail_string = "stop";
 static int play_event, stop_event = -1;
+
+static const char * const microphone_variable_name = "microphone";
 
 /* Spectrum events */
 int tape_edge_event;
@@ -94,15 +96,24 @@ static void tape_stop_mic_off( libspectrum_dword last_tstates, int type,
 
 /* Function definitions */
 
+static libspectrum_dword
+get_microphone( void )
+{
+  return tape_microphone;
+}
+
 static int
 tape_init( void *context )
 {
   tape = libspectrum_tape_alloc();
 
-  play_event = debugger_event_register( event_type_string,
+  play_event = debugger_event_register( debugger_type_string,
 					play_event_detail_string );
-  stop_event = debugger_event_register( event_type_string,
+  stop_event = debugger_event_register( debugger_type_string,
 					stop_event_detail_string );
+
+  debugger_system_variable_register( debugger_type_string,
+      microphone_variable_name, get_microphone, NULL );
 
   tape_edge_event = event_register( tape_next_edge, "Tape edge" );
   tape_mic_off_event = event_register( tape_stop_mic_off, "Tape stop MIC off" );

@@ -5,6 +5,8 @@
         * Debugger improvements:
           * Allow an exit code to be specified when using the "exit" command
             (Philip Kendall).
+          * Add a new "tape:microphone" system variable to allow access to
+            the current tape level (Philip Kendall).
 
         * Deprecated features removed:
           * All Z80 variables in the debugger must now be referenced as
