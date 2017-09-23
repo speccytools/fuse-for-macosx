@@ -2,6 +2,12 @@
 
         * Fuse 1.4.1 released.
 
+        * Emulation core improvements:
+          * Improvements to the loader acceleration code to reduce errors -
+            Blood Brothers, City Slicker, Games Compendium (by Gremlin) and
+            Zanthrax now all load successfully (thanks, windale and ub880d)
+            (Philip Kendall).
+
         * Debugger improvements:
           * Allow an exit code to be specified when using the "exit" command
             (Philip Kendall).

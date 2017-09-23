@@ -50,8 +50,7 @@ int tape_save_trap( void );
 int tape_do_play( int autoplay );
 int tape_toggle_play( int autoplay );
 
-void tape_next_edge( libspectrum_dword last_tstates, int type,
-		     void *user_data );
+void tape_next_edge( libspectrum_dword last_tstates, int from_acceleration );
 
 int tape_stop( void );
 int tape_is_playing( void );

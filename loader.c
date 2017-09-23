@@ -85,7 +85,7 @@ do_acceleration( void )
     z80.pc.b.h = readbyte_internal( z80.sp.w ); z80.sp.w++;
 
     event_remove_type( tape_edge_event );
-    tape_next_edge( tstates, 0, NULL );
+    tape_next_edge( tstates, 1 );
 
     successive_reads = 0;
   }
@@ -352,7 +352,7 @@ loader_detect_loader( void )
 }
 
 void
-loader_set_acceleration_flags( int flags )
+loader_set_acceleration_flags( int flags, int from_acceleration )
 {
   if( flags & LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT ) {
     length_known2 = 1;
@@ -362,5 +362,12 @@ loader_set_acceleration_flags( int flags )
     length_long2 = 1;
   } else {
     length_known2 = 0;
+  }
+
+  /* If this tape edge occurred due to normal timings rather than
+     our tape acceleration, turn off acceleration for the next edge
+     or we miss an edge. See [bugs:#387] for more details */
+  if( !from_acceleration ) {
+    length_known1 = 0;
   }
 }

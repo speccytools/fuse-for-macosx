@@ -102,6 +102,12 @@ get_microphone( void )
   return tape_microphone;
 }
 
+static void next_edge( libspectrum_dword last_tstates, int type,
+    void *user_data )
+{
+  tape_next_edge( last_tstates, 0 );
+}
+
 static int
 tape_init( void *context )
 {
@@ -115,7 +121,7 @@ tape_init( void *context )
   debugger_system_variable_register( debugger_type_string,
       microphone_variable_name, get_microphone, NULL );
 
-  tape_edge_event = event_register( tape_next_edge, "Tape edge" );
+  tape_edge_event = event_register( next_edge, "Tape edge" );
   tape_mic_off_event = event_register( tape_stop_mic_off, "Tape stop MIC off" );
   record_event = event_register( tape_event_record_sample,
 				 "Tape sample record" );
@@ -818,7 +824,7 @@ tape_record_stop( void )
 }
 
 void
-tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
+tape_next_edge( libspectrum_dword last_tstates, int from_acceleration )
 {
   libspectrum_error libspec_error;
   libspectrum_tape_block *block;
@@ -893,7 +899,7 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
   event_add( last_tstates + edge_tstates, tape_edge_event );
 
   /* Store length flags for acceleration purposes */
-  loader_set_acceleration_flags( flags );
+  loader_set_acceleration_flags( flags, from_acceleration );
 }
 
 static void
