@@ -308,6 +308,20 @@ if test -z "$UI"; then
   fi
 fi
 
+dnl Look for null UI (default=no)
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether null UI requested)
+  AC_ARG_WITH(null-ui,
+  [  --with-null-ui          use null user interface],
+  if test "$withval" = no; then null_ui=no; else null_ui=yes; fi,
+  null_ui=no)
+  AC_MSG_RESULT($null_ui)
+  if test "$null_ui" = yes; then
+    AC_DEFINE([UI_NULL], 1, [Defined if null UI is in use])
+    UI=null
+  fi
+fi
+
 dnl Look for GTK+ (default=yes)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether GTK+ UI requested)
@@ -368,20 +382,6 @@ AM_CONDITIONAL(HAVE_GTK2, test "$gtk3" != yes)
 
 if test "$UI" = gtk; then
   AC_PATH_XTRA
-fi
-
-dnl Look for null UI (default=no)
-if test -z "$UI"; then
-  AC_MSG_CHECKING(whether null UI requested)
-  AC_ARG_WITH(null-ui,
-  [  --with-null-ui          use null user interface],
-  if test "$withval" = no; then null_ui=no; else null_ui=yes; fi,
-  null_ui=no)
-  AC_MSG_RESULT($null_ui)
-  if test "$null_ui" = yes; then
-    AC_DEFINE([UI_NULL], 1, [Defined if null UI is in use])
-    UI=null
-  fi
 fi
 
 dnl Look for Xlib UI (default=yes)

@@ -56,7 +56,7 @@ ide_init( libspectrum_ide_channel *channel,
     if( error ) return error;
   }
 
-  if( slave_menu_item ) {
+  if( slave_setting ) {
     error = ide_insert_file( channel, LIBSPECTRUM_IDE_SLAVE, slave_setting,
                              slave_menu_item );
     if( error ) return error;

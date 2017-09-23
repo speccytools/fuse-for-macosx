@@ -185,10 +185,12 @@ add_filter_auxiliary_files( GtkFileFilter *filter )
   gtk_file_filter_add_pattern( filter, "*.log" );
   gtk_file_filter_add_pattern( filter, "*.pok" );
   gtk_file_filter_add_pattern( filter, "*.scr" );
+  gtk_file_filter_add_pattern( filter, "*.mlt" );
 
   gtk_file_filter_add_pattern( filter, "*.LOG" );
   gtk_file_filter_add_pattern( filter, "*.POK" );
   gtk_file_filter_add_pattern( filter, "*.SCR" );
+  gtk_file_filter_add_pattern( filter, "*.MLT" );
 
 #ifdef USE_LIBPNG
   gtk_file_filter_add_pattern( filter, "*.png" );

@@ -225,7 +225,7 @@ amiga_asl( char *title, BOOL is_saving ) {
                                            ASLFR_RejectIcons,TRUE,
                                            ASLFR_TitleText,title,
                                            ASLFR_DoSaveMode,is_saving,
-                                           ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|png|gz|bz2)",
+                                           ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|mlt|png|gz|bz2)",
                                            ASLFR_DoPatterns,TRUE,
                                            TAG_DONE );
       if( err = IAsl->AslRequest( filereq, NULL ) ) {
@@ -236,7 +236,7 @@ amiga_asl( char *title, BOOL is_saving ) {
                                      ASLFR_RejectIcons,TRUE,
                                      ASLFR_TitleText,title,
                                      ASLFR_DoSaveMode,is_saving,
-                                     ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|png|gz|bz2)",
+                                     ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|mlt|png|gz|bz2)",
                                      ASLFR_DoPatterns,TRUE,
                                      TAG_DONE );
       if( err = AslRequest( filereq, NULL ) ) {
