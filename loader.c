@@ -73,6 +73,7 @@ static void
 do_acceleration( void )
 {
   if( length_known1 ) {
+    /* B is used to indicate the length of the pulses */
     int set_b_high = length_long1;
     set_b_high ^= ( acceleration_mode == ACCELERATION_MODE_DECREASING );
     if( set_b_high ) {
@@ -80,7 +81,13 @@ do_acceleration( void )
     } else {
       z80.bc.b.h = 0x00;
     }
+
+    /* Bit 5 of C is used to indicate the current microphone level */
+    z80.bc.b.l = (z80.bc.b.l & ~0x20) | (tape_microphone ? 0x00 : 0x20);
+
     z80.af.b.l |= 0x01;
+
+    /* Simulate the RET at the end of the edge-finding loop */
     z80.pc.b.l = readbyte_internal( z80.sp.w ); z80.sp.w++;
     z80.pc.b.h = readbyte_internal( z80.sp.w ); z80.sp.w++;
 
