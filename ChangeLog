@@ -4,9 +4,10 @@
 
         * Emulation core improvements:
           * Improvements to the loader acceleration code to reduce errors -
-            Blood Brothers, City Slicker, Games Compendium (by Gremlin) and
-            Zanthrax now all load successfully (thanks, windale and ub880d)
-            (Philip Kendall).
+            Blood Brothers, City Slicker, Driller, Dynamite Dan, Games
+            Compendium (by Gremlin), Joe Blade II, Kokotoni Wilf, Powerplay,
+            Saboteur, Trapdoor and Zanthrax now all load successfully (thanks,
+            windale and ub880d) (Philip Kendall).
 
         * Debugger improvements:
           * Allow an exit code to be specified when using the "exit" command
