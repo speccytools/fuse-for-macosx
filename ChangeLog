@@ -8,6 +8,10 @@
             Compendium (by Gremlin), Joe Blade II, Kokotoni Wilf, Powerplay,
             Saboteur, Trapdoor and Zanthrax now all load successfully (thanks,
             windale and ub880d) (Philip Kendall).
+          * Multiface 3 returns values stored from ports 0x1ffd and 0x7ffd
+            (thanks, Fredrick Meunier) (Sergio Baldoví).
+          * Set contention for DivIDE/DivMMC EPROM memory and clear data to 1's
+            (Sergio Baldoví).
 
         * Debugger improvements:
           * Allow an exit code to be specified when using the "exit" command
@@ -20,6 +24,16 @@
           * All Z80 variables in the debugger must now be referenced as
             "z80:NAME" rather than just "NAME" e.g. "set z80:af 0x1234"
             rather than just "set af 0x1234" (Philip Kendall).
+
+        * Miscellaneous improvements:
+          * Support XCode 9 SDK in CoreAudio driver (Fredrick Meunier).
+          * Correct enabling of ide slave menu item (Fredrick Meunier).
+          * Add *.mlt as an allowed filetype to file selectors (thanks,
+            jonesypeter) (Fredrick Meunier).
+          * Add null UI for use in automation tests (Philip Kendall).
+          * Ensure null UI is not overridden by GTK+ UI (Sergio Baldoví).
+          * Fix detection of libspectrum capabilities (Sergio Baldoví).
+          * Remove C11 typedef redefinition of divxxx_t (Fredrick Meunier).
 
 2017-09-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
