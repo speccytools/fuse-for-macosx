@@ -167,7 +167,7 @@
 /* #undef USE_WIDGET */
 
 /* Version number of libspectrum package (encoded in snapshots etc.)*/
-#define VERSION "1.4.0"
+#define VERSION "1.4.1"
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */

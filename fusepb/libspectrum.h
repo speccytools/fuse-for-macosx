@@ -441,7 +441,7 @@ typedef enum libspectrum_id_t {
 
   LIBSPECTRUM_ID_SCREEN_SCR,		/* .scr screen file */
 
-  /* Below here, present only in 1.3.6 and later */
+  /* Below here, present only in 1.4.0 and later */
 
   LIBSPECTRUM_ID_SCREEN_MLT,		/* .mlt screen file */
 
