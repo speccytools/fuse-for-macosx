@@ -61,8 +61,6 @@ br{eakpoint} (re{ad}\|w{rite}) [address] [if condition] | Set a breakpoint to tr
 *n{ext}* | Step to the opcode following the current one. As with the `finish' command, this works by setting a temporary breakpoint at the next opcode, so is not infalliable.
 *o{ut} port value* | Write value to IO port port.
 *se{t} address value* | Poke value into memory at address.
-*se{t} register value* | Set the value of the Z80 register register to value.
-*se{t} mode value* | Set the interrupt mode or interrupt flip flops (im, iff1 or iff2) to value. If the im mode is not 0, 1 or 2 it will be ignored, while non-zero iff values will be converted to one.
 *se{t} $variable value* | Set the value of the debugger variable variable to value.
 *se{t} area:detail value* | Set the value of the system variable area : detail to value. The available system variables are listed below.
 *s{tep}* | Equivalent to the Single Step button.
@@ -121,6 +119,8 @@ SYSTEM VARIABLE | DESCRIPTION
 :--- | :---
 *ay:current* | The current AY‐3‐8912 register.
 *divmmc:control* | The last byte written to DivMMC control port.
+*spectrum:frames* | The frame count since reset. Note that this variable can only be read, not written to.
+*tape:microphone* | The current level of the tape input connected to the 'EAR' port. Note that this variable can only be read, not written to.
 *ula:last* | The last byte written to the ULA. Note that this variable can only be read, not written to.
 *ula:mem1ffd* | The last byte written to memory control port used by the ZX Spectrum +2A/3; normally addressed at 0x1ffd, hence the name.
 *ula:mem7ffd* | The last byte written to primary memory control port used by the ZX Spectrum 128 and later; normally addressed at 0x7ffd, hence the name.
@@ -129,8 +129,3 @@ SYSTEM VARIABLE | DESCRIPTION
 *z80:im* | The current interrupt mode of the Z80.
 *z80:iff1* | 1 if the interrupt flip‐flop is currently set, or 0 if it is not set.
 *z80:iff2* | 1 if the interrupt flip‐flop is currently set, or 0 if it is not set.
-
-<br>
-The Z80 registers, interrupt mode and interrupt flip‐flops can also be specified
-without the ‘z80:’ prefix, but this syntax is deprecated and will be removed in
-Fuse 1.4.

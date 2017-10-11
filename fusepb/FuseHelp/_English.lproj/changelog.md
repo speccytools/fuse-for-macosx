@@ -3,6 +3,30 @@ title: What's New In Fuse?
 description: This section describes the changes for version 1.4.0 of the Fuse emulator.
 ---
 
+## What's new in Fuse for macOS 1.4.1
+
+### Emulation core improvements:
+* Improvements to the loader acceleration code to reduce errors - Blood
+  Brothers, City Slicker, Driller, Dynamite Dan, Games Compendium (by Gremlin),
+  Joe Blade II, Kokotoni Wilf, Powerplay, Saboteur, Trapdoor and Zanthrax now
+  all load successfully (thanks, windale and ub880d) (Philip Kendall).
+* Multiface 3 returns values stored from ports 0x1ffd and 0x7ffd (thanks,
+  Fredrick Meunier) (Sergio Baldoví).
+* Set contention for DivIDE/DivMMC EPROM memory and clear data to 1's (Sergio
+  Baldoví).
+* Fix generation of malformed RZXs (thanks, Nicholas Naime) (ub880d).
+
+### Debugger improvements:
+* Add new "tape:microphone" and "spectrum:frames" system variables to allow
+  access to the current tape level and frame count since reset (Philip Kendall).
+
+### Deprecated features removed:
+* All Z80 variables in the debugger must now be referenced as "z80:NAME" rather
+  than just "NAME" e.g. "set z80:af 0x1234" rather than just "set af 0x1234"
+  (Philip Kendall).
+
+### Various other minor bugfixes.
+
 ## What's new in Fuse for macOS 1.4.0
 
 ### New features:
