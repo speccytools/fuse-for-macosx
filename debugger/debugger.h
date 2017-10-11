@@ -80,7 +80,10 @@ int debugger_event_register( const char *type, const char *detail );
 void debugger_event( int event_code );
 
 /* Exit the emulator */
-void debugger_exit_emulator( void );
+void debugger_exit_emulator( debugger_expression *exit_code_expression );
+
+/* Get the exit code to be used when exiting the emulator */
+int debugger_get_exit_code( void );
 
 /* Debugger system variables */
 typedef libspectrum_dword (*debugger_get_system_variable_fn_t)( void );

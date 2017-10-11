@@ -187,14 +187,18 @@ int old_main(int argc, char **argv)
   if( settings_current.show_help ||
       settings_current.show_version ) return 0;
 
-  while( !fuse_exiting ) {
-    spectrum_do_frame();
+  if( settings_current.unittests ) {
+    r = unittests_run();
+  } else {
+    while( !fuse_exiting ) {
+      spectrum_do_frame();
+    }
+    r = debugger_get_exit_code();
   }
 
   fuse_end();
   
   return r;
-
 }
 
 static int

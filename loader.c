@@ -73,6 +73,7 @@ static void
 do_acceleration( void )
 {
   if( length_known1 ) {
+    /* B is used to indicate the length of the pulses */
     int set_b_high = length_long1;
     set_b_high ^= ( acceleration_mode == ACCELERATION_MODE_DECREASING );
     if( set_b_high ) {
@@ -80,12 +81,18 @@ do_acceleration( void )
     } else {
       z80.bc.b.h = 0x00;
     }
+
+    /* Bit 5 of C is used to indicate the current microphone level */
+    z80.bc.b.l = (z80.bc.b.l & ~0x20) | (tape_microphone ? 0x00 : 0x20);
+
     z80.af.b.l |= 0x01;
+
+    /* Simulate the RET at the end of the edge-finding loop */
     z80.pc.b.l = readbyte_internal( z80.sp.w ); z80.sp.w++;
     z80.pc.b.h = readbyte_internal( z80.sp.w ); z80.sp.w++;
 
     event_remove_type( tape_edge_event );
-    tape_next_edge( tstates, 0, NULL );
+    tape_next_edge( tstates, 1 );
 
     successive_reads = 0;
   }
@@ -352,7 +359,7 @@ loader_detect_loader( void )
 }
 
 void
-loader_set_acceleration_flags( int flags )
+loader_set_acceleration_flags( int flags, int from_acceleration )
 {
   if( flags & LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT ) {
     length_known2 = 1;
@@ -362,5 +369,12 @@ loader_set_acceleration_flags( int flags )
     length_long2 = 1;
   } else {
     length_known2 = 0;
+  }
+
+  /* If this tape edge occurred due to normal timings rather than
+     our tape acceleration, turn off acceleration for the next edge
+     or we miss an edge. See [bugs:#387] for more details */
+  if( !from_acceleration ) {
+    length_known1 = 0;
   }
 }

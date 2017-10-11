@@ -66,12 +66,14 @@ static int tape_autoplay;
 /* Is there a high input to the EAR socket? */
 int tape_microphone;
 
-/* Debugger events */
-static const char * const event_type_string = "tape";
+/* Debugger integration */
+static const char * const debugger_type_string = "tape";
 
 static const char * const play_event_detail_string = "play",
   * const stop_event_detail_string = "stop";
 static int play_event, stop_event = -1;
+
+static const char * const microphone_variable_name = "microphone";
 
 /* Spectrum events */
 int tape_edge_event;
@@ -94,17 +96,32 @@ static void tape_stop_mic_off( libspectrum_dword last_tstates, int type,
 
 /* Function definitions */
 
+static libspectrum_dword
+get_microphone( void )
+{
+  return tape_microphone;
+}
+
+static void next_edge( libspectrum_dword last_tstates, int type,
+    void *user_data )
+{
+  tape_next_edge( last_tstates, 0 );
+}
+
 static int
 tape_init( void *context )
 {
   tape = libspectrum_tape_alloc();
 
-  play_event = debugger_event_register( event_type_string,
+  play_event = debugger_event_register( debugger_type_string,
 					play_event_detail_string );
-  stop_event = debugger_event_register( event_type_string,
+  stop_event = debugger_event_register( debugger_type_string,
 					stop_event_detail_string );
 
-  tape_edge_event = event_register( tape_next_edge, "Tape edge" );
+  debugger_system_variable_register( debugger_type_string,
+      microphone_variable_name, get_microphone, NULL );
+
+  tape_edge_event = event_register( next_edge, "Tape edge" );
   tape_mic_off_event = event_register( tape_stop_mic_off, "Tape stop MIC off" );
   record_event = event_register( tape_event_record_sample,
 				 "Tape sample record" );
@@ -807,7 +824,7 @@ tape_record_stop( void )
 }
 
 void
-tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
+tape_next_edge( libspectrum_dword last_tstates, int from_acceleration )
 {
   libspectrum_error libspec_error;
   libspectrum_tape_block *block;
@@ -882,7 +899,7 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
   event_add( last_tstates + edge_tstates, tape_edge_event );
 
   /* Store length flags for acceleration purposes */
-  loader_set_acceleration_flags( flags );
+  loader_set_acceleration_flags( flags, from_acceleration );
 }
 
 static void

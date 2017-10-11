@@ -19,12 +19,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.4.0])
+m4_define([fuse_version], [1.4.1])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
 m4_define([fuse_minor_version], [4])
-m4_define([fuse_micro_version], [0])
+m4_define([fuse_micro_version], [1])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
@@ -308,6 +308,20 @@ if test -z "$UI"; then
   fi
 fi
 
+dnl Look for null UI (default=no)
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether null UI requested)
+  AC_ARG_WITH(null-ui,
+  [  --with-null-ui          use null user interface],
+  if test "$withval" = no; then null_ui=no; else null_ui=yes; fi,
+  null_ui=no)
+  AC_MSG_RESULT($null_ui)
+  if test "$null_ui" = yes; then
+    AC_DEFINE([UI_NULL], 1, [Defined if null UI is in use])
+    UI=null
+  fi
+fi
+
 dnl Look for GTK+ (default=yes)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether GTK+ UI requested)
@@ -409,6 +423,7 @@ fi
 
 AM_CONDITIONAL(UI_FB, test "$UI" = fb)
 AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
+AM_CONDITIONAL(UI_NULL, test "$UI" = null)
 AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
 AM_CONDITIONAL(UI_SVGA, test "$UI" = svga)
 AM_CONDITIONAL(UI_WII, test "$UI" = wii)
@@ -443,7 +458,7 @@ fi
 dnl Check if supplied libspectrum has support for bz2 compressed files
 AC_MSG_CHECKING(whether libspectrum supports compressed bz2 files)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
     [[
@@ -459,7 +474,7 @@ AC_SUBST(LIBSPEC_HAVE_BZ2)
 dnl Check if supplied libspectrum has support for wav files
 AC_MSG_CHECKING(whether libspectrum supports wav files)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
     [[
@@ -759,7 +774,7 @@ AM_CONDITIONAL(BUILD_SPECTRANET, test "$build_spectranet" = yes)
 dnl See if Linux TAP devices are supported
 AC_MSG_CHECKING(whether Linux TAP devices are supported)
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[
       #include <linux/if_tun.h>

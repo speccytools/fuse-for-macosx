@@ -37,7 +37,7 @@ static const libspectrum_byte DIVXXX_CONTROL_MAPRAM = 0x40;
 
 #define DIVXXX_PAGE_LENGTH 0x2000
 
-typedef struct divxxx_t {
+struct divxxx_t {
   libspectrum_byte control;
 
   int active;
@@ -69,7 +69,7 @@ typedef struct divxxx_t {
   const int *enabled;
   const int *write_protect;
 
-} divxxx_t;
+};
 
 divxxx_t*
 divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
@@ -89,8 +89,10 @@ divxxx_alloc( const char *eprom_source_name, size_t ram_page_count,
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
     memory_page *page = &divxxx->memory_map_eprom[i];
     page->source = divxxx->eprom_memory_source;
+    page->contended = 0;
     page->page_num = 0;
   }
+  divxxx->eprom = NULL;
 
   divxxx->ram_page_count = ram_page_count;
   divxxx->ram_memory_source = memory_source_register( ram_source_name );
@@ -218,6 +220,7 @@ divxxx_activate( divxxx_t *divxxx )
     }
 
     divxxx->eprom = memory_pool_allocate_persistent( DIVXXX_PAGE_LENGTH, 1 );
+    memset( divxxx->eprom, 0xff, DIVXXX_PAGE_LENGTH );
     for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
       memory_page *page = divxxx_get_eprom_page( divxxx, i );
       page->page = divxxx->eprom + i * MEMORY_PAGE_SIZE;

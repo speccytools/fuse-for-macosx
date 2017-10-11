@@ -95,8 +95,6 @@
 %token		 TIME
 %token		 WRITE
 
-%token <string>	 DEBUGGER_REGISTER
-
 %token <integer> NUMBER
 
 %token <string>	 STRING
@@ -178,7 +176,7 @@ command:   BASE number { debugger_output_base = $2; }
 	 | DEBUGGER_DELETE { debugger_breakpoint_remove_all(); }
 	 | DEBUGGER_DELETE number { debugger_breakpoint_remove( $2 ); }
 	 | DISASSEMBLE number { ui_debugger_disassemble( $2 ); }
-	 | EXIT     { debugger_exit_emulator(); }
+	 | EXIT expressionornull { debugger_exit_emulator( $2 ); }
 	 | FINISH   { debugger_breakpoint_exit(); }
 	 | DEBUGGER_IGNORE NUMBER number {
 	     debugger_breakpoint_ignore( $2, $3 );
@@ -187,12 +185,8 @@ command:   BASE number { debugger_output_base = $2; }
 	 | DEBUGGER_OUT number NUMBER { debugger_port_write( $2, $3 ); }
 	 | DEBUGGER_PRINT number { printf( "0x%x\n", $2 ); }
 	 | SET NUMBER number { debugger_poke( $2, $3 ); }
-	 | SET DEBUGGER_REGISTER number { debugger_register_set( $2, $3 ); }
 	 | SET VARIABLE number { debugger_variable_set( $2, $3 ); }
          | SET STRING ':' STRING number { debugger_system_variable_set( $2, $4, $5 ); }
-         /* Temporary hack while we deprecate the old unprefixed style
-            of register access. This should be removed in Fuse 1.4 */
-         | SET STRING ':' DEBUGGER_REGISTER number { debugger_system_variable_set( $2, $4, $5 ); }
 	 | STEP	    { debugger_step(); }
 ;
 
@@ -244,17 +238,9 @@ number:   expression { $$ = debugger_expression_evaluate( $1 ); }
 expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_pool );
 		       if( !$$ ) YYABORT;
 		     }
-	    | DEBUGGER_REGISTER { $$ = debugger_expression_new_register( $1, debugger_memory_pool );
-			 if( !$$ ) YYABORT;
-		       }
             | STRING ':' STRING { $$ = debugger_expression_new_system_variable( $1, $3, debugger_memory_pool );
                                   if( !$$ ) YYABORT;
                                 }
-            /* Temporary hack while we deprecate the old unprefixed style
-               of register access. This should be removed in Fuse 1.4 */
-            | STRING ':' DEBUGGER_REGISTER { $$ = debugger_expression_new_system_variable( $1, $3, debugger_memory_pool );
-                                             if( !$$ ) YYABORT;
-                                           }
 	    | VARIABLE { $$ = debugger_expression_new_variable( $1, debugger_memory_pool );
 			 if( !$$ ) YYABORT;
 		       }

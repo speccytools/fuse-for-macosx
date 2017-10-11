@@ -34,6 +34,7 @@
 #include "loader.h"
 #include "machine.h"
 #include "memory_pages.h"
+#include "module.h"
 #include "peripherals/printer.h"
 #include "psg.h"
 #include "profile.h"
@@ -61,6 +62,29 @@ static int contention_pattern_76543210[] = { 5, 4, 3, 2, 1, 0, 7, 6 };
 /* Event */
 int spectrum_frame_event;
 
+/* Debugger variable prefix */
+static const char * const debugger_type_string = "spectrum";
+
+/* Debugger variable for frame count */
+static const char * const frame_count_name = "frames";
+
+/* Count of frames since last reset */
+static libspectrum_dword frames_since_reset;
+
+static void
+spectrum_reset( int hard_reset )
+{
+  frames_since_reset = 0;
+}
+
+static module_info_t module_info = {
+  /* .reset = */ spectrum_reset,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ NULL,
+  /* .snapshot_to = */ NULL
+};
+
 static void
 spectrum_frame_event_fn( libspectrum_dword last_tstates, int type,
 			 void *user_data )
@@ -84,11 +108,22 @@ spectrum_do_frame_end( void )
   event_frame_end = 0;
 }
 
+static libspectrum_dword
+get_frame_count( void )
+{
+  return frames_since_reset;
+}
+
 static int
 spectrum_init( void *context )
 {
   spectrum_frame_event = event_register( spectrum_frame_event_fn,
 					 "End of frame" );
+
+  module_register( &module_info );
+
+  debugger_system_variable_register( debugger_type_string,
+      frame_count_name, get_frame_count, NULL );
 
   return 0;
 }
@@ -97,6 +132,7 @@ void
 spectrum_register_startup( void )
 {
   startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_EVENT,
     STARTUP_MANAGER_MODULE_SETUID,
   };
@@ -134,6 +170,8 @@ spectrum_frame( void )
                spectrum_frame_event );
 
   loader_frame( frame_length );
+
+  frames_since_reset++;
 
   return 0;
 }
