@@ -1,3 +1,11 @@
+2017-11-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.x.x released.
+
+        * Debugger improvements:
+          * Ensure conditional timed breakpoints work correctly (Philip
+            Kendall).
+
 2017-10-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.4.1 released.

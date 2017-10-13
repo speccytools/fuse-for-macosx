@@ -315,11 +315,11 @@ debugger_breakpoint_trigger( debugger_breakpoint *bp )
 {
   if( bp->ignore ) { bp->ignore--; return 0; }
 
-  if( bp->condition && !debugger_expression_evaluate( bp->condition ) )
-    return 0;
-
   if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME )
     bp->value.time.triggered = 1;
+
+  if( bp->condition && !debugger_expression_evaluate( bp->condition ) )
+    return 0;
 
   return 1;
 }
