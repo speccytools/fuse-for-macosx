@@ -1,5 +1,5 @@
-/* ula.h: ULA routines
-   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
+/* phantom_typist.h: starting game loading automatically
+   Copyright (c) 2017 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,24 +21,13 @@
 
 */
 
-#ifndef FUSE_ULA_H
-#define FUSE_ULA_H
+#ifndef FUSE_PHANTOM_TYPIST_H
+#define FUSE_PHANTOM_TYPIST_H
 
-#define ULA_CONTENTION_SIZE 80000
+libspectrum_byte
+phantom_typist_ula_read( libspectrum_word port );
 
-/* How much contention do we get at every tstate when MREQ is active? */
-extern libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ];
+void
+phantom_typist_frame( void );
 
-/* And how much when it is inactive */
-extern libspectrum_byte ula_contention_no_mreq[ ULA_CONTENTION_SIZE ];
-
-void ula_register_startup( void );
-
-libspectrum_byte ula_last_byte( void );
-
-libspectrum_byte ula_tape_level( void );
-
-void ula_contend_port_early( libspectrum_word port );
-void ula_contend_port_late( libspectrum_word port );
-
-#endif			/* #ifndef FUSE_ULA_H */
+#endif /* #ifndef FUSE_PHANTOM_TYPIST_H */

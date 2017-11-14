@@ -37,6 +37,7 @@
 #include "machines/specplus3.h"
 #include "module.h"
 #include "periph.h"
+#include "phantom_typist.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -176,12 +177,6 @@ ula_register_startup( void )
                             NULL );
 }
 
-static int phantom_typist_state = 0;
-static int next_phantom_typist_state = 1;
-static int count = 0;
-static libspectrum_dword first_read = 100000;
-static libspectrum_byte keyboard_ports_read = 0x00;
-
 static libspectrum_byte
 ula_read( libspectrum_word port, libspectrum_byte *attached )
 {
@@ -191,76 +186,7 @@ ula_read( libspectrum_word port, libspectrum_byte *attached )
 
   loader_detect_loader();
 
-  libspectrum_byte high_byte = port >> 8;
-
-  if( phantom_typist_state == 1 && high_byte != 0xff ) {
-    switch( high_byte ) {
-      case 0xfe:
-        keyboard_ports_read |= 0x01;
-        break;
-      case 0xfd:
-        keyboard_ports_read |= 0x02;
-        break;
-      case 0xfb:
-        keyboard_ports_read |= 0x04;
-        break;
-      case 0xf7:
-        keyboard_ports_read |= 0x08;
-        break;
-      case 0xef:
-        keyboard_ports_read |= 0x10;
-        break;
-      case 0xdf:
-        keyboard_ports_read |= 0x20;
-        break;
-      case 0xbf:
-        keyboard_ports_read |= 0x40;
-        break;
-      case 0x7f:
-        keyboard_ports_read |= 0x80;
-        break;
-    }
-
-    if( keyboard_ports_read == 0xff ) {
-      next_phantom_typist_state = 2;
-      count = 8;
-    }
-  }
-
-  if( phantom_typist_state == 2 && count == 0 && high_byte == 0xbf ) {
-    r &= ~0x08;
-    next_phantom_typist_state = 3;
-  }
-
-  if( phantom_typist_state == 3 ) {
-    switch( high_byte ) {
-      case 0x7f:
-        r &= ~0x02;
-        break;
-      case 0xdf:
-        r &= ~0x01;
-        break;
-    }
-    next_phantom_typist_state = 4;
-    count = 5;
-  }
-
-  if( phantom_typist_state == 4 && count == 0 ) {
-    switch( high_byte ) {
-      case 0x7f:
-        r &= ~0x02;
-        break;
-      case 0xdf:
-        r &= ~0x01;
-        break;
-    }
-    next_phantom_typist_state = 5;
-  }
-
-  if( phantom_typist_state == 5 && high_byte == 0xbf ) {
-    r &= ~0x01;
-    next_phantom_typist_state = 0;
-  }
+  r &= phantom_typist_ula_read( port );
 
   r &= keyboard_read( port >> 8 );
   if( tape_microphone ) r ^= 0x40;
@@ -356,19 +282,5 @@ ula_contend_port_late( libspectrum_word port )
       tstates += 2;
     }
 
-  }
-}
-
-void
-ula_phantom_typist_frame( void )
-{
-  first_read = 0;
-  keyboard_ports_read = 0x00;
-  if( next_phantom_typist_state != phantom_typist_state ) {
-    printf("Phantom typist entering state %d\n", next_phantom_typist_state);
-    phantom_typist_state = next_phantom_typist_state;
-  }
-  if( count > 0 ) {
-    count--;
   }
 }
