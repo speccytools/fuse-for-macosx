@@ -34,17 +34,39 @@ typedef enum phantom_typist_state_t {
   PHANTOM_TYPIST_STATE_ENTER
 } phantom_typist_state_t;
 
+static int delay_before_state[] = { 0, 0, 8, 0, 5, 0 };
+
 static phantom_typist_state_t phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
 static phantom_typist_state_t next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
-static int count = 0;
-static libspectrum_dword first_read = 100000;
+static int delay = 0;
 static libspectrum_byte keyboard_ports_read = 0x00;
+
+static libspectrum_byte
+type_quote( libspectrum_byte high_byte )
+{
+  libspectrum_byte r = 0xff;
+
+  switch( high_byte ) {
+    case 0x7f:
+      r &= ~0x02;
+      break;
+    case 0xdf:
+      r &= ~0x01;
+      break;
+  }
+
+  return r;
+}
 
 libspectrum_byte
 phantom_typist_ula_read( libspectrum_word port )
 {
   libspectrum_byte r = 0xff;
   libspectrum_byte high_byte = port >> 8;
+
+  if( delay != 0 ) {
+    return r;
+  }
 
   switch( phantom_typist_state ) {
     case PHANTOM_TYPIST_STATE_INACTIVE:
@@ -54,76 +76,44 @@ phantom_typist_ula_read( libspectrum_word port )
     case PHANTOM_TYPIST_STATE_WAITING:
       switch( high_byte ) {
         case 0xfe:
-          keyboard_ports_read |= 0x01;
-          break;
         case 0xfd:
-          keyboard_ports_read |= 0x02;
-          break;
         case 0xfb:
-          keyboard_ports_read |= 0x04;
-          break;
         case 0xf7:
-          keyboard_ports_read |= 0x08;
-          break;
         case 0xef:
-          keyboard_ports_read |= 0x10;
-          break;
         case 0xdf:
-          keyboard_ports_read |= 0x20;
-          break;
         case 0xbf:
-          keyboard_ports_read |= 0x40;
-          break;
         case 0x7f:
-          keyboard_ports_read |= 0x80;
+          keyboard_ports_read |= ~high_byte;
           break;
       }
 
       if( keyboard_ports_read == 0xff ) {
-        next_phantom_typist_state = 2;
-        count = 8;
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_LOAD;
       }
       break;
 
     case PHANTOM_TYPIST_STATE_LOAD:
-      if( count == 0 && high_byte == 0xbf ) {
+      if( high_byte == 0xbf ) {
         r &= ~0x08;
-        next_phantom_typist_state = 3;
       }
+      next_phantom_typist_state = PHANTOM_TYPIST_STATE_QUOTE1;
       break;
 
     case PHANTOM_TYPIST_STATE_QUOTE1:
-      switch( high_byte ) {
-        case 0x7f:
-          r &= ~0x02;
-          break;
-        case 0xdf:
-          r &= ~0x01;
-          break;
-      }
-      next_phantom_typist_state = 4;
-      count = 5;
+      r &= type_quote( high_byte );
+      next_phantom_typist_state = PHANTOM_TYPIST_STATE_QUOTE2;
       break;
 
     case PHANTOM_TYPIST_STATE_QUOTE2:
-      if( count == 0 ) {
-        switch( high_byte ) {
-          case 0x7f:
-            r &= ~0x02;
-            break;
-          case 0xdf:
-            r &= ~0x01;
-            break;
-        }
-        next_phantom_typist_state = 5;
-      }
+      r &= type_quote( high_byte );
+      next_phantom_typist_state = PHANTOM_TYPIST_STATE_ENTER;
       break;
 
     case PHANTOM_TYPIST_STATE_ENTER:
       if( high_byte == 0xbf ) {
         r &= ~0x01;
-        next_phantom_typist_state = 0;
       }
+      next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
       break;
   }
 
@@ -133,13 +123,12 @@ phantom_typist_ula_read( libspectrum_word port )
 void
 phantom_typist_frame( void )
 {
-  first_read = 0;
   keyboard_ports_read = 0x00;
   if( next_phantom_typist_state != phantom_typist_state ) {
-    printf("Phantom typist entering state %d\n", next_phantom_typist_state);
     phantom_typist_state = next_phantom_typist_state;
+    delay = delay_before_state[ phantom_typist_state ];
   }
-  if( count > 0 ) {
-    count--;
+  if( delay > 0 ) {
+    delay--;
   }
 }
