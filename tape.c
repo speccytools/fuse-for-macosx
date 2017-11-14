@@ -206,7 +206,7 @@ static int
 tape_autoload( libspectrum_machine hardware )
 {
   machine_reset( 0 );
-  phantom_typist_activate();
+  phantom_typist_activate( hardware );
   return 0;
 }
 
