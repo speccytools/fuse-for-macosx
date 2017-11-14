@@ -36,6 +36,7 @@
 #include "memory_pages.h"
 #include "module.h"
 #include "peripherals/printer.h"
+#include "peripherals/ula.h"
 #include "psg.h"
 #include "profile.h"
 #include "rzx.h"
@@ -163,6 +164,7 @@ spectrum_frame( void )
                spectrum_frame_event );
 
   loader_frame( frame_length );
+  ula_phantom_typist_frame();
 
   frames_since_reset++;
 

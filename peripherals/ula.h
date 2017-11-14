@@ -41,4 +41,6 @@ libspectrum_byte ula_tape_level( void );
 void ula_contend_port_early( libspectrum_word port );
 void ula_contend_port_late( libspectrum_word port );
 
+void ula_phantom_typist_frame( void );
+
 #endif			/* #ifndef FUSE_ULA_H */
