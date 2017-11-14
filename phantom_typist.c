@@ -37,9 +37,16 @@ typedef enum phantom_typist_state_t {
 static int delay_before_state[] = { 0, 0, 8, 0, 5, 0 };
 
 static phantom_typist_state_t phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
-static phantom_typist_state_t next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+static phantom_typist_state_t next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
 static int delay = 0;
 static libspectrum_byte keyboard_ports_read = 0x00;
+
+void
+phantom_typist_activate( void )
+{
+  phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+  next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+}
 
 static libspectrum_byte
 type_quote( libspectrum_byte high_byte )
