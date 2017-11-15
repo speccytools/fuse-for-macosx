@@ -122,4 +122,9 @@ input_key keysyms_remap( libspectrum_dword ui_keysym );
 
 const char* keyboard_key_text( keyboard_key_name key );
 
+/* Simulate what would be returned by the ULA if it is read from with
+   the high byte of the port as "porth" and "key" is pressed */
+libspectrum_byte
+keyboard_simulate_keypress( libspectrum_byte porth, keyboard_key_name key );
+
 #endif			/* #ifndef FUSE_KEYBOARD_H */

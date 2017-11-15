@@ -25,31 +25,66 @@
 
 #include <libspectrum.h>
 
+#include "keyboard.h"
+
+/* The various strings of keypresses that the phantom typist can use */
 typedef enum phantom_typist_mode_t {
-  PHANTOM_TYPIST_MODE_JPP,
-  PHANTOM_TYPIST_MODE_ENTER,
-  PHANTOM_TYPIST_MODE_LOADPP
+  PHANTOM_TYPIST_MODE_JPP, /* J, SS + P, SS + P, Enter */
+  PHANTOM_TYPIST_MODE_ENTER, /* Enter only */
+  PHANTOM_TYPIST_MODE_LOADPP /* L, O, A, D, SS + P, SS + P, Enter */
 } phantom_typist_mode_t;
 
 typedef enum phantom_typist_state_t {
+  /* The phantom typist is inactive */
   PHANTOM_TYPIST_STATE_INACTIVE,
 
+  /* The phantom typist is waiting for the keyboard to be read */
   PHANTOM_TYPIST_STATE_WAITING,
 
+  /* JPP mode */
   PHANTOM_TYPIST_STATE_LOAD,
   PHANTOM_TYPIST_STATE_QUOTE1,
   PHANTOM_TYPIST_STATE_QUOTE2,
   PHANTOM_TYPIST_STATE_ENTER,
 
+  /* Enter mode */
   PHANTOM_TYPIST_STATE_ENTER_ONLY,
 
+  /* LOAD mode - chains into the quotes of JPP mode */
   PHANTOM_TYPIST_STATE_L,
   PHANTOM_TYPIST_STATE_O,
   PHANTOM_TYPIST_STATE_A,
   PHANTOM_TYPIST_STATE_D
 } phantom_typist_state_t;
 
-static int delay_before_state[] = { 0, 0, 8, 0, 5, 0, 3, 2, 0, 4, 4 };
+/* States for the phantom typist state machine */
+struct state_info_t {
+  /* The keys to be pressed in this state */
+  keyboard_key_name keys_to_press[2];
+
+  /* The next state to move to */
+  phantom_typist_state_t next_state;
+
+  /* The number of frames to wait before acting in this state */
+  int delay_before_state;
+};
+
+/* Definitions for the phantom typist's state machine */
+static struct state_info_t state_info[] = {
+  /* INACTIVE and WAITING - data not used */
+  { { KEYBOARD_NONE, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
+  { { KEYBOARD_NONE, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
+
+  { { KEYBOARD_j, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_QUOTE1, 8 },
+  { { KEYBOARD_Symbol, KEYBOARD_p }, PHANTOM_TYPIST_STATE_QUOTE2, 0 },
+  { { KEYBOARD_Symbol, KEYBOARD_p }, PHANTOM_TYPIST_STATE_ENTER, 5 },
+  { { KEYBOARD_Enter, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
+  { { KEYBOARD_Enter, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 3 },
+  { { KEYBOARD_l, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_O, 2 },
+  { { KEYBOARD_o, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_A, 0 },
+  { { KEYBOARD_a, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_D, 4 },
+  { { KEYBOARD_d, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_QUOTE1, 4 }
+};
 
 static phantom_typist_mode_t phantom_typist_mode;
 static phantom_typist_state_t phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
@@ -61,7 +96,6 @@ void
 phantom_typist_activate( libspectrum_machine machine )
 {
   switch( machine ) {
-    /* Machines where you press J, SS + P, SS + P, Enter to load a game */
     case LIBSPECTRUM_MACHINE_16:
     case LIBSPECTRUM_MACHINE_48:
     case LIBSPECTRUM_MACHINE_48_NTSC:
@@ -71,7 +105,6 @@ phantom_typist_activate( libspectrum_machine machine )
       phantom_typist_mode = PHANTOM_TYPIST_MODE_JPP;
       break;
 
-    /* Machines where you just press Enter to load a game */
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_128E:
     case LIBSPECTRUM_MACHINE_PLUS2:
@@ -85,8 +118,6 @@ phantom_typist_activate( libspectrum_machine machine )
       phantom_typist_mode = PHANTOM_TYPIST_MODE_ENTER;
       break;
 
-    /* Machines where you type L, O, A, D, SS + P, SS + P, Enter to load a
-       game */
     case LIBSPECTRUM_MACHINE_SE:
       phantom_typist_mode = PHANTOM_TYPIST_MODE_LOADPP;
       break;
@@ -101,19 +132,52 @@ phantom_typist_activate( libspectrum_machine machine )
   next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
 }
 
-static libspectrum_byte
-type_quote( libspectrum_byte high_byte )
+static void
+process_waiting_state( libspectrum_byte high_byte )
 {
-  libspectrum_byte r = 0xff;
-
   switch( high_byte ) {
-    case 0x7f:
-      r &= ~0x02;
-      break;
+    case 0xfe:
+    case 0xfd:
+    case 0xfb:
+    case 0xf7:
+    case 0xef:
     case 0xdf:
-      r &= ~0x01;
+    case 0xbf:
+    case 0x7f:
+      keyboard_ports_read |= ~high_byte;
       break;
   }
+
+  if( keyboard_ports_read == 0xff ) {
+    switch( phantom_typist_mode ) {
+      case PHANTOM_TYPIST_MODE_JPP:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_LOAD;
+        break;
+
+      case PHANTOM_TYPIST_MODE_ENTER:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_ENTER_ONLY;
+        break;
+
+      case PHANTOM_TYPIST_MODE_LOADPP:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_L;
+        break;
+
+      default:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
+        break;
+    }
+  }
+}
+
+static libspectrum_byte
+process_state( libspectrum_byte high_byte )
+{
+  libspectrum_byte r = 0xff;
+  struct state_info_t *this_state = &state_info[phantom_typist_state];
+
+  r &= keyboard_simulate_keypress( high_byte, this_state->keys_to_press[0] );
+  r &= keyboard_simulate_keypress( high_byte, this_state->keys_to_press[1] );
+  next_phantom_typist_state = this_state->next_state;
 
   return r;
 }
@@ -134,91 +198,11 @@ phantom_typist_ula_read( libspectrum_word port )
       break;
 
     case PHANTOM_TYPIST_STATE_WAITING:
-      switch( high_byte ) {
-        case 0xfe:
-        case 0xfd:
-        case 0xfb:
-        case 0xf7:
-        case 0xef:
-        case 0xdf:
-        case 0xbf:
-        case 0x7f:
-          keyboard_ports_read |= ~high_byte;
-          break;
-      }
-
-      if( keyboard_ports_read == 0xff ) {
-        switch( phantom_typist_mode ) {
-          case PHANTOM_TYPIST_MODE_JPP:
-            next_phantom_typist_state = PHANTOM_TYPIST_STATE_LOAD;
-            break;
-
-          case PHANTOM_TYPIST_MODE_ENTER:
-            next_phantom_typist_state = PHANTOM_TYPIST_STATE_ENTER_ONLY;
-            break;
-
-          case PHANTOM_TYPIST_MODE_LOADPP:
-            next_phantom_typist_state = PHANTOM_TYPIST_STATE_L;
-            break;
-
-          default:
-            next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
-            break;
-        }
-      }
+      process_waiting_state( high_byte );
       break;
 
-    case PHANTOM_TYPIST_STATE_LOAD:
-      if( high_byte == 0xbf ) {
-        r &= ~0x08;
-      }
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_QUOTE1;
-      break;
-
-    case PHANTOM_TYPIST_STATE_QUOTE1:
-      r &= type_quote( high_byte );
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_QUOTE2;
-      break;
-
-    case PHANTOM_TYPIST_STATE_QUOTE2:
-      r &= type_quote( high_byte );
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_ENTER;
-      break;
-
-    case PHANTOM_TYPIST_STATE_ENTER:
-    case PHANTOM_TYPIST_STATE_ENTER_ONLY:
-      if( high_byte == 0xbf ) {
-        r &= ~0x01;
-      }
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
-      break;
-
-    case PHANTOM_TYPIST_STATE_L:
-      if( high_byte == 0xbf ) {
-        r &= ~0x02;
-      }
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_O;
-      break;
-
-    case PHANTOM_TYPIST_STATE_O:
-      if( high_byte == 0xdf ) {
-        r &= ~0x02;
-      }
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_A;
-      break;
-
-    case PHANTOM_TYPIST_STATE_A:
-      if( high_byte == 0xfd ) {
-        r &= ~0x01;
-      }
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_D;
-      break;
-
-    case PHANTOM_TYPIST_STATE_D:
-      if( high_byte == 0xfd ) {
-        r &= ~0x04;
-      }
-      next_phantom_typist_state = PHANTOM_TYPIST_STATE_QUOTE1;
+     default: 
+      r &= process_state( high_byte );
       break;
   }
 
@@ -231,7 +215,7 @@ phantom_typist_frame( void )
   keyboard_ports_read = 0x00;
   if( next_phantom_typist_state != phantom_typist_state ) {
     phantom_typist_state = next_phantom_typist_state;
-    delay = delay_before_state[ phantom_typist_state ];
+    delay = state_info[phantom_typist_state].delay_before_state;
   }
   if( delay > 0 ) {
     delay--;
