@@ -29,9 +29,23 @@
 
 /* The various strings of keypresses that the phantom typist can use */
 typedef enum phantom_typist_mode_t {
-  PHANTOM_TYPIST_MODE_JPP, /* J, SS + P, SS + P, Enter */
+  /* J, SS + P, SS + P, Enter => LOAD "" */
+  PHANTOM_TYPIST_MODE_JPP,
+
+  /* J, SS + P, SS + P, CS + SS, I, Enter => LOAD ""CODE */
+  PHANTOM_TYPIST_MODE_JPPI,
+
   PHANTOM_TYPIST_MODE_ENTER, /* Enter only */
-  PHANTOM_TYPIST_MODE_LOADPP /* L, O, A, D, SS + P, SS + P, Enter */
+
+  /* Down, Enter, L, O, A, D, SS + P, SS + P, C, O, D, E =>
+     LOAD ""CODE in BASIC */
+  PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE,
+
+  /* L, O, A, D, SS + P, SS + P, Enter => LOAD "" */
+  PHANTOM_TYPIST_MODE_LOADPP,
+
+  /* L, O, A, D, SS + P, SS + P, C, O, D, E, Enter => LOAD ""CODE */
+  PHANTOM_TYPIST_MODE_LOADPPCODE
 } phantom_typist_mode_t;
 
 typedef enum phantom_typist_state_t {
@@ -51,10 +65,26 @@ typedef enum phantom_typist_state_t {
   PHANTOM_TYPIST_STATE_ENTER_ONLY,
 
   /* LOAD mode - chains into the quotes of JPP mode */
-  PHANTOM_TYPIST_STATE_L,
-  PHANTOM_TYPIST_STATE_O,
-  PHANTOM_TYPIST_STATE_A,
-  PHANTOM_TYPIST_STATE_D
+  PHANTOM_TYPIST_STATE_LOAD_L,
+  PHANTOM_TYPIST_STATE_LOAD_O,
+  PHANTOM_TYPIST_STATE_LOAD_A,
+  PHANTOM_TYPIST_STATE_LOAD_D,
+
+  /* For producing "CODE" in keyword mode */
+  PHANTOM_TYPIST_STATE_EXTENDED_MODE,
+  PHANTOM_TYPIST_STATE_CODE,
+
+  /* For producing "CODE" in single character entry mode */
+  PHANTOM_TYPIST_STATE_CODE_C,
+  PHANTOM_TYPIST_STATE_CODE_O,
+  PHANTOM_TYPIST_STATE_CODE_D,
+  PHANTOM_TYPIST_STATE_CODE_E,
+
+  /* For selecting 128K BASIC or similar */
+  PHANTOM_TYPIST_STATE_DOWN,
+  PHANTOM_TYPIST_STATE_SELECT_BASIC,
+  PHANTOM_TYPIST_STATE_WAIT
+
 } phantom_typist_state_t;
 
 /* States for the phantom typist state machine */
@@ -62,28 +92,48 @@ struct state_info_t {
   /* The keys to be pressed in this state */
   keyboard_key_name keys_to_press[2];
 
-  /* The next state to move to */
+  /* The function used to determine the next state */
+  phantom_typist_state_t (*next_state_fn)( void );
+
+  /* The next state to move to - used if next_state_fn is NULL */
   phantom_typist_state_t next_state;
 
   /* The number of frames to wait before acting in this state */
   int delay_before_state;
 };
 
+/* Next state selector functions */
+static phantom_typist_state_t code_or_enter( void );
+
 /* Definitions for the phantom typist's state machine */
 static struct state_info_t state_info[] = {
   /* INACTIVE and WAITING - data not used */
-  { { KEYBOARD_NONE, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
-  { { KEYBOARD_NONE, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
+  { { 0, 0 }, NULL, 0, 0 },
+  { { 0, 0 }, NULL, 0, 0 },
 
-  { { KEYBOARD_j, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_QUOTE1, 8 },
-  { { KEYBOARD_Symbol, KEYBOARD_p }, PHANTOM_TYPIST_STATE_QUOTE2, 0 },
-  { { KEYBOARD_Symbol, KEYBOARD_p }, PHANTOM_TYPIST_STATE_ENTER, 5 },
-  { { KEYBOARD_Enter, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
-  { { KEYBOARD_Enter, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_INACTIVE, 3 },
-  { { KEYBOARD_l, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_O, 2 },
-  { { KEYBOARD_o, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_A, 0 },
-  { { KEYBOARD_a, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_D, 4 },
-  { { KEYBOARD_d, KEYBOARD_NONE }, PHANTOM_TYPIST_STATE_QUOTE1, 4 }
+  { { KEYBOARD_j, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_QUOTE1, 8 },
+  { { KEYBOARD_Symbol, KEYBOARD_p }, NULL, PHANTOM_TYPIST_STATE_QUOTE2, 0 },
+  { { KEYBOARD_Symbol, KEYBOARD_p }, code_or_enter, 0, 5 },
+  { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
+  
+  { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_INACTIVE, 3 },
+
+  { { KEYBOARD_l, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_O, 2 },
+  { { KEYBOARD_o, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_A, 0 },
+  { { KEYBOARD_a, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_D, 4 },
+  { { KEYBOARD_d, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_QUOTE1, 4 },
+
+  { { KEYBOARD_Caps, KEYBOARD_Symbol }, NULL, PHANTOM_TYPIST_STATE_CODE, 0 },
+  { { KEYBOARD_i, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_ENTER, 4 },
+
+  { { KEYBOARD_c, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_CODE_O, 0 },
+  { { KEYBOARD_o, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_CODE_D, 4 },
+  { { KEYBOARD_d, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_CODE_E, 0 },
+  { { KEYBOARD_e, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_ENTER, 4 },
+
+  { { KEYBOARD_Caps, KEYBOARD_6 }, NULL, PHANTOM_TYPIST_STATE_SELECT_BASIC, 4 },
+  { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_WAIT, 10 },
+  { { KEYBOARD_NONE, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_L, 28 }
 };
 
 static phantom_typist_mode_t phantom_typist_mode;
@@ -93,7 +143,7 @@ static int delay = 0;
 static libspectrum_byte keyboard_ports_read = 0x00;
 
 void
-phantom_typist_activate( libspectrum_machine machine )
+phantom_typist_activate( libspectrum_machine machine, int needs_code )
 {
   switch( machine ) {
     case LIBSPECTRUM_MACHINE_16:
@@ -102,7 +152,9 @@ phantom_typist_activate( libspectrum_machine machine )
     case LIBSPECTRUM_MACHINE_TC2048:
     case LIBSPECTRUM_MACHINE_TC2068:
     case LIBSPECTRUM_MACHINE_TS2068:
-      phantom_typist_mode = PHANTOM_TYPIST_MODE_JPP;
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_JPPI :
+        PHANTOM_TYPIST_MODE_JPP;
       break;
 
     case LIBSPECTRUM_MACHINE_128:
@@ -115,11 +167,15 @@ phantom_typist_activate( libspectrum_machine machine )
     case LIBSPECTRUM_MACHINE_PENT512:
     case LIBSPECTRUM_MACHINE_PENT1024:
     case LIBSPECTRUM_MACHINE_SCORP:
-      phantom_typist_mode = PHANTOM_TYPIST_MODE_ENTER;
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE :
+        PHANTOM_TYPIST_MODE_ENTER;
       break;
 
     case LIBSPECTRUM_MACHINE_SE:
-      phantom_typist_mode = PHANTOM_TYPIST_MODE_LOADPP;
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_LOADPPCODE :
+        PHANTOM_TYPIST_MODE_LOADPP;
       break;
 
     /* Anything else, lets try the JPP set as it ends with Enter anyway */
@@ -151,6 +207,7 @@ process_waiting_state( libspectrum_byte high_byte )
   if( keyboard_ports_read == 0xff ) {
     switch( phantom_typist_mode ) {
       case PHANTOM_TYPIST_MODE_JPP:
+      case PHANTOM_TYPIST_MODE_JPPI:
         next_phantom_typist_state = PHANTOM_TYPIST_STATE_LOAD;
         break;
 
@@ -158,8 +215,13 @@ process_waiting_state( libspectrum_byte high_byte )
         next_phantom_typist_state = PHANTOM_TYPIST_STATE_ENTER_ONLY;
         break;
 
+      case PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_DOWN;
+        break;
+
       case PHANTOM_TYPIST_MODE_LOADPP:
-        next_phantom_typist_state = PHANTOM_TYPIST_STATE_L;
+      case PHANTOM_TYPIST_MODE_LOADPPCODE:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_LOAD_L;
         break;
 
       default:
@@ -167,6 +229,31 @@ process_waiting_state( libspectrum_byte high_byte )
         break;
     }
   }
+}
+
+static phantom_typist_state_t
+code_or_enter( void )
+{
+  phantom_typist_state_t next_state;
+
+  switch( phantom_typist_mode ) {
+    case PHANTOM_TYPIST_MODE_JPP:
+    case PHANTOM_TYPIST_MODE_LOADPP:
+      next_state = PHANTOM_TYPIST_STATE_ENTER;
+      break;
+    case PHANTOM_TYPIST_MODE_JPPI:
+      next_state = PHANTOM_TYPIST_STATE_EXTENDED_MODE;
+      break;
+    case PHANTOM_TYPIST_MODE_LOADPPCODE:
+    case PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE:
+      next_state = PHANTOM_TYPIST_STATE_CODE_C;
+      break;
+    default:
+      next_state = PHANTOM_TYPIST_STATE_INACTIVE;
+      break;
+  }
+
+  return next_state;
 }
 
 static libspectrum_byte
@@ -177,7 +264,9 @@ process_state( libspectrum_byte high_byte )
 
   r &= keyboard_simulate_keypress( high_byte, this_state->keys_to_press[0] );
   r &= keyboard_simulate_keypress( high_byte, this_state->keys_to_press[1] );
-  next_phantom_typist_state = this_state->next_state;
+  next_phantom_typist_state = this_state->next_state_fn ?
+    this_state->next_state_fn() :
+    this_state->next_state;
 
   return r;
 }

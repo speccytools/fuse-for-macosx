@@ -25,7 +25,7 @@
 #define FUSE_PHANTOM_TYPIST_H
 
 void
-phantom_typist_activate( libspectrum_machine machine );
+phantom_typist_activate( libspectrum_machine machine, int needs_code );
 
 libspectrum_byte
 phantom_typist_ula_read( libspectrum_word port );

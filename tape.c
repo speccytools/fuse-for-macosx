@@ -201,12 +201,52 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
   return 0;
 }
 
+static int
+does_tape_load_with_code( void )
+{
+  libspectrum_tape_block *block;
+  libspectrum_tape_iterator iterator;
+  int needs_code = 0;
+
+  for( block = libspectrum_tape_iterator_init( &iterator, tape );
+       block;
+       block = libspectrum_tape_iterator_next( &iterator ) ) {
+
+    libspectrum_tape_type block_type;
+    size_t block_length;
+    libspectrum_byte *data;
+
+    /* Skip over blocks until we find one which might be a header */
+    block_type = libspectrum_tape_block_type( block );
+    if( block_type != LIBSPECTRUM_TAPE_BLOCK_ROM &&
+        block_type != LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK )
+      continue;
+
+    /* For this to be a CODE block, the block must have the right
+       length, it must have the header flag set and it must indicate
+       a CODE block */
+    block_length = libspectrum_tape_block_data_length( block );
+    data = libspectrum_tape_block_data( block );
+    needs_code =
+      (block_length == 19) &&
+      (data[0] == 0x00) &&
+      (data[1] == 0x03);
+
+    /* Stop looking now - either we found an appropriate block or we found
+       something strange, in which case we'll just assume it loads normally */
+    break;
+  }
+
+  return needs_code;
+}
+
 /* Load a snap to start the current tape autoloading */
 static int
 tape_autoload( libspectrum_machine hardware )
 {
+  int needs_code = does_tape_load_with_code();
   machine_reset( 0 );
-  phantom_typist_activate( hardware );
+  phantom_typist_activate( hardware, needs_code );
   return 0;
 }
 
