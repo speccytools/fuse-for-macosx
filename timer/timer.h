@@ -1,5 +1,5 @@
 /* timer.h: Speed routines for Fuse
-   Copyright (c) 1999-2008 Philip Kendall
+   Copyright (c) 1999-2017 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,9 @@ void timer_register_startup( void );
 
 extern float current_speed;
 extern int timer_event;
+
+void timer_start_fastloading( void );
+void timer_stop_fastloading( void );
 
 /* Internal routines */
 

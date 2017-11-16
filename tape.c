@@ -416,6 +416,9 @@ int tape_load_trap( void )
     return -1;
   }
 
+  /* Deactivate the phantom typist */
+  phantom_typist_deactivate();
+
   /* All returns made via the RET at #05E2, except on Timex 2068 at #0136 */
   if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ||
        machine_current->machine == LIBSPECTRUM_MACHINE_TS2068 ) {
@@ -619,13 +622,16 @@ tape_play( int autoplay )
   /* Update the status bar */
   ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_ACTIVE );
 
-  /* If we're fastloading, turn sound off */
-  if( settings_current.fastload ) sound_pause();
+  timer_start_fastloading();
 
   loader_tape_play();
 
   event_add( tstates + next_tape_edge_tstates, tape_edge_event );
   next_tape_edge_tstates = 0;
+
+  /* Once the tape has started, the phantom typist has done its job so
+     cancel any pending actions */
+  phantom_typist_deactivate();
 
   debugger_event( play_event );
 
@@ -676,12 +682,7 @@ tape_stop( void )
     ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
     loader_tape_stop();
 
-    /* If we were fastloading, sound was off, so turn it back on, and
-       reset the speed counter */
-    if( settings_current.fastload ) {
-      sound_unpause();
-      timer_estimate_reset();
-    }
+    timer_stop_fastloading();
 
     tape_save_next_edge();
     event_remove_type( tape_edge_event );

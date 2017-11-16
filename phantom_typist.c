@@ -26,6 +26,7 @@
 #include <libspectrum.h>
 
 #include "keyboard.h"
+#include "timer/timer.h"
 
 /* The various strings of keypresses that the phantom typist can use */
 typedef enum phantom_typist_mode_t {
@@ -63,6 +64,7 @@ typedef enum phantom_typist_state_t {
 
   /* Enter mode */
   PHANTOM_TYPIST_STATE_ENTER_ONLY,
+  PHANTOM_TYPIST_STATE_WAIT_AFTER_ENTER,
 
   /* LOAD mode - chains into the quotes of JPP mode */
   PHANTOM_TYPIST_STATE_LOAD_L,
@@ -116,7 +118,9 @@ static struct state_info_t state_info[] = {
   { { KEYBOARD_Symbol, KEYBOARD_p }, code_or_enter, 0, 5 },
   { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_INACTIVE, 0 },
   
-  { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_INACTIVE, 3 },
+  { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_WAIT_AFTER_ENTER, 3 },
+  /* This state is here to "swallow" the pause while the +3 checks for a disk */
+  { { KEYBOARD_NONE, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_INACTIVE, 600 },
 
   { { KEYBOARD_l, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_O, 2 },
   { { KEYBOARD_o, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_A, 0 },
@@ -186,6 +190,15 @@ phantom_typist_activate( libspectrum_machine machine, int needs_code )
 
   phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
   next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+
+  timer_start_fastloading();
+}
+
+void
+phantom_typist_deactivate( void )
+{
+  phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
+  next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
 }
 
 static void
@@ -298,14 +311,25 @@ phantom_typist_ula_read( libspectrum_word port )
   return r;
 }
 
+int
+phantom_typist_is_active( void )
+{
+  return phantom_typist_state != PHANTOM_TYPIST_STATE_INACTIVE;
+}
+
 void
 phantom_typist_frame( void )
 {
   keyboard_ports_read = 0x00;
   if( next_phantom_typist_state != phantom_typist_state ) {
+    if( next_phantom_typist_state == PHANTOM_TYPIST_STATE_INACTIVE ) {
+      timer_stop_fastloading();
+    }
     phantom_typist_state = next_phantom_typist_state;
     delay = state_info[phantom_typist_state].delay_before_state;
+
   }
+
   if( delay > 0 ) {
     delay--;
   }
