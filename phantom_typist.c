@@ -42,6 +42,9 @@ typedef enum phantom_typist_mode_t {
      LOAD ""CODE in BASIC */
   PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE,
 
+  /* Wait a bit and then perform the above */
+  PHANTOM_TYPIST_MODE_WAIT_DOWN_LOADPPCODE,
+
   /* L, O, A, D, SS + P, SS + P, Enter => LOAD "" */
   PHANTOM_TYPIST_MODE_LOADPP,
 
@@ -83,6 +86,7 @@ typedef enum phantom_typist_state_t {
   PHANTOM_TYPIST_STATE_CODE_E,
 
   /* For selecting 128K BASIC or similar */
+  PHANTOM_TYPIST_STATE_WAIT_DOWN,
   PHANTOM_TYPIST_STATE_DOWN,
   PHANTOM_TYPIST_STATE_SELECT_BASIC,
   PHANTOM_TYPIST_STATE_WAIT
@@ -124,7 +128,7 @@ static struct state_info_t state_info[] = {
 
   { { KEYBOARD_l, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_O, 2 },
   { { KEYBOARD_o, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_A, 0 },
-  { { KEYBOARD_a, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_D, 4 },
+  { { KEYBOARD_a, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_D, 5 },
   { { KEYBOARD_d, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_QUOTE1, 4 },
 
   { { KEYBOARD_Caps, KEYBOARD_Symbol }, NULL, PHANTOM_TYPIST_STATE_CODE, 0 },
@@ -135,6 +139,7 @@ static struct state_info_t state_info[] = {
   { { KEYBOARD_d, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_CODE_E, 0 },
   { { KEYBOARD_e, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_ENTER, 4 },
 
+  { { KEYBOARD_NONE, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_DOWN, 24 },
   { { KEYBOARD_Caps, KEYBOARD_6 }, NULL, PHANTOM_TYPIST_STATE_SELECT_BASIC, 4 },
   { { KEYBOARD_Enter, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_WAIT, 10 },
   { { KEYBOARD_NONE, KEYBOARD_NONE }, NULL, PHANTOM_TYPIST_STATE_LOAD_L, 28 }
@@ -164,7 +169,6 @@ phantom_typist_activate( libspectrum_machine machine, int needs_code )
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_128E:
     case LIBSPECTRUM_MACHINE_PLUS2:
-    case LIBSPECTRUM_MACHINE_PLUS2A:
     case LIBSPECTRUM_MACHINE_PLUS3:
     case LIBSPECTRUM_MACHINE_PLUS3E:
     case LIBSPECTRUM_MACHINE_PENT:
@@ -173,6 +177,12 @@ phantom_typist_activate( libspectrum_machine machine, int needs_code )
     case LIBSPECTRUM_MACHINE_SCORP:
       phantom_typist_mode = needs_code ?
         PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE :
+        PHANTOM_TYPIST_MODE_ENTER;
+      break;
+
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_WAIT_DOWN_LOADPPCODE :
         PHANTOM_TYPIST_MODE_ENTER;
       break;
 
@@ -232,6 +242,10 @@ process_waiting_state( libspectrum_byte high_byte )
         next_phantom_typist_state = PHANTOM_TYPIST_STATE_DOWN;
         break;
 
+      case PHANTOM_TYPIST_MODE_WAIT_DOWN_LOADPPCODE:
+        next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAIT_DOWN;
+        break;
+
       case PHANTOM_TYPIST_MODE_LOADPP:
       case PHANTOM_TYPIST_MODE_LOADPPCODE:
         next_phantom_typist_state = PHANTOM_TYPIST_STATE_LOAD_L;
@@ -259,6 +273,7 @@ code_or_enter( void )
       break;
     case PHANTOM_TYPIST_MODE_LOADPPCODE:
     case PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE:
+    case PHANTOM_TYPIST_MODE_WAIT_DOWN_LOADPPCODE:
       next_state = PHANTOM_TYPIST_STATE_CODE_C;
       break;
     default:
