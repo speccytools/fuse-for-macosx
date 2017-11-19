@@ -24,6 +24,9 @@
 #ifndef FUSE_PHANTOM_TYPIST_H
 #define FUSE_PHANTOM_TYPIST_H
 
+void
+phantom_typist_register_startup( void );
+
 /* Activate the phantom typist for a given machine, and optionally
    for a tape that needs LOAD ""CODE rather than just LOAD "" */
 void

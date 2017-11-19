@@ -89,6 +89,7 @@
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
+#include "phantom_typist.h"
 #include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
