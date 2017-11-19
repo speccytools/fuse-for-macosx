@@ -451,31 +451,7 @@ specplus3_shutdown( void )
 static int
 ui_drive_autoload( void )
 {
-  int error;
-  utils_file snap;
-  libspectrum_id_t type;
-
-  /* Look for an autoload snap. Try .szx first, then .z80 */
-  type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
-  error = utils_read_auxiliary_file( "disk_plus3.szx", &snap,
-                                     UTILS_AUXILIARY_LIB );
-  if( error == -1 ) {
-    type = LIBSPECTRUM_ID_SNAPSHOT_Z80;
-    error = utils_read_auxiliary_file( "disk_plus3.z80", &snap,
-                                       UTILS_AUXILIARY_LIB );
-  }
-
-  /* If we couldn't find either, give up */
-  if( error == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't find autoload snap for +3 disk" );
-    return 1;
-  }
-  if( error ) return error;
-
-  error = snapshot_read_buffer( snap.buffer, snap.length, type );
-  if( error ) { utils_close_file( &snap ); return error; }
-
-  utils_close_file( &snap );
-
+  machine_reset( 0 );
+  phantom_typist_activate_disk();
   return 0;
 }

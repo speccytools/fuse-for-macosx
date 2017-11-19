@@ -29,6 +29,10 @@
 void
 phantom_typist_activate( libspectrum_machine machine, int needs_code );
 
+/* Activate the phantom typist to load a +3 disk */
+void
+phantom_typist_activate_disk( void );
+
 /* Deactivate the phantom typist */
 void
 phantom_typist_deactivate( void );

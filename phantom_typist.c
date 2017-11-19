@@ -176,6 +176,16 @@ static int delay = 0;
 static libspectrum_byte keyboard_ports_read = 0x00;
 static int command_count;
 
+static void
+set_state_waiting( void )
+{
+  command_count = 0;
+  phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+  next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+
+  timer_start_fastloading();
+}
+
 void
 phantom_typist_activate( libspectrum_machine machine, int needs_code )
 {
@@ -228,11 +238,14 @@ phantom_typist_activate( libspectrum_machine machine, int needs_code )
       break;
   }
 
-  command_count = 0;
-  phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
-  next_phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+  set_state_waiting();
+}
 
-  timer_start_fastloading();
+void
+phantom_typist_activate_disk( void )
+{
+  phantom_typist_mode = PHANTOM_TYPIST_MODE_ENTER;
+  set_state_waiting();
 }
 
 void
