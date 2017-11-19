@@ -25,7 +25,11 @@
 
 #include <libspectrum.h>
 
+#include "compat.h"
+#include "infrastructure/startup_manager.h"
 #include "keyboard.h"
+#include "module.h"
+#include "phantom_typist.h"
 #include "timer/timer.h"
 
 /* The various strings of keypresses that the phantom typist can use */
@@ -128,6 +132,9 @@ static phantom_typist_state_t t_colon_or_quote( void );
 static phantom_typist_state_t code_or_enter( void );
 static phantom_typist_state_t next_command_or_end( void );
 
+/* Reset function */
+static void phantom_typist_reset( int hard_reset );
+
 /* Definitions for the phantom typist's state machine */
 static struct state_info_t state_info[] = {
   /* INACTIVE and WAITING - data not used */
@@ -175,6 +182,36 @@ static phantom_typist_state_t next_phantom_typist_state = PHANTOM_TYPIST_STATE_I
 static int delay = 0;
 static libspectrum_byte keyboard_ports_read = 0x00;
 static int command_count;
+
+static module_info_t phantom_typist_module_info = {
+  phantom_typist_reset,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+};
+
+static int
+phantom_typist_init( void *context )
+{
+  module_register( &phantom_typist_module_info );
+  return 0;
+}
+
+void
+phantom_typist_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_PHANTOM_TYPIST, dependencies,
+                            ARRAY_SIZE( dependencies ), phantom_typist_init,
+                            NULL, NULL );
+}
+
+static void
+phantom_typist_reset( int hard_reset )
+{
+  phantom_typist_deactivate();
+}
 
 static void
 set_state_waiting( void )
