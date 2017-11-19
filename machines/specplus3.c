@@ -43,6 +43,7 @@
 #include "peripherals/disk/fdd.h"
 #include "peripherals/disk/upd_fdc.h"
 #include "peripherals/printer.h"
+#include "phantom_typist.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "spec128.h"
