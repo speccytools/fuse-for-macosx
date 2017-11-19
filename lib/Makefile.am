@@ -36,11 +36,8 @@ lib_tests = \
             lib/tests/success.udi
 
 pkgdata_DATA += \
-                $(lib_@AUTOLOAD_SNAPS@_snaps) \
                 $(lib_files)
 
 EXTRA_DIST += \
-              $(lib_compressed_snaps) \
               $(lib_files) \
-              $(lib_tests) \
-              $(lib_uncompressed_snaps)
+              $(lib_tests)
