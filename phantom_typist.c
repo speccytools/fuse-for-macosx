@@ -30,7 +30,27 @@
 #include "keyboard.h"
 #include "module.h"
 #include "phantom_typist.h"
+#include "settings.h"
 #include "timer/timer.h"
+
+/* The various high level ways the phantom typist can type */
+typedef enum phantom_typist_highlevel_mode_t {
+  /* Use keyword entry */
+  PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD,
+
+  /* Use keystroke entry */
+  PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYSTROKE,
+
+  /* Use the loader option from the menu */
+  PHANTOM_TYPIST_HIGHLEVEL_MODE_MENU,
+
+  /* Use the loader option from the menu but with an additional delay */
+  PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS2A,
+
+  /* Use the loader option from the menu but with an additional delay
+     and special handling of LOAD ""CODE programs */
+  PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS3
+} phantom_typist_highlevel_mode_t;
 
 /* The various strings of keypresses that the phantom typist can use */
 typedef enum phantom_typist_mode_t {
@@ -213,6 +233,49 @@ phantom_typist_reset( int hard_reset )
   phantom_typist_deactivate();
 }
 
+static phantom_typist_highlevel_mode_t
+get_highlevel_mode( libspectrum_machine machine )
+{
+  phantom_typist_highlevel_mode_t highlevel_mode;
+
+  switch( machine ) {
+    case LIBSPECTRUM_MACHINE_16:
+    case LIBSPECTRUM_MACHINE_48:
+    case LIBSPECTRUM_MACHINE_48_NTSC:
+    case LIBSPECTRUM_MACHINE_TC2048:
+    case LIBSPECTRUM_MACHINE_TC2068:
+    case LIBSPECTRUM_MACHINE_TS2068:
+    default:
+      highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD;
+      break;
+
+    case LIBSPECTRUM_MACHINE_128:
+    case LIBSPECTRUM_MACHINE_128E:
+    case LIBSPECTRUM_MACHINE_PLUS2:
+    case LIBSPECTRUM_MACHINE_PENT:
+    case LIBSPECTRUM_MACHINE_PENT512:
+    case LIBSPECTRUM_MACHINE_PENT1024:
+    case LIBSPECTRUM_MACHINE_SCORP:
+      highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_MENU;
+      break;
+
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+      highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS2A;
+      break;
+
+    case LIBSPECTRUM_MACHINE_PLUS3:
+    case LIBSPECTRUM_MACHINE_PLUS3E:
+      highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS3;
+      break;
+
+    case LIBSPECTRUM_MACHINE_SE:
+      highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYSTROKE;
+      break;
+  }
+
+  return highlevel_mode;
+}
+
 static void
 set_state_waiting( void )
 {
@@ -226,54 +289,58 @@ set_state_waiting( void )
 void
 phantom_typist_activate( libspectrum_machine machine, int needs_code )
 {
-  switch( machine ) {
-    case LIBSPECTRUM_MACHINE_16:
-    case LIBSPECTRUM_MACHINE_48:
-    case LIBSPECTRUM_MACHINE_48_NTSC:
-    case LIBSPECTRUM_MACHINE_TC2048:
-    case LIBSPECTRUM_MACHINE_TC2068:
-    case LIBSPECTRUM_MACHINE_TS2068:
+  phantom_typist_highlevel_mode_t highlevel_mode;
+  const char *setting = settings_current.phantom_typist_mode;
+
+  if( strcmp( setting, "keyword" ) == 0 ) {
+    highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD;
+  } else if( strcmp( setting, "keystroke" ) == 0) {
+    highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYSTROKE;
+  } else if( strcmp( setting, "menu" ) == 0) {
+    highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_MENU;
+  } else if( strcmp( setting, "plus2a" ) == 0) {
+    highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS2A;
+  } else if( strcmp( setting, "plus3" ) == 0) {
+    highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS3;
+  } else if( strcmp( setting, "auto" ) == 0) {
+    highlevel_mode = get_highlevel_mode( machine );
+  } else {
+    highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD;
+  }
+
+  switch( highlevel_mode ) {
+    case PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD:
+    default:
       phantom_typist_mode = needs_code ?
         PHANTOM_TYPIST_MODE_JPPI :
         PHANTOM_TYPIST_MODE_JPP;
       break;
 
-    case LIBSPECTRUM_MACHINE_128:
-    case LIBSPECTRUM_MACHINE_128E:
-    case LIBSPECTRUM_MACHINE_PLUS2:
-    case LIBSPECTRUM_MACHINE_PENT:
-    case LIBSPECTRUM_MACHINE_PENT512:
-    case LIBSPECTRUM_MACHINE_PENT1024:
-    case LIBSPECTRUM_MACHINE_SCORP:
-      phantom_typist_mode = needs_code ?
-        PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE :
-        PHANTOM_TYPIST_MODE_ENTER;
-      break;
-
-    case LIBSPECTRUM_MACHINE_PLUS2A:
-      phantom_typist_mode = needs_code ?
-        PHANTOM_TYPIST_MODE_WAIT_DOWN_LOADPPCODE :
-        PHANTOM_TYPIST_MODE_ENTER;
-      break;
-
-    case LIBSPECTRUM_MACHINE_PLUS3:
-    case LIBSPECTRUM_MACHINE_PLUS3E:
-      phantom_typist_mode = needs_code ?
-        PHANTOM_TYPIST_MODE_PLUS3_CODE_BLOCK :
-        PHANTOM_TYPIST_MODE_ENTER;
-      break;
-
-    case LIBSPECTRUM_MACHINE_SE:
+    case PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYSTROKE:
       phantom_typist_mode = needs_code ?
         PHANTOM_TYPIST_MODE_LOADPPCODE :
         PHANTOM_TYPIST_MODE_LOADPP;
       break;
 
-    /* Anything else, lets try the JPP set as it ends with Enter anyway */
-    default:
-      phantom_typist_mode = PHANTOM_TYPIST_MODE_JPP;
+    case PHANTOM_TYPIST_HIGHLEVEL_MODE_MENU:
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_DOWN_LOADPPCODE :
+        PHANTOM_TYPIST_MODE_ENTER;
+      break;
+
+    case PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS2A:
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_WAIT_DOWN_LOADPPCODE :
+        PHANTOM_TYPIST_MODE_ENTER;
+      break;
+
+    case PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS3:
+      phantom_typist_mode = needs_code ?
+        PHANTOM_TYPIST_MODE_PLUS3_CODE_BLOCK :
+        PHANTOM_TYPIST_MODE_ENTER;
       break;
   }
+
 
   set_state_waiting();
 }
