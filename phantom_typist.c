@@ -21,6 +21,8 @@
 
 */
 
+#include <string.h>
+
 #include <config.h>
 
 #include <libspectrum.h>
