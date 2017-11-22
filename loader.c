@@ -110,6 +110,7 @@ acceleration_detector( libspectrum_word pc )
     switch( state ) {
     case 0:
       switch( b ) {
+      case 0x03: state = 28; break;     /* Data byte of JR NZ, ... - Alkatraz */
       case 0x04: state = 1; break;	/* INC B - Many loaders */
       default: state = 13; break;	/* Possible Digital Integration */
       }
@@ -288,7 +289,74 @@ acceleration_detector( libspectrum_word pc )
       default: return ACCELERATION_MODE_NONE;
       }
       break;
-	
+
+    /* Alkatraz */
+
+    case 28:
+      switch( b ) {
+      case 0xc3: state = 29; break;     /* JP nnnn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 29:
+      state = 30; break;                /* First data byte of JP */
+    case 30:
+      state = 31; break;                /* Second data byte of JP */
+    case 31:
+      switch( b ) {
+      case 0xdb: state = 32; break;	/* IN A,(nn) */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 32:
+      switch( b ) {
+      case 0xfe: state = 33; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 33:
+      switch( b ) {
+      case 0x1f: state = 34; break;	/* RRA */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 34:
+      switch( b ) {
+      case 0xc8: state = 35; break;	/* RET Z */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 35:
+      switch( b ) {
+      case 0xa9: state = 36; break;	/* XOR C */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 36:
+      switch( b ) {
+      case 0xe6: state = 37; break;	/* AND nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 37:
+      switch( b ) {
+      case 0x20: state = 38; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 38:
+      switch( b ) {
+      case 0x28: state = 39; break;	/* JR Z,nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 39:
+      switch( b ) {
+      case 0xf1: return ACCELERATION_MODE_INCREASING; /* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+
     default:
       /* Can't happen */
       break;
