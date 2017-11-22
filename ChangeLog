@@ -6,6 +6,10 @@
           * Ensure conditional timed breakpoints work correctly (Philip
             Kendall).
 
+        * Miscellaneous improvements:
+          * Alkatraz loaders (e.g. Cobra and Fairlight) are now accelerated
+            (Philip Kendall).
+
 2017-10-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.4.1 released.
