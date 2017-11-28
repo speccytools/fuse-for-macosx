@@ -7,6 +7,8 @@
             Kendall).
 
         * Miscellaneous improvements:
+          * Autoload snapshots replaced by a "phantom typist" which types
+            LOAD "" or similar.
           * Alkatraz loaders (e.g. Cobra and Fairlight) are now accelerated
             (Philip Kendall).
 

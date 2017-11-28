@@ -89,6 +89,7 @@
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
+#include "phantom_typist.h"
 #include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
@@ -318,6 +319,7 @@ run_startup_manager( int *argc, char ***argv )
   mempool_register_startup();
   multiface_register_startup();
   opus_register_startup();
+  phantom_typist_register_startup();
   plusd_register_startup();
   printer_register_startup();
   profile_register_startup();
