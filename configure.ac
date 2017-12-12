@@ -19,12 +19,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.4.1])
+m4_define([fuse_version], [1.5.0])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
-m4_define([fuse_minor_version], [4])
-m4_define([fuse_micro_version], [1])
+m4_define([fuse_minor_version], [5])
+m4_define([fuse_micro_version], [0])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
@@ -153,28 +153,11 @@ AC_COMPILE_IFELSE(
       int test = LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION;
     ]])
   ],
-  [AUTOLOAD_SNAPS=compressed; LIBSPEC_HAVE_ZLIB=yes; AC_MSG_RESULT(yes)],
-  [AUTOLOAD_SNAPS=uncompressed; LIBSPEC_HAVE_ZLIB=""; AC_MSG_RESULT(no)]
+  [LIBSPEC_HAVE_ZLIB=yes; AC_MSG_RESULT(yes)],
+  [LIBSPEC_HAVE_ZLIB=""; AC_MSG_RESULT(no)]
 )
 CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(AUTOLOAD_SNAPS)
 AC_SUBST(LIBSPEC_HAVE_ZLIB)
-AC_CONFIG_LINKS([
-	lib/disk_plus3.szx:lib/"$AUTOLOAD_SNAPS"/disk_plus3.szx
-	lib/tape_128.szx:lib/"$AUTOLOAD_SNAPS"/tape_128.szx
-	lib/tape_16.szx:lib/"$AUTOLOAD_SNAPS"/tape_16.szx
-	lib/tape_2048.szx:lib/"$AUTOLOAD_SNAPS"/tape_2048.szx
-	lib/tape_2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_2068.szx
-	lib/tape_48.szx:lib/"$AUTOLOAD_SNAPS"/tape_48.szx
-	lib/tape_48_ntsc.szx:lib/"$AUTOLOAD_SNAPS"/tape_48_ntsc.szx
-	lib/tape_plus2.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2.szx
-	lib/tape_plus2a.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2a.szx
-	lib/tape_plus3.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3.szx
-	lib/tape_plus3e.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3e.szx
-	lib/tape_pentagon.szx:lib/"$AUTOLOAD_SNAPS"/tape_pentagon.szx
-	lib/tape_scorpion.szx:lib/"$AUTOLOAD_SNAPS"/tape_scorpion.szx
-	lib/tape_se.szx:lib/"$AUTOLOAD_SNAPS"/tape_se.szx
-	lib/tape_ts2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_ts2068.szx])
 
 dnl Select a user interface
 

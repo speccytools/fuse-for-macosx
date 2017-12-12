@@ -410,3 +410,21 @@ keyboard_key_text( keyboard_key_name key )
 
   return ptr ? *ptr : "[Unknown key]";
 }
+
+libspectrum_byte
+keyboard_simulate_keypress( libspectrum_byte porth, keyboard_key_name key )
+{
+  libspectrum_byte r = 0xff;
+  struct key_bit *data;
+
+  data = g_hash_table_lookup( keyboard_data, &key );
+
+  if( data ) {
+    libspectrum_byte mask = (1 << data->port);
+    if( !(porth & mask) ) {
+      r &= ~data->bit;
+    }
+  }
+
+  return r;
+}

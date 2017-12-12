@@ -40,6 +40,7 @@
 #include "machine.h"
 #include "memory_pages.h"
 #include "peripherals/ula.h"
+#include "phantom_typist.h"
 #include "rzx.h"
 #include "settings.h"
 #include "sound.h"
@@ -200,44 +201,52 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
   return 0;
 }
 
+static int
+does_tape_load_with_code( void )
+{
+  libspectrum_tape_block *block;
+  libspectrum_tape_iterator iterator;
+  int needs_code = 0;
+
+  for( block = libspectrum_tape_iterator_init( &iterator, tape );
+       block;
+       block = libspectrum_tape_iterator_next( &iterator ) ) {
+
+    libspectrum_tape_type block_type;
+    size_t block_length;
+    libspectrum_byte *data;
+
+    /* Skip over blocks until we find one which might be a header */
+    block_type = libspectrum_tape_block_type( block );
+    if( block_type != LIBSPECTRUM_TAPE_BLOCK_ROM &&
+        block_type != LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK )
+      continue;
+
+    /* For this to be a CODE block, the block must have the right
+       length, it must have the header flag set and it must indicate
+       a CODE block */
+    block_length = libspectrum_tape_block_data_length( block );
+    data = libspectrum_tape_block_data( block );
+    needs_code =
+      (block_length == 19) &&
+      (data[0] == 0x00) &&
+      (data[1] == 0x03);
+
+    /* Stop looking now - either we found an appropriate block or we found
+       something strange, in which case we'll just assume it loads normally */
+    break;
+  }
+
+  return needs_code;
+}
+
 /* Load a snap to start the current tape autoloading */
 static int
 tape_autoload( libspectrum_machine hardware )
 {
-  int error; const char *id;
-  char filename[80];
-  utils_file snap;
-  libspectrum_id_t type;
-
-  id = machine_get_id( hardware );
-  if( !id ) {
-    ui_error( UI_ERROR_ERROR, "Unknown machine type %d!", hardware );
-    return 1;
-  }
-
-  /* Look for an autoload snap. Try .szx first, then .z80 */
-  type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
-  snprintf( filename, sizeof(filename), "tape_%s.szx", id );
-  error = utils_read_auxiliary_file( filename, &snap, UTILS_AUXILIARY_LIB );
-  if( error == -1 ) {
-    type = LIBSPECTRUM_ID_SNAPSHOT_Z80;
-    snprintf( filename, sizeof(filename), "tape_%s.z80", id );
-    error = utils_read_auxiliary_file( filename, &snap, UTILS_AUXILIARY_LIB );
-  }
-    
-  /* If we couldn't find either, give up */
-  if( error == -1 ) {
-    ui_error( UI_ERROR_ERROR,
-	      "Couldn't find autoload snap for machine type '%s'", id );
-    return 1;
-  }
-  if( error ) return error;
-
-  error = snapshot_read_buffer( snap.buffer, snap.length, type );
-  if( error ) { utils_close_file( &snap ); return error; }
-
-  utils_close_file( &snap );
-    
+  int needs_code = does_tape_load_with_code();
+  machine_reset( 0 );
+  phantom_typist_activate( hardware, needs_code );
   return 0;
 }
 
@@ -406,6 +415,9 @@ int tape_load_trap( void )
     tape_play( 1 );
     return -1;
   }
+
+  /* Deactivate the phantom typist */
+  phantom_typist_deactivate();
 
   /* All returns made via the RET at #05E2, except on Timex 2068 at #0136 */
   if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ||
@@ -610,13 +622,16 @@ tape_play( int autoplay )
   /* Update the status bar */
   ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_ACTIVE );
 
-  /* If we're fastloading, turn sound off */
-  if( settings_current.fastload ) sound_pause();
+  timer_start_fastloading();
 
   loader_tape_play();
 
   event_add( tstates + next_tape_edge_tstates, tape_edge_event );
   next_tape_edge_tstates = 0;
+
+  /* Once the tape has started, the phantom typist has done its job so
+     cancel any pending actions */
+  phantom_typist_deactivate();
 
   debugger_event( play_event );
 
@@ -667,12 +682,7 @@ tape_stop( void )
     ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
     loader_tape_stop();
 
-    /* If we were fastloading, sound was off, so turn it back on, and
-       reset the speed counter */
-    if( settings_current.fastload ) {
-      sound_unpause();
-      timer_estimate_reset();
-    }
+    timer_stop_fastloading();
 
     tape_save_next_edge();
     event_remove_type( tape_edge_event );

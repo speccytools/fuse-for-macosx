@@ -1,3 +1,17 @@
+2017-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.0 released.
+
+        * Debugger improvements:
+          * Ensure conditional timed breakpoints work correctly (Philip
+            Kendall).
+
+        * Miscellaneous improvements:
+          * Autoload snapshots replaced by a "phantom typist" which types
+            LOAD "" or similar.
+          * Alkatraz loaders (e.g. Cobra and Fairlight) are now accelerated
+            (Philip Kendall).
+
 2017-10-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.4.1 released.
