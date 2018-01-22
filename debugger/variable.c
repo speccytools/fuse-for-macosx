@@ -55,13 +55,8 @@ debugger_variable_end( void )
 void
 debugger_variable_set( const char *name, libspectrum_dword value )
 {
-  /* Check if we need to allocate memory for this key */
-  if( !g_hash_table_lookup( debugger_variables, name ) )
-    name = utils_safe_strdup( name );
-
-  /* Cast is safe as we have either taken a copy of the key, or know that
-     it already exists so we're not going to use it */
-  g_hash_table_insert( debugger_variables, (char*)name, GINT_TO_POINTER(value) );
+  g_hash_table_insert( debugger_variables, utils_safe_strdup( name ),
+                       GINT_TO_POINTER(value) );
 }
 
 libspectrum_dword
