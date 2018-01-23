@@ -197,6 +197,7 @@ CODE
                               $widget->{data1} );
     snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
     gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
+    gtk_entry_set_activates_default( GTK_ENTRY( dialog.$widget->{value} ), TRUE );
 
     gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, TRUE, TRUE, 0 );
 
