@@ -323,7 +323,7 @@ ui_end(void)
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
-  GtkWidget *dialog, *label, *vbox, *content_area, *action_area;
+  GtkWidget *dialog, *label, *vbox, *content_area;
   const gchar *title;
 
   /* If we don't have a UI yet, we can't output widgets */
@@ -350,10 +350,8 @@ ui_error_specific( ui_error_level severity, const char *message )
   /* Make a new vbox for the top part for saner spacing */
   vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
-  action_area = gtk_dialog_get_action_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), vbox, TRUE, TRUE, 0 );
   gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
-  gtk_container_set_border_width( GTK_CONTAINER( action_area ), 5 );
 
   /* Put the label in it */
   gtk_container_add( GTK_CONTAINER( vbox ), label );

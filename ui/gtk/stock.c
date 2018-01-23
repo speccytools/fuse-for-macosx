@@ -74,12 +74,11 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 
   if( !accel ) accel = gtkstock_add_accel_group (widget);
 
-  btn = gtk_button_new_with_mnemonic( button->label );
-
   if( GTK_IS_DIALOG( widget ) ) {
-    GtkWidget *action_area = gtk_dialog_get_action_area( GTK_DIALOG( widget ) );
-    gtk_container_add( GTK_CONTAINER( action_area ), btn );
+    btn = gtk_dialog_add_button( GTK_DIALOG( widget ), button->label,
+                                 GTK_RESPONSE_NONE );
   } else {
+    btn = gtk_button_new_with_mnemonic( button->label );
     gtk_container_add( GTK_CONTAINER( widget ), btn );
   }
 
