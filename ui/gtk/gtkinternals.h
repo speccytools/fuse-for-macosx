@@ -84,6 +84,7 @@ typedef struct gtkstock_button {
   GdkModifierType modifier;     /* primary shortcut */
   guint shortcut_alt;
   GdkModifierType modifier_alt; /* secondary shortcut */
+  gint response_id;             /* response id for dialog */
 } gtkstock_button;
 
 /* GTK1: create a simple button with the given label.

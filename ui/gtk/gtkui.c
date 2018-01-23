@@ -464,6 +464,9 @@ menu_get_scaler( scaler_available_fn selector )
                              (gpointer) &dialog, DEFAULT_DESTROY,
                              DEFAULT_DESTROY );
 
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog.dialog ),
+                                   GTK_RESPONSE_OK );
+
   gtk_widget_show_all( dialog.dialog );
 
   /* Process events until the window is done with */
@@ -601,6 +604,9 @@ menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
                              G_CALLBACK( menu_machine_select_done ),
                              (gpointer) &dialog, DEFAULT_DESTROY,
                              DEFAULT_DESTROY );
+
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog.dialog ),
+                                   GTK_RESPONSE_OK );
 
   gtk_widget_show_all( dialog.dialog );
 
@@ -764,6 +770,9 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
                              G_CALLBACK( confirm_joystick_done ),
                              (gpointer) &dialog, DEFAULT_DESTROY,
                              DEFAULT_DESTROY );
+
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog.dialog ),
+                                   GTK_RESPONSE_OK );
 
   gtk_widget_show_all( dialog.dialog );
 

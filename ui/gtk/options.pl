@@ -248,6 +248,9 @@ CODE
                              G_CALLBACK( menu_options_$_->{name}_done ),
                              (gpointer) &dialog, NULL, DEFAULT_DESTROY );
 
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog.dialog ),
+                                   GTK_RESPONSE_OK );
+
   /* Display the window */
   gtk_widget_show_all( dialog.dialog );
 
