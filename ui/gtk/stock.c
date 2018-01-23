@@ -71,14 +71,15 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 {
   GtkWidget *btn;
   gboolean link_object = ( button->label[0] == '!' );
+  const gchar *button_label = button->label + link_object;
 
   if( !accel ) accel = gtkstock_add_accel_group (widget);
 
   if( GTK_IS_DIALOG( widget ) ) {
-    btn = gtk_dialog_add_button( GTK_DIALOG( widget ), button->label,
+    btn = gtk_dialog_add_button( GTK_DIALOG( widget ), button_label,
                                  button->response_id );
   } else {
-    btn = gtk_button_new_with_mnemonic( button->label );
+    btn = gtk_button_new_with_mnemonic( button_label );
     gtk_container_add( GTK_CONTAINER( widget ), btn );
   }
 
