@@ -812,3 +812,68 @@ debugger_search_instruction( libspectrum_word address, int delta )
 
   return address;
 }
+
+/* Unit tests */
+
+/* Disassembly test data */
+libspectrum_byte test1_data[] = { 0x00 };
+
+libspectrum_byte test2_data[] = { 0xdd, 0x00 };
+libspectrum_byte test3_data[] = { 0xdd, 0x09 };
+libspectrum_byte test4_data[] = { 0xdd, 0xdd, 0x00 };
+libspectrum_byte test5_data[] = { 0xdd, 0xcb, 0x55, 0x06 };
+
+libspectrum_byte test6_data[] = { 0xfd, 0x00 };
+libspectrum_byte test7_data[] = { 0xfd, 0x09 };
+libspectrum_byte test8_data[] = { 0xfd, 0xfd, 0x00 };
+libspectrum_byte test9_data[] = { 0xfd, 0xcb, 0x55, 0x06 };
+
+libspectrum_byte test10_data[] = { 0xdd, 0xfd, 0x09 };
+libspectrum_byte test11_data[] = { 0xfd, 0xdd, 0x09 };
+
+libspectrum_byte test12_data[] = { 0xdd, 0xfd, 0xdd, 0xfd, 0xdd, 0xfd, 0xdd,
+                                   0xfd, 0xdd, 0xfd, 0xdd, 0xfd, 0x09 };
+libspectrum_byte test13_data[] = { 0xfd, 0xdd, 0xfd, 0xdd, 0xfd, 0xdd, 0xfd,
+                                   0xdd, 0xfd, 0xdd, 0xfd, 0xdd, 0x09 };
+
+static int
+run_test( libspectrum_byte *data, size_t data_length, const char *expected )
+{
+  char disassembly[16];
+  size_t length;
+
+  memcpy( memory_map_read[8].page, data, data_length );
+  
+  debugger_disassemble( disassembly, sizeof( disassembly ), &length, 0x4000 );
+
+  if( strcmp( disassembly, expected ) ) return 1;
+  if( length != data_length ) return 1;
+
+  return 0;
+}
+
+int
+debugger_disassemble_unittest( void )
+{
+  int r = 0;
+
+  r += run_test( test1_data, sizeof( test1_data ), "NOP" );
+
+  r += run_test( test2_data, sizeof( test2_data ), "NOP" );
+  r += run_test( test3_data, sizeof( test3_data ), "ADD IX,BC" );
+  r += run_test( test4_data, sizeof( test4_data ), "NOP" );
+  r += run_test( test5_data, sizeof( test5_data ), "RLC (IX+55)" );
+
+  r += run_test( test6_data, sizeof( test6_data ), "NOP" );
+  r += run_test( test7_data, sizeof( test7_data ), "ADD IY,BC" );
+  r += run_test( test8_data, sizeof( test8_data ), "NOP" );
+  r += run_test( test9_data, sizeof( test9_data ), "RLC (IY+55)" );
+
+  r += run_test( test10_data, sizeof( test10_data ), "ADD IY,BC" );
+  r += run_test( test11_data, sizeof( test11_data ), "ADD IX,BC" );
+
+  r += run_test( test12_data, sizeof( test12_data ), "ADD IY,BC" );
+  r += run_test( test13_data, sizeof( test13_data ), "ADD IX,BC" );
+
+  return r;
+}

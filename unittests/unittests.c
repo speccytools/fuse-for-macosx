@@ -26,6 +26,7 @@
 
 #include <libspectrum.h>
 
+#include "debugger/debugger.h"
 #include "fuse.h"
 #include "machine.h"
 #include "mempool.h"
@@ -784,6 +785,9 @@ unittests_run( void )
   r += floating_bus_merge_test();
   r += mempool_test();
   r += paging_test();
+  r += debugger_disassemble_unittest();
+
+  printf("Final return value: %d (should be 0)\n", r);
 
   return r;
 }
