@@ -197,6 +197,7 @@ CODE
                               $widget->{data1} );
     snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
     gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
+    gtk_entry_set_activates_default( GTK_ENTRY( dialog.$widget->{value} ), TRUE );
 
     gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, TRUE, TRUE, 0 );
 
@@ -247,6 +248,9 @@ CODE
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
                              G_CALLBACK( menu_options_$_->{name}_done ),
                              (gpointer) &dialog, NULL, DEFAULT_DESTROY );
+
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog.dialog ),
+                                   GTK_RESPONSE_OK );
 
   /* Display the window */
   gtk_widget_show_all( dialog.dialog );
