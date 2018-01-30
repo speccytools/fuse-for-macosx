@@ -30,7 +30,6 @@
 
 #include "event.h"
 #include "infrastructure/startup_manager.h"
-#include "fuse.h"
 #include "module.h"
 #include "profile.h"
 #include "ui/ui.h"
@@ -97,8 +96,6 @@ profile_start( void )
 void
 profile_map( libspectrum_word pc )
 {
-  if( tstates - profile_last_tstates > 256 ) fuse_abort();
-
   total_tstates[ profile_last_pc ] += tstates - profile_last_tstates;
 
   profile_last_pc = z80.pc.w;
