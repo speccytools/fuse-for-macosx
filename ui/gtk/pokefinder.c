@@ -203,11 +203,16 @@ static void
 gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
   long value;
+  const gchar *entry;
+  char *endptr;
+  int base;
 
   errno = 0;
-  value = strtol( gtk_entry_get_text( GTK_ENTRY( widget ) ), NULL, 10 );
+  entry = gtk_entry_get_text( GTK_ENTRY( widget ) );
+  base = ( g_str_has_prefix( entry, "0x" ) )? 16 : 10;
+  value = strtol( entry, &endptr, base );
 
-  if( errno != 0 || value < 0 || value > 255 ) {
+  if( errno != 0 || value < 0 || value > 255 || endptr == entry ) {
     ui_error( UI_ERROR_ERROR, "Invalid value: use an integer from 0 to 255" );
     return;
   }

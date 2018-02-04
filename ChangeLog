@@ -7,8 +7,10 @@
           * Fix crash when setting debugger variables (Gergely Szasz).
 
         * Miscellaneous improvements:
-          * GTK UI: Improve behaviour of default button on dialogs (thanks,
+          * GTK+ UI: Improve behaviour of default button on dialogs (thanks,
             atom-atom) (ub880d and Sergio Baldoví).
+          * GTK+ and win32 UIs: Support hex numbers in load/save binary and
+            pokefinder dialogs (thanks, Allan Turvey) (Sergio Baldoví).
 
 2017-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 

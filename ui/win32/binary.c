@@ -175,11 +175,13 @@ static void
 load_data( HWND hwndDlg, LONG_PTR user_data )
 {
   struct binary_info *info = ( struct binary_info * )user_data;
+  HWND hwnd_control;
 
   long start, length; size_t i;
-  
-  TCHAR *temp_buffer;
+
+  TCHAR *temp_buffer, *endptr;
   size_t temp_buffer_len;
+  int base;
 
   errno = 0;
   temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH,
@@ -187,12 +189,18 @@ load_data( HWND hwndDlg, LONG_PTR user_data )
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
   SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
-  length = _tcstol( temp_buffer, NULL, 10 );
-  free( temp_buffer );
-  if( errno || length < 1 || length > 0x10000 ) {
+
+  errno = 0;
+  base = ( !_tcsncmp( _T("0x"), temp_buffer, strlen( _T("0x") ) ) )? 16 : 10;
+  length = _tcstol( temp_buffer, &endptr, base );
+  if( errno || length < 1 || length > 0x10000 || endptr == temp_buffer ) {
+    free( temp_buffer );
     ui_error( UI_ERROR_ERROR, "Length must be between 1 and 65536" );
+    hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_LENGTH );
+    SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
+  free( temp_buffer );
 
   if( length > info->file.length ) {
     ui_error( UI_ERROR_ERROR,
@@ -207,15 +215,23 @@ load_data( HWND hwndDlg, LONG_PTR user_data )
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
   SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
-  start = _tcstol( temp_buffer, NULL, 10 );
-  free( temp_buffer );
-  if( errno || start < 0 || start > 0xffff ) {
+
+  errno = 0;
+  base = ( !_tcsncmp( _T("0x"), temp_buffer, strlen( _T("0x") ) ) )? 16 : 10;
+  start = _tcstol( temp_buffer, &endptr, base );
+  if( errno || start < 0 || start > 0xffff || endptr == temp_buffer ) {
+    free( temp_buffer );
     ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
+    hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_START );
+    SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
+  free( temp_buffer );
 
   if( start + length > 0x10000 ) {
     ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+    hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_LENGTH );
+    SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
 
@@ -274,9 +290,11 @@ save_data( HWND hwndDlg, LONG_PTR user_data )
 
   long start, length; size_t i;
   libspectrum_byte *buffer;
+  HWND hwnd_control;
 
-  TCHAR *temp_buffer;
+  TCHAR *temp_buffer, *endptr;
   size_t temp_buffer_len;
+  int base;
 
   int error;
 
@@ -286,12 +304,18 @@ save_data( HWND hwndDlg, LONG_PTR user_data )
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
   SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
-  length = _tcstol( temp_buffer, NULL, 10 );
-  free( temp_buffer );
-  if( errno || length < 1 || length > 0x10000 ) {
+
+  errno = 0;
+  base = ( !_tcsncmp( _T("0x"), temp_buffer, strlen( _T("0x") ) ) )? 16 : 10;
+  length = _tcstol( temp_buffer, &endptr, base );
+  if( errno || length < 1 || length > 0x10000 || endptr == temp_buffer ) {
+    free( temp_buffer );
     ui_error( UI_ERROR_ERROR, "Length must be between 1 and 65536" );
+    hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_LENGTH );
+    SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
+  free( temp_buffer );
 
   buffer = malloc( length * sizeof( libspectrum_byte ) );
   if( !buffer ) {
@@ -305,17 +329,25 @@ save_data( HWND hwndDlg, LONG_PTR user_data )
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
   SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
-  start = _tcstol( temp_buffer, NULL, 10 );
-  free( temp_buffer );
-  if( errno || start < 0 || start > 0xffff ) {
+
+  errno = 0;
+  base = ( !_tcsncmp( _T("0x"), temp_buffer, strlen( _T("0x") ) ) )? 16 : 10;
+  start = _tcstol( temp_buffer, &endptr, base );
+  if( errno || start < 0 || start > 0xffff || endptr == temp_buffer ) {
+    free( temp_buffer );
     ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
     free( buffer );
+    hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_START );
+    SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
+  free( temp_buffer );
 
   if( start + length > 0x10000 ) {
     ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
     free( buffer );
+    hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_LENGTH );
+    SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
 
