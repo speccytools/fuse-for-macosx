@@ -4,6 +4,13 @@
           * Prevent crash when we try to disassemble an instruction with many
             DD or FD prefixes (Philip Kendall; thanks, Miguel Angel Rodríguez
             Jódar).
+          * Fix crash when setting debugger variables (Gergely Szasz).
+
+        * Miscellaneous improvements:
+          * GTK+ UI: Improve behaviour of default button on dialogs (thanks,
+            atom-atom) (ub880d and Sergio Baldoví).
+          * GTK+ and win32 UIs: Support hex numbers in load/save binary and
+            pokefinder dialogs (thanks, Allan Turvey) (Sergio Baldoví).
 
         * Profiler improvements:
           * Prevent crash when we try to profile an instruction with many DD

@@ -229,6 +229,9 @@ menu_machine_pokefinder( int action GCC_UNUSED )
     initial_width = rect.right - rect.left;
     initial_height = rect.bottom - rect.top;
 
+    /* Set text limit */
+    SendDlgItemMessage( fuse_hPFWnd, IDC_PF_EDIT, EM_LIMITTEXT, 4, 0 );
+
     /* set extended listview style to select full row, when an item
        is selected */
     DWORD lv_ext_style;
@@ -285,8 +288,9 @@ static void
 win32ui_pokefinder_search( void )
 {
   long value;
-  TCHAR *buffer;
-  int buffer_size; 
+  TCHAR *buffer, *endptr;
+  int buffer_size, base;
+  HWND hwnd_control;
 
   /* poll the size of the value in Search box first */
   buffer_size = SendDlgItemMessage( fuse_hPFWnd, IDC_PF_EDIT, WM_GETTEXTLENGTH,
@@ -305,14 +309,19 @@ win32ui_pokefinder_search( void )
     return;
   }
 
-  value = _ttol( buffer );
-  free( buffer );
+  errno = 0;
+  base = ( !_tcsncmp( _T("0x"), buffer, strlen( _T("0x") ) ) )? 16 : 10;
+  value = _tcstol( buffer, &endptr, base );
 
-  if( value < 0 || value > 255 ) {
+  if( errno || value < 0 || value > 255 || endptr == buffer ) {
+    free( buffer );
     ui_error( UI_ERROR_ERROR, "Invalid value: use an integer from 0 to 255" );
+    hwnd_control = GetDlgItem( fuse_hPFWnd, IDC_PF_EDIT );
+    SendMessage( fuse_hPFWnd, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
-  
+  free( buffer );
+
   pokefinder_search( value );
   update_pokefinder();
 }

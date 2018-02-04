@@ -71,15 +71,15 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 {
   GtkWidget *btn;
   gboolean link_object = ( button->label[0] == '!' );
+  const gchar *button_label = button->label + link_object;
 
   if( !accel ) accel = gtkstock_add_accel_group (widget);
 
-  btn = gtk_button_new_with_mnemonic( button->label );
-
   if( GTK_IS_DIALOG( widget ) ) {
-    GtkWidget *action_area = gtk_dialog_get_action_area( GTK_DIALOG( widget ) );
-    gtk_container_add( GTK_CONTAINER( action_area ), btn );
+    btn = gtk_dialog_add_button( GTK_DIALOG( widget ), button_label,
+                                 button->response_id );
   } else {
+    btn = gtk_button_new_with_mnemonic( button_label );
     gtk_container_add( GTK_CONTAINER( widget ), btn );
   }
 
@@ -147,8 +147,8 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
                            GCallback destroy_ok, GCallback destroy_cancel )
 {
   gtkstock_button btn[] = {
-    { "_Cancel", NULL, NULL, NULL, GDK_KEY_Escape, 0, 0, 0 },
-    { "_OK", NULL, NULL, NULL, GDK_KEY_Return, 0, 0, 0 },
+    { "_Cancel", NULL, NULL, NULL, GDK_KEY_Escape, 0, 0, 0, GTK_RESPONSE_CANCEL},
+    { "_OK", NULL, NULL, NULL, 0, 0, 0, 0, GTK_RESPONSE_OK},
   };
   btn[0].destroy = destroy_cancel ? destroy_cancel : NULL;
   btn[1].destroy = destroy_ok ? destroy_ok : NULL;
@@ -165,7 +165,8 @@ gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 {
   gtkstock_button btn = {
     "_Close", NULL, NULL, (destroy ? destroy : DEFAULT_DESTROY),
-    (esconly ? GDK_KEY_VoidSymbol : GDK_KEY_Return), 0, GDK_KEY_Escape, 0
+    (esconly ? GDK_KEY_VoidSymbol : GDK_KEY_Return), 0, GDK_KEY_Escape, 0,
+    GTK_RESPONSE_CLOSE
   };
   return gtkstock_create_buttons( widget, accel, &btn, 1 );
 }
@@ -175,6 +176,7 @@ gtkstock_dialog_new( const gchar *title, GCallback destroy )
 {
   GtkWidget *dialog = gtk_dialog_new();
   if( title ) gtk_window_set_title( GTK_WINDOW( dialog ), title );
+  /* TODO: allow to keep the dialog after closing for gtk_dialog_run() */
   g_signal_connect( G_OBJECT( dialog ), "delete-event",
 		    destroy ? destroy : DEFAULT_DESTROY, NULL );
   if( destroy == NULL ) gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );

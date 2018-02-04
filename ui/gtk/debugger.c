@@ -775,9 +775,9 @@ static int
 create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group )
 {
   static const gtkstock_button
-    step  = { "Single step", G_CALLBACK( gtkui_debugger_done_step ), NULL, NULL, 0, 0, 0, 0 },
-    cont  = { "Continue", G_CALLBACK( gtkui_debugger_done_continue ), NULL, NULL, 0, 0, 0, 0 },
-    brk   = { "Break", G_CALLBACK( gtkui_debugger_break ), NULL, NULL, 0, 0, 0, 0 };
+    step  = { "Single step", G_CALLBACK( gtkui_debugger_done_step ), NULL, NULL, 0, 0, 0, 0, GTK_RESPONSE_NONE },
+    cont  = { "Continue", G_CALLBACK( gtkui_debugger_done_continue ), NULL, NULL, 0, 0, 0, 0, GTK_RESPONSE_NONE },
+    brk   = { "Break", G_CALLBACK( gtkui_debugger_break ), NULL, NULL, 0, 0, 0, 0, GTK_RESPONSE_NONE };
 
   /* Create the action buttons for the dialog box */
   gtkstock_create_button( GTK_WIDGET( parent ), accel_group, &step );
