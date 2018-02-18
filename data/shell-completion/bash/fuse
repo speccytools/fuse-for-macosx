@@ -158,7 +158,8 @@ _fuse()
         --joystick-[12]-output|--joystick-keyboard-down| \
         --joystick-keyboard-fire|--joystick-keyboard-left| \
         --joystick-keyboard-output|--joystick-keyboard-right| \
-        --joystick-keyboard-up|--mdr-len|--rate|--snet|--sound-device|-d| \
+        --joystick-keyboard-up|--mdr-len|--phantom-typist-mode|--rate| \
+        --sdl-fullscreen-mode|--snet|--sound-device|-d| \
         --sound-freq|-f|--speccyboot-tap|--speed|--svga-modes|--volume-ay| \
         --volume-beeper|--volume-covox|--volume-specdrum)
             # argument required but no completions available
@@ -234,8 +235,8 @@ _fuse()
             --no-strict-aspect-hint --no-traps --no-unittests --no-usource
             --no-writable-roms --no-zxatasp --no-zxatasp-upload
             --no-zxatasp-write-protect --no-zxcf --no-zxcf-upload --no-zxmmc
-            --no-zxprinter --opus --opusdisk --pal-tv2x --playback
-            --plus3-detect-speedlock --plus3disk --plusd --plusddisk
+            --no-zxprinter --opus --opusdisk --pal-tv2x --phantom-typist-mode
+            --playback --plus3-detect-speedlock --plus3disk --plusd --plusddisk
             --printer --rate --raw-s-net --record --recreated-spectrum
             --rom-128-0 --rom-128-1
             --rom-16 --rom-48 --rom-beta128 --rom-didaktik80 --rom-disciple
@@ -253,8 +254,8 @@ _fuse()
             --rom-speccyboot --rom-spec-se-0 --rom-spec-se-1
             --rom-tc2048 --rom-tc2068-0 --rom-tc2068-1 --rom-ts2068-0
             --rom-ts2068-1 --rom-usource --rs232-handshake --rs232-rx
-            --rs232-tx --rzx-autosaves --separation --simpleide
-            --simpleide-masterfile --simpleide-slavefile --slt
+            --rs232-tx --rzx-autosaves --sdl-fullscreen-mode --separation
+            --simpleide --simpleide-masterfile --simpleide-slavefile --slt
             --snapshot --snet --sound --sound-device --sound-force-8bit
             --sound-freq --speaker-type --speccyboot --speccyboot-tap
             --specdrum --spectranet --spectranet-disable --speed
