@@ -300,15 +300,14 @@ utils_find_file_path( const char *filename, char *ret_path,
   init_path_context( &ctx, type );
 
   while( compat_get_next_path( &ctx ) ) {
-
+    int bytes_written;
 #ifdef AMIGA
-    snprintf( ret_path, PATH_MAX, "%s%s", ctx.path, filename );
+    bytes_written = snprintf( ret_path, PATH_MAX, "%s%s", ctx.path, filename );
 #else
-    snprintf( ret_path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path,
-              filename );
+    bytes_written = snprintf( ret_path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s",
+        ctx.path, filename );
 #endif
-    if( compat_file_exists(ret_path) ) return 0;
-
+    if( bytes_written < PATH_MAX && compat_file_exists(ret_path) ) return 0;
   }
 
   return 1;
