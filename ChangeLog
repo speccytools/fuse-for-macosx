@@ -1,5 +1,7 @@
 2018-02-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
+        * Fuse 1.5.1 released.
+
         * Debugger improvements:
           * Prevent crash when we try to disassemble an instruction with many
             DD or FD prefixes (Philip Kendall; thanks, Miguel Angel Rodríguez
