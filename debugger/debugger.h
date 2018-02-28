@@ -94,4 +94,7 @@ void debugger_system_variable_register(
   debugger_get_system_variable_fn_t get,
   debugger_set_system_variable_fn_t set );
 
+/* Unit tests */
+int debugger_disassemble_unittest( void );
+
 #endif				/* #ifndef FUSE_DEBUGGER_H */

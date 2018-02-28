@@ -31,7 +31,6 @@ install-win32: all
 	cp $(top_srcdir)/roms/README.copyright $(DESTDIR)/roms
 	cp $(top_srcdir)/lib/*.bmp $(DESTDIR)/lib
 	cp $(top_srcdir)/lib/*.scr $(DESTDIR)/lib
-	cp $(top_builddir)/lib/*.szx $(DESTDIR)/lib
 	test "$(UI)" != "sdl" || cp $(top_builddir)/ui/widget/fuse.font $(DESTDIR)/ui/widget
 #	Copy fuse executable (we should manually copy the required libraries)
 	cp $(top_builddir)/.libs/fuse$(EXEEXT) $(DESTDIR) || \

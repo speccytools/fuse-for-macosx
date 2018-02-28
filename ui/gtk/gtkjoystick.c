@@ -229,6 +229,8 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( joystick_done ),
                              &info, DEFAULT_DESTROY, DEFAULT_DESTROY );
 
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog ), GTK_RESPONSE_OK );
+
   gtk_widget_show_all( dialog );
   gtk_main();
 

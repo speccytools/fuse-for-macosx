@@ -210,6 +210,7 @@ aspect_hint, boolean, 1
 strict_aspect_hint, boolean, 0
 fb_mode, numeric, 320,, 'v', fbmode
 svga_modes, string, NULL
+sdl_fullscreen_mode, string, NULL
 doublescan_mode, numeric, 1,, 'D', doublescan-mode
 
 start_scaler_mode, string, "normal",, 'g', graphics-filter
