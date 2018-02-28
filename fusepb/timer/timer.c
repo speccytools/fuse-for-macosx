@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2008 Philip Kendall, Marek Januszewski, Fredrick Meunier
+   Copyright (c) 1999-2017 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    $Id$
 
@@ -27,6 +27,7 @@
 
 #include "event.h"
 #include "infrastructure/startup_manager.h"
+#include "phantom_typist.h"
 #include "settings.h"
 #include "sound.h"
 #include "tape.h"
@@ -132,6 +133,30 @@ timer_register_startup( void )
   startup_manager_register( STARTUP_MANAGER_MODULE_TIMER, dependencies,
                             ARRAY_SIZE( dependencies ), timer_init, NULL,
                             timer_end );
+}
+
+void
+timer_start_fastloading( void )
+{
+  /* If we're fastloading, turn sound off */
+  if( settings_current.fastload ) sound_pause();
+}
+
+void
+timer_stop_fastloading( void )
+{
+  /* If we were fastloading, sound was off, so turn it back on, and
+     reset the speed counter */
+  if( settings_current.fastload ) {
+    sound_unpause();
+    timer_estimate_reset();
+  }
+}
+
+int
+fastloading_active( void )
+{
+  return tape_is_playing() || phantom_typist_is_active();
 }
 
 static void

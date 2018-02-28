@@ -168,7 +168,7 @@ static Emulator *instance = nil;
     }
   /* If we're fastloading, keep running frames until we have used up 95% of
      the timer interval */
-  } else if( settings_current.fastload && tape_is_playing() ) {
+  } else if( settings_current.fastload && fastloading_active() ) {
     int done = 0;
     CFTimeInterval startTime = CFAbsoluteTimeGetCurrent();
     while( !done ) {

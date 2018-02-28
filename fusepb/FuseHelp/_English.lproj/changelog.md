@@ -1,7 +1,18 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.4.0 of the Fuse emulator.
+description: This section describes the changes for version 1.5.0 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.0
+
+### Debugger improvements:
+* Ensure conditional timed breakpoints work correctly (Philip Kendall).
+
+### Miscellaneous improvements:
+* Autoload snapshots replaced by a "phantom typist" which types LOAD "" or
+  similar.
+* Alkatraz loaders (e.g. Cobra and Fairlight) are now accelerated (Philip
+  Kendall).
 
 ## What's new in Fuse for macOS 1.4.1
 

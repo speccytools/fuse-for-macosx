@@ -21,17 +21,6 @@
 		B6168CEC1F0BC50D008C99E6 /* multiface.c in Sources */ = {isa = PBXBuildFile; fileRef = B6168CEA1F0BC50D008C99E6 /* multiface.c */; };
 		B61700F4163EAF8D00142336 /* PokeMemory.xib in Resources */ = {isa = PBXBuildFile; fileRef = B61700F3163EAF8D00142336 /* PokeMemory.xib */; };
 		B61700F7163EAFC600142336 /* PokeMemoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = B61700F6163EAFC600142336 /* PokeMemoryController.m */; };
-		B61F459409121DF100C8096C /* disk_plus3.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F2076596C700DE7E81 /* disk_plus3.szx */; };
-		B61F459509121DF100C8096C /* tape_16.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F4076596FD00DE7E81 /* tape_16.szx */; };
-		B61F459609121DF100C8096C /* tape_48.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F60765971300DE7E81 /* tape_48.szx */; };
-		B61F459709121DF100C8096C /* tape_128.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F80765972E00DE7E81 /* tape_128.szx */; };
-		B61F459809121DF100C8096C /* tape_2048.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3FA0765974600DE7E81 /* tape_2048.szx */; };
-		B61F459909121DF100C8096C /* tape_2068.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3FC0765975C00DE7E81 /* tape_2068.szx */; };
-		B61F459A09121DF100C8096C /* tape_pentagon.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C402076597F200DE7E81 /* tape_pentagon.szx */; };
-		B61F459B09121DF100C8096C /* tape_plus2.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C4040765981300DE7E81 /* tape_plus2.szx */; };
-		B61F459C09121DF100C8096C /* tape_plus3.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C4080765986A00DE7E81 /* tape_plus3.szx */; };
-		B61F459D09121DF100C8096C /* tape_plus2a.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C4060765984000DE7E81 /* tape_plus2a.szx */; };
-		B61F459F09121DF100C8096C /* tape_scorpion.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C40A0765988200DE7E81 /* tape_scorpion.szx */; };
 		B61F45FF09121DF100C8096C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		B61F460009121DF100C8096C /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = F5F291060396932B01730B00 /* Credits.html */; };
 		B61F460C09121DF100C8096C /* 48.rom in Resources */ = {isa = PBXBuildFile; fileRef = F559854C0389212301A804BA /* 48.rom */; };
@@ -183,6 +172,7 @@
 		B665EE281052A53C00FCFED8 /* SavePanelAccessoryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B665EE271052A53C00FCFED8 /* SavePanelAccessoryView.xib */; };
 		B665FD490DD25D8900D21C79 /* upd_fdc.c in Sources */ = {isa = PBXBuildFile; fileRef = B665FD470DD25D8900D21C79 /* upd_fdc.c */; };
 		B66E04720CEDBAF400A647DC /* pentagon512.c in Sources */ = {isa = PBXBuildFile; fileRef = B66E04710CEDBAF400A647DC /* pentagon512.c */; };
+		B6772EF71FDFECC1002B4AAD /* phantom_typist.c in Sources */ = {isa = PBXBuildFile; fileRef = B6772EF61FDFECC1002B4AAD /* phantom_typist.c */; };
 		B67DC2190B63835100FA31B6 /* cocoastatusbar.m in Sources */ = {isa = PBXBuildFile; fileRef = B67DC2180B63835100FA31B6 /* cocoastatusbar.m */; };
 		B6825549091817F30014B5EE /* divide.c in Sources */ = {isa = PBXBuildFile; fileRef = B6825547091817F30014B5EE /* divide.c */; };
 		B684A19A0E93A88200A5B097 /* mempool.c in Sources */ = {isa = PBXBuildFile; fileRef = B684A1960E93A88200A5B097 /* mempool.c */; };
@@ -211,7 +201,6 @@
 		B6B076B30B59FE9A00D4F95C /* Emulator.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B076B10B59FE9A00D4F95C /* Emulator.m */; };
 		B6B274061672AC8C00FC209B /* paths.c in Sources */ = {isa = PBXBuildFile; fileRef = B6B274051672AC8C00FC209B /* paths.c */; };
 		B6B99F8A0B5F798700EE408F /* cocoadisplay.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B99F890B5F798700EE408F /* cocoadisplay.m */; };
-		B6BDE2D3125DF48000B81C58 /* tape_48_ntsc.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6BDE2D2125DF48000B81C58 /* tape_48_ntsc.szx */; };
 		B6BDE2DB125DF4A800B81C58 /* spec48_ntsc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6BDE2DA125DF4A800B81C58 /* spec48_ntsc.c */; };
 		B6CA27A70C2CDBC500F06FB3 /* dirty.c in Sources */ = {isa = PBXBuildFile; fileRef = B6CA27A50C2CDBC500F06FB3 /* dirty.c */; };
 		B6CA2A230C33F84A0003CF90 /* module.c in Sources */ = {isa = PBXBuildFile; fileRef = B6CA2A210C33F8490003CF90 /* module.c */; };
@@ -288,9 +277,6 @@
 		B6E1F1AD14F653FB00600EB0 /* specdrum.c in Sources */ = {isa = PBXBuildFile; fileRef = B6E1F1A914F653FB00600EB0 /* specdrum.c */; };
 		B6E1F1B114F6555400600EB0 /* disciple.c in Sources */ = {isa = PBXBuildFile; fileRef = B6E1F1AF14F6555400600EB0 /* disciple.c */; };
 		B6E1F26E14F85BD500600EB0 /* speccyboot-1.4.rom in Resources */ = {isa = PBXBuildFile; fileRef = B6E1F26D14F85BD500600EB0 /* speccyboot-1.4.rom */; };
-		B6F047F60952A6D6006D8005 /* tape_se.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6F047F20952A6BA006D8005 /* tape_se.szx */; };
-		B6F047F70952A6D6006D8005 /* tape_ts2068.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6F047F30952A6BA006D8005 /* tape_ts2068.szx */; };
-		B6F047F80952A6E3006D8005 /* tape_plus3e.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6F047F00952A69A006D8005 /* tape_plus3e.szx */; };
 		B6F0480F0952B597006D8005 /* dck.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F0480E0952B597006D8005 /* dck.icns */; };
 		B6F048110952B5AE006D8005 /* mdr.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F048100952B5AD006D8005 /* mdr.icns */; };
 		B6F048130952B5C1006D8005 /* scl.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F048120952B5C1006D8005 /* scl.icns */; };
@@ -368,21 +354,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				B61F459409121DF100C8096C /* disk_plus3.szx in CopyFiles */,
-				B61F459509121DF100C8096C /* tape_16.szx in CopyFiles */,
-				B6BDE2D3125DF48000B81C58 /* tape_48_ntsc.szx in CopyFiles */,
-				B61F459609121DF100C8096C /* tape_48.szx in CopyFiles */,
-				B61F459709121DF100C8096C /* tape_128.szx in CopyFiles */,
-				B61F459809121DF100C8096C /* tape_2048.szx in CopyFiles */,
-				B61F459909121DF100C8096C /* tape_2068.szx in CopyFiles */,
-				B61F459A09121DF100C8096C /* tape_pentagon.szx in CopyFiles */,
-				B61F459B09121DF100C8096C /* tape_plus2.szx in CopyFiles */,
-				B61F459C09121DF100C8096C /* tape_plus3.szx in CopyFiles */,
-				B61F459D09121DF100C8096C /* tape_plus2a.szx in CopyFiles */,
-				B6F047F80952A6E3006D8005 /* tape_plus3e.szx in CopyFiles */,
-				B61F459F09121DF100C8096C /* tape_scorpion.szx in CopyFiles */,
-				B6F047F60952A6D6006D8005 /* tape_se.szx in CopyFiles */,
-				B6F047F70952A6D6006D8005 /* tape_ts2068.szx in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,17 +468,6 @@
 		B650986B09366C8F003AF1BF /* rom.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = rom.icns; path = resources/rom.icns; sourceTree = SOURCE_ROOT; };
 		B650986C09366C8F003AF1BF /* rzx.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = rzx.icns; path = resources/rzx.icns; sourceTree = SOURCE_ROOT; };
 		B650987009366CA2003AF1BF /* szx.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = szx.icns; path = resources/szx.icns; sourceTree = SOURCE_ROOT; };
-		B650C3F2076596C700DE7E81 /* disk_plus3.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = disk_plus3.szx; path = ../lib/compressed/disk_plus3.szx; sourceTree = SOURCE_ROOT; };
-		B650C3F4076596FD00DE7E81 /* tape_16.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_16.szx; path = ../lib/compressed/tape_16.szx; sourceTree = SOURCE_ROOT; };
-		B650C3F60765971300DE7E81 /* tape_48.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_48.szx; path = ../lib/compressed/tape_48.szx; sourceTree = SOURCE_ROOT; };
-		B650C3F80765972E00DE7E81 /* tape_128.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_128.szx; path = ../lib/compressed/tape_128.szx; sourceTree = SOURCE_ROOT; };
-		B650C3FA0765974600DE7E81 /* tape_2048.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_2048.szx; path = ../lib/compressed/tape_2048.szx; sourceTree = SOURCE_ROOT; };
-		B650C3FC0765975C00DE7E81 /* tape_2068.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_2068.szx; path = ../lib/compressed/tape_2068.szx; sourceTree = SOURCE_ROOT; };
-		B650C402076597F200DE7E81 /* tape_pentagon.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_pentagon.szx; path = ../lib/compressed/tape_pentagon.szx; sourceTree = SOURCE_ROOT; };
-		B650C4040765981300DE7E81 /* tape_plus2.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_plus2.szx; path = ../lib/compressed/tape_plus2.szx; sourceTree = SOURCE_ROOT; };
-		B650C4060765984000DE7E81 /* tape_plus2a.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_plus2a.szx; path = ../lib/compressed/tape_plus2a.szx; sourceTree = SOURCE_ROOT; };
-		B650C4080765986A00DE7E81 /* tape_plus3.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_plus3.szx; path = ../lib/compressed/tape_plus3.szx; sourceTree = SOURCE_ROOT; };
-		B650C40A0765988200DE7E81 /* tape_scorpion.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_scorpion.szx; path = ../lib/compressed/tape_scorpion.szx; sourceTree = SOURCE_ROOT; };
 		B650F73E07E7CD3F00E4F3AF /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PreferencesController.h; path = controllers/PreferencesController.h; sourceTree = SOURCE_ROOT; };
 		B650F73F07E7CD3F00E4F3AF /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PreferencesController.m; path = controllers/PreferencesController.m; sourceTree = SOURCE_ROOT; };
 		B65352BD0B89B8AA0083F942 /* SDL_joystick.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SDL_joystick.h; sourceTree = "<group>"; };
@@ -544,6 +504,8 @@
 		B66E04710CEDBAF400A647DC /* pentagon512.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = pentagon512.c; sourceTree = "<group>"; };
 		B66EA7830401075300A864FD /* FuseMenus.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FuseMenus.h; sourceTree = SOURCE_ROOT; };
 		B66EA7840401075300A864FD /* FuseMenus.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = FuseMenus.m; sourceTree = SOURCE_ROOT; };
+		B6772EF51FDFECC1002B4AAD /* phantom_typist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = phantom_typist.h; sourceTree = "<group>"; };
+		B6772EF61FDFECC1002B4AAD /* phantom_typist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = phantom_typist.c; sourceTree = "<group>"; };
 		B678E4060608FB4300678A33 /* spec_se.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = spec_se.c; sourceTree = "<group>"; };
 		B67DC2180B63835100FA31B6 /* cocoastatusbar.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = cocoastatusbar.m; sourceTree = "<group>"; };
 		B67F3C1407ED1C9D0045339F /* ScalerNameToIdTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ScalerNameToIdTransformer.h; path = transformers/ScalerNameToIdTransformer.h; sourceTree = SOURCE_ROOT; };
@@ -619,7 +581,6 @@
 		B6B274051672AC8C00FC209B /* paths.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = paths.c; sourceTree = "<group>"; };
 		B6B99F890B5F798700EE408F /* cocoadisplay.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = cocoadisplay.m; sourceTree = "<group>"; };
 		B6BA1A9404E4F88F0017354F /* uijoystick.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = uijoystick.h; path = ../ui/uijoystick.h; sourceTree = SOURCE_ROOT; };
-		B6BDE2D2125DF48000B81C58 /* tape_48_ntsc.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_48_ntsc.szx; path = ../lib/compressed/tape_48_ntsc.szx; sourceTree = "<group>"; };
 		B6BDE2DA125DF4A800B81C58 /* spec48_ntsc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = spec48_ntsc.c; sourceTree = "<group>"; };
 		B6C3479F044B091100E1BBA7 /* ts2068.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ts2068.png; path = resources/ts2068.png; sourceTree = SOURCE_ROOT; };
 		B6C57E0005ECA05B0056F1D0 /* periph.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = periph.c; path = ../periph.c; sourceTree = SOURCE_ROOT; };
@@ -746,9 +707,6 @@
 		B6E811F4084B5148008CF718 /* ide.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ide.c; sourceTree = "<group>"; };
 		B6E811F5084B5148008CF718 /* ide.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ide.h; sourceTree = "<group>"; };
 		B6EEA76F03CEF1D500FE73F2 /* spec16.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = spec16.c; sourceTree = "<group>"; };
-		B6F047F00952A69A006D8005 /* tape_plus3e.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_plus3e.szx; path = ../lib/compressed/tape_plus3e.szx; sourceTree = SOURCE_ROOT; };
-		B6F047F20952A6BA006D8005 /* tape_se.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_se.szx; path = ../lib/compressed/tape_se.szx; sourceTree = SOURCE_ROOT; };
-		B6F047F30952A6BA006D8005 /* tape_ts2068.szx */ = {isa = PBXFileReference; lastKnownFileType = file; name = tape_ts2068.szx; path = ../lib/compressed/tape_ts2068.szx; sourceTree = SOURCE_ROOT; };
 		B6F0480E0952B597006D8005 /* dck.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = dck.icns; path = resources/dck.icns; sourceTree = SOURCE_ROOT; };
 		B6F048100952B5AD006D8005 /* mdr.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = mdr.icns; path = resources/mdr.icns; sourceTree = SOURCE_ROOT; };
 		B6F048120952B5C1006D8005 /* scl.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = scl.icns; path = resources/scl.icns; sourceTree = SOURCE_ROOT; };
@@ -966,7 +924,6 @@
 				B61EEB950D1A917D006FEA80 /* FuseGenerator.qlgenerator */,
 				B64FEA96084F8EC300879389 /* FuseImporter.mdimporter */,
 				B643BB8C0403A0D300A864FD /* resources */,
-				F559854B0389210301A804BA /* snaps */,
 				F559854A038920FD01A804BA /* roms */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				F56B6A6203A628A901CA65B5 /* 48k.png */,
@@ -1519,28 +1476,6 @@
 			name = roms;
 			sourceTree = "<group>";
 		};
-		F559854B0389210301A804BA /* snaps */ = {
-			isa = PBXGroup;
-			children = (
-				B650C3F2076596C700DE7E81 /* disk_plus3.szx */,
-				B650C3F4076596FD00DE7E81 /* tape_16.szx */,
-				B6BDE2D2125DF48000B81C58 /* tape_48_ntsc.szx */,
-				B650C3F60765971300DE7E81 /* tape_48.szx */,
-				B650C3F80765972E00DE7E81 /* tape_128.szx */,
-				B650C3FA0765974600DE7E81 /* tape_2048.szx */,
-				B650C3FC0765975C00DE7E81 /* tape_2068.szx */,
-				B650C402076597F200DE7E81 /* tape_pentagon.szx */,
-				B650C4040765981300DE7E81 /* tape_plus2.szx */,
-				B650C4080765986A00DE7E81 /* tape_plus3.szx */,
-				B650C4060765984000DE7E81 /* tape_plus2a.szx */,
-				B6F047F00952A69A006D8005 /* tape_plus3e.szx */,
-				B650C40A0765988200DE7E81 /* tape_scorpion.szx */,
-				B6F047F20952A6BA006D8005 /* tape_se.szx */,
-				B6F047F30952A6BA006D8005 /* tape_ts2068.szx */,
-			);
-			name = snaps;
-			sourceTree = "<group>";
-		};
 		F559859A038921CA01A804BA /* ui */ = {
 			isa = PBXGroup;
 			children = (
@@ -1600,6 +1535,8 @@
 				B64BD1280FF701AA000B82AE /* options.h */,
 				B6C57E0005ECA05B0056F1D0 /* periph.c */,
 				B6C57E0105ECA05B0056F1D0 /* periph.h */,
+				B6772EF61FDFECC1002B4AAD /* phantom_typist.c */,
+				B6772EF51FDFECC1002B4AAD /* phantom_typist.h */,
 				B6E811F0084B5117008CF718 /* profile.c */,
 				B6E811F1084B5117008CF718 /* profile.h */,
 				B6CA304C049CEC410037E9F2 /* psg.c */,
@@ -1879,6 +1816,7 @@
 				B61F465B09121DF100C8096C /* commandy.y in Sources */,
 				B61F465A09121DF100C8096C /* commandl.l in Sources */,
 				B61F465C09121DF100C8096C /* debugger.c in Sources */,
+				B6772EF71FDFECC1002B4AAD /* phantom_typist.c in Sources */,
 				B61F465D09121DF100C8096C /* disassemble.c in Sources */,
 				B61F466009121DF100C8096C /* DebuggerController.m in Sources */,
 				B61F466209121DF100C8096C /* FuseMenus.m in Sources */,
