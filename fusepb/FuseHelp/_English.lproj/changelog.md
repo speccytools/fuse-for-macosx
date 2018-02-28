@@ -1,7 +1,18 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.5.0 of the Fuse emulator.
+description: This section describes the changes for version 1.5.1 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.1
+
+### Debugger improvements:
+* Prevent crash when we try to disassemble an instruction with many DD or FD
+  prefixes (Philip Kendall; thanks, Miguel Angel Rodríguez Jódar).
+* Fix crash when setting debugger variables (Gergely Szasz).
+
+### Profiler improvements:
+* Prevent crash when we try to profile an instruction with many DD or FD
+  prefixes (Philip Kendall; thanks, Sergio Baldoví).
 
 ## What's new in Fuse for macOS 1.5.0
 
