@@ -1,3 +1,11 @@
+2018-03-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.? released.
+
+        * Miscellaneous improvements:
+          * Spectrum reset is accelerated when phantom typist is enabled and a
+          file is loaded from the menu (Fredrick Meunier).
+
 2018-02-25  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.1 released.

@@ -36,6 +36,7 @@
 #include "settings.h"
 #include "sound.h"
 #include "tape.h"
+#include "timer/timer.h"
 #include "ui/ui.h"
 #include "sound/blipbuffer.h"
 
@@ -341,7 +342,7 @@ void
 sound_unpause( void )
 {
   /* No sound if fastloading in progress */
-  if( settings_current.fastload && tape_is_playing() )
+  if( settings_current.fastload && timer_fastloading_active() )
     return;
 
   sound_init( settings_current.sound_device );

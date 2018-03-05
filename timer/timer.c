@@ -193,8 +193,8 @@ timer_stop_fastloading( void )
   }
 }
 
-static int
-fastloading_active( void )
+int
+timer_fastloading_active( void )
 {
   return tape_is_playing() || phantom_typist_is_active();
 }
@@ -213,7 +213,7 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
 
   /* If we're fastloading, just schedule another check in a frame's time
      and do nothing else */
-  if( settings_current.fastload && fastloading_active() ) {
+  if( settings_current.fastload && timer_fastloading_active() ) {
 
     libspectrum_dword next_check_time =
       last_tstates + machine_current->timings.tstates_per_frame;
