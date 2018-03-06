@@ -105,6 +105,11 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(dirname geteuid getopt_long fsync)
 AC_CHECK_LIB([m],[cos])
 
+AX_STRING_STRCASECMP
+if test x"$ac_cv_string_strcasecmp" = "xno" ; then
+  AX_STRINGS_STRCASECMP
+fi
+
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,
 [  --with-local-prefix=PFX local libraries installed in PFX (optional)],

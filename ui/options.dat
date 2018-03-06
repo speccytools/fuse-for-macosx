@@ -25,6 +25,7 @@ Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
 media
 Media Options
 Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
+Combo, (P)hantom typist mode, phantom_typist_mode, INPUT_KEY_p, *Auto|Keyword|Keystroke|Menu|Plus 2A|Plus 3
 Checkbox, (D)etect loaders, detect_loader, INPUT_KEY_d
 Checkbox, (F)astloading, fastload, INPUT_KEY_f
 Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t

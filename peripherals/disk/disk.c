@@ -24,6 +24,9 @@
 #include <config.h>
 
 #include <string.h>
+#ifdef HAVE_STRINGS_STRCASECMP
+#include <strings.h>
+#endif      /* #ifdef HAVE_STRINGS_STRCASECMP */
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
