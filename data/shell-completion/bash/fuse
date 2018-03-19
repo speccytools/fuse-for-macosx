@@ -32,6 +32,12 @@ _fuse_drive_type()
     COMPREPLY=( $( IFS='|' compgen -W 'Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track' -- "$cur" ) )
 }
 
+_fuse_phantom_typist()
+{
+    local IFS=$'\n'
+    COMPREPLY=( $( IFS='|' compgen -W 'Auto|Keyword|Keystroke|Menu|Plus 2A|Plus 3' -- "$cur" ) )
+}
+
 _fuse_speaker_type()
 {
     local IFS=$'\n'
@@ -117,6 +123,10 @@ _fuse()
             _filedir '@(fmf|FMF)'
             return 0
             ;;
+        --phantom-typist-mode)
+            _fuse_phantom_typist
+            return 0
+            ;;
         --playback|-p|--record|-r)
             _filedir '@(rzx|RZX)'
             return 0
@@ -158,7 +168,7 @@ _fuse()
         --joystick-[12]-output|--joystick-keyboard-down| \
         --joystick-keyboard-fire|--joystick-keyboard-left| \
         --joystick-keyboard-output|--joystick-keyboard-right| \
-        --joystick-keyboard-up|--mdr-len|--phantom-typist-mode|--rate| \
+        --joystick-keyboard-up|--mdr-len|--rate| \
         --sdl-fullscreen-mode|--snet|--sound-device|-d| \
         --sound-freq|-f|--speccyboot-tap|--speed|--svga-modes|--volume-ay| \
         --volume-beeper|--volume-covox|--volume-specdrum)
