@@ -2,6 +2,10 @@
 
         * Fuse 1.5.? released.
 
+        * Emulation core improvements:
+          * Emulate ROM bug loading zero length blocks when using tape traps
+            (ub880d).
+
         * Miscellaneous improvements:
           * Spectrum reset is accelerated when phantom typist is enabled and a
             file is loaded from the menu (Fredrick Meunier).

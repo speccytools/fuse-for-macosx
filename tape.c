@@ -491,11 +491,21 @@ trap_load_block( libspectrum_tape_block *block )
 
   verify =  !(F_ & FLAG_C);
   i = A_; /* i = A' (flag byte) */
-  AF_ = 0x0145;
   A = 0;
 
   /* Initialise the parity check and L to the block ID byte */
   L = parity = *data++;
+
+  /* emulate zero length block rom bug */
+  if (!DE) {
+    i = 0; /* one byte was read, but it is not treated as data byte */
+    B = 0xB0; /* B is set to 0xB0 at the end of LD-8-BITS/0x05CA loop */
+    A = parity; /* rom 0x05DF */
+    CP( 1 ); /* parity check is successful if A==0 */
+    goto common_ret;
+  }
+
+  AF_ = 0x0145;
 
   /* If the block ID byte != the flag byte, clear carry and return */
   if( parity != i )
@@ -538,6 +548,7 @@ error_ret:
     F &= ~FLAG_C;
   }
 
+common_ret:
   /* At this point, AF, AF', B and L are already modified */
   C = 1;
   H = parity;
