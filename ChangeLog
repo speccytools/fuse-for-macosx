@@ -10,6 +10,8 @@
           * Spectrum reset is accelerated when phantom typist is enabled and a
             file is loaded from the menu (Fredrick Meunier).
           * Add options UI for phantom typist (Fredrick Meunier).
+          * GTK+ 3 UI: Memory browser dialog allows to go to specific offset
+            (Sergio Baldoví).
 
 2018-02-25  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
