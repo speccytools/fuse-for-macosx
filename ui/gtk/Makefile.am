@@ -47,7 +47,6 @@ ui_gtk_files = \
                ui/gtk/gtkmouse.c \
                ui/gtk/gtkui.c \
                ui/gtk/keysyms.c \
-               ui/gtk/memory.c \
                ui/gtk/menu_data.c \
                ui/gtk/options.c \
                ui/gtk/picture.c \
@@ -60,7 +59,14 @@ ui_gtk_files = \
                ui/gtk/stock.c
 
 if HAVE_GTK2
-ui_gtk_files += ui/gtk/gtkcompat.c
+
+ui_gtk_files += ui/gtk/gtkcompat.c \
+                ui/gtk/memory_gtk2.c
+
+else
+
+ui_gtk_files += ui/gtk/memory.c
+
 endif
 
 ui_gtk_built = \
