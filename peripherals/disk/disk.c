@@ -796,12 +796,24 @@ int disk_preformat( disk_t *d )
 
   buffer.file.length = 0;
   buffer.index = 0;
+
+  if( d->sides == 2 ) {
+    if( trackgen( d, &buffer, 1, 0, 0xff, 1, 128,
+                  NO_PREINDEX, GAP_MINIMAL_MFM, NO_INTERLEAVE, 0xff ) )
+    return DISK_GEOM;
+
+    if( trackgen( d, &buffer, 1, 2, 0xfe, 1, 128,
+                  NO_PREINDEX, GAP_MINIMAL_MFM, NO_INTERLEAVE, 0xff ) )
+    return DISK_GEOM;
+  }
+
   if( trackgen( d, &buffer, 0, 0, 0xff, 1, 128,
 		      NO_PREINDEX, GAP_MINIMAL_MFM, NO_INTERLEAVE, 0xff ) )
     return DISK_GEOM;
   if( trackgen( d, &buffer, 0, 2, 0xfe, 1, 128,
 		      NO_PREINDEX, GAP_MINIMAL_MFM, NO_INTERLEAVE, 0xff ) )
     return DISK_GEOM;
+
   return DISK_OK;
 }
 
