@@ -1,6 +1,6 @@
 2018-03-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-        * Fuse 1.5.? released.
+        * Fuse 1.5.2 released.
 
         * Emulation core improvements:
           * Emulate ROM bug loading zero length blocks when using tape traps
