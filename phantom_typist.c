@@ -22,6 +22,9 @@
 */
 
 #include <string.h>
+#ifdef HAVE_STRINGS_STRCASECMP
+#include <strings.h>
+#endif      /* #ifdef HAVE_STRINGS_STRCASECMP */
 
 #include <config.h>
 
@@ -294,17 +297,19 @@ phantom_typist_activate( libspectrum_machine machine, int needs_code )
   phantom_typist_highlevel_mode_t highlevel_mode;
   const char *setting = settings_current.phantom_typist_mode;
 
-  if( strcmp( setting, "keyword" ) == 0 ) {
+  if( strcasecmp( setting, "Keyword" ) == 0 ) {
     highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD;
-  } else if( strcmp( setting, "keystroke" ) == 0) {
+  } else if( strcasecmp( setting, "Keystroke" ) == 0) {
     highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYSTROKE;
-  } else if( strcmp( setting, "menu" ) == 0) {
+  } else if( strcasecmp( setting, "Menu" ) == 0) {
     highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_MENU;
-  } else if( strcmp( setting, "plus2a" ) == 0) {
+  } else if( strcasecmp( setting, "Plus 2A" ) == 0 ||
+             strcasecmp( setting, "plus2a" ) == 0) {
     highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS2A;
-  } else if( strcmp( setting, "plus3" ) == 0) {
+  } else if( strcasecmp( setting, "Plus 3" ) == 0 ||
+             strcasecmp( setting, "plus3" ) == 0) {
     highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_PLUS3;
-  } else if( strcmp( setting, "auto" ) == 0) {
+  } else if( strcasecmp( setting, "Auto" ) == 0) {
     highlevel_mode = get_highlevel_mode( machine );
   } else {
     highlevel_mode = PHANTOM_TYPIST_HIGHLEVEL_MODE_KEYWORD;

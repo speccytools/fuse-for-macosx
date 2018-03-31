@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "25th February, 2018" "Version 1.5.1" "Emulators"
+.TH fuse 1 "27th March, 2018" "Version 1.5.2" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -988,26 +988,16 @@ option.
 .I mode
 .RS
 Specify the keystroke sequence that the "phantom typist" should use when
-starting a program loading. Available options are
-.I auto
-(the default),
-.IR keyword ,
-.IR keystroke ,
-.IR menu ,
-.IR plus2a
-and
-.IR plus3 .
-The first four of these correspond to automatic detection based on machine
-model, keyword based entry, keystroke based entry, and selection from a 128K
-style menu.
-.I plus2a
-and
-.I plus3
-also correspond to selection from a 128K style menu, but have special handling
-for games which need to be loaded with `LOAD ""CODE'. The most likely use for
-this option will be use
-.I keystroke
-if you have changed the default 48K ROM for one with keystroke entry.
+starting a program loading. The available options are
+.IR "Auto" ,
+.IR "Keyword" ,
+.IR "Keystroke" ,
+.IR "Menu" ,
+.IR "Plus 2A" " and"
+.IR "Plus 3" .
+The same as the Media Options dialog's
+.I "Phantom typist mode"
+option.
 .RE
 .PP
 .B \-p
@@ -2442,6 +2432,38 @@ routine is in progress, and then automatically start the virtual tape
 to load the program in. This is done by using a heuristic to identify
 a loading routine, so is by no means infallible, but works in most
 cases.
+.RE
+.PP
+.I "Phantom typist mode"
+.RS
+Specify the keystroke sequence that the "phantom typist" should use when
+starting a program loading. Available options are
+.RS
+.PP
+.I Auto
+.PP
+.I Keyword
+.PP
+.I Keystroke
+.PP
+.I Menu
+.PP
+.I Plus 2A
+.PP
+.I Plus 3
+.RE
+.PP
+The first four of these correspond to automatic detection based on machine
+model, keyword based entry, keystroke based entry, and selection from a 128K
+style menu.
+.I Plus 2A
+and
+.I Plus 3
+also correspond to selection from a 128K style menu, but have special handling
+for games which need to be loaded with `LOAD ""CODE'. The most likely use for
+this option will be use
+.I Keystroke
+if you have changed the default 48K ROM for one with keystroke entry.
 .RE
 .PP
 .I "Fastloading"

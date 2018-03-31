@@ -88,7 +88,7 @@ spectranet_disable, boolean, 0
 usource, boolean, 0
 zxprinter, boolean, 1
 covox, boolean, 0
-phantom_typist_mode, string, "auto"
+phantom_typist_mode, string, "Auto"
 
 sound_device, string, NULL,, 'd'
 sound, boolean, 1

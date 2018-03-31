@@ -1,3 +1,21 @@
+2018-03-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.2 released.
+
+        * Emulation core improvements:
+          * Emulate ROM bug loading zero length blocks when using tape traps
+            (ub880d).
+
+        * Machine specific improvements:
+          * Fix the format of double-sided +3 disks (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Spectrum reset is accelerated when phantom typist is enabled and a
+            file is loaded from the menu (Fredrick Meunier).
+          * Add options UI for phantom typist (Fredrick Meunier).
+          * GTK+ 3 UI: Memory browser dialog allows to go to specific offset
+            (Sergio Baldoví).
+
 2018-02-25  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.1 released.

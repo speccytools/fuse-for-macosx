@@ -19,12 +19,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.5.1])
+m4_define([fuse_version], [1.5.2])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
 m4_define([fuse_minor_version], [5])
-m4_define([fuse_micro_version], [1])
+m4_define([fuse_micro_version], [2])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
@@ -104,6 +104,11 @@ AC_C_INLINE
 dnl Checks for library functions.
 AC_CHECK_FUNCS(dirname geteuid getopt_long fsync)
 AC_CHECK_LIB([m],[cos])
+
+AX_STRING_STRCASECMP
+if test x"$ac_cv_string_strcasecmp" = "xno" ; then
+  AX_STRINGS_STRCASECMP
+fi
 
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,
