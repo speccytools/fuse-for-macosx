@@ -13,9 +13,9 @@ description: This section describes the changes for version 1.5.2 of the Fuse em
 * Fix the format of double-sided +3 disks (Sergio Baldoví).
 
 ### Miscellaneous improvements:
-* Spectrum reset is accelerated when phantom typist is enabled and a
+* Spectrum reset is accelerated when auto-load is enabled and a
   file is loaded from the menu (Fredrick Meunier).
-* Add preferences for changing the auto-load tape mode (Fredrick Meunier).
+* Add preferences for changing the auto-load mode (Fredrick Meunier).
 
 ## What's new in Fuse for macOS 1.5.1
 
