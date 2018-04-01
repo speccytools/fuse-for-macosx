@@ -1,7 +1,21 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.5.1 of the Fuse emulator.
+description: This section describes the changes for version 1.5.2 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.2
+
+### Emulation core improvements:
+* Emulate ROM bug loading zero length blocks when using tape traps
+  (ub880d).
+
+### Machine specific improvements:
+* Fix the format of double-sided +3 disks (Sergio Baldoví).
+
+### Miscellaneous improvements:
+* Spectrum reset is accelerated when phantom typist is enabled and a
+  file is loaded from the menu (Fredrick Meunier).
+* Add preferences for changing the auto-load tape mode (Fredrick Meunier).
 
 ## What's new in Fuse for macOS 1.5.1
 

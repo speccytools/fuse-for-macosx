@@ -548,3 +548,9 @@ phantom_typist_frame( void )
     delay--;
   }
 }
+
+int
+auto_load_is_enabled( void )
+{
+  return strcasecmp( settings_current.phantom_typist_mode, "Disabled" );
+}

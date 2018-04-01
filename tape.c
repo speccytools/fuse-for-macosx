@@ -369,7 +369,7 @@ int tape_write( const char* filename )
 
 int tape_can_autoload( void )
 {
-  return( settings_current.auto_load && !memory_custom_rom() );
+  return( auto_load_is_enabled() && !memory_custom_rom() );
 }
 
 /* Load the next tape block into memory; returns 0 if a block was

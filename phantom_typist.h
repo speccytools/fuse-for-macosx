@@ -52,4 +52,8 @@ phantom_typist_is_active( void );
 void
 phantom_typist_frame( void );
 
+/* Returns non-zero if auto-load is enabled */
+int
+auto_load_is_enabled( void );
+
 #endif /* #ifndef FUSE_PHANTOM_TYPIST_H */

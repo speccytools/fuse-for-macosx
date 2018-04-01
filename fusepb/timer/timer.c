@@ -154,7 +154,7 @@ timer_stop_fastloading( void )
 }
 
 int
-fastloading_active( void )
+timer_fastloading_active( void )
 {
   return tape_is_playing() || phantom_typist_is_active();
 }

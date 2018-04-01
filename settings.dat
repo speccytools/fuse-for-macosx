@@ -38,7 +38,6 @@ kempston_mouse, boolean, 0
 mouse_swap_buttons, boolean, 0
 tape_traps, boolean, 1,,, traps, tapetraps
 fastload, boolean, 1
-auto_load, boolean, 1
 detect_loader, boolean, 1
 accelerate_loader, boolean, 1
 slt_traps, boolean, 1,,, slt, slttraps

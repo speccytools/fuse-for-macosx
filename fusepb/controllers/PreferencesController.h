@@ -55,6 +55,7 @@
   NSArray *soundStereoAY;
   NSArray *diskTryMerge;
   NSArray *movieCompression;
+  NSArray *phantomTypistMode;
 }
 + (void)initialize;
 
@@ -77,6 +78,7 @@
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)bar;
 - (void)setMassStorageType;
 - (void)setExternalSoundType;
+- (void)fixPhantomTypistMode;
 
 - (unsigned int)countOfMachineRoms;
 - (id)objectInMachineRomsAtIndex:(unsigned int)index;

@@ -36,6 +36,7 @@
 #include "bitmap.h"
 #include "crc.h"
 #include "disk.h"
+#include "phantom_typist.h"
 #include "settings.h"
 #include "trdos.h"
 #include "ui/ui.h"
@@ -1448,7 +1449,7 @@ open_trd( buffer_t *buffer, disk_t *d )
     }
   }
   
-  if( settings_current.auto_load ) {
+  if( auto_load_is_enabled() ) {
     position_context_save( d, &context );
     trdos_insert_boot_loader( d );
     position_context_restore( d, &context );
@@ -1869,7 +1870,7 @@ open_scl( buffer_t *buffer, disk_t *d )
       return d->status = DISK_OPEN;
   }
 
-  if( settings_current.auto_load ) {
+  if( auto_load_is_enabled() ) {
     position_context_save( d, &context );
     trdos_insert_boot_loader( d );
     position_context_restore( d, &context );

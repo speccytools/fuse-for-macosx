@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -104,93 +104,12 @@
             </connections>
             <point key="canvasLocation" x="-560" y="133.5"/>
         </window>
-        <customView id="1347" userLabel="General">
-            <rect key="frame" x="0.0" y="0.0" width="627" height="265"/>
+        <customView misplaced="YES" id="1347" userLabel="General">
+            <rect key="frame" x="0.0" y="0.0" width="576" height="299"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <button verticalHuggingPriority="750" id="931">
-                    <rect key="frame" x="461" y="12" width="152" height="32"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="push" title="Reset Preferences" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1266">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="resetUserDefaults:" target="-2" id="932"/>
-                    </connections>
-                </button>
-                <button id="1349">
-                    <rect key="frame" x="119" y="129" width="170" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Accelerate tape loaders" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1378">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.accelerateloader" id="1392"/>
-                    </connections>
-                </button>
-                <button id="1350">
-                    <rect key="frame" x="119" y="109" width="145" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Detect tape loaders" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1377">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.detectloader" id="1394"/>
-                    </connections>
-                </button>
-                <button id="1351">
-                    <rect key="frame" x="119" y="149" width="131" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Fast tape loading" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1376">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.fastload" id="1786"/>
-                    </connections>
-                </button>
-                <button id="1356">
-                    <rect key="frame" x="119" y="169" width="113" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Use tape traps" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1367">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                        <connections>
-                            <binding destination="270" name="value" keyPath="values.tapetraps" id="1385"/>
-                        </connections>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.tapetraps" id="1788"/>
-                        <outlet property="nextKeyView" destination="1358" id="1381"/>
-                    </connections>
-                </button>
-                <button id="1358">
-                    <rect key="frame" x="119" y="89" width="165" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Auto-load media" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1365">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.autoload" id="1395"/>
-                    </connections>
-                </button>
-                <button id="1359">
-                    <rect key="frame" x="119" y="69" width="168" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Show tape/disk status" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1364">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.statusbar" id="1397"/>
-                    </connections>
-                </button>
-                <button id="1360">
-                    <rect key="frame" x="293" y="169" width="131" height="18"/>
+                <button misplaced="YES" id="1360">
+                    <rect key="frame" x="322" y="204" width="131" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Issue 2 keyboard" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1363">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -200,8 +119,8 @@
                         <binding destination="270" name="value" keyPath="values.issue2" id="1401"/>
                     </connections>
                 </button>
-                <button id="1361">
-                    <rect key="frame" x="119" y="49" width="123" height="18"/>
+                <button misplaced="YES" id="1361">
+                    <rect key="frame" x="322" y="64" width="123" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Confirm actions" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1362">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -211,8 +130,8 @@
                         <binding destination="270" name="value" keyPath="values.confirmactions" id="1399"/>
                     </connections>
                 </button>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="NNe-bG-amc">
-                    <rect key="frame" x="167" y="230" width="112" height="17"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NNe-bG-amc">
+                    <rect key="frame" x="167" y="264" width="112" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Emulation speed:" id="BoH-kb-bUl">
                         <font key="font" metaFont="system"/>
@@ -220,8 +139,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="V1D-ym-CTs">
-                    <rect key="frame" x="119" y="196" width="160" height="17"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="V1D-ym-CTs">
+                    <rect key="frame" x="119" y="230" width="160" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Screen refresh rate (1:n):" id="69l-0C-1Jd">
                         <font key="font" metaFont="system"/>
@@ -229,8 +148,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="AQm-ut-oKC">
-                    <rect key="frame" x="285" y="228" width="116" height="22"/>
+                <textField verticalHuggingPriority="750" id="AQm-ut-oKC">
+                    <rect key="frame" x="285" y="262" width="116" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="8Rf-5o-m5G">
                         <numberFormatter key="formatter" formatterBehavior="10_0" positiveFormat="#,##0%" negativeFormat="-#,##0.00" thousandSeparator="," id="jTc-rQ-dSN" customClass="NumberFormatter">
@@ -245,8 +164,8 @@
                         <binding destination="270" name="value" keyPath="values.speed" id="zJq-NB-RjL"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="rJU-D7-OFM">
-                    <rect key="frame" x="285" y="194" width="116" height="22"/>
+                <textField verticalHuggingPriority="750" id="rJU-D7-OFM">
+                    <rect key="frame" x="285" y="228" width="116" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="5My-XZ-RQ4">
                         <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="F1O-A5-msN" customClass="NumberFormatter">
@@ -262,7 +181,7 @@
                     </connections>
                 </textField>
                 <button misplaced="YES" id="1348">
-                    <rect key="frame" x="293" y="149" width="151" height="18"/>
+                    <rect key="frame" x="322" y="184" width="151" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Late CPU timings" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1379">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -273,7 +192,7 @@
                     </connections>
                 </button>
                 <button misplaced="YES" id="Uch-Bs-QML">
-                    <rect key="frame" x="293" y="129" width="151" height="18"/>
+                    <rect key="frame" x="322" y="164" width="151" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Z80 is CMOS" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="qDh-Th-upD">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -284,7 +203,7 @@
                     </connections>
                 </button>
                 <button misplaced="YES" id="1354">
-                    <rect key="frame" x="293" y="109" width="151" height="18"/>
+                    <rect key="frame" x="322" y="144" width="151" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Allow writes to ROM" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1369">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -295,7 +214,7 @@
                     </connections>
                 </button>
                 <button misplaced="YES" id="1355">
-                    <rect key="frame" x="293" y="69" width="214" height="18"/>
+                    <rect key="frame" x="322" y="104" width="214" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Set joysticks on snapshot load" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1368">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -306,7 +225,7 @@
                     </connections>
                 </button>
                 <button misplaced="YES" id="1357">
-                    <rect key="frame" x="293" y="89" width="105" height="18"/>
+                    <rect key="frame" x="322" y="124" width="105" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Use .slt traps" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1366">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -317,13 +236,124 @@
                         <outlet property="nextKeyView" destination="1354" id="1380"/>
                     </connections>
                 </button>
+                <box misplaced="YES" title="Tape Loading Options" id="UR1-Rc-cJx">
+                    <rect key="frame" x="48" y="71" width="271" height="151"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <view key="contentView" id="sdM-R0-gFh">
+                        <rect key="frame" x="2" y="2" width="267" height="134"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="hJR-fH-Qpw">
+                                <rect key="frame" x="18" y="23" width="151" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Auto-load media" id="cjc-xp-DdZ">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button misplaced="YES" id="1349">
+                                <rect key="frame" x="18" y="66" width="170" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Accelerate tape loaders" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1378">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.accelerateloader" id="1392"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1350">
+                                <rect key="frame" x="18" y="46" width="145" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Detect tape loaders" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1377">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.detectloader" id="1394"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1351">
+                                <rect key="frame" x="18" y="86" width="131" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Fast tape loading" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1376">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.fastload" id="1786"/>
+                                </connections>
+                            </button>
+                            <button misplaced="YES" id="1356">
+                                <rect key="frame" x="18" y="106" width="113" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Use tape traps" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1367">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <binding destination="270" name="value" keyPath="values.tapetraps" id="1385"/>
+                                    </connections>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.tapetraps" id="1788"/>
+                                </connections>
+                            </button>
+                            <popUpButton verticalHuggingPriority="750" misplaced="YES" id="qsA-CP-uSF">
+                                <rect key="frame" x="128" y="17" width="123" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="kXT-IT-Koi" id="jVH-zL-7Bz">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="zfQ-Xb-Pbk">
+                                        <items>
+                                            <menuItem title="Item 1" state="on" id="kXT-IT-Koi"/>
+                                            <menuItem title="Item 2" id="CW7-HS-aLS"/>
+                                            <menuItem title="Item 3" id="DXa-B1-RPo"/>
+                                        </items>
+                                    </menu>
+                                    <connections>
+                                        <binding destination="EwE-p0-R91" name="contentValues" keyPath="arrangedObjects" id="EiI-FY-4VL"/>
+                                        <binding destination="270" name="selectedValue" keyPath="values.phantomtypistmode" previousBinding="EiI-FY-4VL" id="Chd-lB-g2L"/>
+                                    </connections>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="EwE-p0-R91" name="content" keyPath="arrangedObjects" id="lJE-GL-yil"/>
+                                </connections>
+                            </popUpButton>
+                        </subviews>
+                    </view>
+                </box>
+                <button misplaced="YES" id="1359">
+                    <rect key="frame" x="322" y="84" width="168" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Show tape/disk status" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1364">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.statusbar" id="1397"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" misplaced="YES" id="931">
+                    <rect key="frame" x="410" y="13" width="152" height="32"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset Preferences" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1266">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetUserDefaults:" target="-2" id="932"/>
+                    </connections>
+                </button>
             </subviews>
+            <point key="canvasLocation" x="114" y="472.5"/>
         </customView>
         <customView misplaced="YES" id="1408" userLabel="Sound">
             <rect key="frame" x="0.0" y="0.0" width="628" height="272"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1848">
+                <textField verticalHuggingPriority="750" misplaced="YES" id="1848">
                     <rect key="frame" x="233" y="174" width="101" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY Volume" id="1849">
@@ -342,7 +372,7 @@
                         <binding destination="270" name="value" keyPath="values.volumeay" id="1852"/>
                     </connections>
                 </slider>
-                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1413">
+                <textField verticalHuggingPriority="750" misplaced="YES" id="1413">
                     <rect key="frame" x="233" y="206" width="101" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Beeper Volume" id="1418">
@@ -372,7 +402,7 @@
                         <binding destination="270" name="value" keyPath="values.volumebeeper" id="1846"/>
                     </connections>
                 </slider>
-                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="rtY-km-onC">
+                <textField verticalHuggingPriority="750" misplaced="YES" id="rtY-km-onC">
                     <rect key="frame" x="233" y="143" width="125" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="SpecDrum Volume" id="zRw-eR-clg">
@@ -410,7 +440,7 @@
                         <binding destination="270" name="selectedValue" keyPath="values.speakertype" previousBinding="1861" id="1864"/>
                     </connections>
                 </popUpButton>
-                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1862">
+                <textField verticalHuggingPriority="750" misplaced="YES" id="1862">
                     <rect key="frame" x="216" y="78" width="101" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Speaker type" id="1863">
@@ -419,7 +449,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1900">
+                <textField verticalHuggingPriority="750" misplaced="YES" id="1900">
                     <rect key="frame" x="216" y="46" width="131" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY stereo mode" id="1901">
@@ -458,7 +488,7 @@
                         <binding destination="270" name="selectedValue" keyPath="values.separation" previousBinding="1897" id="1899"/>
                     </connections>
                 </popUpButton>
-                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1902">
+                <textField verticalHuggingPriority="750" misplaced="YES" id="1902">
                     <rect key="frame" x="233" y="111" width="125" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Covox Volume" id="1905">
@@ -573,7 +603,7 @@
                                     <binding destination="270" name="value" keyPath="values.zxprinter" id="1953"/>
                                 </connections>
                             </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="Vg7-l5-Jxr">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Vg7-l5-Jxr">
                                 <rect key="frame" x="25" y="46" width="131" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Graphic Output File:" id="bvv-kb-cZ4">
@@ -582,7 +612,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="ptU-fP-Mnq">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ptU-fP-Mnq">
                                 <rect key="frame" x="47" y="16" width="109" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text Output File:" id="0Dt-bm-EQa">
@@ -591,7 +621,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="LuR-Lj-xFi">
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="LuR-Lj-xFi">
                                 <rect key="frame" x="157" y="44" width="326" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="xTs-kP-Vfd">
@@ -603,7 +633,7 @@
                                     <binding destination="270" name="value" keyPath="values.graphicsfile" id="kps-HD-1Jz"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="YFe-FE-BDr">
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="YFe-FE-BDr">
                                 <rect key="frame" x="157" y="14" width="326" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="y2D-9H-b0V">
@@ -1008,7 +1038,7 @@
                         <binding destination="270" name="selectedValue" keyPath="values.moviecompr" previousBinding="1939" id="1948"/>
                     </connections>
                 </popUpButton>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1930">
+                <textField verticalHuggingPriority="750" id="1930">
                     <rect key="frame" x="183" y="16" width="177" height="21"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Movie Compression Level" id="1931">
@@ -1017,7 +1047,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="I3r-Pl-MAf">
+                <textField verticalHuggingPriority="750" id="I3r-Pl-MAf">
                     <rect key="frame" x="429" y="43" width="83" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="fzK-PL-kaX">
@@ -1030,7 +1060,7 @@
                         <binding destination="270" name="value" keyPath="values.competitioncode" id="bZY-YP-trS"/>
                     </connections>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="O78-AX-6Cd">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="O78-AX-6Cd">
                     <rect key="frame" x="184" y="45" width="239" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Emulator recording competition code" id="mIT-9v-7ht">
@@ -1072,7 +1102,7 @@
                                     <binding destination="270" name="selectedIndex" keyPath="values.joystickkeyboardoutput" previousBinding="1558" id="1559"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1511">
+                            <textField verticalHuggingPriority="750" id="1511">
                                 <rect key="frame" x="13" y="4" width="122" height="34"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="1512">
@@ -1132,7 +1162,7 @@
                                     <binding destination="270" name="selectedIndex" keyPath="values.joystick1output" previousBinding="1574" id="1579"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1520">
+                            <textField verticalHuggingPriority="750" id="1520">
                                 <rect key="frame" x="17" y="18" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Emulated joystick:" id="1525">
@@ -1141,7 +1171,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1521">
+                            <textField verticalHuggingPriority="750" id="1521">
                                 <rect key="frame" x="17" y="50" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Real device:" id="1524">
@@ -1209,7 +1239,7 @@
                                     <binding destination="270" name="selectedIndex" keyPath="values.joystick2output" previousBinding="1575" id="1580"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1536">
+                            <textField verticalHuggingPriority="750" id="1536">
                                 <rect key="frame" x="11" y="50" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Real device:" id="1541">
@@ -1218,7 +1248,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1537">
+                            <textField verticalHuggingPriority="750" id="1537">
                                 <rect key="frame" x="11" y="18" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Emulated joystick:" id="1540">
@@ -1361,7 +1391,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="RVo-Sg-mDk">
                         <rect key="frame" x="1" y="0.0" width="135" height="302"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1631" id="1634">
                                 <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
@@ -1370,7 +1400,7 @@
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1635">
+                                    <tableColumn identifier="" editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1635">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Machines">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1503,7 +1533,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="7ih-tq-3PK">
                         <rect key="frame" x="1" y="0.0" width="135" height="302"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1612" id="1615">
                                 <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
@@ -1512,7 +1542,7 @@
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1616">
+                                    <tableColumn identifier="" editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1616">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Machines">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2091,6 +2121,11 @@
         <arrayController id="1889" userLabel="StereoAY">
             <connections>
                 <binding destination="-2" name="contentArray" keyPath="soundStereoAY" id="1894"/>
+            </connections>
+        </arrayController>
+        <arrayController id="EwE-p0-R91" userLabel="PhantomTypistMode">
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="phantomTypistMode" id="Wsy-DW-YXx"/>
             </connections>
         </arrayController>
     </objects>

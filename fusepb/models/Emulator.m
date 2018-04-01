@@ -50,6 +50,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "phantom_typist.h"
 #include "ui/cocoa/cocoascreenshot.h"
 #include "ui/ui.h"
 #include "ui/uimedia.h"
@@ -168,7 +169,7 @@ static Emulator *instance = nil;
     }
   /* If we're fastloading, keep running frames until we have used up 95% of
      the timer interval */
-  } else if( settings_current.fastload && fastloading_active() ) {
+  } else if( settings_current.fastload && timer_fastloading_active() ) {
     int done = 0;
     CFTimeInterval startTime = CFAbsoluteTimeGetCurrent();
     while( !done ) {
@@ -200,7 +201,7 @@ static Emulator *instance = nil;
 
 -(void) openFile:(const char *)filename
 {
-  utils_open_file( filename, settings_current.auto_load, NULL );
+  utils_open_file( filename, auto_load_is_enabled(), NULL );
 
   display_refresh_all();
 }

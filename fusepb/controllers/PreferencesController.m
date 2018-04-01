@@ -111,6 +111,7 @@
   soundStereoAY = cocoa_sound_stereo_ay();
   diskTryMerge = cocoa_diskoptions_disk_try_merge();
   movieCompression = cocoa_movie_movie_compr();
+  phantomTypistMode = cocoa_media_phantom_typist_mode();
 
   return self;
 }
@@ -139,6 +140,8 @@
 
   [self setMassStorageType];
   [self setExternalSoundType];
+  
+  [self fixPhantomTypistMode];
 
   [[NSNotificationCenter defaultCenter] addObserver:self
 		 selector:@selector(handleWillClose:)
@@ -146,6 +149,30 @@
 		   object:[self window]];
 
   [NSApp runModalForWindow:[self window]];
+}
+
+- (void)fixPhantomTypistMode
+{
+  NSUserDefaults *currentValues = [NSUserDefaults standardUserDefaults];
+  const char *setting = settings_current.phantom_typist_mode;
+  
+  if( strcasecmp( setting, "Keyword" ) == 0 ) {
+    [currentValues setObject:@"Keyword" forKey:@"phantomtypistmode"];
+  } else if( strcasecmp( setting, "Keystroke" ) == 0) {
+    [currentValues setObject:@"Keystroke" forKey:@"phantomtypistmode"];
+  } else if( strcasecmp( setting, "Menu" ) == 0) {
+    [currentValues setObject:@"Menu" forKey:@"phantomtypistmode"];
+  } else if( strcasecmp( setting, "Plus 2A" ) == 0 ||
+            strcasecmp( setting, "plus2a" ) == 0) {
+    [currentValues setObject:@"Plus 2A" forKey:@"phantomtypistmode"];
+  } else if( strcasecmp( setting, "Plus 3" ) == 0 ||
+            strcasecmp( setting, "plus3" ) == 0) {
+    [currentValues setObject:@"Plus 3" forKey:@"phantomtypistmode"];
+  } else if( strcasecmp( setting, "Disabled" ) == 0) {
+    [currentValues setObject:@"Disabled" forKey:@"phantomtypistmode"];
+  } else {
+    [currentValues setObject:@"Auto" forKey:@"phantomtypistmode"];
+  }
 }
 
 - (void)handleWillClose:(NSNotification *)note
