@@ -1,3 +1,11 @@
+2018-04-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.x released.
+
+        * Emulation core improvements:
+          * Disable inactive peripherals after loading a snapshot (Sergio
+            Baldoví).
+
 2018-03-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.2 released.
