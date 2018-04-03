@@ -195,8 +195,7 @@ usource_unittest( void )
 static void
 usource_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_usource_active( snap ) )
-    settings_current.usource = 1;
+  settings_current.usource = libspectrum_snap_usource_active( snap );
 }
 
 static void

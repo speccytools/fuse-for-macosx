@@ -492,8 +492,7 @@ zxatasp_memory_map( void )
 static void
 zxatasp_snapshot_enabled( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_zxatasp_active( snap ) )
-    settings_current.zxatasp_active = 1;
+  settings_current.zxatasp_active = libspectrum_snap_zxatasp_active( snap );
 }
 
 static void

@@ -291,8 +291,7 @@ zxcf_memory_map( void )
 static void
 zxcf_snapshot_enabled( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_zxcf_active( snap ) )
-    settings_current.zxcf_active = 1;
+  settings_current.zxcf_active = libspectrum_snap_zxcf_active( snap );
 }
 
 static void

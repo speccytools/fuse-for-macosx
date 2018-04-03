@@ -463,8 +463,7 @@ if1_memory_map( void )
 static void
 if1_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_interface1_active( snap ) )
-    settings_current.interface1 = 1;
+  settings_current.interface1 = libspectrum_snap_interface1_active( snap );
 }
 
 static void

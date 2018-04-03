@@ -556,6 +556,10 @@ multiface_unittest( void )
 static void
 multiface_enabled_snapshot( libspectrum_snap *snap )
 {
+  settings_current.multiface1 = 0;
+  settings_current.multiface128 = 0;
+  settings_current.multiface3 = 0;
+
   if( !libspectrum_snap_multiface_active( snap ) ) return;
 
   if( libspectrum_snap_multiface_model_one( snap ) )

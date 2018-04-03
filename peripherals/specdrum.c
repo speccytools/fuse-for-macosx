@@ -92,8 +92,7 @@ specdrum_reset( int hard_reset GCC_UNUSED )
 static void 
 specdrum_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_specdrum_active( snap ) )
-    settings_current.specdrum = 1;
+  settings_current.specdrum = libspectrum_snap_specdrum_active( snap );
 }
 
 static void

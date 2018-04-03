@@ -597,8 +597,7 @@ static ui_media_drive_info_t disciple_ui_drives[ DISCIPLE_NUM_DRIVES ] = {
 static void
 disciple_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_disciple_active( snap ) )
-    settings_current.disciple = 1;
+  settings_current.disciple = libspectrum_snap_disciple_active( snap );
 }
 
 static void

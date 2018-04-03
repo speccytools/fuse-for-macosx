@@ -408,8 +408,7 @@ plusd_get_fdd( plusd_drive_number which )
 static void
 plusd_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_plusd_active( snap ) )
-    settings_current.plusd = 1;
+  settings_current.plusd = libspectrum_snap_plusd_active( snap );
 }
 
 static void

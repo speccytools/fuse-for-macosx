@@ -106,8 +106,7 @@ covox_reset( int hard_reset GCC_UNUSED )
 static void
 covox_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_covox_active( snap ) )
-    settings_current.covox = 1;
+  settings_current.covox = libspectrum_snap_covox_active( snap );
 }
 
 static void

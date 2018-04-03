@@ -65,8 +65,7 @@ static const periph_t fuller_periph = {
 static void
 fuller_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_fuller_box_active( snap ) )
-    settings_current.fuller = 1;
+  settings_current.fuller = libspectrum_snap_fuller_box_active( snap );
 }
 
 static void

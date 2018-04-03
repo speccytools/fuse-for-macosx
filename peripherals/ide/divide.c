@@ -258,8 +258,7 @@ divide_memory_map( void )
 static void
 divide_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_divide_active( snap ) )
-    settings_current.divide_enabled = 1;
+  settings_current.divide_enabled = libspectrum_snap_divide_active( snap );
 }
 
 static void

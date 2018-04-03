@@ -425,8 +425,7 @@ opus_write( libspectrum_word address, libspectrum_byte b )
 static void
 opus_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_opus_active( snap ) )
-    settings_current.opus = 1;
+  settings_current.opus = libspectrum_snap_opus_active( snap );
 }
 
 static void
