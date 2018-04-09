@@ -362,7 +362,7 @@ phantom_typist_activate_disk( void )
 void
 phantom_typist_deactivate( void )
 {
-  phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
+  phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
   next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
 }
 
@@ -536,12 +536,12 @@ phantom_typist_frame( void )
       command_count++;
     }
 
+    phantom_typist_state = next_phantom_typist_state;
+    delay = state_info[phantom_typist_state].delay_before_state;
+
     if( next_phantom_typist_state == PHANTOM_TYPIST_STATE_INACTIVE ) {
       timer_stop_fastloading();
     }
-
-    phantom_typist_state = next_phantom_typist_state;
-    delay = state_info[phantom_typist_state].delay_before_state;
   }
 
   if( delay > 0 ) {
