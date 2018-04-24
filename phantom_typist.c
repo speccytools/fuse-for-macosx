@@ -235,7 +235,8 @@ phantom_typist_register_startup( void )
 static void
 phantom_typist_reset( int hard_reset )
 {
-  phantom_typist_deactivate();
+  phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
+  next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
 }
 
 static phantom_typist_highlevel_mode_t
