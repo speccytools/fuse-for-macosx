@@ -64,8 +64,7 @@ static const periph_t melodik_periph = {
 static void
 melodik_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_melodik_active( snap ) )
-    settings_current.melodik = 1;
+  settings_current.melodik = libspectrum_snap_melodik_active( snap );
 }
 
 static void

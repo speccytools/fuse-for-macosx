@@ -193,6 +193,20 @@ get_hard_reset( gpointer key, gpointer value, gpointer user_data )
   *machine_hard_reset = ( periph_hard_reset || *machine_hard_reset );
 }
 
+static void
+disable_optional( gpointer key, gpointer value, gpointer user_data )
+{
+  periph_private_t *private = value;
+
+  switch ( private->present ) {
+  case PERIPH_PRESENT_NEVER:
+  case PERIPH_PRESENT_OPTIONAL:
+    if( private->periph->option ) *(private->periph->option) = 0;
+    break;
+  default: break;
+  }
+}
+
 /* Free the memory used by a peripheral-port response pair */
 static void
 free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
@@ -431,6 +445,33 @@ update_ide_menu( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXMMC, zxmmc );
 }
 
+static void
+update_peripherals_status( void )
+{
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
+                    periph_is_active( PERIPH_TYPE_INTERFACE1 ) );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
+                    periph_is_active( PERIPH_TYPE_INTERFACE2 ) );
+
+  update_cartridge_menu();
+  update_ide_menu();
+  if1_update_menu();
+  multiface_status_update();
+  specplus3_765_update_fdd();
+}
+
+void
+periph_disable_optional( void )
+{
+  if( ui_mouse_present && ui_mouse_grabbed ) {
+    ui_mouse_grabbed = ui_mouse_release( 1 );
+  }
+
+  g_hash_table_foreach( peripherals, disable_optional, NULL );
+
+  update_peripherals_status();
+}
+
 int
 periph_update( void )
 {
@@ -446,16 +487,7 @@ periph_update( void )
 
   g_hash_table_foreach( peripherals, set_activity, &needs_hard_reset );
 
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
-		    periph_is_active( PERIPH_TYPE_INTERFACE1 ) );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
-		    periph_is_active( PERIPH_TYPE_INTERFACE2 ) );
-
-  update_cartridge_menu();
-  update_ide_menu();
-  if1_update_menu();
-  multiface_status_update();
-  specplus3_765_update_fdd();
+  update_peripherals_status();
   machine_current->memory_map();
 
   return needs_hard_reset;

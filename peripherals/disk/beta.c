@@ -413,10 +413,9 @@ beta_get_fdd( beta_drive_number which )
 static void
 beta_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_beta_active( snap ) &&
-      !( machine_current->capabilities &
+  if( !( machine_current->capabilities &
          LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) )
-    settings_current.beta128 = 1;
+    settings_current.beta128 = libspectrum_snap_beta_active( snap );
 }
 
 static void

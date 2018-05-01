@@ -84,6 +84,7 @@ snapshot_copy_from( libspectrum_snap *snap )
   int error;
   libspectrum_machine machine;
 
+  periph_disable_optional();
   module_snapshot_enabled( snap );
 
   machine = libspectrum_snap_machine( snap );

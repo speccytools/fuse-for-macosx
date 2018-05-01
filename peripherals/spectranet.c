@@ -263,8 +263,7 @@ spectranet_activate( void )
 static void
 spectranet_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_spectranet_active( snap ) )
-    settings_current.spectranet = 1;
+  settings_current.spectranet = libspectrum_snap_spectranet_active( snap );
 }
 
 static void

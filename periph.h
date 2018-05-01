@@ -165,6 +165,8 @@ void periph_posthook( void );
 
 int periph_postcheck( void );
 
+void periph_disable_optional( void );
+
 /* Register debugger page/unpage events for a peripheral */
 void periph_register_paging_events( const char *type_string, int *page_event,
 				    int *unpage_event );

@@ -465,8 +465,7 @@ static ui_media_drive_info_t didaktik_ui_drives[ DIDAKTIK80_NUM_DRIVES ] = {
 static void
 didaktik_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_didaktik80_active( snap ) )
-    settings_current.didaktik80 = 1;
+  settings_current.didaktik80 = libspectrum_snap_didaktik80_active( snap );
 }
 
 static void
