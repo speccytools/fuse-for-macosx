@@ -1,7 +1,18 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.5.2 of the Fuse emulator.
+description: This section describes the changes for version 1.5.3 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.3
+
+### Emulation core improvements:
+* Disable inactive peripherals after loading a snapshot (Sergio Baldoví).
+
+### Miscellaneous improvements:
+* Re-enable sound after phantom typist finishes loading TAP, standard ROM TZX
+  or +3 DSK images (thanks, Alberto Garcia) (Fredrick Meunier).
+* RZX files containing a snapshot which cannot be compressed are now written
+  correctly (Philip Kendall, thanks Chris Flynn).
 
 ## What's new in Fuse for macOS 1.5.2
 
