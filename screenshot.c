@@ -285,60 +285,109 @@ screenshot_available_scalers( scaler_type scaler )
 
 #endif				/* #ifdef USE_LIBPNG */
 
-int
-screenshot_scr_write( const char *filename )
+static int
+screenshot_scr_hires_write( const char *filename )
 {
-  libspectrum_byte scr_data[HIRES_SCR_SIZE];
-  int scr_length;
+  libspectrum_byte scr_data[ HIRES_SCR_SIZE ];
+
+  memset( scr_data, 0, HIRES_SCR_SIZE );
+
+  memcpy( scr_data,
+          &RAM[ memory_current_screen ][ display_get_addr(0,0) ],
+          MONO_BITMAP_SIZE );
+  memcpy( scr_data + MONO_BITMAP_SIZE,
+          &RAM[ memory_current_screen ][ display_get_addr(0,0) +
+          ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
+  scr_data[ HIRES_ATTR ] = ( scld_last_dec.byte & HIRESCOLMASK ) |
+                             scld_last_dec.mask.scrnmode;
+
+  return utils_write_file( filename, scr_data, HIRES_SCR_SIZE );
+}
+
+static int
+screenshot_scr_hicolor_write( const char *filename ) 
+{
+  libspectrum_byte scr_data[ HICOLOUR_SCR_SIZE ];
   int x, y;
   int beam_x, beam_y;
   int index;
   libspectrum_word offset;
   libspectrum_byte data, data2;
 
-  memset( scr_data, 0, HIRES_SCR_SIZE );
+  memset( scr_data, 0, HICOLOUR_SCR_SIZE );
 
-  if( scld_last_dec.name.hires ) {
-    memcpy( scr_data,
-            &RAM[ memory_current_screen ][display_get_addr(0,0)],
-            MONO_BITMAP_SIZE );
-    memcpy( scr_data + MONO_BITMAP_SIZE,
-            &RAM[ memory_current_screen ][display_get_addr(0,0) +
-            ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
-    scr_data[HIRES_ATTR] = ( scld_last_dec.byte & HIRESCOLMASK ) |
-                           scld_last_dec.mask.scrnmode;
-    scr_length = HIRES_SCR_SIZE;
+  for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
+    for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
+      offset = display_get_addr( x, y );
+      beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+      beam_y = y + DISPLAY_BORDER_HEIGHT;
+
+      /* Read byte, atrr/byte, and screen mode */
+      index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+
+      data = display_last_screen[ index ] & 0xff;
+      data2 = (display_last_screen[ index ] & 0xff00)>>8;
+
+      /* write pixel data to offset into scr data */
+      scr_data[ offset ] = data;
+      /* write attribute into bitmap order buffer following bitmap */
+      scr_data[ MONO_BITMAP_SIZE + offset ] = data2;
+    }
   }
-  else if( scld_last_dec.name.b1 ) {
-    for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
-      for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
-        offset = display_get_addr( x, y );
-        beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
-        beam_y = y + DISPLAY_BORDER_HEIGHT;
 
-        /* Read byte, atrr/byte, and screen mode */
-        index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+  return utils_write_file( filename, scr_data, HICOLOUR_SCR_SIZE );
+}
 
-        data = display_last_screen[ index ] & 0xff;
-        data2 = (display_last_screen[ index ] & 0xff00)>>8;
+static int
+screenshot_scr_standard_write( const char *filename )
+{
+  libspectrum_byte scr_data[ STANDARD_SCR_SIZE ];
+  int x, y;
+  int beam_x, beam_y;
+  int index;
+  libspectrum_word offset;
+  libspectrum_byte data, data2;
 
-        /* write pixel data to offset into mlt data */
-        scr_data[offset] = data;
-        /* write attribute into bitmap order buffer following bitmap */
-        scr_data[MONO_BITMAP_SIZE + offset] = data2;
+  memset( scr_data, 0, STANDARD_SCR_SIZE );
+
+  for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
+    for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
+      offset = display_get_addr( x, y );
+      beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+      beam_y = y + DISPLAY_BORDER_HEIGHT;
+
+      /* Read byte, atrr/byte, and screen mode */
+      index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+
+      data = display_last_screen[ index ] & 0xff;
+      data2 = (display_last_screen[ index ] & 0xff00)>>8;
+
+      /* write pixel data to offset into mlt data */
+      scr_data[ offset ] = data;
+
+      if( y%8 == 0 ) {
+        int attribute_offset = x + (y/8 * DISPLAY_WIDTH_COLS);
+        /* write attribute into attribute order buffer following bitmap */
+        scr_data[ MONO_BITMAP_SIZE + attribute_offset ] = data2;
       }
     }
+  }
 
-    scr_length = HICOLOUR_SCR_SIZE;
+  return utils_write_file( filename, scr_data, STANDARD_SCR_SIZE );
+}
+
+int
+screenshot_scr_write( const char *filename )
+{
+  if( scld_last_dec.name.hires ) {
+    return screenshot_scr_hires_write( filename );
+  }
+  else if( scld_last_dec.name.b1 ) {
+    return screenshot_scr_hicolor_write( filename );
   }
   else { /* ALTDFILE and default */
-    memcpy( scr_data, 
-            &RAM[ memory_current_screen ][display_get_addr(0,0)],
-            STANDARD_SCR_SIZE );
-    scr_length = STANDARD_SCR_SIZE;
+    return screenshot_scr_standard_write( filename );
   }
-
-  return utils_write_file( filename, scr_data, scr_length );
 }
 
 int
@@ -372,9 +421,9 @@ screenshot_mlt_write( const char *filename )
       data2 = (display_last_screen[ index ] & 0xff00)>>8;
 
       /* write pixel data to offset into mlt data */
-      mlt_data[offset] = data;
+      mlt_data[ offset ] = data;
       /* write attribute into linear buffer following bitmap */
-      mlt_data[MONO_BITMAP_SIZE + x + y * DISPLAY_WIDTH_COLS] = data2;
+      mlt_data[ MONO_BITMAP_SIZE + x + y * DISPLAY_WIDTH_COLS ] = data2;
     }
   }
 
