@@ -329,21 +329,24 @@ set_hicolor_pixels_and_attribute( int x, int y, libspectrum_byte* scr_data )
   scr_data[ MONO_BITMAP_SIZE + offset ] = attribute_data;
 }
 
+typedef void (*data_write_fn)( int x, int y, libspectrum_byte* scr_data );
+
 static int
-screenshot_scr_hicolor_write( const char *filename ) 
+scr_write( const char *filename, const int data_size,
+           data_write_fn scr_data_write )
 {
-  libspectrum_byte scr_data[ HICOLOUR_SCR_SIZE ];
+  libspectrum_byte scr_data[ data_size ];
   int x, y;
 
-  memset( scr_data, 0, HICOLOUR_SCR_SIZE );
+  memset( scr_data, 0, data_size );
 
   for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
     for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
-      set_hicolor_pixels_and_attribute( x, y, scr_data );
+      scr_data_write( x, y, scr_data );
     }
   }
 
-  return utils_write_file( filename, scr_data, HICOLOUR_SCR_SIZE );
+  return utils_write_file( filename, scr_data, data_size );
 }
 
 static void
@@ -364,23 +367,6 @@ set_standard_pixels_and_attribute( int x, int y, libspectrum_byte* scr_data )
   }
 }
 
-static int
-screenshot_scr_standard_write( const char *filename )
-{
-  libspectrum_byte scr_data[ STANDARD_SCR_SIZE ];
-  int x, y;
-
-  memset( scr_data, 0, STANDARD_SCR_SIZE );
-
-  for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
-    for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
-      set_standard_pixels_and_attribute( x, y, scr_data );
-    }
-  }
-
-  return utils_write_file( filename, scr_data, STANDARD_SCR_SIZE );
-}
-
 int
 screenshot_scr_write( const char *filename )
 {
@@ -388,10 +374,12 @@ screenshot_scr_write( const char *filename )
     return screenshot_scr_hires_write( filename );
   }
   else if( scld_last_dec.name.b1 ) {
-    return screenshot_scr_hicolor_write( filename );
+    return scr_write( filename, HICOLOUR_SCR_SIZE,
+                      &set_hicolor_pixels_and_attribute );
   }
   else { /* ALTDFILE and default */
-    return screenshot_scr_standard_write( filename );
+    return scr_write( filename, STANDARD_SCR_SIZE,
+                      &set_standard_pixels_and_attribute );
   }
 }
 
@@ -411,24 +399,13 @@ set_mlt_pixels_and_attribute( int x, int y, libspectrum_byte* mlt_data )
 int
 screenshot_mlt_write( const char *filename )
 {
-  libspectrum_byte mlt_data[ MLT_SIZE ];
-  int x, y;
-
-  memset( mlt_data, 0, MLT_SIZE );
-
   if( machine_current->timex && scld_last_dec.name.hires ) {
     ui_error( UI_ERROR_ERROR,
               "MLT format not supported for Timex hi-res screen mode" );
     return 1;
   }
 
-  for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
-    for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
-      set_mlt_pixels_and_attribute( x, y, mlt_data );
-    }
-  }
-
-  return utils_write_file( filename, mlt_data, HICOLOUR_SCR_SIZE );
+  return scr_write( filename, MLT_SIZE, &set_mlt_pixels_and_attribute );
 }
 
 #ifdef WORDS_BIGENDIAN
