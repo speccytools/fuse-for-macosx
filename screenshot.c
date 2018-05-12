@@ -307,12 +307,9 @@ screenshot_scr_hires_write( const char *filename )
 static int
 get_display_last_screen_index( int x, int y )
 {
-  int beam_x, beam_y;
+  int beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+  int beam_y = y + DISPLAY_BORDER_HEIGHT;
 
-  beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
-  beam_y = y + DISPLAY_BORDER_HEIGHT;
-
-  /* Read byte, atrr/byte, and screen mode */
   return beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
 }
 
@@ -385,7 +382,6 @@ screenshot_scr_write( const char *filename )
 static void
 set_mlt_pixels_and_attribute( int x, int y, libspectrum_byte* mlt_data )
 {
-  /* Read byte, atrr/byte, and screen mode */
   int index = get_display_last_screen_index( x, y );
   libspectrum_byte pixel_data = display_last_screen[ index ] & 0xff;
   libspectrum_byte attribute_data = (display_last_screen[ index ] & 0xff00)>>8;
