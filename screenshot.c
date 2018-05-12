@@ -323,7 +323,7 @@ set_hicolor_pixels_and_attribute( int x, int y, libspectrum_byte* scr_data )
   libspectrum_byte pixel_data = display_last_screen[ index ] & 0xff;
   libspectrum_byte attribute_data = (display_last_screen[ index ] & 0xff00)>>8;
 
-  libspectrum_word offset = display_get_addr( x, y );
+  libspectrum_word offset = display_get_offset( x, y );
   scr_data[ offset ] = pixel_data;
   /* write attribute into bitmap order buffer after bitmap */
   scr_data[ MONO_BITMAP_SIZE + offset ] = attribute_data;
@@ -352,13 +352,12 @@ scr_write( const char *filename, const int data_size,
 static void
 set_standard_pixels_and_attribute( int x, int y, libspectrum_byte* scr_data )
 {
-  /* Read byte, atrr/byte, and screen mode */
   int index = get_display_last_screen_index( x, y );
   libspectrum_byte pixel_data = display_last_screen[ index ] & 0xff;
   libspectrum_byte attribute_data = (display_last_screen[ index ] & 0xff00)>>8;
   int attribute_offset;
 
-  scr_data[ display_get_addr( x, y ) ] = pixel_data;
+  scr_data[ display_get_offset( x, y ) ] = pixel_data;
 
   if( y%8 == 0 ) {
     /* write attribute into standard attribute order buffer after bitmap */
@@ -391,7 +390,7 @@ set_mlt_pixels_and_attribute( int x, int y, libspectrum_byte* mlt_data )
   libspectrum_byte pixel_data = display_last_screen[ index ] & 0xff;
   libspectrum_byte attribute_data = (display_last_screen[ index ] & 0xff00)>>8;
 
-  mlt_data[ display_get_addr( x, y ) ] = pixel_data;
+  mlt_data[ display_get_offset( x, y ) ] = pixel_data;
   /* write attribute into linear buffer following bitmap */
   mlt_data[ MONO_BITMAP_SIZE + x + y * DISPLAY_WIDTH_COLS ] = attribute_data;
 }
