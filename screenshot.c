@@ -305,11 +305,22 @@ screenshot_scr_hires_write( const char *filename )
 }
 
 static int
+get_display_last_screen_index( int x, int y )
+{
+  int beam_x, beam_y;
+
+  beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+  beam_y = y + DISPLAY_BORDER_HEIGHT;
+
+  /* Read byte, atrr/byte, and screen mode */
+  return beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+}
+
+static int
 screenshot_scr_hicolor_write( const char *filename ) 
 {
   libspectrum_byte scr_data[ HICOLOUR_SCR_SIZE ];
   int x, y;
-  int beam_x, beam_y;
   int index;
   libspectrum_word offset;
   libspectrum_byte data, data2;
@@ -319,11 +330,9 @@ screenshot_scr_hicolor_write( const char *filename )
   for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
     for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
       offset = display_get_addr( x, y );
-      beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
-      beam_y = y + DISPLAY_BORDER_HEIGHT;
 
       /* Read byte, atrr/byte, and screen mode */
-      index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+      index = get_display_last_screen_index( x, y );
 
       data = display_last_screen[ index ] & 0xff;
       data2 = (display_last_screen[ index ] & 0xff00)>>8;
@@ -343,7 +352,6 @@ screenshot_scr_standard_write( const char *filename )
 {
   libspectrum_byte scr_data[ STANDARD_SCR_SIZE ];
   int x, y;
-  int beam_x, beam_y;
   int index;
   libspectrum_word offset;
   libspectrum_byte data, data2;
@@ -353,11 +361,9 @@ screenshot_scr_standard_write( const char *filename )
   for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
     for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
       offset = display_get_addr( x, y );
-      beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
-      beam_y = y + DISPLAY_BORDER_HEIGHT;
 
       /* Read byte, atrr/byte, and screen mode */
-      index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+      index = get_display_last_screen_index( x, y );
 
       data = display_last_screen[ index ] & 0xff;
       data2 = (display_last_screen[ index ] & 0xff00)>>8;
@@ -395,7 +401,6 @@ screenshot_mlt_write( const char *filename )
 {
   libspectrum_byte mlt_data[ MLT_SIZE ];
   int x, y;
-  int beam_x, beam_y;
   int index;
   libspectrum_word offset;
   libspectrum_byte data, data2;
@@ -411,11 +416,9 @@ screenshot_mlt_write( const char *filename )
   for( y = 0; y < DISPLAY_HEIGHT; y++ ) {
     for( x = 0; x < DISPLAY_WIDTH_COLS; x++ ) {
       offset = display_get_addr( x, y );
-      beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
-      beam_y = y + DISPLAY_BORDER_HEIGHT;
 
       /* Read byte, atrr/byte, and screen mode */
-      index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+      index = get_display_last_screen_index( x, y );
 
       data = display_last_screen[ index ] & 0xff;
       data2 = (display_last_screen[ index ] & 0xff00)>>8;
