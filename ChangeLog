@@ -1,9 +1,13 @@
-2018-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2018-06-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-        * Fuse 1.x.x released.
+        * Fuse 1.5.4 released.
 
         * Miscellaneous improvements:
-          * Add *.fmf as an allowed filetype to file selectors (Sergio Baldoví).
+          * Add *.FMF as an allowed filetype to file selectors (Sergio Baldoví).
+          * Save SCR from current display file (thanks, Einar Saukas) (Fredrick
+            Meunier).
+          * Use 44.1KHz as default sound frequency (Fredrick Meunier).
+          * Various minor bugfixes.
 
 2018-04-29  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
