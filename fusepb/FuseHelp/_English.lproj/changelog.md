@@ -1,7 +1,16 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.5.3 of the Fuse emulator.
+description: This section describes the changes for version 1.5.4 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.4
+
+### Miscellaneous improvements:
+* Save SCR from current display file (thanks, Einar Saukas) (Fredrick Meunier).
+* Use 44.1KHz as default sound frequency (Fredrick Meunier).
+* Fix TC2048 and TC2068 timings regression (Sergio Baldoví).
+
+### Various other minor bugfixes.
 
 ## What's new in Fuse for macOS 1.5.3
 
