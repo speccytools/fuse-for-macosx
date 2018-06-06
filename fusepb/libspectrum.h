@@ -1,5 +1,5 @@
 /* libspectrum.h: the library for dealing with ZX Spectrum emulator files
-   Copyright (c) 2001-2015 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2018 Philip Kendall, Darren Salt, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -1432,6 +1432,9 @@ libspectrum_tape_iterator_current( libspectrum_tape_iterator iterator );
 
 WIN32_DLL libspectrum_tape_block *
 libspectrum_tape_iterator_next( libspectrum_tape_iterator *iterator );
+
+WIN32_DLL libspectrum_tape_block *
+libspectrum_tape_iterator_peek_next( libspectrum_tape_iterator iterator );
 
 /*** Routines for handling the TZX generalised data block symbol table
      structure ***/
