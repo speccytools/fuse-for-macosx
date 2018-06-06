@@ -94,7 +94,7 @@ sound, boolean, 1
 sound_load, boolean, 1,,,, loading-sound
 stereo_ay, string, "None", option_enumerate_string_sound_stereo_ay,, separation
 sound_force_8bit, boolean, 0
-sound_freq, numeric, 32000,, 'f'
+sound_freq, numeric, 44100,, 'f'
 speaker_type, string, "TV speaker", option_enumerate_string_sound_speaker_type
 volume_ay, numeric, 100
 volume_beeper, numeric, 100

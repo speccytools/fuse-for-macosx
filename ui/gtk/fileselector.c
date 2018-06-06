@@ -37,6 +37,7 @@ static void add_filter_disk_files( GtkFileFilter *filter );
 static void add_filter_dock_files( GtkFileFilter *filter );
 static void add_filter_harddisk_files( GtkFileFilter *filter );
 static void add_filter_microdrive_files( GtkFileFilter *filter );
+static void add_filter_movie_files( GtkFileFilter *filter );
 static void add_filter_recording_files( GtkFileFilter *filter );
 static void add_filter_snapshot_files( GtkFileFilter *filter );
 static void add_filter_tape_files( GtkFileFilter *filter );
@@ -119,6 +120,7 @@ add_filter_defaults( GtkWidget *file_chooser )
   add_filter_dock_files( filter );
   add_filter_harddisk_files( filter );
   add_filter_microdrive_files( filter );
+  add_filter_movie_files( filter );
   add_filter_recording_files( filter );
   add_filter_snapshot_files( filter );
   add_filter_tape_files( filter );
@@ -160,6 +162,11 @@ add_filter_defaults( GtkWidget *file_chooser )
   filter = gtk_file_filter_new();
   gtk_file_filter_set_name( filter, "Microdrive Files" );
   add_filter_microdrive_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Movie Files" );
+  add_filter_movie_files( filter );
   gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
 
   filter = gtk_file_filter_new();
@@ -281,6 +288,14 @@ add_filter_microdrive_files( GtkFileFilter *filter )
   gtk_file_filter_add_pattern( filter, "*.mdr" );
 
   gtk_file_filter_add_pattern( filter, "*.MDR" );
+}
+
+static void
+add_filter_movie_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.fmf" );
+
+  gtk_file_filter_add_pattern( filter, "*.FMF" );
 }
 
 static void

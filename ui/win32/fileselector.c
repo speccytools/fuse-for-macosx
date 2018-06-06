@@ -69,6 +69,8 @@ static LPCTSTR file_filter = TEXT(
 "*.hdf\0"
 "Microdrive Files (*.mdr)\0"
 "*.mdr\0"
+"Movie Files (*.fmf)\0"
+"*.fmf\0"
 "Recording Files (*.rzx)\0"
 "*.rzx\0"
 "Snapshot Files (*.szx;*.z80;*.sna;...)\0"
