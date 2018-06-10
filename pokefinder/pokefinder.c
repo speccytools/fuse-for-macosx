@@ -44,7 +44,7 @@ pokefinder_clear( void )
   max_page = MEMORY_PAGES_IN_16K * machine_current->ram.valid_pages;
   pokefinder_count = 0;
   for( page = 0; page < MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES; ++page )
-    if( memory_map_ram[page].writable && page < max_page ) {
+    if( page < max_page && memory_map_ram[page].writable ) {
       pokefinder_count += MEMORY_PAGE_SIZE;
       memcpy( pokefinder_possible[page], memory_map_ram[page].page, MEMORY_PAGE_SIZE );
       memset( pokefinder_impossible[page], 0, MEMORY_PAGE_SIZE / 8 );
