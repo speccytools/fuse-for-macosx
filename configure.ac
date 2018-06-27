@@ -495,6 +495,15 @@ fi
 AC_SUBST(PNG_CFLAGS)
 AC_SUBST(PNG_LIBS)
 
+dnl Check if we can improve Blip Buffer accuracy on LP64 platforms
+AC_CHECK_SIZEOF(long)
+AC_MSG_CHECKING([Blip Buffer accuracy])
+AS_IF([test "$ac_cv_sizeof_long" -ge 8],
+  [AC_DEFINE([BLIP_BUFFER_ACCURACY], [32], [Defined if we can increase Blip Buffer accuracy])
+    AC_MSG_RESULT([32])],
+  [AC_MSG_RESULT([default])]
+)
+
 dnl Check if a version of libasound which supplies pcm is available
 AC_MSG_CHECKING(whether ALSA requested)
 AC_ARG_WITH(alsa,

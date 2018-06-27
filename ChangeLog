@@ -2,6 +2,10 @@
 
         * Fuse 1.5.x released.
 
+        * Emulation core improvements:
+          * Improve sound accuracy on Unix 64 bits systems (thanks, Fredrick
+            Meunier) (Sergio Baldoví).
+
         * Miscellaneous improvements:
           * Allow the use of real joystick hats/dpads in the SDL joystick code
             (thanks, Sarah) (Fredrick Meunier).
