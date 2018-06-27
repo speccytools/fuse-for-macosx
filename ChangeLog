@@ -5,6 +5,8 @@
         * Miscellaneous improvements:
           * Allow the use of real joystick hats/dpads in the SDL joystick code
             (thanks, Sarah) (Fredrick Meunier).
+          * Rename compat_get_home_path() to compat_get_config_path() (Alberto
+            Garcia).
 
 2018-06-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 

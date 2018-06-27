@@ -48,7 +48,7 @@ compat_get_temp_path( void )
 }
 
 const char*
-compat_get_home_path( void )
+compat_get_config_path( void )
 {
   const char *dir;
   dir = getenv( "USERPROFILE" ); if( dir ) return dir;
