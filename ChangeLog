@@ -1,3 +1,11 @@
+2018-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.x released.
+
+        * Miscellaneous improvements:
+          * Allow the use of real joystick hats/dpads in the SDL joystick code
+            (thanks, Sarah) (Fredrick Meunier).
+
 2018-06-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.4 released.
