@@ -350,7 +350,7 @@ save_data( GtkEntry *entry GCC_UNUSED, gpointer user_data )
   }
 
   for( i = 0; i < length; i++ )
-    buffer[ i ] = readbyte( start + i );
+    buffer[ i ] = readbyte_internal( start + i );
 
   error = utils_write_file( info->filename, buffer, length );
   if( error ) { free( buffer ); return; }
