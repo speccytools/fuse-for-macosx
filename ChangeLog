@@ -1,3 +1,11 @@
+2018-07-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.5 released.
+
+        * Miscellaneous improvements:
+          * Saving binary data no longer increments tstate count (Philip
+            Kendall).
+
 2018-06-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.4 released.
