@@ -40,6 +40,21 @@ fuse_SOURCES += \
                 compat/unix/timer.c
 endif
 
+## Linux routines
+if COMPAT_LINUX
+fuse_SOURCES += \
+                compat/unix/dir.c \
+                compat/unix/file.c \
+                compat/unix/osname.c \
+                compat/linux/relative_paths.c \
+                compat/unix/paths.c \
+                compat/unix/timer.c
+
+if HAVE_SOCKETS
+fuse_SOURCES += compat/unix/socket.c
+endif
+endif
+
 ## Morphos routines
 if COMPAT_MORPHOS
 fuse_SOURCES += \
@@ -56,6 +71,7 @@ fuse_SOURCES += \
                 compat/unix/dir.c \
                 compat/unix/file.c \
                 compat/unix/osname.c \
+                compat/unix/relative_paths.c \
                 compat/unix/paths.c \
                 compat/unix/timer.c
 
