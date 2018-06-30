@@ -59,6 +59,33 @@ compat_is_absolute_path( const char *path )
   return path[0] == '/';
 }
 
+#ifdef __linux__
+static int
+get_relative_directory( char *buffer, size_t bufsize )
+{
+  ssize_t retval;
+  retval = readlink( "/proc/self/exe", buffer, bufsize - 1 );
+  if( retval < 0 ) {
+    return -errno;
+  }
+  buffer[ retval ] = '\0';
+  return 0;
+}
+#else /* #ifdef __linux__ */
+static int
+get_relative_directory( char *buffer, size_t bufsize )
+{
+  size_t len;
+  len = bufsize - strlen( fuse_progname ) - strlen( FUSE_DIR_SEP_STR );
+  if( !getcwd( buffer, len ) ) {
+    return -errno;
+  }
+  strcat( buffer, FUSE_DIR_SEP_STR );
+  strcat( buffer, fuse_progname );
+  return 0;
+}
+#endif /* #ifdef __linux__ */
+
 int
 compat_get_next_path( path_context *ctx )
 {
@@ -89,15 +116,12 @@ compat_get_next_path( path_context *ctx )
       strncpy( buffer, fuse_progname, PATH_MAX );
       buffer[ PATH_MAX - 1 ] = '\0';
     } else {
-      size_t len;
-      len = PATH_MAX - strlen( fuse_progname ) - strlen( FUSE_DIR_SEP_STR );
-      if( !getcwd( buffer, len ) ) {
+      int ret = get_relative_directory( buffer, PATH_MAX );
+      if( ret < 0 ) {
         ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
-	          strerror( errno ) );
+	          strerror( -ret ) );
         return 0;
       }
-      strcat( buffer, FUSE_DIR_SEP_STR );
-      strcat( buffer, fuse_progname );
     }
 
     path2 = dirname( buffer );

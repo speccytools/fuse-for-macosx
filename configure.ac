@@ -821,9 +821,6 @@ case "$host_os" in
   amigaos)
     COMPAT_OSNAME='amiga'
     ;;
-  linux*)
-    COMPAT_OSNAME='linux'
-    ;;
   morphos)
     COMPAT_OSNAME='morphos'
     ;;
@@ -842,7 +839,6 @@ case "$host_os" in
 esac
 AC_MSG_RESULT($COMPAT_OSNAME)
 AM_CONDITIONAL(COMPAT_AMIGA, test "$COMPAT_OSNAME" = 'amiga')
-AM_CONDITIONAL(COMPAT_LINUX, test "$COMPAT_OSNAME" = 'linux')
 AM_CONDITIONAL(COMPAT_MORPHOS, test "$COMPAT_OSNAME" = 'morphos')
 AM_CONDITIONAL(COMPAT_UNIX, test "$COMPAT_OSNAME" = 'unix')
 AM_CONDITIONAL(COMPAT_WII, test "$COMPAT_OSNAME" = 'wii')
