@@ -1,6 +1,6 @@
 2018-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-        * Fuse 1.5.x released.
+        * Fuse 1.5.5 released.
 
         * Emulation core improvements:
           * Improve sound accuracy on Unix 64 bits systems (thanks, Fredrick
@@ -11,6 +11,7 @@
             (thanks, Sarah) (Fredrick Meunier).
           * Rename compat_get_home_path() to compat_get_config_path() (Alberto
             Garcia).
+          * Various minor bugfixes.
 
 2018-06-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
