@@ -50,6 +50,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "timer.h"
 #include "phantom_typist.h"
 #include "ui/cocoa/cocoascreenshot.h"
 #include "ui/ui.h"

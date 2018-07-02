@@ -1,7 +1,17 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.5.4 of the Fuse emulator.
+description: This section describes the changes for version 1.5.5 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.5
+
+### Emulation core improvements:
+* Improve sound accuracy on Unix 64 bits systems (thanks, Fredrick Meunier) (Sergio Baldoví).
+
+### Miscellaneous improvements:
+* Allow the use of real joystick hats/dpads (thanks, Sarah) (Fredrick Meunier).
+
+### Various other minor bugfixes.
 
 ## What's new in Fuse for macOS 1.5.4
 
