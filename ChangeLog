@@ -1,3 +1,11 @@
+2018-08-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.? released.
+
+        * Miscellaneous improvements:
+          * Factor out common paths code between Linux and generic UNIX (Alberto
+            Garcia and Fredrick Meunier).
+
 2018-07-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.5 released.
