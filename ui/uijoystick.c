@@ -141,18 +141,18 @@ int open_joystick( int which, const char *device, const char *calibration )
 int
 ui_joystick_init( void )
 {
-  const char *home;
+  const char *cfgdir;
   char *calibration;
   int error;
   size_t i, j;
 
-  home = compat_get_home_path(); if( !home ) return 1;
+  cfgdir = compat_get_config_path(); if( !cfgdir ) return 1;
 
   /* Default calibration file is ~/.joystick */
-  calibration = libspectrum_new( char, strlen( home ) +
+  calibration = libspectrum_new( char, strlen( cfgdir ) +
                                        strlen( JSDefaultCalibration ) + 2 );
 
-  sprintf( calibration, "%s/%s", home, JSDefaultCalibration );
+  sprintf( calibration, "%s/%s", cfgdir, JSDefaultCalibration );
 
   for( i = 0; i < 2; i++ ) {
     for( j = 0; j < NUM_JOY_BUTTONS; j++ ) {

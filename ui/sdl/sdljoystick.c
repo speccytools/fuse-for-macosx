@@ -41,6 +41,7 @@ int joy2_num_axes = 0;
 
 static void do_axis( int which, Sint16 value, input_key negative,
 		     input_key positive );
+static void do_hat( int which, Uint8 value, Uint8 mask, input_key direction );
 
 int
 ui_joystick_init( void )
@@ -105,6 +106,9 @@ ui_joystick_poll( void )
       break;
     case SDL_JOYAXISMOTION:
       sdljoystick_axismove( &(event.jaxis) );
+      break;
+    case SDL_JOYHATMOTION:
+      sdljoystick_hatmove( &(event.jhat) );
       break;
     default:
       break;
@@ -208,6 +212,39 @@ do_axis( int which, Sint16 value, input_key negative, input_key positive )
 
   input_event( &event1 );
   input_event( &event2 );
+}
+
+void
+sdljoystick_hatmove( SDL_JoyHatEvent *hatevent )
+{
+  int which = hatevent->which;
+  Uint8 value = hatevent->value;
+
+  if( hatevent->hat != 0 ) {
+    return;
+  }
+
+  do_hat( which, value, SDL_HAT_UP, INPUT_JOYSTICK_UP );
+  do_hat( which, value, SDL_HAT_DOWN, INPUT_JOYSTICK_DOWN );
+  do_hat( which, value, SDL_HAT_RIGHT, INPUT_JOYSTICK_RIGHT );
+  do_hat( which, value, SDL_HAT_LEFT, INPUT_JOYSTICK_LEFT );
+}
+
+static void
+do_hat( int which, Uint8 value, Uint8 mask, input_key direction )
+{
+  input_event_t event;
+
+  event.types.joystick.which = which;
+  event.types.joystick.button = direction;
+
+  event.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  input_event( &event );
+
+  if( value & mask ) {
+    event.type = INPUT_EVENT_JOYSTICK_PRESS;
+    input_event( &event );
+  }
 }
 
 void

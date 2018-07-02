@@ -894,7 +894,10 @@ xdisplay_end( void )
 {
   xdisplay_destroy_image();
   /* Free the allocated GC */
-  if( gc ) XFreeGC( display, gc ); gc = 0;
+  if( gc ) {
+    XFreeGC( display, gc );
+    gc = 0;
+  }
 
   return 0;
 }

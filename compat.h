@@ -129,7 +129,7 @@ typedef struct path_context {
 
 int compat_osname( char *buffer, size_t length );
 const char* compat_get_temp_path( void );
-const char* compat_get_home_path( void );
+const char* compat_get_config_path( void );
 int compat_is_absolute_path( const char *path );
 int compat_get_next_path( path_context *ctx );
 
