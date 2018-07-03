@@ -5,6 +5,9 @@
         * Miscellaneous improvements:
           * Factor out common paths code between Linux and generic UNIX (Alberto
             Garcia and Fredrick Meunier).
+          * More improvements disabling phantom typist after finishing loading
+            TAP or standard ROM TZX files (thanks, Alberto Garcia) (Fredrick
+            Meunier).
 
 2018-07-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
