@@ -448,6 +448,26 @@ utils_safe_strdup( const char *src )
   return dest;
 }
 
+int
+utils_save_binary( libspectrum_word start, libspectrum_word length,
+                   const char *filename )
+{
+  libspectrum_byte *buffer;
+  size_t i;
+  int error = 0;
+
+  buffer = libspectrum_new( libspectrum_byte, length );
+
+  for( i = 0; i < length; i++ )
+    buffer[ i ] = readbyte_internal( start + i );
+
+  error = utils_write_file( filename, buffer, length );
+
+  libspectrum_free( buffer );
+
+  return error;
+}
+
 void
 utils_networking_init( void )
 {

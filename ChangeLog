@@ -3,8 +3,8 @@
         * Fuse 1.5.5 released.
 
         * Miscellaneous improvements:
-          * Saving binary data no longer increments tstate count (Philip
-            Kendall).
+          * Saving and loading binary data no longer increments tstate count
+            or triggers breakpoints (thanks Sergio Baldoví) (Philip Kendall).
 
 2018-06-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
