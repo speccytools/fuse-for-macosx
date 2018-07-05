@@ -1,5 +1,5 @@
-/* sdljoystick.h: routines for dealing with the SDL joystick
-   Copyright (c) 2003 Fredrick Meunier
+/* relative_paths.c: Path-related compatibility routines
+   Copyright (c) 1999-2012 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,16 +19,26 @@
 
    E-mail: philip-fuse@shadowmagic.org.uk
 
-   Fred: fredm@spamcop.net
-
 */
 
-#ifndef FUSE_SDLJOYSTICK_H
-#define FUSE_SDLJOYSTICK_H
+#include <config.h>
 
-void sdljoystick_buttonpress( SDL_JoyButtonEvent *buttonevent );
-void sdljoystick_buttonrelease( SDL_JoyButtonEvent *buttonevent );
-void sdljoystick_axismove( SDL_JoyAxisEvent *axisevent );
-void sdljoystick_hatmove( SDL_JoyHatEvent *hatevent );
+#include <errno.h>
+#include <string.h>
+#include <unistd.h>
 
-#endif			/* #ifndef FUSE_SDLJOYSTICK_H */
+#include "fuse.h"
+#include "ui/ui.h"
+
+void
+get_relative_directory( char *buffer, size_t bufsize )
+{
+  size_t len = bufsize - strlen( fuse_progname ) - strlen( FUSE_DIR_SEP_STR );
+  if( !getcwd( buffer, len ) ) {
+    ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
+              strerror( -errno ) );
+    fuse_abort();
+  }
+  strcat( buffer, FUSE_DIR_SEP_STR );
+  strcat( buffer, fuse_progname );
+}

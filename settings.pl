@@ -166,13 +166,13 @@ void settings_defaults( settings_info *settings )
 static int
 read_config_file( settings_info *settings )
 {
-  const char *home; char path[ PATH_MAX ];
+  const char *cfgdir; char path[ PATH_MAX ];
 
   xmlDocPtr doc;
 
-  home = compat_get_home_path(); if( !home ) return 1;
+  cfgdir = compat_get_config_path(); if( !cfgdir ) return 1;
 
-  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", cfgdir, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
   if( !compat_file_exists( path ) ) {
@@ -271,13 +271,13 @@ print hashline( __LINE__ ), << 'CODE';
 int
 settings_write_config( settings_info *settings )
 {
-  const char *home; char path[ PATH_MAX ], buffer[80]; 
+  const char *cfgdir; char path[ PATH_MAX ], buffer[80];
 
   xmlDocPtr doc; xmlNodePtr root;
 
-  home = compat_get_home_path(); if( !home ) return 1;
+  cfgdir = compat_get_config_path(); if( !cfgdir ) return 1;
 
-  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", cfgdir, CONFIG_FILE_NAME );
 
   /* Create the XML document */
   doc = xmlNewDoc( (const xmlChar*)"1.0" );
@@ -327,15 +327,15 @@ CODE
 static int
 read_config_file( settings_info *settings )
 {
-  const char *home; char path[ PATH_MAX ];
+  const char *cfgdir; char path[ PATH_MAX ];
   struct stat stat_info;
   int error;
 
   utils_file file;
 
-  home = compat_get_home_path(); if( !home ) return 1;
+  cfgdir = compat_get_config_path(); if( !cfgdir ) return 1;
 
-  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", cfgdir, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
   if( stat( path, &stat_info ) ) {
@@ -497,13 +497,13 @@ settings_numeric_write( compat_fd doc, const char* name, int config )
 int
 settings_write_config( settings_info *settings )
 {
-  const char *home; char path[ PATH_MAX ];
+  const char *cfgdir; char path[ PATH_MAX ];
 
   compat_fd doc;
 
-  home = compat_get_home_path(); if( !home ) return 1;
+  cfgdir = compat_get_config_path(); if( !cfgdir ) return 1;
 
-  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", cfgdir, CONFIG_FILE_NAME );
 
   doc = compat_file_open( path, 1 );
   if( doc == COMPAT_FILE_OPEN_FAILED ) {

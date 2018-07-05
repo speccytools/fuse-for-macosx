@@ -110,6 +110,9 @@ ui_event( void )
     case SDL_JOYAXISMOTION:
       sdljoystick_axismove( &(event.jaxis) );
       break;
+    case SDL_JOYHATMOTION:
+      sdljoystick_hatmove( &(event.jhat) );
+      break;
 
 #endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
 
