@@ -693,24 +693,6 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
   ui_widget_finish();
 }
 
-MENU_CALLBACK( menu_media_ide_zxatasp_upload )
-{
-  settings_current.zxatasp_upload = !settings_current.zxatasp_upload;
-  ui_widget_finish();
-}
-
-MENU_CALLBACK( menu_media_ide_zxatasp_writeprotect )
-{
-  settings_current.zxatasp_wp = !settings_current.zxatasp_wp;
-  ui_widget_finish();
-}
-
-MENU_CALLBACK( menu_media_ide_zxcf_upload )
-{
-  settings_current.zxcf_upload = !settings_current.zxcf_upload;
-  ui_widget_finish();
-}
-
 MENU_CALLBACK( menu_file_savesnapshot )
 {
   char *filename;
