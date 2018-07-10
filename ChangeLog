@@ -2,6 +2,10 @@
 
         * Fuse 1.5.? released.
 
+        * Emulation core improvements:
+          * Z80 flags register is now correct after SCF and CCF (Sergio
+            Baldoví).
+
         * Miscellaneous improvements:
           * Factor out common paths code between Linux and generic UNIX (Alberto
             Garcia and Fredrick Meunier).
