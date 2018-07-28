@@ -14,6 +14,8 @@
             Meunier).
           * Saving and loading binary data no longer increments tstate count
             or triggers breakpoints (thanks, Sergio Baldoví) (Philip Kendall).
+          * Dinaload loaders (e.g. Astro Marine Corps) are now accelerated
+            (Philip Kendall).
 
 2018-07-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 

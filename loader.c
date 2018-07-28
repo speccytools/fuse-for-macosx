@@ -131,6 +131,7 @@ acceleration_detector( libspectrum_word pc )
       switch( b ) {
       case 0x00:			/* Search Loader */
       case 0x7f:			/* ROM loader and variants */
+      case 0xff:                        /* Dinaload */
 	state = 4; break;		/* Data byte */
       default: return ACCELERATION_MODE_NONE;
       }
