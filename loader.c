@@ -279,6 +279,7 @@ acceleration_detector( libspectrum_word pc )
       break;
     case 26:
       switch( b ) {
+      case 0x28: state = 12; break;     /* JR Z - Space Crusade */
       case 0xd8: state = 27; break;	/* RET C */
       default: return ACCELERATION_MODE_NONE;
       }
