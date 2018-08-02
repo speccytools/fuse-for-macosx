@@ -41,6 +41,7 @@
 #include "movie.h"
 #include "peripherals/ula.h"
 #include "pokefinder/pokemem.h"
+#include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -133,6 +134,10 @@ machine_select( libspectrum_machine type )
 {
   int i;
   int error;
+
+  /* Stop any ongoing RZX */
+  rzx_stop_recording();
+  rzx_stop_playback( 1 );
 
   /* We don't want to have to deal with screen size changes in the movie code
      and recording movies where we change machines seems pretty obscure */

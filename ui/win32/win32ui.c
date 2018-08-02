@@ -573,8 +573,15 @@ menu_machine_reset( int action )
 
   if( hard_reset )
     message = "Hard reset?";
-  
-  if( win32ui_confirm( message ) && machine_reset( hard_reset ) ) {
+
+  if( !win32ui_confirm( message ) ) {
+    return;
+
+  /* Stop any ongoing RZX */
+  rzx_stop_recording();
+  rzx_stop_playback( 1 );
+
+  if( machine_reset( hard_reset ) ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
     /* FIXME: abort() seems a bit extreme here, but it'll do for now */

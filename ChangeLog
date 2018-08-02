@@ -18,6 +18,8 @@
             "Variant" Search Loader programs (e.g. Lotus Esprit Turbo
             Challenge and Space Crusade) and Dinaload loaders (e.g. Astro Marine
             Corps) are now accelerated (Philip Kendall).
+          * Stop RZX playback/recording on machine reset/change (Sergio
+            Baldoví).
 
 2018-07-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
