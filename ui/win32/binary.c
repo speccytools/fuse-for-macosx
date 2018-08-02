@@ -66,7 +66,7 @@ menu_file_loadbinarydata( int action )
 
   fuse_emulation_pause();
 
-  info.dialog_title = TEXT( "Fuse - Load Binary Data" );
+  info.dialog_title = (TCHAR *) TEXT( "Fuse - Load Binary Data" );
   
   info.filename = ui_get_open_filename( info.dialog_title );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
@@ -248,7 +248,7 @@ menu_file_savebinarydata( int action )
 
   fuse_emulation_pause();
 
-  info.dialog_title = TEXT( "Fuse - Save Binary Data" );
+  info.dialog_title = (TCHAR *) TEXT( "Fuse - Save Binary Data" );
 
   info.filename = ui_get_save_filename( info.dialog_title );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
