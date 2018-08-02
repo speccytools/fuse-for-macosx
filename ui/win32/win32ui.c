@@ -574,7 +574,7 @@ menu_machine_reset( int action )
   if( hard_reset )
     message = "Hard reset?";
 
-  if( !win32ui_confirm( message ) ) {
+  if( !win32ui_confirm( message ) )
     return;
 
   /* Stop any ongoing RZX */
