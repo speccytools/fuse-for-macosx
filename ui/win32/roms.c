@@ -186,8 +186,8 @@ add_rom( HWND hwndDlg, size_t start, size_t row, int is_peripheral )
   HWND hgroup, hedit, hbutton;
   TCHAR buffer[ 80 ], **setting;
 
-  _sntprintf( buffer, 80, "ROM %d", row );
-  
+  _sntprintf( buffer, 80, "ROM %lu", (unsigned long)row );
+
   font = ( HFONT ) SendMessage( hwndDlg, WM_GETFONT, 0, 0 );
   
   /* create a groupbox */

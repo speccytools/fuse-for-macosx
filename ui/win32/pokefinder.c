@@ -202,7 +202,8 @@ update_pokefinder( void )
                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
 
   /* print possible locations */
-  _sntprintf( buffer, 256, "Possible locations: %d", pokefinder_count );
+  _sntprintf( buffer, 256, "Possible locations: %lu",
+              (unsigned long)pokefinder_count );
   SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LOCATIONS, WM_SETTEXT, 0,
                       (LPARAM) buffer );
 }
