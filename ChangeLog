@@ -1,6 +1,6 @@
 2018-08-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-        * Fuse 1.5.? released.
+        * Fuse 1.5.6 released.
 
         * Emulation core improvements:
           * Z80 flags register is now correct after SCF and CCF (Sergio
@@ -20,6 +20,7 @@
             Corps) are now accelerated (Philip Kendall).
           * Stop RZX playback/recording on machine reset/change (Sergio
             Baldoví).
+          * Various minor bugfixes.
 
 2018-07-01  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
