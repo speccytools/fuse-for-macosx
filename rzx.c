@@ -374,6 +374,8 @@ int rzx_stop_playback( int add_interrupt )
 {
   libspectrum_error libspec_error;
 
+  if( !rzx_playback ) return 0;
+
   rzx_playback = 0;
   if( settings_current.movie_stop_after_rzx ) movie_stop();
 

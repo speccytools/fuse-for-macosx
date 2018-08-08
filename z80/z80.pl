@@ -149,6 +149,7 @@ sub cpi_cpd ($) {
 	  ( bytetemp & FLAG_S );
 	if(F & FLAG_H) bytetemp--;
 	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
+	Q = F;
 	z80.memptr.w$modifier;
       }
 CODE
@@ -175,6 +176,7 @@ sub cpir_cpdr ($) {
 	  ( bytetemp & FLAG_S );
 	if(F & FLAG_H) bytetemp--;
 	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
+	Q = F;
 	if( ( F & ( FLAG_V | FLAG_Z ) ) == FLAG_V ) {
 	  contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
 	  contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
@@ -252,6 +254,7 @@ sub ini_ind ($) {
             ( ( initemp2 < initemp ) ? FLAG_H | FLAG_C : 0 ) |
             ( parity_table[ ( initemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
             sz53_table[B];
+	Q = F;
       }
 CODE
 }
@@ -277,6 +280,7 @@ sub inir_indr ($) {
             ( ( initemp2 < initemp ) ? FLAG_H | FLAG_C : 0 ) |
             ( parity_table[ ( initemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
             sz53_table[B];
+	Q = F;
 
 	if( B ) {
 	  contend_write_no_mreq( HL, 1 ); contend_write_no_mreq( HL, 1 );
@@ -306,6 +310,7 @@ sub ldi_ldd ($) {
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
 	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
+	Q = F;
       }
 CODE
 }
@@ -325,6 +330,7 @@ sub ldir_lddr ($) {
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
 	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
+	Q = F;
 	if(BC) {
 	  contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
 	  contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
@@ -359,6 +365,7 @@ sub otir_otdr ($) {
             ( ( outitemp2 < outitemp ) ? FLAG_H | FLAG_C : 0 ) |
             ( parity_table[ ( outitemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
             sz53_table[B];
+	Q = F;
 
 	if( B ) {
 	  contend_read_no_mreq( BC, 1 ); contend_read_no_mreq( BC, 1 );
@@ -392,6 +399,7 @@ sub outi_outd ($) {
             ( ( outitemp2 < outitemp ) ? FLAG_H | FLAG_C : 0 ) |
             ( parity_table[ ( outitemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
             sz53_table[B];
+	Q = F;
       }
 CODE
 }
@@ -516,7 +524,9 @@ sub opcode_CALL (@) { call_jp( 'CALL', $_[0], $_[1] ); }
 sub opcode_CCF (@) {
     print << "CCF";
       F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
-	( ( F & FLAG_C ) ? FLAG_H : FLAG_C ) | ( A & ( FLAG_3 | FLAG_5 ) );
+          ( ( F & FLAG_C ) ? FLAG_H : FLAG_C ) |
+          ( ( IS_CMOS ? A : ( ( last_Q ^ F ) | A ) ) & ( FLAG_3 | FLAG_5 ) );
+      Q = F;
 CCF
 }
 
@@ -535,6 +545,7 @@ sub opcode_CPL (@) {
       A ^= 0xff;
       F = ( F & ( FLAG_C | FLAG_P | FLAG_Z | FLAG_S ) ) |
 	( A & ( FLAG_3 | FLAG_5 ) ) | ( FLAG_N | FLAG_H );
+      Q = F;
 CPL
 }
 
@@ -551,6 +562,7 @@ sub opcode_DAA (@) {
 	  ADD(add);
 	}
 	F = ( F & ~( FLAG_C | FLAG_P ) ) | carry | parity_table[A];
+	Q = F;
       }
 DAA
 }
@@ -752,6 +764,7 @@ LD
             if( $dest eq 'A' and ( $src eq 'I' or $src eq 'R' ) ) {
 		print << "LD";
       F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );
+      Q = F;
       z80.iff2_read = 1;
       event_add( tstates, z80_nmos_iff2_event );
 LD
@@ -1000,6 +1013,7 @@ sub opcode_RLCA (@) {
       A = ( A << 1 ) | ( A >> 7 );
       F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
 	( A & ( FLAG_C | FLAG_3 | FLAG_5 ) );
+      Q = F;
 RLCA
 }
 
@@ -1010,6 +1024,7 @@ sub opcode_RLA (@) {
 	A = ( A << 1 ) | ( F & FLAG_C );
 	F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
 	  ( A & ( FLAG_3 | FLAG_5 ) ) | ( bytetemp >> 7 );
+	Q = F;
       }
 RLA
 }
@@ -1023,6 +1038,7 @@ sub opcode_RLD (@) {
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
 	F = ( F & FLAG_C ) | sz53p_table[A];
+	Q = F;
 	z80.memptr.w=HL+1;
       }
 RLD
@@ -1037,6 +1053,7 @@ sub opcode_RRA (@) {
 	A = ( A >> 1 ) | ( F << 7 );
 	F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
 	  ( A & ( FLAG_3 | FLAG_5 ) ) | ( bytetemp & FLAG_C ) ;
+	Q = F;
       }
 RRA
 }
@@ -1048,6 +1065,7 @@ sub opcode_RRCA (@) {
       F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) | ( A & FLAG_C );
       A = ( A >> 1) | ( A << 7 );
       F |= ( A & ( FLAG_3 | FLAG_5 ) );
+      Q = F;
 RRCA
 }
 
@@ -1060,6 +1078,7 @@ sub opcode_RRD (@) {
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
 	F = ( F & FLAG_C ) | sz53p_table[A];
+	Q = F;
 	z80.memptr.w=HL+1;
       }
 RRD
@@ -1077,8 +1096,9 @@ sub opcode_SBC (@) { arithmetic_logical( 'SBC', $_[0], $_[1] ); }
 sub opcode_SCF (@) {
     print << "SCF";
       F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
-	  ( A & ( FLAG_3 | FLAG_5          ) ) |
-	  FLAG_C;
+          ( ( IS_CMOS ? A : ( ( last_Q ^ F ) | A ) ) & ( FLAG_3 | FLAG_5 ) ) |
+          FLAG_C;
+      Q = F;
 SCF
 }
 

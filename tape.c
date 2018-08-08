@@ -103,8 +103,8 @@ get_microphone( void )
   return tape_microphone;
 }
 
-static void next_edge( libspectrum_dword last_tstates, int type,
-    void *user_data )
+static void
+next_edge( libspectrum_dword last_tstates, int type, void *user_data )
 {
   tape_next_edge( last_tstates, 0 );
 }
@@ -159,7 +159,8 @@ tape_register_startup( void )
                             tape_end );
 }
 
-int tape_open( const char *filename, int autoload )
+int
+tape_open( const char *filename, int autoload )
 {
   utils_file file;
   int error;
@@ -251,7 +252,8 @@ tape_autoload( libspectrum_machine hardware )
 }
 
 /* Close the active tape file */
-int tape_close( void )
+int
+tape_close( void )
 {
   int error;
   ui_confirm_save_t confirm;
@@ -334,7 +336,8 @@ tape_get_current_block( void )
 }
 
 /* Write the current in-memory tape file out to disk */
-int tape_write( const char* filename )
+int
+tape_write( const char* filename )
 {
   libspectrum_id_t type;
   libspectrum_class_t class;
@@ -376,7 +379,8 @@ int tape_can_autoload( void )
    loaded (even if it had an tape loading error or equivalent) or
    non-zero if there was an error at the emulator level, or tape traps
    are not active */
-int tape_load_trap( void )
+int
+tape_load_trap( void )
 {
   libspectrum_tape_block *block, *next_block;
   int error;
@@ -560,7 +564,8 @@ common_ret:
 /* Append to the current tape file in memory; returns 0 if a block was
    saved or non-zero if there was an error at the emulator level, or tape
    traps are not active */
-int tape_save_trap( void )
+int
+tape_save_trap( void )
 {
   libspectrum_tape_block *block;
   libspectrum_byte parity, *data;
@@ -659,7 +664,8 @@ tape_do_play( int autoplay )
   }
 }
 
-int tape_toggle_play( int autoplay )
+int
+tape_toggle_play( int autoplay )
 {
   if( tape_playing ) {
     return tape_stop();

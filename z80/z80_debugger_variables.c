@@ -75,6 +75,8 @@ static const char * const im_detail_string = "im";
 static const char * const iff1_detail_string = "iff1";
 static const char * const iff2_detail_string = "iff2";
 
+static const char * const q_detail_string = "q";
+
 #define DEBUGGER_CALLBACKS(reg) static libspectrum_dword \
 get_##reg( void ) \
 { \
@@ -121,6 +123,8 @@ DEBUGGER_CALLBACKS(IX)
 DEBUGGER_CALLBACKS(IY)
 
 DEBUGGER_CALLBACKS(I)
+
+DEBUGGER_CALLBACKS(Q)
 
 static libspectrum_dword
 get_R( void )
@@ -263,4 +267,7 @@ z80_debugger_variables_init( void )
                                      get_IFF1, set_IFF1 );
   debugger_system_variable_register( debugger_type_string, iff2_detail_string, 
                                      get_IFF2, set_IFF2 );
+
+  debugger_system_variable_register( debugger_type_string, q_detail_string, 
+                                     get_Q, set_Q );
 }

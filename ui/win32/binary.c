@@ -66,7 +66,7 @@ menu_file_loadbinarydata( int action )
 
   fuse_emulation_pause();
 
-  info.dialog_title = TEXT( "Fuse - Load Binary Data" );
+  info.dialog_title = (TCHAR *) TEXT( "Fuse - Load Binary Data" );
   
   info.filename = ui_get_open_filename( info.dialog_title );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
@@ -236,7 +236,7 @@ load_data( HWND hwndDlg, LONG_PTR user_data )
   }
 
   for( i = 0; i < length; i++ )
-    writebyte( start + i, info->file.buffer[ i ] );
+    writebyte_internal( start + i, info->file.buffer[ i ] );
 
   EndDialog( hwndDlg, 0 );
 }
@@ -248,7 +248,7 @@ menu_file_savebinarydata( int action )
 
   fuse_emulation_pause();
 
-  info.dialog_title = TEXT( "Fuse - Save Binary Data" );
+  info.dialog_title = (TCHAR *) TEXT( "Fuse - Save Binary Data" );
 
   info.filename = ui_get_save_filename( info.dialog_title );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
@@ -287,9 +287,7 @@ static void
 save_data( HWND hwndDlg, LONG_PTR user_data )
 {
   struct binary_info *info = ( struct binary_info * ) user_data;
-
-  long start, length; size_t i;
-  libspectrum_byte *buffer;
+  long start, length;
   HWND hwnd_control;
 
   TCHAR *temp_buffer, *endptr;
@@ -317,12 +315,6 @@ save_data( HWND hwndDlg, LONG_PTR user_data )
   }
   free( temp_buffer );
 
-  buffer = malloc( length * sizeof( libspectrum_byte ) );
-  if( !buffer ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return;
-  }
-
   errno = 0;
   temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START,
                                         WM_GETTEXTLENGTH, 0, 0 );
@@ -336,7 +328,6 @@ save_data( HWND hwndDlg, LONG_PTR user_data )
   if( errno || start < 0 || start > 0xffff || endptr == temp_buffer ) {
     free( temp_buffer );
     ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
-    free( buffer );
     hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_START );
     SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
@@ -345,19 +336,13 @@ save_data( HWND hwndDlg, LONG_PTR user_data )
 
   if( start + length > 0x10000 ) {
     ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
-    free( buffer );
     hwnd_control = GetDlgItem( hwndDlg, IDC_BINARY_EDIT_LENGTH );
     SendMessage( hwndDlg, WM_NEXTDLGCTL, (WPARAM) hwnd_control, TRUE );
     return;
   }
 
-  for( i = 0; i < length; i++ )
-    buffer[ i ] = readbyte( start + i );
-
-  error = utils_write_file( info->filename, buffer, length );
-  if( error ) { free( buffer ); return; }
-
-  free( buffer );
+  error = utils_save_binary( start, length, info->filename );
+  if( error ) return;
 
   EndDialog( hwndDlg, 0 );
 }

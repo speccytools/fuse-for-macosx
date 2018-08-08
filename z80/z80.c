@@ -159,6 +159,7 @@ z80_reset( int hard_reset )
   IFF1=IFF2=IM=0;
   z80.halted=0;
   z80.iff2_read=0;
+  Q = 0;
 
   if( hard_reset ) {
     BC =DE =HL =0;
@@ -234,6 +235,7 @@ z80_interrupt( void )
     }
 
     z80.memptr.w = PC;
+    Q = 0;
 
     return 1;			/* Accepted an interrupt */
 
@@ -276,6 +278,7 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
     spectranet_nmi();
   }
 
+  Q = 0;
   PC = 0x0066;
 }
 
@@ -310,6 +313,8 @@ z80_from_snapshot( libspectrum_snap *snap )
 
   z80.interrupts_enabled_at =
     libspectrum_snap_last_instruction_ei( snap ) ? tstates : -1;
+
+  Q = libspectrum_snap_last_instruction_set_f( snap ) ? F : 0;
 }
   
 static void
@@ -341,4 +346,9 @@ z80_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_last_instruction_ei(
     snap, z80.interrupts_enabled_at == tstates
   );
+
+  /* If last instruction set F but it's zero, it is saved as false, but the
+     result of the next (hypothetically) SCF/CCF instruction it's
+     independent of this flag */
+  libspectrum_snap_set_last_instruction_set_f( snap, !!Q );
 }

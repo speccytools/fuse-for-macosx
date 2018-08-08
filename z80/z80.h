@@ -49,6 +49,12 @@ typedef struct {
   libspectrum_byte iff1, iff2, im;
   int halted;
 
+  /* Presumably, internal register where Z80 assembles the new content of the
+     F register, before moving it back to F. The behaviour is deterministic in
+     Zilog Z80 and nondeterministic in NEC Z80.
+     https://www.worldofspectrum.org/forums/discussion/41704/ */
+  libspectrum_byte q;
+
   /* Interrupts were enabled at this time; do not accept any interrupts
      until tstates > this value */
   libspectrum_signed_dword interrupts_enabled_at;

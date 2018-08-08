@@ -363,8 +363,10 @@ phantom_typist_activate_disk( void )
 void
 phantom_typist_deactivate( void )
 {
-  phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
-  next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
+  if( phantom_typist_is_active() ) {
+    phantom_typist_state = PHANTOM_TYPIST_STATE_WAITING;
+    next_phantom_typist_state = PHANTOM_TYPIST_STATE_INACTIVE;
+  }
 }
 
 static void

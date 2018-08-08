@@ -617,6 +617,11 @@ menu_machine_reset( int action )
     return;
 
   widget_end_all( WIDGET_FINISHED_OK );
+
+  /* Stop any ongoing RZX */
+  rzx_stop_recording();
+  rzx_stop_playback( 1 );
+
   machine_reset( hard_reset );
 }
 

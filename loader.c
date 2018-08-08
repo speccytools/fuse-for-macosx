@@ -117,6 +117,7 @@ acceleration_detector( libspectrum_word pc )
       break;
     case 1:
       switch( b ) {
+      case 0x20: state = 40; break;     /* JR NZ - variant Alkatraz */
       case 0xc8: state = 2; break;	/* RET Z */
       default: return ACCELERATION_MODE_NONE;
       }
@@ -131,6 +132,7 @@ acceleration_detector( libspectrum_word pc )
       switch( b ) {
       case 0x00:			/* Search Loader */
       case 0x7f:			/* ROM loader and variants */
+      case 0xff:                        /* Dinaload */
 	state = 4; break;		/* Data byte */
       default: return ACCELERATION_MODE_NONE;
       }
@@ -279,6 +281,7 @@ acceleration_detector( libspectrum_word pc )
       break;
     case 26:
       switch( b ) {
+      case 0x28: state = 12; break;     /* JR Z - Space Crusade */
       case 0xd8: state = 27; break;	/* RET C */
       default: return ACCELERATION_MODE_NONE;
       }
@@ -352,7 +355,24 @@ acceleration_detector( libspectrum_word pc )
       break;
     case 39:
       switch( b ) {
-      case 0xf1: return ACCELERATION_MODE_INCREASING; /* Data byte */
+      case 0xf1:                        /* Normal data byte */
+      case 0xf3:                        /* Variant data byte */
+        return ACCELERATION_MODE_INCREASING;
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+
+    /* "Variant" Alkatraz */
+
+    case 40:
+      switch( b ) {
+      case 0x01: state = 41; break;     /* Data byte of JR NZ */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 41:
+      switch( b ) {
+      case 0xc9: state = 31; break;     /* RET */
       default: return ACCELERATION_MODE_NONE;
       }
       break;

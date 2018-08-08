@@ -46,7 +46,8 @@ fuse_SOURCES += \
                 compat/unix/dir.c \
                 compat/unix/file.c \
                 compat/unix/osname.c \
-                compat/linux/paths.c \
+                compat/linux/relative_paths.c \
+                compat/unix/paths.c \
                 compat/unix/timer.c
 
 if HAVE_SOCKETS
@@ -70,6 +71,7 @@ fuse_SOURCES += \
                 compat/unix/dir.c \
                 compat/unix/file.c \
                 compat/unix/osname.c \
+                compat/unix/relative_paths.c \
                 compat/unix/paths.c \
                 compat/unix/timer.c
 

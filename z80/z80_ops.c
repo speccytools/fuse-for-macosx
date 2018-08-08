@@ -115,6 +115,7 @@ z80_do_opcodes( void )
 #ifdef HAVE_ENOUGH_MEMORY
   libspectrum_byte opcode = 0x00;
 #endif
+  libspectrum_byte last_Q;
 
   int even_m1 =
     machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_EVEN_M1; 
@@ -353,6 +354,9 @@ z80_do_opcodes( void )
 
   end_opcode:
     PC++; R++;
+    last_Q = Q; /* keep Q value from previous opcode for SCF and CCF */
+    Q = 0;      /* preempt Q value assuming next opcode doesn't set flags */
+
     switch(opcode) {
 #include "z80/opcodes_base.c"
     }
