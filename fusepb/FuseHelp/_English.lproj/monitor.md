@@ -125,7 +125,7 @@ SYSTEM VARIABLE | DESCRIPTION
 *ula:mem1ffd* | The last byte written to memory control port used by the ZX Spectrum +2A/3; normally addressed at 0x1ffd, hence the name.
 *ula:mem7ffd* | The last byte written to primary memory control port used by the ZX Spectrum 128 and later; normally addressed at 0x7ffd, hence the name.
 *ula:tstates* | The number of tstates since the last interrupt.
-*z80: register name* | The value of the specified register. Both 8‐bit registers and 16‐bit register pairs are supported. The MEMPTR / WZ hidden register is also supported.
+*z80: register name* | The value of the specified register. Both 8‐bit registers and 16‐bit register pairs are supported. The MEMPTR / WZ hidden register is also supported. The (presumable) Q hidden register is also supported.
 *z80:im* | The current interrupt mode of the Z80.
 *z80:iff1* | 1 if the interrupt flip‐flop is currently set, or 0 if it is not set.
 *z80:iff2* | 1 if the interrupt flip‐flop is currently set, or 0 if it is not set.

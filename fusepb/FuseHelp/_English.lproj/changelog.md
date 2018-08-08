@@ -1,7 +1,21 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.5.5 of the Fuse emulator.
+description: This section describes the changes for version 1.5.6 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.5.6
+
+### Emulation core improvements:
+* Z80 flags register is now correct after SCF and CCF (Sergio
+Baldoví).
+
+### Miscellaneous improvements:
+* More improvements disabling phantom typist after finishing loading TAP or standard ROM TZX files (thanks, Alberto Garcia) (Fredrick Meunier).
+* Saving and loading binary data no longer increments tstate count or triggers breakpoints (thanks, Sergio Baldoví) (Philip Kendall).
+* "Variant" Alkatraz loaders (e.g. Gauntlet 3 and Shadow Dancer), "Variant" Search Loader programs (e.g. Lotus Esprit Turbo Challenge and Space Crusade) and Dinaload loaders (e.g. Astro Marine Corps) are now accelerated (Philip Kendall).
+* Stop emulator recording playback/recording on machine reset/change (Sergio Baldoví).
+
+### Various other minor bugfixes.
 
 ## What's new in Fuse for macOS 1.5.5
 

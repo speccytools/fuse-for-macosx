@@ -66,27 +66,14 @@
 
 - (IBAction)apply:(id)sender
 {
-  libspectrum_word s, l; size_t i;
-  libspectrum_byte *buffer;
-
-  int error;
+  libspectrum_word s, l;
 
   s = [start intValue];
   l = [length intValue];
   
-  buffer = malloc( l * sizeof( libspectrum_byte ) );
-  if( !buffer ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+  if( utils_save_binary( s, l, [[file stringValue] UTF8String] ) ) {
     return;
   }
-
-  for( i = 0; i < l; i++ )
-    buffer[ i ] = readbyte( s + i );
-
-  error = utils_write_file( [[file stringValue] UTF8String], buffer, l );
-  if( error ) { free( buffer ); return; }
-
-  free( buffer );
   
   [self cancel:self];
 }

@@ -82,7 +82,7 @@ static utils_file u_file;
   s = [start intValue];
 
   for( i = 0; i < len; i++ )
-    writebyte( s + i, u_file.buffer[ i ] );
+    writebyte_internal( s + i, u_file.buffer[ i ] );
 
   [self cancel:self];
 }
