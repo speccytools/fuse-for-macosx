@@ -449,7 +449,7 @@ utils_safe_strdup( const char *src )
 }
 
 int
-utils_save_binary( libspectrum_word start, libspectrum_word length,
+utils_save_binary( libspectrum_word start, size_t length,
                    const char *filename )
 {
   libspectrum_byte *buffer;
