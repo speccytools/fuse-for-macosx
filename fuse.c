@@ -87,7 +87,7 @@
 #include "peripherals/scld.h"
 #include "peripherals/speccyboot.h"
 #include "peripherals/spectranet.h"
-#include "peripherals/teletext.h"
+#include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
 #include "phantom_typist.h"
@@ -337,7 +337,7 @@ run_startup_manager( int *argc, char ***argv )
   spectranet_register_startup();
   spectrum_register_startup();
   tape_register_startup();
-  teletext_register_startup();
+  ttx2000s_register_startup();
   timer_register_startup();
   ula_register_startup();
   usource_register_startup();

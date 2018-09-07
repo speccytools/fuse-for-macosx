@@ -38,7 +38,7 @@ fuse_SOURCES += \
                 peripherals/spectranet.c \
                 peripherals/ula.c \
                 peripherals/usource.c \
-                peripherals/teletext.c \
+                peripherals/ttx2000s.c \
                 peripherals/disk/beta.c \
                 peripherals/disk/crc.c \
                 peripherals/disk/didaktik.c \
@@ -88,7 +88,7 @@ noinst_HEADERS += \
                   peripherals/spectranet.h \
                   peripherals/ula.h \
                   peripherals/usource.h \
-                  peripherals/teletext.h \
+                  peripherals/ttx2000s.h \
                   peripherals/disk/beta.h \
                   peripherals/disk/crc.h \
                   peripherals/disk/didaktik.h \

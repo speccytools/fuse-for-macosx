@@ -769,7 +769,7 @@ settings_get_rom_setting( settings_info *settings, size_t which,
     case  7: return &( settings->rom_multiface3 );
     case  8: return &( settings->rom_opus );
     case  9: return &( settings->rom_speccyboot );
-    case 10: return &( settings->rom_teletext );
+    case 10: return &( settings->rom_ttx2000s );
     case 11: return &( settings->rom_usource );
     default: return NULL;
     }

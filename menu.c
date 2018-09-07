@@ -292,7 +292,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
   case  8: menu_select_peripheral_roms( "Multiface 3",     7, 1 ); return;
   case  9: menu_select_peripheral_roms( "Opus Discovery",  8, 1 ); return;
   case 10: menu_select_peripheral_roms( "SpeccyBoot",      9, 1 ); return;
-  case 11: menu_select_peripheral_roms( "Teletext",       10, 1 ); return;
+  case 11: menu_select_peripheral_roms( "TTX2000S",       10, 1 ); return;
   case 12: menu_select_peripheral_roms( "uSource",        11, 1 ); return;
 
   }
