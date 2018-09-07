@@ -1,5 +1,5 @@
 # settings.dat: configuration options for Fuse
-# Copyright (c) 2002-2017 Philip Kendall
+# Copyright (c) 2002-2018 Philip Kendall, Alistair Cree
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -85,6 +85,7 @@ speccyboot, boolean, 0
 specdrum, boolean, 0
 spectranet, boolean, 0
 spectranet_disable, boolean, 0
+teletext, boolean, 0
 usource, boolean, 0
 zxprinter, boolean, 1
 covox, boolean, 0
@@ -258,6 +259,7 @@ rom_multiface128, string, "mf128.rom",
 rom_multiface3, string, "mf3.rom",
 rom_opus, string, "opus.rom",
 rom_speccyboot, string, "speccyboot-1.4.rom",
+rom_teletext, string, "teletext.rom",
 rom_usource, string, "usource.rom",
 
 drive_plus3a_type, string, NULL

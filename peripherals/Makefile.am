@@ -1,8 +1,6 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2011 Philip Kendall
-## Copyright (c) 2015 Stuart Brady
-## Copyright (c) 2015 Sergio Baldoví
-## Copyright (c) 2017 Fredrick Meunier
+## Copyright (c) 2018 Philip Kendall, Stuart Brady, Sergio Baldoví,
+##   Fredrick Meunier, Alistair Cree
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -40,6 +38,7 @@ fuse_SOURCES += \
                 peripherals/spectranet.c \
                 peripherals/ula.c \
                 peripherals/usource.c \
+                peripherals/teletext.c \
                 peripherals/disk/beta.c \
                 peripherals/disk/crc.c \
                 peripherals/disk/didaktik.c \
@@ -89,6 +88,7 @@ noinst_HEADERS += \
                   peripherals/spectranet.h \
                   peripherals/ula.h \
                   peripherals/usource.h \
+                  peripherals/teletext.h \
                   peripherals/disk/beta.h \
                   peripherals/disk/crc.h \
                   peripherals/disk/didaktik.h \
