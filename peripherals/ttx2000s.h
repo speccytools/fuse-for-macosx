@@ -23,7 +23,8 @@
 extern int ttx2000s_paged;
 
 void ttx2000s_register_startup( void );
-
+void ttx2000s_page( void );
+void ttx2000s_unpage( void );
 int ttx2000s_unittest( void );
 
 #endif				/* #ifndef FUSE_TTX2000S_H */

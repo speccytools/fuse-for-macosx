@@ -22,6 +22,7 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory_pages.h"
@@ -30,6 +31,7 @@
 #include "settings.h"
 #include "unittests/unittests.h"
 #include "ttx2000s.h"
+#include "ui/ui.h"
 
 static memory_page ttx2000s_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page ttx2000s_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
@@ -43,6 +45,34 @@ int ttx2000s_paged = 0;
 static void ttx2000s_write( libspectrum_word port, libspectrum_byte val );
 static void ttx2000s_reset( int hard_reset );
 static void ttx2000s_memory_map( void );
+
+/* Debugger events */
+static const char * const event_type_string = "ttx2000s";
+static int page_event, unpage_event;
+
+void
+ttx2000s_page( void )
+{
+  if( ttx2000s_paged )
+    return;
+
+  ttx2000s_paged = 1;
+  machine_current->ram.romcs = 1;
+  machine_current->memory_map();
+  debugger_event( page_event );
+}
+
+void
+ttx2000s_unpage( void )
+{
+  if( !ttx2000s_paged )
+    return;
+
+  ttx2000s_paged = 0;
+  machine_current->ram.romcs = 0;
+  machine_current->memory_map();
+  debugger_event( unpage_event );
+}
 
 static module_info_t ttx2000s_module_info = {
   /* .reset = */ ttx2000s_reset,
@@ -79,6 +109,8 @@ ttx2000s_init( void *context )
     ttx2000s_memory_map_romcs_ram[i].source = ttx2000s_ram_memory_source;
 
   periph_register( PERIPH_TYPE_TTX2000S, &ttx2000s_periph );
+  periph_register_paging_events( event_type_string, &page_event,
+				 &unpage_event );
 
   return 0;
 }
@@ -92,6 +124,7 @@ void
 ttx2000s_register_startup( void )
 {
   startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
     STARTUP_MANAGER_MODULE_SETUID,
   };
@@ -148,9 +181,10 @@ ttx2000s_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
   /* bits 0 and 1 select channel preset */
   /* bit 2 enables automatic frequency control */
-  ttx2000s_paged = (val & 8)?0:1; /* bit 3 pages out */
-  machine_current->ram.romcs = ttx2000s_paged;
-  machine_current->memory_map();
+  if (val & 0x08) /* bit 3 pages out */
+    ttx2000s_unpage();
+  else
+    ttx2000s_page();
 }
 
 int

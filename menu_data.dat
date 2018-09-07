@@ -125,7 +125,7 @@ Options/Select ROMs/Peripheral ROMs/Multiface _128..., Item,, menu_options_selec
 Options/Select ROMs/Peripheral ROMs/Multiface _3..., Item,, menu_options_selectroms_peripheral_select,, 8
 Options/Select ROMs/Peripheral ROMs/_Opus Discovery..., Item,, menu_options_selectroms_peripheral_select,, 9
 Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_peripheral_select,, 10
-Options/Select ROMs/Peripheral ROMs/Telete_xt..., Item,, menu_options_selectroms_peripheral_select,, 11
+Options/Select ROMs/Peripheral ROMs/TT_X2000S..., Item,, menu_options_selectroms_peripheral_select,, 11
 Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 12
 
 Options/_Filter..., Item,,, menu_filter_detail
