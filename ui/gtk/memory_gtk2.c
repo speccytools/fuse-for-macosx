@@ -154,7 +154,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
   GtkAdjustment *adjustment;
   GtkTreeModel *model;
   int error;
-  gtkui_font font;
+  PangoFontDescription *font;
 
   fuse_emulation_pause();
 
@@ -170,7 +170,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   /* The list itself */
   list = create_mem_list();
-  gtkui_set_font( list, font );
+  gtk_widget_override_font( list, font );
   model = gtk_tree_view_get_model( GTK_TREE_VIEW( list ) );
   update_display( GTK_TREE_MODEL( model ), memaddr );
   gtk_box_pack_start( GTK_BOX( box ), list, TRUE, TRUE, 0 );

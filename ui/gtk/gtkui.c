@@ -798,7 +798,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
  */
 
 int
-gtkui_get_monospaced_font( gtkui_font *font )
+gtkui_get_monospaced_font( PangoFontDescription **font )
 {
   *font = pango_font_description_from_string( "Monospace 10" );
   if( !(*font) ) {
@@ -810,15 +810,9 @@ gtkui_get_monospaced_font( gtkui_font *font )
 }
 
 void
-gtkui_free_font( gtkui_font font )
+gtkui_free_font( PangoFontDescription *font )
 {
   pango_font_description_free( font );
-}
-
-void
-gtkui_set_font( GtkWidget *widget, gtkui_font font )
-{
-  gtk_widget_override_font( widget, font );
 }
 
 void

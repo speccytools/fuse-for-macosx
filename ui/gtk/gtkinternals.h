@@ -118,11 +118,8 @@ GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 
 GtkWidget *gtkstock_dialog_new( const gchar *title, GCallback destroy );
 
-typedef PangoFontDescription *gtkui_font;
-
-int gtkui_get_monospaced_font( gtkui_font *font );
-void gtkui_free_font( gtkui_font font );
-void gtkui_set_font( GtkWidget *widget, gtkui_font font );
+int gtkui_get_monospaced_font( PangoFontDescription **font );
+void gtkui_free_font( PangoFontDescription *font );
 
 int gtkui_menubar_get_height( void );
 
