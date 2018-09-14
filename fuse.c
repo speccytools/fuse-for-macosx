@@ -413,7 +413,7 @@ creator_init( void *context )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
-  char *custom, osname[ 256 ];
+  char *custom, osname[ 192 ];
   static const size_t CUSTOM_SIZE = 256;
   
   libspectrum_error error; int sys_error;
