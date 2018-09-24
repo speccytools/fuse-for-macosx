@@ -29,6 +29,10 @@
 
 #include <gtk/gtk.h>
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
+
 #include "display.h"
 #include "fuse.h"
 #include "gtkinternals.h"
@@ -583,6 +587,9 @@ gtkdisplay_update_geometry( void )
 
   scale = scaler_get_scaling_factor( current_scaler );
 
+  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
+          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
+
 #if GTK_CHECK_VERSION( 3, 0, 0 )
 
   /* Since GTK+ 3.20 it is intended that gtk_window_set_geometry_hints
@@ -597,14 +604,22 @@ gtkdisplay_update_geometry( void )
     extra_height += gtkstatusbar_get_height();
   }
 
-#else
+#ifdef GDK_WINDOWING_WAYLAND
+  /* We don't calculate the window size enough accurately on wayland
+     backend to force the window geometry (bug #367) */
+  GdkDisplay *display = gdk_display_get_default();
+
+  if( GDK_IS_WAYLAND_DISPLAY( display ) ) {
+    hints &= ~GDK_HINT_RESIZE_INC;
+  }
+#endif                /* #ifdef GDK_WINDOWING_WAYLAND */
+
+#else                 /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
 
   geometry_widget = gtkui_drawing_area;
 
 #endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
 
-  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
-          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
 
   geometry.min_width = DISPLAY_ASPECT_WIDTH;
   geometry.min_height = DISPLAY_SCREEN_HEIGHT + extra_height;

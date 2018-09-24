@@ -350,7 +350,12 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
   /* Go to offset */
   box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 8 );
   offset = gtk_search_entry_new();
-  gtk_entry_set_width_chars( GTK_ENTRY( offset ), 7 );
+  /*
+   * Entry is max 6 chars wide ("0xXXXX") but the GTK widget adds
+   * a search icon and "clear contents" icon, which between them
+   * take up about 6 char's widths. So it needs to be wider.
+   */
+  gtk_entry_set_width_chars( GTK_ENTRY( offset ), 15 );
   gtk_entry_set_max_length( GTK_ENTRY( offset ), 6 );
   gtk_box_pack_end( GTK_BOX( box ), offset, FALSE, FALSE, 0 );
 
