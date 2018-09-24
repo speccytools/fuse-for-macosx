@@ -3,6 +3,8 @@
         * Miscellaneous improvements:
           * "Save binary" command can now save 65536 bytes again (regression
             introduced in 1.5.6; thanks, thrice) (Philip Kendall).
+          * Improve Fuse's behaviour under Wayland; still not right, but
+            better than it was before (Sergio Baldoví).
 
 2018-08-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
