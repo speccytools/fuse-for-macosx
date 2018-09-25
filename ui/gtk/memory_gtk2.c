@@ -56,7 +56,7 @@ update_display( GtkTreeModel *model, libspectrum_word base )
 
   gchar buffer[ 8 + 64 + 20 ];
   gchar *text[] = { &buffer[0], &buffer[ 8 ], &buffer[ 8 + 64 ] };
-  char buffer2[ 8 ];
+  char buffer2[ 4 ];
 
   memaddr = base;
   gtk_list_store_clear( GTK_LIST_STORE( model ) );
