@@ -50,7 +50,7 @@ gtkmouse_reset_pointer( void )
    * For Win32, use SetCursorPos() -- see sdpGtkWarpPointer() at
    * http://k3d.cvs.sourceforge.net/k3d/projects/sdplibs/sdpgtk/sdpgtkutility.cpp?view=markup
    */
-  GtkWindow *gtkwindow;
+  GtkWidget *widget;
   GdkWindow *window;
 
   /* The logic here is a bit hairy:
@@ -68,15 +68,15 @@ gtkmouse_reset_pointer( void )
   if( GDK_IS_WAYLAND_DISPLAY( display ) ) return;
 #endif                /* #ifdef GDK_WINDOWING_WAYLAND */
 
-  gtkwindow = gtkui_window;
+  widget = gtkui_window;
 
 #else                 /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
 
-  gtkwindow = gtkui_drawing_area;
+  widget = gtkui_drawing_area;
 
 #endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
 
-  window = gtk_widget_get_window( gtkwindow );
+  window = gtk_widget_get_window( widget );
   XWarpPointer( GDK_WINDOW_XDISPLAY( window ), None, 
                 GDK_WINDOW_XID( window ), 0, 0, 0, 0, 128, 128 );
 }
