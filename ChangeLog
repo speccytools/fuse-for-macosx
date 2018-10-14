@@ -1,12 +1,18 @@
 2018-09-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
+        * UI improvements:
+          * GTK+ 3: Make the offset entry wider in memory browser (Derek
+            Fountain).
+          * Improve Fuse's window sizing under Wayland; still not right, but
+            better than it was before (Sergio Baldoví).
+          * Improve Fuse's Kempston mouse handling under GTK+ 3.x (Philip
+            Kendall).
+          * Stop Kempston mouse causing a crash under Wayland; still doesn't
+            work properly though (Philip Kendall).
+
         * Miscellaneous improvements:
           * "Save binary" command can now save 65536 bytes again (regression
             introduced in 1.5.6; thanks, thrice) (Philip Kendall).
-          * GTK+ 3 UI: Make the offset entry wider in memory browser (Derek
-            Fountain).
-          * Improve Fuse's behaviour under Wayland; still not right, but
-            better than it was before (Sergio Baldoví).
           * Remove gcc 8 string overflow warnings (Philip Kendall).
 
 2018-08-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>

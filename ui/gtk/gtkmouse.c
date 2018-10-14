@@ -30,6 +30,10 @@
 #include "gtkinternals.h"
 #include "ui/ui.h"
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
+
 /* For XWarpPointer *only* - see below */
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
@@ -46,8 +50,33 @@ gtkmouse_reset_pointer( void )
    * For Win32, use SetCursorPos() -- see sdpGtkWarpPointer() at
    * http://k3d.cvs.sourceforge.net/k3d/projects/sdplibs/sdpgtk/sdpgtkutility.cpp?view=markup
    */
-  GdkWindow *window = gtk_widget_get_window( gtkui_drawing_area );
+  GtkWindow *gtkwindow;
+  GdkWindow *window;
 
+  /* The logic here is a bit hairy:
+
+     * On GTK+ 2.x, we warp relative to the drawing area
+     * On GTK+ 3.x on X11, we warp relative to the top-level window
+     * On GTK+ 3.x on Wayland, we don't warp at all because it causes a
+       segfault (see bug #435)
+   */
+
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+
+#ifdef GDK_WINDOWING_WAYLAND
+  GdkDisplay *display = gdk_display_get_default();
+  if( GDK_IS_WAYLAND_DISPLAY( display ) ) return;
+#endif                /* #ifdef GDK_WINDOWING_WAYLAND */
+
+  gtkwindow = gtkui_window;
+
+#else                 /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+
+  gtkwindow = gtkui_drawing_area;
+
+#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+
+  window = gtk_widget_get_window( gtkwindow );
   XWarpPointer( GDK_WINDOW_XDISPLAY( window ), None, 
                 GDK_WINDOW_XID( window ), 0, 0, 0, 0, 128, 128 );
 }
