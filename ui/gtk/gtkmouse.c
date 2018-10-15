@@ -100,8 +100,7 @@ ui_mouse_grab( int startup )
 #else
 
   GdkDisplay *display;
-  GdkDeviceManager *device_manager;
-  GdkDevice *pointer;
+  GdkSeat *seat;
 
   display = gdk_window_get_display( window );
 
@@ -109,13 +108,9 @@ ui_mouse_grab( int startup )
     nullpointer = gdk_cursor_new_for_display( display, GDK_BLANK_CURSOR );
   }
 
-  device_manager = gdk_display_get_device_manager( display );
-  pointer = gdk_device_manager_get_client_pointer( device_manager );
-
-  status = gdk_device_grab( pointer, window, GDK_OWNERSHIP_WINDOW, FALSE,
-                            GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK |
-                            GDK_BUTTON_RELEASE_MASK,
-                            nullpointer, GDK_CURRENT_TIME );
+  seat = gdk_display_get_default_seat( display );
+  status = gdk_seat_grab( seat, window, GDK_SEAT_CAPABILITY_ALL_POINTING,
+                          FALSE, nullpointer, NULL, NULL, NULL );
 
 #endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
@@ -139,14 +134,11 @@ ui_mouse_release( int suspend GCC_UNUSED )
 #else
 
   GdkDisplay *display;
-  GdkDeviceManager *device_manager;
-  GdkDevice *pointer;
+  GdkSeat *seat;
 
   display = gtk_widget_get_display( gtkui_drawing_area );
-  device_manager = gdk_display_get_device_manager( display );
-  pointer = gdk_device_manager_get_client_pointer( device_manager );
-
-  gdk_device_ungrab( pointer, GDK_CURRENT_TIME );
+  seat = gdk_display_get_default_seat( display );
+  gdk_seat_ungrab( seat );
 
 #endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */ 
 
