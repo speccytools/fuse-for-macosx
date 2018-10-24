@@ -30,31 +30,47 @@
 #include "gtkinternals.h"
 #include "ui/ui.h"
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
+
 /* For XWarpPointer *only* - see below */
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 
 static GdkCursor *nullpointer = NULL;
 
+/* The widget we base our events, grabs, warping etc on */
+static GtkWidget *mouse_widget = NULL;
+
 static void
 gtkmouse_reset_pointer( void )
 {
   /* Ugh. GDK doesn't have its own move-pointer function :-|
-   * Framebuffer users and win32 users will have to make their own
-   * arrangements here.
-   *
-   * For Win32, use SetCursorPos() -- see sdpGtkWarpPointer() at
-   * http://k3d.cvs.sourceforge.net/k3d/projects/sdplibs/sdpgtk/sdpgtkutility.cpp?view=markup
-   */
-  GdkWindow *window = gtk_widget_get_window( gtkui_drawing_area );
 
+     The logic here is a bit hairy:
+
+     * On GTK+ 2.x, we warp relative to the drawing area
+     * On GTK+ 3.x on X11, we warp relative to the top-level window
+     * On GTK+ 3.x on Wayland, we don't warp at all because it causes a
+       segfault (see bug #435)
+   */
+
+  GdkWindow *window;
+
+#ifdef GDK_WINDOWING_WAYLAND
+  GdkDisplay *display = gdk_display_get_default();
+  if( GDK_IS_WAYLAND_DISPLAY( display ) ) return;
+#endif                /* #ifdef GDK_WINDOWING_WAYLAND */
+
+  window = gtk_widget_get_window( mouse_widget );
   XWarpPointer( GDK_WINDOW_XDISPLAY( window ), None, 
                 GDK_WINDOW_XID( window ), 0, 0, 0, 0, 128, 128 );
 }
 
-gboolean
-gtkmouse_position( GtkWidget *widget GCC_UNUSED,
-                   GdkEventMotion *event, gpointer data GCC_UNUSED )
+static gboolean
+motion_event( GtkWidget *widget GCC_UNUSED, GdkEventMotion *event,
+              gpointer data GCC_UNUSED )
 {
   if( !ui_mouse_grabbed ) return TRUE;
 
@@ -64,9 +80,9 @@ gtkmouse_position( GtkWidget *widget GCC_UNUSED,
   return TRUE;
 }
 
-gboolean
-gtkmouse_button( GtkWidget *widget GCC_UNUSED, GdkEventButton *event,
-		 gpointer data GCC_UNUSED )
+static gboolean
+button_event( GtkWidget *widget GCC_UNUSED, GdkEventButton *event,
+	      gpointer data GCC_UNUSED )
 {
   if( event->type == GDK_BUTTON_PRESS || event->type == GDK_2BUTTON_PRESS
       || event->type == GDK_3BUTTON_PRESS )
@@ -74,6 +90,25 @@ gtkmouse_button( GtkWidget *widget GCC_UNUSED, GdkEventButton *event,
   else
     ui_mouse_button( event->button, 0 );
   return TRUE;
+}
+
+void
+gtkmouse_init( void )
+{
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+  mouse_widget = gtkui_window;
+#else                 /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+  mouse_widget = gtkui_drawing_area;
+#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+
+  gtk_widget_add_events( GTK_WIDGET( mouse_widget ),
+    GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
+  g_signal_connect( G_OBJECT( mouse_widget ), "motion-notify-event",
+		    G_CALLBACK( motion_event ), NULL );
+  g_signal_connect( G_OBJECT( mouse_widget ), "button-press-event",
+		    G_CALLBACK( button_event ), NULL );
+  g_signal_connect( G_OBJECT( mouse_widget ), "button-release-event",
+		    G_CALLBACK( button_event ), NULL );
 }
 
 int
@@ -84,7 +119,7 @@ ui_mouse_grab( int startup )
 
   if( startup ) return 0;
 
-  window = gtk_widget_get_window( gtkui_drawing_area );
+  window = gtk_widget_get_window( mouse_widget );
 
 #if !GTK_CHECK_VERSION( 3, 0, 0 )
 
@@ -136,7 +171,7 @@ ui_mouse_release( int suspend GCC_UNUSED )
   GdkDisplay *display;
   GdkSeat *seat;
 
-  display = gtk_widget_get_display( gtkui_drawing_area );
+  display = gtk_widget_get_display( mouse_widget );
   seat = gdk_display_get_default_seat( display );
   gdk_seat_ungrab( seat );
 

@@ -51,8 +51,7 @@ int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
  * Mouse routines (gtkmouse.c)
  */
 
-gboolean gtkmouse_position( GtkWidget*, GdkEventMotion*, gpointer );
-gboolean gtkmouse_button( GtkWidget*, GdkEventButton*, gpointer);
+void gtkmouse_init( void );
 
 /*
  * General user interface routines (gtkui.c)
