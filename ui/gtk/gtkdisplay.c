@@ -239,6 +239,26 @@ uidisplay_init( int width, int height )
   return 0;
 }
 
+/* Ensure that an appropriate Cairo surface exists */
+static void
+ensure_appropriate_surface( void )
+{
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+
+  /* Create a bigger surface for the new display size */
+  float scale = (float)gtkdisplay_current_size / image_scale;
+  if( surface ) cairo_surface_destroy( surface );
+
+  surface =
+      cairo_image_surface_create_for_data( scaled_image,
+                                           CAIRO_FORMAT_RGB24,
+                                           scale * image_width,
+                                           scale * image_height,
+                                           scaled_pitch );
+
+#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+}
+
 static int
 drawing_area_resize( int width, int height, int force_scaler )
 {
@@ -257,20 +277,7 @@ drawing_area_resize( int width, int height, int force_scaler )
 
   memset( scaled_image, 0, sizeof( scaled_image ) );
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
-
-  /* Create a bigger surface for the new display size */
-  float scale = (float)gtkdisplay_current_size / image_scale;
-  if( surface ) cairo_surface_destroy( surface );
-
-  surface =
-      cairo_image_surface_create_for_data( scaled_image,
-                                           CAIRO_FORMAT_RGB24,
-                                           scale * image_width,
-                                           scale * image_height,
-                                           scaled_pitch );
-
-#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+  ensure_appropriate_surface();
 
   display_refresh_all();
 
@@ -542,16 +549,7 @@ static gboolean
 gtkdisplay_draw( GtkWidget *widget, cairo_t *cr, gpointer user_data )
 {
   /* Create a new surface for this gfx mode */
-  if( !surface ) {
-    float scale = (float)gtkdisplay_current_size / image_scale;
-
-    surface =
-      cairo_image_surface_create_for_data( scaled_image,
-                                           CAIRO_FORMAT_RGB24,
-                                           scale * image_width,
-                                           scale * image_height,
-                                           scaled_pitch );
-  }
+  if( !surface ) ensure_appropriate_surface();
 
   /* Repaint the drawing area */
   cairo_set_source_surface( cr, surface, 0, 0 );
