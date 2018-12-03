@@ -1,8 +1,13 @@
-2018-09-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2018-12-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.7 released.
 
         * UI improvements:
           * GTK+ 3: Make the offset entry wider in memory browser (Derek
             Fountain).
+          * GTK+: Remove duplicated surface creation code (Philip Kendall).
+          * GTK+: Remove use of deprecated gtk_device_(un)grab functions
+            (Philip Kendall).
           * Improve Fuse's window sizing under Wayland; still not right, but
             better than it was before (Sergio Baldoví).
           * Improve Fuse's Kempston mouse handling under GTK+ 3.x (Philip
