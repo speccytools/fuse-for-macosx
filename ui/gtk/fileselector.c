@@ -189,11 +189,13 @@ add_filter_defaults( GtkWidget *file_chooser )
 static void
 add_filter_auxiliary_files( GtkFileFilter *filter )
 {
+  gtk_file_filter_add_pattern( filter, "*.bin" );
   gtk_file_filter_add_pattern( filter, "*.log" );
   gtk_file_filter_add_pattern( filter, "*.pok" );
   gtk_file_filter_add_pattern( filter, "*.scr" );
   gtk_file_filter_add_pattern( filter, "*.mlt" );
 
+  gtk_file_filter_add_pattern( filter, "*.BIN" );
   gtk_file_filter_add_pattern( filter, "*.LOG" );
   gtk_file_filter_add_pattern( filter, "*.POK" );
   gtk_file_filter_add_pattern( filter, "*.SCR" );
