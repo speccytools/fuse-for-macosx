@@ -8,6 +8,8 @@
           * GTK+: Remove duplicated surface creation code (Philip Kendall).
           * GTK+: Remove use of deprecated gtk_device_(un)grab functions
             (Philip Kendall).
+          * GTK+/Win32: Add *.bin as an allowed filetype to file selectors and
+            amend .fmf filetype (thanks, Allan Turvey) (Sergio Baldoví).
           * Improve Fuse's window sizing under Wayland; still not right, but
             better than it was before (Sergio Baldoví).
           * Improve Fuse's Kempston mouse handling under GTK+ 3.x (Philip
