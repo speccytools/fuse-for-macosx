@@ -1806,8 +1806,6 @@ FUNCTION( scaler_HQ3x ) ( const libspectrum_byte *srcPtr,
        | w7 | w8 | w9 |
        +----+----+----+ */
   for( j = 0; j < height; j++ ) {
-    if( j == height - 1 ) nextline = 0;
-
     p = p0;
     q = q0;
     q1 = q + 1; q2 = q + 2;

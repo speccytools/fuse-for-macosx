@@ -1,3 +1,9 @@
+2019-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Miscellaneous improvements:
+          * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
+            (Sergio Baldoví).
+
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.7 released.
