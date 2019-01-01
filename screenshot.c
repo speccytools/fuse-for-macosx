@@ -259,6 +259,7 @@ screenshot_available_scalers( scaler_type scaler )
     switch( scaler ) {
 
     case SCALER_HALF: case SCALER_HALFSKIP: case SCALER_NORMAL:
+    case SCALER_TIMEX1_5X:
     case SCALER_TIMEXTV: case SCALER_PALTV:
       return 1;
     default:
@@ -272,8 +273,9 @@ screenshot_available_scalers( scaler_type scaler )
 
     case SCALER_NORMAL: case SCALER_DOUBLESIZE: case SCALER_TRIPLESIZE:
     case SCALER_2XSAI: case SCALER_SUPER2XSAI: case SCALER_SUPEREAGLE:
-    case SCALER_ADVMAME2X: case SCALER_ADVMAME3X: case SCALER_TV2X:
-    case SCALER_DOTMATRIX: case SCALER_PALTV2X: case SCALER_PALTV3X:
+    case SCALER_ADVMAME2X: case SCALER_ADVMAME3X:
+    case SCALER_TV2X: case SCALER_TV3X: case SCALER_DOTMATRIX:
+    case SCALER_PALTV: case SCALER_PALTV2X: case SCALER_PALTV3X:
     case SCALER_HQ2X: case SCALER_HQ3X:
       return 1;
     default:

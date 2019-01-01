@@ -3,6 +3,8 @@
         * Miscellaneous improvements:
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
             (Sergio Baldoví).
+          * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
+            Baldoví).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
