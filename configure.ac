@@ -560,19 +560,26 @@ AC_CHECK_LIB( ao, ao_open_live,
   [AC_MSG_WARN(ao_open_live not found - no libao sound output)]
 )
 
-dnl Solaris and HP/UX
-if test "$ac_cv_header_dsound_h" = yes; then
-  audio_driver_list="$audio_driver_list solaris hpux"
+dnl Solaris, HP/UX and OpenBSD
+if test "$ac_cv_header_sys_audio_h" = yes; then
+
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <sys/audio.h>]],
+                     [[return AUDIO_SETINFO;]])],
+    [audio_driver_list="$audio_driver_list solaris"])
+
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <sys/audio.h>]],
+                     [[return AUDIO_FORMAT_LINEAR16BIT;]])],
+    [audio_driver_list="$audio_driver_list hpux"])
+
+elif test "$ac_cv_header_sys_audioio_h" = yes; then
+  audio_driver_list="$audio_driver_list openbsd"
 fi
 
 dnl Open sound system
 if test "$ac_cv_header_sys_soundcard_h" = yes; then
   audio_driver_list="$audio_driver_list oss"
-fi
-
-dnl OpenBSD audio
-if test "$ac_cv_header_sys_audioio_h" = yes; then
-  audio_driver_list="$audio_driver_list openbsd"
 fi
 
 dnl Check if CoreAudio is available
