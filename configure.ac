@@ -278,6 +278,8 @@ if test -z "$UI"; then
 fi
 
 dnl Look for SDL (default=no)
+SDL_VERSION=1.2.4
+AM_PATH_SDL($SDL_VERSION, sdl_available=yes, sdl_available=no)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether SDL UI requested)
   AC_ARG_WITH(sdl,
@@ -286,13 +288,15 @@ if test -z "$UI"; then
   sdl=no)
   AC_MSG_RESULT($sdl)
   if test "$sdl" = yes; then
-    SDL_VERSION=1.2.4
-    AM_PATH_SDL($SDL_VERSION,
-		AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
-		AC_DEFINE([USE_WIDGET], 1,
-		          [Defined if we're using a widget-based UI])
-		UI=sdl; WIDGET=widget,
-                AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
+    if test "$sdl_available" = yes; then
+      AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
+      AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
+      UI=sdl
+      WIDGET=widget
+      use_sdl=yes
+    else
+      AC_MSG_ERROR([SDL version $SDL_VERSION not found])
+    fi
   fi
 fi
 
@@ -669,12 +673,14 @@ if test "$stick" = yes; then
       if test "$libjsw" = yes; then
         AC_MSG_RESULT([no, use libjsw])
       else
-        AC_MSG_RESULT(yes)
-        SDL_VERSION=1.2.4
-        AM_PATH_SDL($SDL_VERSION,		    
-          AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),
+        if test "$sdl_available" = yes; then
+          AC_MSG_RESULT(yes)
+          AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
+          use_sdl=yes
+        else
           AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled])
-          stick=no)
+          stick=no
+        fi
       fi
       ;;
     wii)
@@ -847,6 +853,9 @@ AM_CONDITIONAL(COMPAT_MORPHOS, test "$COMPAT_OSNAME" = 'morphos')
 AM_CONDITIONAL(COMPAT_UNIX, test "$COMPAT_OSNAME" = 'unix')
 AM_CONDITIONAL(COMPAT_WII, test "$COMPAT_OSNAME" = 'wii')
 AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
+
+dnl This tells the Makefile to use SDL_CFLAGS and SDL_LIBS during the build
+AM_CONDITIONAL(USE_SDL, test "$use_sdl" = "yes")
 
 dnl Decide whether to install desktop and mime files
 AC_ARG_ENABLE(desktop-integration,
