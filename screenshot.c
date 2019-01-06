@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "display.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "peripherals/scld.h"
 #include "screenshot.h"
@@ -63,12 +64,10 @@ static int rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
    creating via the scalers */
 #define MAX_SIZE 4
 
-/* The space used for drawing the screen image on. Out here to avoid placing
-   these large objects on the stack */
-static libspectrum_byte
-   rgb_data[ DISPLAY_SCREEN_HEIGHT * DISPLAY_ASPECT_WIDTH * 4 ],
-scaled_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4 ],
-   png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3 ];
+/* The space used for drawing the screen image on */
+static libspectrum_byte *rgb_data = NULL;
+static libspectrum_byte *scaled_data;
+static libspectrum_byte *png_data = NULL;
 
 int
 screenshot_write( const char *filename, scaler_type scaler )
@@ -92,6 +91,20 @@ screenshot_write( const char *filename, scaler_type scaler )
     base_height = DISPLAY_SCREEN_HEIGHT;
     base_width = DISPLAY_ASPECT_WIDTH;
   }
+
+  /* Allocate buffers on demand */
+  if( !rgb_data )
+    rgb_data = libspectrum_new( libspectrum_byte,
+                                DISPLAY_SCREEN_HEIGHT * rgb_stride );
+
+  if( !scaled_data )
+    scaled_data = libspectrum_new( libspectrum_byte,
+                                   MAX_SIZE * DISPLAY_SCREEN_HEIGHT *
+                                   scaled_stride );
+
+  if( !png_data )
+    png_data = libspectrum_new( libspectrum_byte,
+                                MAX_SIZE * DISPLAY_SCREEN_HEIGHT * png_stride );
 
   /* Change from paletted data to RGB data */
   error = get_rgb32_data( rgb_data, rgb_stride, base_height, base_width );
@@ -287,6 +300,25 @@ screenshot_available_scalers( scaler_type scaler )
 }
 
 #endif				/* #ifdef USE_LIBPNG */
+
+static void
+screenshot_end( void )
+{
+#ifdef USE_LIBPNG
+  libspectrum_free( rgb_data ); rgb_data = NULL;
+  libspectrum_free( scaled_data ); scaled_data = NULL;
+  libspectrum_free( png_data ); png_data = NULL;
+#endif
+}
+
+void
+screenshot_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SREENSHOT, dependencies,
+                            ARRAY_SIZE( dependencies ), NULL, NULL,
+                            screenshot_end );
+}
 
 static int
 screenshot_scr_hires_write( const char *filename )
