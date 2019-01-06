@@ -495,6 +495,7 @@ which uses no filtering. The available options are
 .IR 2x ,
 .IR 2xsai ,
 .IR 3x ,
+.IR 4x ,
 .IR advmame2x ,
 .IR advmame3x ,
 .IR dotmatrix ,
@@ -502,12 +503,16 @@ which uses no filtering. The available options are
 .IR halfskip ,
 .IR hq2x ,
 .IR hq3x ,
+.IR hq4x ,
 .IR normal ,
 .IR super2xsai ,
 .IR supereagle ,
 .IR timex15x ,
+.IR timex2x ,
 .IR timextv ,
 .IR tv2x ,
+.IR tv3x ,
+.IR tv4x ,
 .IR paltv ,
 .IR paltv2x ,
 and
@@ -4102,6 +4107,12 @@ GTK+, Win32, Xlib and SDL user interfaces or when saving screenshots of
 non-Timex machines.
 .RE
 .PP
+.IR "Quadruple size " ( 4x )
+.RS
+Scale the displayed screen up to quadruple size. Available only with the
+GTK+, Win32 and SDL user interfaces.
+.RE
+.PP
 .IR "2xSaI " ( 2xsai )
 .br
 .IR "Super 2xSaI " ( super2xsai )
@@ -4131,11 +4142,14 @@ screenshots of non-Timex machines.
 .br
 .IR "TV\ 3x " ( tv3x )
 .br
+.IR "TV\ 4x " ( tv4x )
+.br
 .IR "Timex\ TV " ( timextv )
 .RS
-Three filters which attempt to emulate the effect of television
+Four filters which attempt to emulate the effect of television
 scanlines. The first is a double-sizing filter for non-Timex
-machines, the second is a similar triple-sizing filter, while the last
+machines, the second is a similar triple-sizing filter, the third
+is a similar quadruple-sizing filter, while the last
 is a single-sizing filter for Timex machines (note that this means TV\ 2X
 and Timex\ TV produce the same size output).
 .RE
@@ -4166,12 +4180,22 @@ up to 1.5\(mu its usual size (which is therefore 3\(mu the size of a
 user interfaces or when saving screenshots.
 .RE
 .PP
+.IR "Timex\ 2x " ( timex2x )
+.RS
+A non-interpolating Timex-specific filter which scales the Timex screen
+up to 2\(mu its usual size (which is therefore 4\(mu the size of a
+`normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
+user interfaces or when saving screenshots.
+.RE
+.PP
 .IR "HQ\ 2x " ( hq2x )
 .br
 .IR "HQ\ 3x " ( hq3x )
+.br
+.IR "HQ\ 4x " ( hq4x )
 .RS
-Two filters which do high quality (but slow) antialiasing. Doubles and
-triples the size of the displayed screen respectively.
+Three filters which do high quality (but slow) antialiasing. Doubles and
+triples and quadruples the size of the displayed screen respectively.
 .\"
 .\"------------------------------------------------------------------
 .\"
