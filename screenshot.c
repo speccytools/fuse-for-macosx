@@ -61,14 +61,14 @@ static int rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
 /* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
    DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
    creating via the scalers */
-#define MAX_SIZE 3
+#define MAX_SIZE 4
 
 /* The space used for drawing the screen image on. Out here to avoid placing
    these large objects on the stack */
 static libspectrum_byte
-  rgb_data1[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
-  rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
-   png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 3 ];
+  rgb_data1[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4 ],
+  rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4 ],
+   png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3 ];
 
 int
 screenshot_write( const char *filename, scaler_type scaler )
@@ -259,7 +259,7 @@ screenshot_available_scalers( scaler_type scaler )
     switch( scaler ) {
 
     case SCALER_HALF: case SCALER_HALFSKIP: case SCALER_NORMAL:
-    case SCALER_TIMEX1_5X:
+    case SCALER_TIMEX1_5X: case SCALER_TIMEX2X:
     case SCALER_TIMEXTV: case SCALER_PALTV:
       return 1;
     default:
@@ -271,12 +271,12 @@ screenshot_available_scalers( scaler_type scaler )
     
     switch( scaler ) {
 
-    case SCALER_NORMAL: case SCALER_DOUBLESIZE: case SCALER_TRIPLESIZE:
+    case SCALER_NORMAL: case SCALER_DOUBLESIZE: case SCALER_TRIPLESIZE: case SCALER_QUADSIZE:
     case SCALER_2XSAI: case SCALER_SUPER2XSAI: case SCALER_SUPEREAGLE:
     case SCALER_ADVMAME2X: case SCALER_ADVMAME3X:
-    case SCALER_TV2X: case SCALER_TV3X: case SCALER_DOTMATRIX:
+    case SCALER_TV2X: case SCALER_TV3X: case SCALER_TV4X: case SCALER_DOTMATRIX:
     case SCALER_PALTV: case SCALER_PALTV2X: case SCALER_PALTV3X:
-    case SCALER_HQ2X: case SCALER_HQ3X:
+    case SCALER_HQ2X: case SCALER_HQ3X: case SCALER_HQ4X:
       return 1;
     default:
       return 0;
