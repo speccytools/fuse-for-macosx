@@ -66,8 +66,8 @@ static int rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
 /* The space used for drawing the screen image on. Out here to avoid placing
    these large objects on the stack */
 static libspectrum_byte
-  rgb_data1[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4 ],
-  rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4 ],
+   rgb_data[ DISPLAY_SCREEN_HEIGHT * DISPLAY_ASPECT_WIDTH * 4 ],
+scaled_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4 ],
    png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3 ];
 
 int
@@ -79,7 +79,8 @@ screenshot_write( const char *filename, scaler_type scaler )
   png_infop info_ptr;
 
   libspectrum_byte *row_pointers[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT ];
-  size_t rgb_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4,
+  size_t rgb_stride = DISPLAY_ASPECT_WIDTH * 4,
+         scaled_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4,
          png_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3;
   size_t y, base_height, base_width, height, width;
   int error;
@@ -93,18 +94,18 @@ screenshot_write( const char *filename, scaler_type scaler )
   }
 
   /* Change from paletted data to RGB data */
-  error = get_rgb32_data( rgb_data1, rgb_stride, base_height, base_width );
+  error = get_rgb32_data( rgb_data, rgb_stride, base_height, base_width );
   if( error ) return error;
 
   /* Actually scale the data here */
-  scaler_get_proc32( scaler )( rgb_data1, rgb_stride, rgb_data2, rgb_stride,
+  scaler_get_proc32( scaler )( rgb_data, rgb_stride, scaled_data, scaled_stride,
 			       base_width, base_height );
 
   height = base_height * scaler_get_scaling_factor( scaler );
   width  = base_width  * scaler_get_scaling_factor( scaler );
 
   /* Reduce from RGB(padding byte) to just RGB */
-  error = rgb32_to_rgb24( png_data, png_stride, rgb_data2, rgb_stride,
+  error = rgb32_to_rgb24( png_data, png_stride, scaled_data, scaled_stride,
 			  height, width );
   if( error ) return error;
 
