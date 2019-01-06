@@ -5,6 +5,7 @@
             (Sergio Baldoví).
           * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
             Baldoví).
+          * GTK+ UI: Add Fuse icon to the about dialog (Alberto Garcia).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 

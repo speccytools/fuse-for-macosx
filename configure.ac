@@ -857,6 +857,9 @@ AC_MSG_CHECKING(whether to install desktop file)
 AC_MSG_RESULT($desktopintegration)
 AM_CONDITIONAL(DESKTOP_INTEGRATION, test "$desktopintegration" = yes)
 AC_CHECK_PROGS(GTK_UPDATE_ICON_CACHE,gtk-update-icon-cache,true)
+if test "$desktopintegration" = "yes"; then
+   AC_DEFINE([FUSE_ICON_AVAILABLE], 1, [Defined if the Fuse icon is installed])
+fi
 
 dnl Where to install the desktop and mime files
 AC_ARG_WITH(desktop-dir,
