@@ -164,6 +164,10 @@ ui_init( int *argc, char ***argv )
 
   gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+#ifdef FUSE_ICON_AVAILABLE
+  gtk_window_set_icon_name( GTK_WINDOW( gtkui_window ), "fuse" );
+#endif
+
   settings = gtk_widget_get_settings( GTK_WIDGET( gtkui_window ) );
   g_object_set( settings, "gtk-menu-bar-accel", "F1", NULL );
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
