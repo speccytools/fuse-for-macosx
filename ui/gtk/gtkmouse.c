@@ -121,7 +121,7 @@ ui_mouse_grab( int startup )
 
   window = gtk_widget_get_window( mouse_widget );
 
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
+#if !GTK_CHECK_VERSION( 3, 20, 0 )
 
   if( !nullpointer ) {
     nullpointer = gdk_cursor_new( GDK_BLANK_CURSOR );
@@ -147,7 +147,7 @@ ui_mouse_grab( int startup )
   status = gdk_seat_grab( seat, window, GDK_SEAT_CAPABILITY_ALL_POINTING,
                           FALSE, nullpointer, NULL, NULL, NULL );
 
-#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
+#endif                /* #if !GTK_CHECK_VERSION( 3, 20, 0 ) */
 
   if( status == GDK_GRAB_SUCCESS ) {
     gtkmouse_reset_pointer();
@@ -162,7 +162,7 @@ ui_mouse_grab( int startup )
 int
 ui_mouse_release( int suspend GCC_UNUSED )
 {
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
+#if !GTK_CHECK_VERSION( 3, 20, 0 )
 
   gdk_pointer_ungrab( GDK_CURRENT_TIME );
 
@@ -175,7 +175,7 @@ ui_mouse_release( int suspend GCC_UNUSED )
   seat = gdk_display_get_default_seat( display );
   gdk_seat_ungrab( seat );
 
-#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */ 
+#endif                /* #if !GTK_CHECK_VERSION( 3, 20, 0 ) */
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_MOUSE, UI_STATUSBAR_STATE_INACTIVE );
   return 0;

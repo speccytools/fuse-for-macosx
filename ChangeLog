@@ -7,6 +7,8 @@
             Baldoví).
           * GTK+ UI: Add Fuse icon to the about dialog and the main window
             (Alberto Garcia).
+          * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
+            (Alberto Garcia).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
