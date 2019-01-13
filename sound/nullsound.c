@@ -27,7 +27,8 @@
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
-  fuse_abort();
+  /* Audio driver not initialised */
+  return 1;
 }
 
 void
