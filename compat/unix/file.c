@@ -41,14 +41,16 @@ compat_file_open( const char *path, int write )
 {
   struct stat statbuf;
 
-  if( stat( path, &statbuf ) ) {
-    return NULL;
-  }
+  if( !write ) {
+    if( stat( path, &statbuf ) ) {
+      return NULL;
+    }
 
-  /* Check file type */
-  if( !S_ISREG( statbuf.st_mode ) ) {
-    errno = EINVAL;
-    return NULL;
+    /* Check file type */
+    if( !S_ISREG( statbuf.st_mode ) ) {
+      errno = EINVAL;
+      return NULL;
+    }
   }
 
   return fopen( path, write ? "wb" : "rb" );
