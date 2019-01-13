@@ -874,34 +874,34 @@ FUNCTION( scaler_AdvMame3x )( const libspectrum_byte *srcPtr,
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
 
-  scaler_data_type /* A, */ B, C;
+  scaler_data_type A, B, C;
   scaler_data_type D, E, F;
-  scaler_data_type /* G, */ H, I;
+  scaler_data_type G, H, I;
 
   while (height--) {
     int i;
 
-    /* B = *(p - 1 - nextlineSrc); */
+    B = *(p - 1 - nextlineSrc);
     E = *(p - 1);
-    /* H = *(p - 1 + nextlineSrc); */
+    H = *(p - 1 + nextlineSrc);
     C = *(p - nextlineSrc);
     F = *(p);
     I = *(p + nextlineSrc);
 
     for (i = 0; i < width; ++i) {
       p++;
-      /* A = B; */ B = C; C = *(p - nextlineSrc);
+      A = B; B = C; C = *(p - nextlineSrc);
       D = E; E = F; F = *(p);
-      /* G = H; */ H = I; I = *(p + nextlineSrc);
+      G = H; H = I; I = *(p + nextlineSrc);
 
       *(q) = D == B && B != F && D != H ? D : E;
-      *(q + 1) = E;
+      *(q + 1) = (D == B && B != F && D != H && E != C) || (B == F && B != D && F != H && E != A) ? B : E;
       *(q + 2) = B == F && B != D && F != H ? F : E;
-      *(q + nextlineDst) = E;
+      *(q + nextlineDst) = (D == B && B != F && D != H && E != G) || (D == H && D != B && H != F && E != A) ? D : E;
       *(q + nextlineDst + 1) = E;
-      *(q + nextlineDst + 2) = E;
+      *(q + nextlineDst + 2) = (B == F && B != D && F != H && E != I) || (H == F && D != H && B != F && E != C) ? F : E;
       *(q + 2 * nextlineDst) = D == H && D != B && H != F ? D : E;
-      *(q + 2 * nextlineDst + 1) = E;
+      *(q + 2 * nextlineDst + 1) = (D == H && D != B && H != F && E != I) || (H == F && D != H && B != F && E != G) ? H : E;
       *(q + 2 * nextlineDst + 2) = H == F && D != H && B != F ? F : E;
       q += 3;
     }
