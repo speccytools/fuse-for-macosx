@@ -39,6 +39,18 @@ const compat_fd COMPAT_FILE_OPEN_FAILED = NULL;
 compat_fd
 compat_file_open( const char *path, int write )
 {
+  struct stat statbuf;
+
+  if( stat( path, &statbuf ) ) {
+    return NULL;
+  }
+
+  /* Check file type */
+  if( !S_ISREG( statbuf.st_mode ) ) {
+    errno = EINVAL;
+    return NULL;
+  }
+
   return fopen( path, write ? "wb" : "rb" );
 }
 
