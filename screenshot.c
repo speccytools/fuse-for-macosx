@@ -58,11 +58,16 @@ static int get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 static int rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
 			   libspectrum_byte *rgb32_data, size_t rgb32_stride,
 			   size_t height, size_t width );
+static void fill_rgb32_margin( libspectrum_byte *rgb32_data, size_t stride,
+                               size_t height, size_t width );
 
 /* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
    DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
    creating via the scalers */
 #define MAX_SIZE 4
+
+/* Pixels arround the RGB image for scalers that "smear" the screen */
+#define K_MARGIN 2
 
 /* The space used for drawing the screen image on */
 static libspectrum_byte *rgb_data = NULL;
@@ -78,7 +83,8 @@ screenshot_write( const char *filename, scaler_type scaler )
   png_infop info_ptr;
 
   libspectrum_byte *row_pointers[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT ];
-  size_t rgb_stride = DISPLAY_ASPECT_WIDTH * 4,
+  libspectrum_byte *rgb_data_centered;
+  size_t rgb_stride = ( DISPLAY_ASPECT_WIDTH + K_MARGIN * 2 ) * 4,
          scaled_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4,
          png_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3;
   size_t y, base_height, base_width, height, width;
@@ -94,8 +100,9 @@ screenshot_write( const char *filename, scaler_type scaler )
 
   /* Allocate buffers on demand */
   if( !rgb_data )
-    rgb_data = libspectrum_new( libspectrum_byte,
-                                DISPLAY_SCREEN_HEIGHT * rgb_stride );
+    rgb_data =
+      libspectrum_new( libspectrum_byte,
+                       ( DISPLAY_SCREEN_HEIGHT + K_MARGIN * 2 ) * rgb_stride );
 
   if( !scaled_data )
     scaled_data = libspectrum_new( libspectrum_byte,
@@ -106,13 +113,21 @@ screenshot_write( const char *filename, scaler_type scaler )
     png_data = libspectrum_new( libspectrum_byte,
                                 MAX_SIZE * DISPLAY_SCREEN_HEIGHT * png_stride );
 
+  /* first pixel of rgb_data (without margin) */
+  rgb_data_centered = rgb_data + K_MARGIN * rgb_stride + K_MARGIN * 4;
+
   /* Change from paletted data to RGB data */
-  error = get_rgb32_data( rgb_data, rgb_stride, base_height, base_width );
+  error = get_rgb32_data( rgb_data_centered, rgb_stride, base_height,
+                          base_width );
   if( error ) return error;
 
+  /* Initialise margin for scalers that "smear" the screen */
+  if( scaler_get_flags( scaler ) & SCALER_FLAGS_EXPAND )
+    fill_rgb32_margin( rgb_data, rgb_stride, base_height, base_width );
+
   /* Actually scale the data here */
-  scaler_get_proc32( scaler )( rgb_data, rgb_stride, scaled_data, scaled_stride,
-			       base_width, base_height );
+  scaler_get_proc32( scaler )( rgb_data_centered, rgb_stride, scaled_data,
+                               scaled_stride, base_width, base_height );
 
   height = base_height * scaler_get_scaling_factor( scaler );
   width  = base_width  * scaler_get_scaling_factor( scaler );
@@ -245,6 +260,78 @@ get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
   }
 
   return 0;
+}
+
+static void
+fill_rgb32_margin( libspectrum_byte *rgb32_data, size_t stride,
+                   size_t height, size_t width )
+{
+  size_t x_dest, y_dest, x_src, y_src;
+  libspectrum_byte *dest_data, *src_data;
+
+  /* We need to initialise the extra space available for scalers that "smear"
+     the screen by copying the nearest neighbour, so we avoid any blending with
+     black colour or memory garbage at the outer border */
+
+  /* Fill top margin */
+  y_src = K_MARGIN;
+  for( y_dest = 0; y_dest < K_MARGIN; y_dest++ ) {
+    for( x_dest = 0; x_dest < width + K_MARGIN * 2; x_dest++ ) {
+
+      if( x_dest < K_MARGIN )
+        x_src = K_MARGIN;
+      else if( x_dest >= K_MARGIN + width )
+        x_src = K_MARGIN + width - 1;
+      else
+        x_src = x_dest;
+
+      dest_data = rgb32_data + y_dest * stride + 4 * x_dest;
+      src_data = rgb32_data + y_src * stride + 4 * x_src;
+      *(libspectrum_dword*) dest_data = *(libspectrum_dword*) src_data;
+    }
+  }
+
+  /* Fill left margin */
+  x_src = K_MARGIN;
+  for( y_dest = K_MARGIN; y_dest < K_MARGIN + height; y_dest++ ) {
+    for( x_dest = 0; x_dest < K_MARGIN; x_dest++ ) {
+      y_src = y_dest;
+
+      dest_data = rgb32_data + y_dest * stride + 4 * x_dest;
+      src_data = rgb32_data + y_src * stride + 4 * x_src;
+      *(libspectrum_dword*) dest_data = *(libspectrum_dword*) src_data;
+    }
+  }
+
+  /* Fill right margin */
+  x_src = K_MARGIN + width -1;
+  for( y_dest = K_MARGIN; y_dest < K_MARGIN + height; y_dest++ ) {
+    for( x_dest = K_MARGIN + width; x_dest < K_MARGIN * 2 + width; x_dest++ ) {
+      y_src = y_dest;
+
+      dest_data = rgb32_data + y_dest * stride + 4 * x_dest;
+      src_data = rgb32_data + y_src * stride + 4 * x_src;
+      *(libspectrum_dword*) dest_data = *(libspectrum_dword*) src_data;
+    }
+  }
+
+  /* Fill bottom margin */
+  y_src = K_MARGIN + height - 1;
+  for( y_dest = K_MARGIN + height; y_dest < height + K_MARGIN * 2; y_dest++ ) {
+    for( x_dest = 0; x_dest < width + K_MARGIN * 2; x_dest++ ) {
+
+      if( x_dest < K_MARGIN )
+        x_src = K_MARGIN;
+      else if( x_dest >= K_MARGIN + width )
+        x_src = K_MARGIN + width - 1;
+      else
+        x_src = x_dest;
+
+      dest_data = rgb32_data + y_dest * stride + 4 * x_dest;
+      src_data = rgb32_data + y_src * stride + 4 * x_src;
+      *(libspectrum_dword*) dest_data = *(libspectrum_dword*) src_data;
+    }
+  }
 }
 
 static int
