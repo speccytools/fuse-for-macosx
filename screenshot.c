@@ -402,7 +402,7 @@ void
 screenshot_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
-  startup_manager_register( STARTUP_MANAGER_MODULE_SREENSHOT, dependencies,
+  startup_manager_register( STARTUP_MANAGER_MODULE_SCREENSHOT, dependencies,
                             ARRAY_SIZE( dependencies ), NULL, NULL,
                             screenshot_end );
 }
