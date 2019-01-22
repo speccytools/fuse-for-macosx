@@ -72,7 +72,7 @@ static gboolean
 motion_event( GtkWidget *widget GCC_UNUSED, GdkEventMotion *event,
               gpointer data GCC_UNUSED )
 {
-  if( !ui_mouse_grabbed ) return TRUE;
+  if( !ui_mouse_grabbed ) return FALSE;
 
   if( event->x != 128 || event->y != 128 )
     gtkmouse_reset_pointer();
@@ -89,7 +89,9 @@ button_event( GtkWidget *widget GCC_UNUSED, GdkEventButton *event,
     ui_mouse_button( event->button, 1 );
   else
     ui_mouse_button( event->button, 0 );
-  return TRUE;
+
+  /* Stop other handlers only if we've grabbed the mouse */
+  return ui_mouse_grabbed? TRUE : FALSE;
 }
 
 void

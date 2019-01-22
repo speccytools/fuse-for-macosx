@@ -12,6 +12,8 @@
             (Alberto Garcia).
           * Allow selection of audio driver at build time (thanks, kov_serg)
             (Alberto Garcia).
+          * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
+            (Sergio Baldoví).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
