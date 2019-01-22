@@ -43,6 +43,46 @@ static GdkCursor *nullpointer = NULL;
 /* The widget we base our events, grabs, warping etc on */
 static GtkWidget *mouse_widget = NULL;
 
+static void (*mouse_motion_fn)( gdouble x, gdouble y, int *rel_x, int *rel_y );
+
+#if defined GDK_WINDOWING_WAYLAND
+
+/* On Wayland we can't warp the pointer so we keep the last position */
+static gdouble last_pos_x = 0;
+static gdouble last_pos_y = 0;
+static int have_last_position = 0;
+
+static void
+mouse_motion_relative( gdouble x, gdouble y, int *rel_x, int *rel_y )
+{
+   if( have_last_position ) {
+     *rel_x = x - last_pos_x;
+     *rel_y = y - last_pos_y;
+   } else {
+     *rel_x = 0;
+     *rel_y = 0;
+     have_last_position = 1;
+   }
+
+   last_pos_x = x;
+   last_pos_y = y;
+}
+
+#endif                /* #if defined GDK_WINDOWING_WAYLAND */
+
+static void
+mouse_motion_x11( gdouble x, gdouble y, int *rel_x, int *rel_y )
+{
+  *rel_x = x - 128;
+  *rel_y = y - 128;
+
+  if( x != 128 || y != 128 ) {
+    GdkWindow *window = gtk_widget_get_window( mouse_widget );
+    XWarpPointer( GDK_WINDOW_XDISPLAY( window ), None,
+                  GDK_WINDOW_XID( window ), 0, 0, 0, 0, 128, 128 );
+  }
+}
+
 static void
 gtkmouse_reset_pointer( void )
 {
@@ -56,14 +96,19 @@ gtkmouse_reset_pointer( void )
        segfault (see bug #435)
    */
 
-  GdkWindow *window;
-
 #ifdef GDK_WINDOWING_WAYLAND
   GdkDisplay *display = gdk_display_get_default();
-  if( GDK_IS_WAYLAND_DISPLAY( display ) ) return;
+  if( GDK_IS_WAYLAND_DISPLAY( display ) ) {
+    mouse_motion_fn = mouse_motion_relative;
+    have_last_position = 0;
+    return;
+  }
 #endif                /* #ifdef GDK_WINDOWING_WAYLAND */
 
-  window = gtk_widget_get_window( mouse_widget );
+  mouse_motion_fn = mouse_motion_x11;
+
+  /* Force initial position */
+  GdkWindow *window = gtk_widget_get_window( mouse_widget );
   XWarpPointer( GDK_WINDOW_XDISPLAY( window ), None, 
                 GDK_WINDOW_XID( window ), 0, 0, 0, 0, 128, 128 );
 }
@@ -72,12 +117,15 @@ static gboolean
 motion_event( GtkWidget *widget GCC_UNUSED, GdkEventMotion *event,
               gpointer data GCC_UNUSED )
 {
+  int rel_x, rel_y;
+
   if( !ui_mouse_grabbed ) return FALSE;
 
-  if( event->x != 128 || event->y != 128 )
-    gtkmouse_reset_pointer();
-  ui_mouse_motion( event->x - 128, event->y - 128 );
-  return TRUE;
+  /* Get relative movement from last position */
+  (*mouse_motion_fn)( event->x, event->y, &rel_x, &rel_y );
+  ui_mouse_motion( rel_x, rel_y );
+
+  return FALSE;
 }
 
 static gboolean
