@@ -18,6 +18,8 @@
             (Alberto Garcia).
           * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
             (Sergio Baldoví).
+          * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
+            Kendall) (Sergio Baldoví).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
