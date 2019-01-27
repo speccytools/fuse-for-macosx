@@ -1,5 +1,9 @@
 2019-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
+        * Emulation core improvements:
+          * Fix activation of joystick and IF2 peripherals when loading a
+            snapshot (thanks, ICEknight) (Sergio Baldoví).
+
         * Miscellaneous improvements:
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
             (Sergio Baldoví).
