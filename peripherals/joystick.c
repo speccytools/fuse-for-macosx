@@ -84,15 +84,15 @@ const char *joystick_connection[ JOYSTICK_CONN_COUNT ] = {
   "Joystick 2",
 };
 
-static void joystick_from_snapshot( libspectrum_snap *snap );
+static void joystick_enabled_snapshot( libspectrum_snap *snap );
 static void joystick_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t joystick_module_info = {
 
   /* .reset = */ NULL,
   /* .romcs = */ NULL,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ joystick_from_snapshot,
+  /* .snapshot_enabled = */ joystick_enabled_snapshot,
+  /* .snapshot_from = */ NULL,
   /* .snapshot_to = */ joystick_to_snapshot,
 
 };
@@ -260,7 +260,7 @@ joystick_fuller_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attach
 }
 
 static void
-joystick_from_snapshot( libspectrum_snap *snap )
+joystick_enabled_snapshot( libspectrum_snap *snap )
 {
   size_t i;
   size_t num_joysticks = libspectrum_snap_joystick_active_count( snap );

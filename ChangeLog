@@ -1,10 +1,25 @@
 2019-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
+        * Emulation core improvements:
+          * Fix activation of joystick and IF2 peripherals when loading a
+            snapshot (thanks, ICEknight) (Sergio Baldoví).
+
         * Miscellaneous improvements:
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
             (Sergio Baldoví).
+          * Fix antialiasing effect of AdvMAME3x scaler (Sergio Baldoví).
           * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
             Baldoví).
+          * GTK+ UI: Add Fuse icon to the about dialog and the main window
+            (Alberto Garcia).
+          * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
+            (Alberto Garcia).
+          * Allow selection of audio driver at build time (thanks, kov_serg)
+            (Alberto Garcia).
+          * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
+            (Sergio Baldoví).
+          * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
+            Kendall) (Sergio Baldoví).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
