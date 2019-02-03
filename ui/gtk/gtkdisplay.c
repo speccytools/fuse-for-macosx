@@ -341,6 +341,7 @@ register_scalers( int force_scaler )
       break;
     case 3: scaler = machine_current->timex ? SCALER_TIMEX1_5X :
                                               SCALER_TRIPLESIZE;
+      break;
     case 4: scaler = machine_current->timex ? SCALER_TIMEX2X :
                                               SCALER_QUADSIZE;
       break;
