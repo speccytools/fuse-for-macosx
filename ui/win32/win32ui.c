@@ -1107,8 +1107,8 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
     width = w_max; height = h_max;
   }
 
-  if( width > 3 || height > 3 ) {
-    width = 3; height = 3;
+  if( width > MAX_SCALE || height > MAX_SCALE ) {
+    width = MAX_SCALE; height = MAX_SCALE;
   }
 
   if( width < height ) {

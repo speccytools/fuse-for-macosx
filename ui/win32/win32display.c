@@ -32,11 +32,6 @@
 #include "ui/scaler/scaler.h"
 #include "win32internals.h"
 
-/* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
-   DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
-   creating via the scalers */
-#define MAX_SCALE 4
-
 /* The size of a 1x1 image in units of
    DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
 int image_scale;
@@ -298,6 +293,9 @@ register_scalers( int force_scaler )
       break;
     case 3: scaler = machine_current->timex ? SCALER_TIMEX1_5X :
                                               SCALER_TRIPLESIZE;
+      break;
+    case 4: scaler = machine_current->timex ? SCALER_TIMEX2X :
+                                              SCALER_QUADSIZE;
       break;
     }
   }
