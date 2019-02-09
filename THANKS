@@ -60,6 +60,8 @@ Some thanks (in alphabetical order):
 
 * David Muriel: for helping test RZX competition mode recording.
 
+* Andrew Owen: for providing the PNG keyboard image used in GTK+ UI.
+
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 
