@@ -24,13 +24,17 @@
 
 #include <config.h>
 
+#include <windows.h>
+
+#ifdef USE_LIBPNG
+#include <png.h>
+#include <zlib.h>
+#endif
+
 #include "display.h"
 #include "picture.h"
-#include "ui/ui.h"
 #include "utils.h"
 #include "win32internals.h"
-
-#include <windows.h>
 
 /* An RGB image of the keyboard picture */
 /* the memory will be allocated by Windows ( height * width * 4 bytes ) */
@@ -46,14 +50,50 @@ static void draw_screen( libspectrum_byte *screen, int border );
 
 static LRESULT WINAPI picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+
+static void draw_png( libspectrum_byte *buffer, size_t size );
+static int read_png_file( const char *filename, png_bytep *buffer,
+                          size_t *size, int *width, int *height );
+
+#endif			/* #ifdef PNG_SIMPLIFIED_READ_SUPPORTED */
+
 int
-win32ui_picture( const char *filename, int border )
+win32ui_picture( const char *filename, win32ui_picture_format format )
 {
   /* Dialog already open? */
-  if( hDialogPicture != NULL ) {
+  if( hDialogPicture != NULL )
     return 0;
+
+  switch( format ) {
+
+  case PICTURE_PNG:
+  {
+
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+    int width, height;
+    png_bytep buffer;
+    size_t size;
+
+    if( read_png_file( filename, &buffer, &size, &width, &height ) )
+      return 1;
+
+    hDialogPicture = create_dialog( width, height );
+    if( hDialogPicture == NULL )
+      return 1;
+
+    draw_png( buffer, size );
+
+    free( buffer );
+    break;
+#else
+    /* PNG format not supported */
+    return 1;
+#endif			/* #ifdef PNG_SIMPLIFIED_READ_SUPPORTED */
   }
 
+  case PICTURE_SCR:
+  {
     utils_file screen;
 
     if( utils_read_screen( filename, &screen ) )
@@ -64,9 +104,17 @@ win32ui_picture( const char *filename, int border )
     if( hDialogPicture == NULL )
       return 1;
 
-    draw_screen( screen.buffer, border );
+    draw_screen( screen.buffer, 0 );
 
     utils_close_file( &screen );
+    break;
+  }
+
+  default:
+    /* Unsupported format */
+    return 1;
+
+  }
 
   ShowWindow( hDialogPicture, SW_SHOW );
   return 0;
@@ -259,3 +307,64 @@ draw_screen( libspectrum_byte *screen, int border )
 
   }
 }
+
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+
+static void
+draw_png( libspectrum_byte *buffer, size_t size )
+{
+  GdiFlush();
+  memcpy( picture, buffer, size );
+}
+
+static int
+read_png_file( const char *filename, png_bytep *buffer, size_t *size,
+               int *width, int *height )
+{
+  utils_file png_file;
+  int error = utils_read_auxiliary_file( filename, &png_file,
+                                         UTILS_AUXILIARY_LIB );
+  if( error == -1 ) {
+    return 1;
+  }
+  if( error ) return 1;
+
+  /* Initialize the 'png_image' structure */
+  png_image image;
+  memset( &image, 0, sizeof( image ) );
+  image.version = PNG_IMAGE_VERSION;
+  image.opaque = NULL;
+
+  if( png_image_begin_read_from_memory( &image, png_file.buffer,
+                                        png_file.length ) == 0 ) {
+    utils_close_file( &png_file );
+    return 1;
+  }
+
+  image.format = PNG_FORMAT_BGRA;
+  *buffer = malloc( PNG_IMAGE_SIZE( image ) );
+
+  if( *buffer == NULL ) {
+    png_image_free( &image );
+    utils_close_file( &png_file );
+    return 1;
+  }
+  *size = PNG_IMAGE_SIZE( image );
+
+  if( !png_image_finish_read( &image, NULL, *buffer, 0, NULL ) ) {
+    png_image_free( &image );
+    free( *buffer );
+    utils_close_file( &png_file );
+    return 1;
+  }
+
+  *width = PNG_IMAGE_ROW_STRIDE( image ) /
+           PNG_IMAGE_PIXEL_SIZE( PNG_FORMAT_BGRA );
+  *height = PNG_IMAGE_SIZE( image ) / PNG_IMAGE_ROW_STRIDE( image );
+  png_image_free( &image );
+  utils_close_file( &png_file );
+
+  return 0;
+}
+
+#endif			/* #ifdef PNG_SIMPLIFIED_READ_SUPPORTED */
