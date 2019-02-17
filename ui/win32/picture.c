@@ -117,6 +117,10 @@ win32ui_picture( const char *filename, win32ui_picture_format format )
   }
 
   ShowWindow( hDialogPicture, SW_SHOW );
+
+  /* Keep focus on Fuse's main window */
+  SetForegroundWindow( fuse_hWnd );
+
   return 0;
 }
 
@@ -153,6 +157,53 @@ inflate_dialog( HWND dialog, int width, int height )
                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
 }
 
+static void
+move_dialog( HWND dialog, HWND parent )
+{
+  RECT rc_workarea, rc_parent, wr_dialog, rc;
+  int placed = 0;
+
+  SystemParametersInfo( SPI_GETWORKAREA, 0, &rc_workarea, 0 );
+  GetWindowRect( parent, &rc_parent );
+  GetWindowRect( dialog, &wr_dialog );
+
+  /* Place centered below Fuse's main window */
+  if( !placed ) {
+    CopyRect( &rc, &wr_dialog );
+    OffsetRect( &rc, -rc.left, -rc.top );
+    OffsetRect( &rc, -rc.right/2, 0 );
+    OffsetRect( &rc, ( rc_parent.right - rc_parent.left ) / 2, 0 );
+    OffsetRect( &rc, rc_parent.left, rc_parent.bottom );
+    if( rc.left >= rc_workarea.left && rc.right <= rc_workarea.right &&
+        rc.bottom <= rc_workarea.bottom )
+      placed = 1;
+  }
+
+  /* Place right to Fuse's main window */
+  if( !placed ) {
+    CopyRect( &rc, &wr_dialog );
+    OffsetRect( &rc, -rc.left, -rc.top );
+    OffsetRect( &rc, rc_parent.right, rc_parent.top );
+    if( rc.right <= rc_workarea.right && rc.bottom <= rc_workarea.bottom )
+      placed = 1;
+  }
+
+  /* Place left to Fuse's main window */
+  if( !placed ) {
+    CopyRect( &rc, &wr_dialog );
+    OffsetRect( &rc, -rc.left, -rc.top );
+    OffsetRect( &rc, rc_parent.left - rc.right, rc_parent.top );
+    if( rc.left >= rc_workarea.left && rc.bottom <= rc_workarea.bottom )
+      placed = 1;
+  }
+
+  /* Move the dialog or leave at initial position */
+  if( placed ) {
+    SetWindowPos( dialog, NULL, rc.left, rc.top, 0, 0,
+                  SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
+  }
+}
+
 static HWND
 create_dialog( int width, int height )
 {
@@ -165,6 +216,7 @@ create_dialog( int width, int height )
     return NULL;
 
   inflate_dialog( dialog, width, height );
+  move_dialog( dialog, fuse_hWnd );
 
   /* Create the picture buffer */
   BITMAPINFO picture_BMI;
