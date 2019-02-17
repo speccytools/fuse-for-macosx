@@ -42,7 +42,7 @@ static libspectrum_byte *picture;
 static const int picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 
 static HWND hDialogPicture = NULL;
-static HBITMAP picture_BMP;
+static HBITMAP picture_BMP = NULL;
 
 static HWND create_dialog( int width, int height );
 
@@ -246,6 +246,16 @@ create_dialog( int width, int height )
   return dialog;
 }
 
+static void
+destroy_dialog( void )
+{
+  DestroyWindow( hDialogPicture );
+  hDialogPicture = NULL;
+
+  DeleteObject( picture_BMP );
+  picture_BMP = NULL;
+}
+
 static int
 draw_frame( LPDRAWITEMSTRUCT drawitem )
 {
@@ -277,23 +287,17 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       break;
 
     case WM_COMMAND:
-      switch( LOWORD( wParam ) ) {
-        case IDCLOSE:
-        {
-          hDialogPicture = NULL;
-          DestroyWindow( hWnd );
-          return 0;
-        }
+      if( LOWORD( wParam ) == IDCLOSE ) {
+        destroy_dialog();
+        return 0;
       }
       break;
 
     case WM_CLOSE:
-    {
-      hDialogPicture = NULL;
-      DestroyWindow( hWnd );
+      destroy_dialog();
       return 0;
-    }
   }
+
   return FALSE;
 }
 
