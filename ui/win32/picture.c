@@ -43,6 +43,8 @@ static const int picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 
 static HWND hDialogPicture = NULL;
 static HBITMAP picture_BMP = NULL;
+static int min_height;
+static int min_width;
 
 static HWND create_dialog( int width, int height );
 
@@ -125,36 +127,87 @@ win32ui_picture( const char *filename, win32ui_picture_format format )
 }
 
 static void
-inflate_dialog( HWND dialog, int width, int height )
+resize_dialog( HWND dialog )
 {
-  RECT wr_dialog, wr_button, wr_frame;
+  RECT wr_dialog, cr_dialog, wr_button, wr_frame, rc;
   HWND button_hWnd, frame_hWnd;
 
-  /* Change the initial size of the dialog to accommodate the picture */
+  /* Dialog dimensions */
   GetWindowRect( dialog, &wr_dialog );
-  OffsetRect( &wr_dialog, -wr_dialog.left, -wr_dialog.top + height );
-  if( width > wr_dialog.right ) wr_dialog.right = width;
-
-  SetWindowPos( dialog, NULL, 0, 0, wr_dialog.right, wr_dialog.bottom,
-                SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+  GetClientRect( dialog, &cr_dialog );
+  OffsetRect( &wr_dialog, -wr_dialog.left, -wr_dialog.top );
+  OffsetRect( &cr_dialog, -cr_dialog.left, -cr_dialog.top );
 
   /* Move Close button */
+  SetRectEmpty( &rc );
+  rc.top = 7; /*  bottom spacing (DLUs) */
+  MapDialogRect( dialog, &rc );
+
   button_hWnd = GetDlgItem( dialog, IDCLOSE );
   GetWindowRect( button_hWnd, &wr_button );
-  MapWindowPoints( 0, dialog, (POINT *)&wr_button, 2 );
-  wr_button.left = ( wr_dialog.right -
+  wr_button.left = ( cr_dialog.right -
                      ( wr_button.right - wr_button.left ) ) / 2;
-  wr_button.top += height;
+  wr_button.top = cr_dialog.bottom - ( wr_button.bottom - wr_button.top ) -
+                  rc.top;
 
   SetWindowPos( button_hWnd, NULL, wr_button.left, wr_button.top, 0, 0,
                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
 
   /* Give any unused space to picture frame */
   frame_hWnd = GetDlgItem( dialog, IDC_PICTURE_FRAME );
-  wr_frame.bottom = width;
-  wr_frame.right = wr_dialog.right;
+  SetRectEmpty( &rc );
+  rc.bottom = 7 + 7; /* spacing above and below button (DLUs) */
+  MapDialogRect( dialog, &rc );
+  GetWindowRect( button_hWnd, &wr_button );
+  rc.bottom += wr_button.bottom - wr_button.top; /* button height */
+  wr_frame.bottom = cr_dialog.bottom - rc.bottom;
+  wr_frame.right = cr_dialog.right;
+
   SetWindowPos( frame_hWnd, NULL, 0, 0, wr_frame.right, wr_frame.bottom,
+                SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS );
+}
+
+static void
+inflate_dialog( HWND dialog, int width, int height )
+{
+  RECT wr_dialog, cr_dialog, wr_button, rc;
+  HWND button_hWnd;
+
+  /* Dialog dimensions */
+  GetWindowRect( dialog, &wr_dialog );
+  GetClientRect( dialog, &cr_dialog );
+  OffsetRect( &wr_dialog, -wr_dialog.left, -wr_dialog.top );
+  OffsetRect( &cr_dialog, -cr_dialog.left, -cr_dialog.top );
+
+  /* Button dimensions */
+  button_hWnd = GetDlgItem( dialog, IDCLOSE );
+  GetWindowRect( button_hWnd, &wr_button );
+  OffsetRect( &wr_button, -wr_button.left, -wr_button.top );
+
+  /* Button spacing */
+  SetRectEmpty( &rc );
+  rc.bottom = 7 + 7; /* top spacing + bottom spacing (DLUs) */
+  rc.right  = 7 + 7; /* left spacing + right spacing (DLUs) */
+  MapDialogRect( dialog, &rc );
+  rc.bottom += wr_button.bottom; /* pixels */
+  rc.right  += wr_button.right;  /* pixels */
+
+  /* Image dimensions */
+  rc.bottom += height; /* pixels */
+  if( width > rc.right )
+    rc.right = width;  /* pixels */
+
+  /* Window decorations */
+  rc.bottom += wr_dialog.bottom - cr_dialog.bottom;
+  rc.right  += wr_dialog.right - cr_dialog.right;
+
+  SetWindowPos( dialog, NULL, 0, 0, rc.right, rc.bottom,
                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+
+  min_width = rc.right;
+  min_height = rc.bottom;
+
+  resize_dialog( dialog );
 }
 
 static void
@@ -256,6 +309,35 @@ destroy_dialog( void )
   picture_BMP = NULL;
 }
 
+static void
+resizing_dialog( WPARAM wParam, LPARAM lParam )
+{
+  RECT *rc;
+  int width, height;
+
+  rc = (RECT *)lParam;
+  width = rc->right - rc->left;
+  height = rc->bottom - rc->top;
+
+  /* Force dialog minimum size to fit original picture size */
+  if( height < min_height ) {
+    if( wParam == WMSZ_TOP || wParam == WMSZ_TOPLEFT ||
+        wParam == WMSZ_TOPRIGHT )
+      rc->top = rc->bottom - min_height;
+    else
+      rc->bottom = rc->top + min_height;
+  }
+
+  if( width < min_width ) {
+    if( wParam == WMSZ_LEFT ||
+        wParam == WMSZ_TOPLEFT ||
+        wParam == WMSZ_BOTTOMLEFT )
+      rc->left = rc->right - min_width;
+    else
+      rc->right = rc->left + min_width;
+  }
+}
+
 static int
 draw_frame( LPDRAWITEMSTRUCT drawitem )
 {
@@ -268,8 +350,11 @@ draw_frame( LPDRAWITEMSTRUCT drawitem )
   BITMAP bitmap_info;
   GetObject( picture_BMP, sizeof( BITMAP ), &bitmap_info );
 
-  BitBlt( drawitem->hDC, 0, 0, bitmap_info.bmWidth,
-          bitmap_info.bmHeight, pic_dc, 0, 0, SRCCOPY );
+  StretchBlt( drawitem->hDC, drawitem->rcItem.left, drawitem->rcItem.top,
+              drawitem->rcItem.right - drawitem->rcItem.left,
+              drawitem->rcItem.bottom - drawitem->rcItem.top,
+              pic_dc, 0, 0, bitmap_info.bmWidth, bitmap_info.bmHeight,
+              SRCCOPY );
 
   SelectObject( pic_dc, old_bmp );
   DeleteDC( pic_dc );
@@ -281,6 +366,14 @@ static LRESULT WINAPI
 picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
+    case WM_SIZE:
+      resize_dialog( hWnd );
+      return 0;
+
+    case WM_SIZING:
+      resizing_dialog( wParam, lParam );
+      return TRUE;
+
     case WM_DRAWITEM:
       if( wParam == IDC_PICTURE_FRAME )
         return draw_frame( (LPDRAWITEMSTRUCT) lParam );
