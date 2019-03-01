@@ -341,23 +341,69 @@ resizing_dialog( WPARAM wParam, LPARAM lParam )
 static int
 draw_frame( LPDRAWITEMSTRUCT drawitem )
 {
+  float scale_x, scale_y, scale_factor;
+  int offset_x, offset_y;
+  int scaled_width, scaled_height;
+  int allocation_width, allocation_height;
+  BITMAP bitmap_info;
+  RECT rc;
+
   if( !( drawitem->itemAction & ODA_DRAWENTIRE ) )
     return FALSE;
 
   HDC pic_dc = CreateCompatibleDC( drawitem->hDC );
   HBITMAP old_bmp = SelectObject( pic_dc, picture_BMP );
-
-  BITMAP bitmap_info;
   GetObject( picture_BMP, sizeof( BITMAP ), &bitmap_info );
 
-  StretchBlt( drawitem->hDC, drawitem->rcItem.left, drawitem->rcItem.top,
-              drawitem->rcItem.right - drawitem->rcItem.left,
-              drawitem->rcItem.bottom - drawitem->rcItem.top,
+  allocation_width = drawitem->rcItem.right - drawitem->rcItem.left;
+  allocation_height = drawitem->rcItem.bottom - drawitem->rcItem.top;
+
+  scale_x = (float)allocation_width / bitmap_info.bmWidth;
+  scale_y = (float)allocation_height / bitmap_info.bmHeight;
+  scale_factor = scale_x < scale_y ? scale_x : scale_y;
+
+  scaled_width = bitmap_info.bmWidth * scale_factor;
+  scaled_height = bitmap_info.bmHeight * scale_factor;
+  offset_x = ( allocation_width - scaled_width ) / 2;
+  offset_y = ( allocation_height - scaled_height ) / 2;
+
+  StretchBlt( drawitem->hDC, offset_x, offset_y,
+              scaled_width,
+              scaled_height,
               pic_dc, 0, 0, bitmap_info.bmWidth, bitmap_info.bmHeight,
               SRCCOPY );
 
   SelectObject( pic_dc, old_bmp );
   DeleteDC( pic_dc );
+
+  /* Erase background (hopefully) without flickering */
+  if( offset_y > 0 ) {
+    rc.left = 0;
+    rc.top = 0;
+    rc.right = allocation_width;
+    rc.bottom = offset_y;
+    FillRect( drawitem->hDC, &rc, (HBRUSH) GetStockObject( BLACK_BRUSH ) );
+
+    rc.left = 0;
+    rc.top = offset_y + scaled_height;
+    rc.right = allocation_width;
+    rc.bottom = allocation_height;
+    FillRect( drawitem->hDC, &rc, (HBRUSH) GetStockObject( BLACK_BRUSH ) );
+  }
+
+  if( offset_x > 0 ) {
+    rc.left = 0;
+    rc.top = 0;
+    rc.right = offset_x;
+    rc.bottom = allocation_height;
+    FillRect( drawitem->hDC, &rc, (HBRUSH) GetStockObject( BLACK_BRUSH ) );
+
+    rc.left = offset_x + scaled_width;
+    rc.top = 0;
+    rc.right = allocation_width;
+    rc.bottom = allocation_height;
+    FillRect( drawitem->hDC, &rc, (HBRUSH) GetStockObject( BLACK_BRUSH ) );
+  }
 
   return TRUE;
 }
