@@ -62,9 +62,12 @@ fuse_LDADD = \
              $(GTK_LIBS) \
              $(GLIB_LIBS) \
              $(PNG_LIBS) \
-             $(SDL_LIBS) \
              $(X_LIBS) \
              $(XML_LIBS)
+
+if USE_SDL
+fuse_LDADD += $(SDL_LIBS)
+endif
 
 fuse_DEPENDENCIES =
 
@@ -87,8 +90,11 @@ AM_CPPFLAGS = \
               $(LIBSPECTRUM_CFLAGS) \
               $(XML_CFLAGS) \
               -DFUSEDATADIR="\"${pkgdatadir}\"" \
-              $(SDL_CFLAGS) \
               $(PNG_CFLAGS)
+
+if USE_SDL
+AM_CPPFLAGS += $(SDL_CFLAGS)
+endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(PTHREAD_CFLAGS)
 

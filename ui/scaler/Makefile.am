@@ -30,11 +30,11 @@ fuse_DEPENDENCIES += \
                      ui/scaler/scalers16.o \
                      ui/scaler/scalers32.o
 
-ui/scaler/scalers16.o: ui/scaler/scalers.c
-	$(AM_V_CC)$(COMPILE) -DSCALER_DATA_SIZE=2 -c $(srcdir)/ui/scaler/scalers.c -o ui/scaler/scalers16.o
+ui/scaler/scalers16.o: $(srcdir)/ui/scaler/scalers.c
+	$(AM_V_CC)$(COMPILE) -DSCALER_DATA_SIZE=2 -c $(srcdir)/ui/scaler/scalers.c -o $@
 
-ui/scaler/scalers32.o: ui/scaler/scalers.c
-	$(AM_V_CC)$(COMPILE) -DSCALER_DATA_SIZE=4 -c $(srcdir)/ui/scaler/scalers.c -o ui/scaler/scalers32.o
+ui/scaler/scalers32.o: $(srcdir)/ui/scaler/scalers.c
+	$(AM_V_CC)$(COMPILE) -DSCALER_DATA_SIZE=4 -c $(srcdir)/ui/scaler/scalers.c -o $@
 
 noinst_HEADERS += \
                   ui/scaler/scaler.h \
@@ -43,7 +43,8 @@ noinst_HEADERS += \
 EXTRA_DIST += \
               ui/scaler/scalers.c \
               ui/scaler/scaler_hq2x.c \
-              ui/scaler/scaler_hq3x.c
+              ui/scaler/scaler_hq3x.c \
+              ui/scaler/scaler_hq4x.c
 
 CLEANFILES += \
               ui/scaler/scalers16.o \

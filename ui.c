@@ -193,7 +193,9 @@ void
 ui_mouse_suspend( void )
 {
   mouse_grab_suspended = ui_mouse_grabbed ? 2 : 1;
-  ui_mouse_grabbed = ui_mouse_release( 1 );
+
+  if( ui_mouse_grabbed )
+    ui_mouse_grabbed = ui_mouse_release( 1 );
 }
 
 void

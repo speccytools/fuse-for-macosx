@@ -112,8 +112,6 @@ init_scalers( void )
   scaler_register_clear();
 
   scaler_register( SCALER_NORMAL );
-  scaler_register( SCALER_DOUBLESIZE );
-  scaler_register( SCALER_TRIPLESIZE );
   scaler_register( SCALER_2XSAI );
   scaler_register( SCALER_SUPER2XSAI );
   scaler_register( SCALER_SUPEREAGLE );
@@ -127,12 +125,18 @@ init_scalers( void )
     scaler_register( SCALER_HALFSKIP );
     scaler_register( SCALER_TIMEXTV );
     scaler_register( SCALER_TIMEX1_5X );
+    scaler_register( SCALER_TIMEX2X );
   } else {
+    scaler_register( SCALER_DOUBLESIZE );
+    scaler_register( SCALER_TRIPLESIZE );
+    scaler_register( SCALER_QUADSIZE );
     scaler_register( SCALER_TV2X );
     scaler_register( SCALER_TV3X );
+    scaler_register( SCALER_TV4X );
     scaler_register( SCALER_PALTV2X );
     scaler_register( SCALER_PALTV3X );
     scaler_register( SCALER_HQ3X );
+    scaler_register( SCALER_HQ4X );
   }
   
   if( scaler_is_supported( current_scaler ) ) {

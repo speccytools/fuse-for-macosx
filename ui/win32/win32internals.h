@@ -64,6 +64,11 @@ HWND fuse_hABOWnd;
  * Display routines (win32display.c)
  */
 
+/* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
+   DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
+   creating via the scalers */
+#define MAX_SCALE 4
+
 /* The colour palette in use */
 extern libspectrum_dword win32display_colours[16];
 
