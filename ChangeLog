@@ -22,6 +22,8 @@
             (Sergio Baldoví).
           * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
             Kendall) (Sergio Baldoví).
+          * Suppress a couple of -Wunused-result warnings from gcc
+            (Alberto Garcia).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
