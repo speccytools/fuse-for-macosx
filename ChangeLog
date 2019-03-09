@@ -24,6 +24,9 @@
             Kendall) (Sergio Baldoví).
           * Suppress a couple of -Wunused-result warnings from gcc
             (Alberto Garcia).
+          * New higher resolution keyboard picture on GTK+ and win32 UIs
+            (thanks, Andrew Owen for the picture) (Sergio Baldoví and Philip
+            Kendall).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 

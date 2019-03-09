@@ -659,7 +659,7 @@ ui_widgets_reset( void )
 void
 menu_help_keyboard( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  gtkui_picture( "keyboard.scr", 0 );
+  gtkui_picture( "keyboard.png", 0 );
 }
 
 void
