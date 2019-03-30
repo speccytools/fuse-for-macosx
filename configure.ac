@@ -366,7 +366,25 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
   if test "$gtk" = yes; then
     AC_DEFINE([UI_GTK], 1, [Defined if GTK+ UI is in use])
     UI=gtk;
-    LIBS="$LIBS -lX11";
+    AC_MSG_CHECKING(whether GTK+ supports x11 backend)
+    ac_save_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
+    AC_COMPILE_IFELSE(
+      [AC_LANG_PROGRAM(
+        [[
+          #include <gdk/gdk.h>
+          #include <stdlib.h>
+        ]],
+        [[
+          #ifndef GDK_WINDOWING_X11
+            #error "X11 backend not supported"
+          #endif
+        ]])
+      ],
+      [LIBS="$LIBS -lX11"; AC_MSG_RESULT(yes)],
+      [AC_MSG_RESULT(no)]
+    )
+    CPPFLAGS="$ac_save_CPPFLAGS"
   fi
 fi
 
