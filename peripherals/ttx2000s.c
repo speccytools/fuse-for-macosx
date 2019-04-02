@@ -32,6 +32,7 @@
 #include "unittests/unittests.h"
 #include "ttx2000s.h"
 #include "ui/ui.h"
+#include "z80/z80.h"
 
 static memory_page ttx2000s_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page ttx2000s_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
@@ -42,9 +43,21 @@ static int ttx2000s_ram_memory_source;
 
 int ttx2000s_paged = 0;
 
+compat_socket_t teletext_socket = INVALID_SOCKET;
+
+/* default addresses and ports for the four channels */
+char teletext_socket_ips[4][16] = { "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1" };
+libspectrum_word teletext_socket_ports[4] = { 19761, 19762, 19763, 19764 };
+
+int ttx2000s_channel;
+
 static void ttx2000s_write( libspectrum_word port, libspectrum_byte val );
+static void ttx2000s_change_channel( int channel );
 static void ttx2000s_reset( int hard_reset );
 static void ttx2000s_memory_map( void );
+
+static int field_event;
+static void ttx2000s_field_event( libspectrum_dword last_tstates, int event, void *user_data );
 
 /* Debugger events */
 static const char * const event_type_string = "ttx2000s";
@@ -112,12 +125,17 @@ ttx2000s_init( void *context )
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
 
+  compat_socket_networking_init(); // enable networking
+  
+  field_event = event_register( ttx2000s_field_event, "TTX2000S field event" );
+  
   return 0;
 }
 
 static void
 ttx2000s_end( void )
 {
+  compat_socket_networking_end();
 }
 
 void
@@ -140,8 +158,26 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
 
   ttx2000s_paged = 0;
 
-  if ( !(settings_current.ttx2000s) ) return;
-
+  event_remove_type( field_event );
+  if ( !(settings_current.ttx2000s) ) {
+    if ( teletext_socket != INVALID_SOCKET ) { /* close the socket */
+      if( compat_socket_close( teletext_socket ) ) {
+        /* what should we do if closing the socket fails? */
+        ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
+      }
+    }
+    
+    return;
+  }
+  
+  /* enable video field interrupt event */
+  event_add_with_data( tstates + 2 *        /* 20ms delay */
+                machine_current->timings.processor_speed / 100,
+                field_event, 0 );
+  
+  ttx2000s_channel = -1; /* force the connection to be reset */
+  ttx2000s_change_channel( 0 );
+  
   if( machine_load_rom_bank( ttx2000s_memory_map_romcs_rom, 0,
 			     settings_current.rom_ttx2000s,
 			     settings_default.rom_ttx2000s, 0x2000 ) ) {
@@ -180,11 +216,101 @@ static void
 ttx2000s_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
   /* bits 0 and 1 select channel preset */
+  ttx2000s_change_channel( val & 0x03 );
   /* bit 2 enables automatic frequency control */
   if (val & 0x08) /* bit 3 pages out */
     ttx2000s_unpage();
   else
     ttx2000s_page();
+}
+
+static void
+ttx2000s_change_channel( int channel )
+{
+  if ( channel != ttx2000s_channel ) {
+    /* only reconnect if channel preset changed */
+    if ( teletext_socket != INVALID_SOCKET ) {
+      if( compat_socket_close( teletext_socket ) ) {
+        /* what should we do if closing the socket fails? */
+        ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
+      }
+    }
+      
+    teletext_socket = socket( AF_INET, SOCK_STREAM, 0 ); /* create a new socket */
+    
+    if ( compat_socket_blocking_mode( teletext_socket, 1 ) ) { /* make it non blocking */
+      /* what should we do if it fails? */
+      ui_error( UI_ERROR_ERROR, "ttx2000s: failed to set socket non-blocking" );
+    }
+    
+    struct sockaddr_in teletext_serv_addr;
+    const char *addr = teletext_socket_ips[channel & 3];
+    teletext_serv_addr.sin_family = AF_INET; /* address family Internet */
+    teletext_serv_addr.sin_port = htons (teletext_socket_ports[channel & 3]); /* Target port */
+    teletext_serv_addr.sin_addr.s_addr = inet_addr (addr); /* Target IP */
+    
+    if (connect( teletext_socket, (SOCKADDR *)&teletext_serv_addr, sizeof(teletext_serv_addr) ) ) {
+      /* TODO: ERROR HANDLING! */
+      errno = compat_socket_get_error();
+      #ifdef WIN32
+      if (errno == WSAEWOULDBLOCK)
+      #else
+      if (errno == EINPROGRESS)
+      #endif
+      {
+        /* we expect this as socket is non-blocking */
+      } else {
+        /* TODO: what should we do when there's an unexpected error? */
+        ui_error( UI_ERROR_ERROR, "ttx2000s: connect returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
+      }
+    }
+    
+    ttx2000s_channel = channel;
+  }
+}
+
+static void
+ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, void *user_data )
+{
+  int bytes_read;
+  int i;
+  libspectrum_byte ttx2000s_socket_buffer[672];
+  
+  /* do stuff */
+  if ( teletext_socket != INVALID_SOCKET )
+  {
+    bytes_read = recv(teletext_socket, (char*) ttx2000s_socket_buffer, 672, 0);
+    if (bytes_read == 672) {
+      for ( i = 0; i < 16; i++ ) {
+        if (ttx2000s_socket_buffer[i*42] != 0) {
+          ttx2000s_ram[i*64] = 0x27;
+          memcpy(ttx2000s_ram + (i * 64) + 1, ttx2000s_socket_buffer + (i * 42), 42);
+        }
+      }
+    } else if (bytes_read == -1) {
+      errno = compat_socket_get_error();
+      #ifdef WIN32
+      if (errno == WSAENOTCONN || errno == WSAEWOULDBLOCK)
+      #else
+      if (errno == ENOTCONN || errno == EWOULDBLOCK)
+      #endif
+      {
+        /* just ignore if the socket is not connected or recv would block */
+      } else {
+        /* TODO: what should we do when there's an unexpected error */
+        ui_error( UI_ERROR_ERROR, "ttx2000s: recv returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
+      }
+    }
+  }
+  
+  event_add( 0, z80_nmi_event );    /* pull /NMI */
+  
+  /* TODO: find out whether interrupts happen irrespective of signal being tuned in */
+  
+  event_remove_type( field_event );
+  event_add_with_data( tstates + 2 *        /* 20ms delay */
+                machine_current->timings.processor_speed / 100,
+                field_event, 0 );
 }
 
 int

@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "compat.h"
 #include "fuse.h"
@@ -49,6 +50,16 @@ void
 compat_socket_networking_end( void )
 {
   /* No action necessary */
+}
+
+int
+compat_socket_blocking_mode( compat_socket_t fd, int blocking )
+{
+   int flags = fcntl( fd, F_GETFL, 0 );
+   if ( flags < 0 ) 
+     return -1;
+   flags = blocking ? ( flags & ~O_NONBLOCK ) : ( flags | O_NONBLOCK );
+   return ( fcntl( fd, F_SETFL, flags ) == 0 );
 }
 
 int

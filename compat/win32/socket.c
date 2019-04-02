@@ -39,6 +39,13 @@ struct compat_socket_selfpipe_t {
 };
 
 int
+compat_socket_blocking_mode( compat_socket_t fd, int blocking )
+{
+    u_long mode = blocking ? 1 : 0;
+    return ( ioctlsocket( fd, FIONBIO, &mode ) );
+}
+
+int
 compat_socket_close( compat_socket_t fd )
 {
   return closesocket( fd );

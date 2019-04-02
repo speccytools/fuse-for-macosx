@@ -204,6 +204,7 @@ base_peripherals_48_128( void )
   periph_set_present( PERIPH_TYPE_OPUS, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_PLUSD, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_SPECDRUM, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_TTX2000S, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_USOURCE, PERIPH_PRESENT_OPTIONAL );
 }
 
