@@ -44,6 +44,7 @@ static int ttx2000s_ram_memory_source;
 int ttx2000s_paged = 0;
 
 compat_socket_t teletext_socket = INVALID_SOCKET;
+int ttx2000s_connected = 0;
 
 /* default addresses and ports for the four channels */
 char teletext_socket_ips[4][16] = { "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1" };
@@ -165,6 +166,7 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
         /* what should we do if closing the socket fails? */
         ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
       }
+      ttx2000s_connected = 0; /* disconnected */
     }
     
     return;
@@ -259,6 +261,7 @@ ttx2000s_change_channel( int channel )
       #endif
       {
         /* we expect this as socket is non-blocking */
+        ttx2000s_connected = 1; /* assume we are connected */
       } else {
         /* TODO: what should we do when there's an unexpected error? */
         ui_error( UI_ERROR_ERROR, "ttx2000s: connect returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
@@ -277,7 +280,7 @@ ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, voi
   libspectrum_byte ttx2000s_socket_buffer[672];
   
   /* do stuff */
-  if ( teletext_socket != INVALID_SOCKET )
+  if ( teletext_socket != INVALID_SOCKET && ttx2000s_connected )
   {
     bytes_read = recv(teletext_socket, (char*) ttx2000s_socket_buffer, 672, 0);
     if (bytes_read == 672) {
@@ -299,13 +302,15 @@ ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, voi
       } else {
         /* TODO: what should we do when there's an unexpected error */
         ui_error( UI_ERROR_ERROR, "ttx2000s: recv returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
+        ttx2000s_connected = 0; /* the connection has failed */
       }
     }
   }
   
-  event_add( 0, z80_nmi_event );    /* pull /NMI */
+  if (ttx2000s_paged)
+    event_add( 0, z80_nmi_event );    /* pull /NMI */
   
-  /* TODO: find out whether interrupts happen irrespective of signal being tuned in */
+  /* TODO: find out how the real hardware behaves */
   
   event_remove_type( field_event );
   event_add_with_data( tstates + 2 *        /* 20ms delay */
