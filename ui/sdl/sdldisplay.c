@@ -222,7 +222,7 @@ uidisplay_init( int width, int height )
 {
   SDL_Rect **modes;
   int no_modes;
-  int i, mw = 0, mh = 0, mn = 0;
+  int i = 0, mw = 0, mh = 0, mn = 0;
 
   /* Get available fullscreen/software modes */
   modes=SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_SWSURFACE);
@@ -253,10 +253,15 @@ uidisplay_init( int width, int height )
     return 0;
   }
 
-  for( i=0; modes[i]; ++i ); /* count modes */
+  if( !no_modes ) {
+    for( i=0; modes[i]; ++i ); /* count modes */
+  }
+
   if( settings_current.sdl_fullscreen_mode ) {
     if( sscanf( settings_current.sdl_fullscreen_mode, " %dx%d", &mw, &mh ) != 2 ) {
-      if( sscanf( settings_current.sdl_fullscreen_mode, " %d", &mn ) == 1 && mn <= i ) {
+      if( !no_modes &&
+          sscanf( settings_current.sdl_fullscreen_mode, " %d", &mn ) == 1 &&
+          mn <= i ) {
         mw = modes[mn - 1]->w; mh = modes[mn - 1]->h;
       }
     }
