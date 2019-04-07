@@ -241,7 +241,7 @@ uidisplay_init( int width, int height )
     );
     if( no_modes ) {
       fprintf( stderr, "  ** The modes list is empty%s...\n",
-                       no_modes == 2 ? ", all resolution allowed" : "" );
+               modes == (SDL_Rect **) -1 ? ", all resolutions allowed" : "" );
     } else {
       for( i = 0; modes[i]; i++ ) {
         fprintf( stderr, "% 3d  % 5d % 5d\n", i + 1, modes[i]->w, modes[i]->h );
@@ -269,14 +269,14 @@ uidisplay_init( int width, int height )
 
   /* Check if there are any modes available, or if our resolution is restricted
      at all */
-  if( no_modes ){
-    /* Just try whatever we have and see what happens */
-    max_fullscreen_height = 480;
-    min_fullscreen_height = 240;
-  } else if( mh > 0 ) {
+  if( mh > 0 ) {
     /* set from command line */
     max_fullscreen_height = min_fullscreen_height = mh;
     fullscreen_width = mw;
+  } else if( no_modes ){
+    /* Just try whatever we have and see what happens */
+    max_fullscreen_height = 480;
+    min_fullscreen_height = 240;
   } else {
     /* Record the largest supported fullscreen software mode */
     max_fullscreen_height = modes[0]->h;
