@@ -14,6 +14,8 @@
             Baldoví).
           * GTK+ UI: Add Fuse icon to the about dialog and the main window
             (Alberto Garcia).
+          * GTK+ UI: Load/save binary dialog remember last values (Derek
+            Fountain).
           * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
             (Alberto Garcia).
           * Allow selection of audio driver at build time (thanks, kov_serg)
