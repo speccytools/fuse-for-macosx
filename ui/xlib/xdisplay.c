@@ -93,9 +93,9 @@ static const int rgb_pitch = 2 * ( DISPLAY_SCREEN_WIDTH + 3 );
 
 /* A scaled copy of the image displayed on the Spectrum's screen */
 static libspectrum_word
-  scaled_image[3 * DISPLAY_SCREEN_HEIGHT][3 * DISPLAY_SCREEN_WIDTH];
+  scaled_image[4 * DISPLAY_SCREEN_HEIGHT][4 * DISPLAY_SCREEN_WIDTH];
 static const ptrdiff_t scaled_pitch =
-  3 * DISPLAY_SCREEN_WIDTH * 2;
+  4 * DISPLAY_SCREEN_WIDTH * 2;
 
 /* A scaled copy of the image displayed on the Spectrum's screen */
 static libspectrum_word
@@ -414,11 +414,11 @@ xdisplay_allocate_image( void )
   if( !shm_used ) {
     image = XCreateImage( display, xdisplay_visual,
 		       xdisplay_depth, ZPixmap, 0, NULL,
-		       3 * DISPLAY_ASPECT_WIDTH,
-		       3 * DISPLAY_SCREEN_HEIGHT + 3 * PIXMAPS_H, 8, 0 );
+		       4 * DISPLAY_ASPECT_WIDTH,
+		       4 * DISPLAY_SCREEN_HEIGHT + 4 * PIXMAPS_H, 8, 0 );
 /*
    we allocate extra space after the screen for status bar icons
-   status bar icons total width always smaller than 3xDISPLAY_ASPECT_WIDTH
+   status bar icons total width always smaller than 4xDISPLAY_ASPECT_WIDTH
 */
     if(!image) {
       fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
@@ -471,8 +471,8 @@ try_shm( void )
   image = XShmCreateImage( display, xdisplay_visual,
 			   xdisplay_depth, ZPixmap,
 			   NULL, &shm_info,
-			   3 * DISPLAY_ASPECT_WIDTH,
-			   3 * DISPLAY_SCREEN_HEIGHT + 3 * PIXMAPS_H);
+			   4 * DISPLAY_ASPECT_WIDTH,
+			   4 * DISPLAY_SCREEN_HEIGHT + 4 * PIXMAPS_H);
 /*
    we allocate extra space after the screen for status bar icons
    status bar icons total width always smaller than 3xDISPLAY_ASPECT_WIDTH
@@ -634,6 +634,10 @@ register_scalers( void )
         scaler_register( SCALER_TV3X );
         scaler_register( SCALER_PALTV3X );
         scaler_register( SCALER_HQ3X );
+
+        scaler_register( SCALER_QUADSIZE );
+        scaler_register( SCALER_TV4X );
+        scaler_register( SCALER_HQ4X );
       }
     }
   if( current_scaler != SCALER_NUM )
@@ -792,11 +796,11 @@ void
 xdisplay_area( int x, int y, int w, int h )
 {
 /* e.g. dwm first expose with too big w and h */
-  if( x + w > 3 * DISPLAY_ASPECT_WIDTH )
-    w = 3 * DISPLAY_ASPECT_WIDTH - x;
+  if( x + w > 4 * DISPLAY_ASPECT_WIDTH )
+    w = 4 * DISPLAY_ASPECT_WIDTH - x;
 
-  if( y + h > 3 * DISPLAY_SCREEN_HEIGHT )
-    h = 3 * DISPLAY_SCREEN_HEIGHT - y;
+  if( y + h > 4 * DISPLAY_SCREEN_HEIGHT )
+    h = 4 * DISPLAY_SCREEN_HEIGHT - y;
 
   if( shm_used ) {
 #ifdef X_USE_SHM
