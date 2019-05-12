@@ -31,6 +31,8 @@
             Kendall).
           * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
             (Jools Wills).
+          * WidgetUI: Enable HOME and END keys in menus on widget UIs (Gergely
+            Szasz).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
