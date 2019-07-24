@@ -283,13 +283,19 @@ ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, voi
   if ( teletext_socket != INVALID_SOCKET && ttx2000s_connected )
   {
     bytes_read = recv(teletext_socket, (char*) ttx2000s_socket_buffer, 672, 0);
+    /* packet server sends 16 lines of 42 bytes, unusued lines are padded with 0x00 */
     if (bytes_read == 672) {
-      for ( i = 0; i < 16; i++ ) {
+      for ( i = 0; i < 12; i++ ) {
+        /* TTX2000S logic only reads the first 12 lines */
         if (ttx2000s_socket_buffer[i*42] != 0) {
-          ttx2000s_ram[i*64] = 0x27;
-          memcpy(ttx2000s_ram + (i * 64) + 1, ttx2000s_socket_buffer + (i * 42), 42);
+          /* I think they are stored at 0x2100 onwards */
+          ttx2000s_ram[i*64+256] = 0x27;
+          memcpy(ttx2000s_ram + (i * 64) + 257, ttx2000s_socket_buffer + (i * 42), 42);
         }
       }
+      /* only generate NMI when ROM is paged in and there is signal */
+      if (ttx2000s_paged)
+        event_add( 0, z80_nmi_event );    /* pull /NMI */
     } else if (bytes_read == -1) {
       errno = compat_socket_get_error();
       #ifdef WIN32
@@ -306,11 +312,6 @@ ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, voi
       }
     }
   }
-  
-  if (ttx2000s_paged)
-    event_add( 0, z80_nmi_event );    /* pull /NMI */
-  
-  /* TODO: find out how the real hardware behaves */
   
   event_remove_type( field_event );
   event_add_with_data( tstates + 2 *        /* 20ms delay */
