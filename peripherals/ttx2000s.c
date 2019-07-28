@@ -33,6 +33,7 @@
 #include "ttx2000s.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
+#include <string.h>
 
 static memory_page ttx2000s_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page ttx2000s_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
@@ -43,7 +44,7 @@ static int ttx2000s_ram_memory_source;
 
 int ttx2000s_paged = 0;
 
-compat_socket_t teletext_socket = INVALID_SOCKET;
+compat_socket_t teletext_socket;
 int ttx2000s_connected = 0;
 
 /* default addresses and ports for the four channels */
@@ -113,6 +114,8 @@ ttx2000s_init( void *context )
 {
   int i;
 
+  teletext_socket = compat_socket_invalid;
+
   module_register( &ttx2000s_module_info );
 
   ttx2000s_rom_memory_source = memory_source_register( "TTX2000S ROM" );
@@ -161,7 +164,7 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
 
   event_remove_type( field_event );
   if ( !(settings_current.ttx2000s) ) {
-    if ( teletext_socket != INVALID_SOCKET ) { /* close the socket */
+    if ( teletext_socket != compat_socket_invalid ) { /* close the socket */
       if( compat_socket_close( teletext_socket ) ) {
         /* what should we do if closing the socket fails? */
         ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
@@ -231,7 +234,7 @@ ttx2000s_change_channel( int channel )
 {
   if ( channel != ttx2000s_channel ) {
     /* only reconnect if channel preset changed */
-    if ( teletext_socket != INVALID_SOCKET ) {
+    if ( teletext_socket != compat_socket_invalid ) {
       if( compat_socket_close( teletext_socket ) ) {
         /* what should we do if closing the socket fails? */
         ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
@@ -240,9 +243,12 @@ ttx2000s_change_channel( int channel )
       
     teletext_socket = socket( AF_INET, SOCK_STREAM, 0 ); /* create a new socket */
     
+    ttx2000s_channel = channel;
+
     if ( compat_socket_blocking_mode( teletext_socket, 1 ) ) { /* make it non blocking */
       /* what should we do if it fails? */
-      ui_error( UI_ERROR_ERROR, "ttx2000s: failed to set socket non-blocking" );
+      ui_error( UI_ERROR_ERROR, "ttx2000s: failed to set socket non-blocking errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
+      return;
     }
     
     struct sockaddr_in teletext_serv_addr;
@@ -251,24 +257,25 @@ ttx2000s_change_channel( int channel )
     teletext_serv_addr.sin_port = htons (teletext_socket_ports[channel & 3]); /* Target port */
     teletext_serv_addr.sin_addr.s_addr = inet_addr (addr); /* Target IP */
     
-    if (connect( teletext_socket, (SOCKADDR *)&teletext_serv_addr, sizeof(teletext_serv_addr) ) ) {
-      /* TODO: ERROR HANDLING! */
+    if (connect( teletext_socket, (compat_sockaddr *)&teletext_serv_addr, sizeof(teletext_serv_addr) ) ) {
       errno = compat_socket_get_error();
-      #ifdef WIN32
-      if (errno == WSAEWOULDBLOCK)
-      #else
-      if (errno == EINPROGRESS)
-      #endif
+      if (errno == COMPAT_ECONNREFUSED)
+      {
+        /* the connection was refused */
+        return;
+      }
+
+      if (errno == COMPAT_EWOULDBLOCK || errno == COMPAT_EINPROGRESS)
       {
         /* we expect this as socket is non-blocking */
         ttx2000s_connected = 1; /* assume we are connected */
-      } else {
+      }
+      else
+      {
         /* TODO: what should we do when there's an unexpected error? */
         ui_error( UI_ERROR_ERROR, "ttx2000s: connect returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
       }
     }
-    
-    ttx2000s_channel = channel;
   }
 }
 
@@ -280,7 +287,7 @@ ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, voi
   libspectrum_byte ttx2000s_socket_buffer[672];
   
   /* do stuff */
-  if ( teletext_socket != INVALID_SOCKET && ttx2000s_connected )
+  if ( teletext_socket != compat_socket_invalid && ttx2000s_connected )
   {
     bytes_read = recv(teletext_socket, (char*) ttx2000s_socket_buffer, 672, 0);
     /* packet server sends 16 lines of 42 bytes, unusued lines are padded with 0x00 */
@@ -298,11 +305,12 @@ ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, voi
         event_add( 0, z80_nmi_event );    /* pull /NMI */
     } else if (bytes_read == -1) {
       errno = compat_socket_get_error();
-      #ifdef WIN32
-      if (errno == WSAENOTCONN || errno == WSAEWOULDBLOCK)
-      #else
-      if (errno == ENOTCONN || errno == EWOULDBLOCK)
-      #endif
+      if (errno == COMPAT_ECONNREFUSED)
+      {
+        /* the connection was refused */
+        ttx2000s_connected = 0;
+      }
+      else if (errno == COMPAT_ENOTCONN || errno == COMPAT_EWOULDBLOCK)
       {
         /* just ignore if the socket is not connected or recv would block */
       } else {
