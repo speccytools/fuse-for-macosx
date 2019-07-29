@@ -59,7 +59,8 @@ static void ttx2000s_reset( int hard_reset );
 static void ttx2000s_memory_map( void );
 
 static int field_event;
-static void ttx2000s_field_event( libspectrum_dword last_tstates, int event, void *user_data );
+static void ttx2000s_field_event( libspectrum_dword last_tstates, int event,
+                                  void *user_data );
 
 /* Debugger events */
 static const char * const event_type_string = "ttx2000s";
@@ -127,12 +128,12 @@ ttx2000s_init( void *context )
 
   periph_register( PERIPH_TYPE_TTX2000S, &ttx2000s_periph );
   periph_register_paging_events( event_type_string, &page_event,
-				 &unpage_event );
+                                 &unpage_event );
 
-  compat_socket_networking_init(); // enable networking
-  
+  compat_socket_networking_init(); /* enable networking */
+
   field_event = event_register( ttx2000s_field_event, "TTX2000S field event" );
-  
+
   return 0;
 }
 
@@ -163,29 +164,31 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
   ttx2000s_paged = 0;
 
   event_remove_type( field_event );
-  if ( !(settings_current.ttx2000s) ) {
-    if ( teletext_socket != compat_socket_invalid ) { /* close the socket */
+  if( !( settings_current.ttx2000s ) ) {
+    if( teletext_socket != compat_socket_invalid ) {  /* close the socket */
       if( compat_socket_close( teletext_socket ) ) {
         /* what should we do if closing the socket fails? */
-        ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
+        ui_error( UI_ERROR_ERROR,
+                  "ttx2000s: close returned unexpected errno %d: %s\n",
+                  compat_socket_get_error(), compat_socket_get_strerror() );
       }
       ttx2000s_connected = 0; /* disconnected */
     }
-    
+
     return;
   }
-  
+
   /* enable video field interrupt event */
   event_add_with_data( tstates + 2 *        /* 20ms delay */
-                machine_current->timings.processor_speed / 100,
-                field_event, 0 );
-  
+                       machine_current->timings.processor_speed / 100,
+                       field_event, 0 );
+
   ttx2000s_channel = -1; /* force the connection to be reset */
   ttx2000s_change_channel( 0 );
-  
+
   if( machine_load_rom_bank( ttx2000s_memory_map_romcs_rom, 0,
-			     settings_current.rom_ttx2000s,
-			     settings_default.rom_ttx2000s, 0x2000 ) ) {
+                             settings_current.rom_ttx2000s,
+                             settings_default.rom_ttx2000s, 0x2000 ) ) {
     settings_current.ttx2000s = 0;
     periph_activate_type( PERIPH_TYPE_TTX2000S, 0 );
     return;
@@ -223,7 +226,7 @@ ttx2000s_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
   /* bits 0 and 1 select channel preset */
   ttx2000s_change_channel( val & 0x03 );
   /* bit 2 enables automatic frequency control */
-  if (val & 0x08) /* bit 3 pages out */
+  if( val & 0x08 ) /* bit 3 pages out */
     ttx2000s_unpage();
   else
     ttx2000s_page();
@@ -232,99 +235,103 @@ ttx2000s_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 static void
 ttx2000s_change_channel( int channel )
 {
-  if ( channel != ttx2000s_channel ) {
+  if( channel != ttx2000s_channel ) {
     /* only reconnect if channel preset changed */
-    if ( teletext_socket != compat_socket_invalid ) {
+    if( teletext_socket != compat_socket_invalid ) {
       if( compat_socket_close( teletext_socket ) ) {
         /* what should we do if closing the socket fails? */
-        ui_error( UI_ERROR_ERROR, "ttx2000s: close returned unexpected errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
+        ui_error( UI_ERROR_ERROR,
+                  "ttx2000s: close returned unexpected errno %d: %s\n",
+                  compat_socket_get_error(), compat_socket_get_strerror() );
       }
     }
-      
+
     teletext_socket = socket( AF_INET, SOCK_STREAM, 0 ); /* create a new socket */
-    
+
     ttx2000s_channel = channel;
 
-    if ( compat_socket_blocking_mode( teletext_socket, 1 ) ) { /* make it non blocking */
+    if( compat_socket_blocking_mode( teletext_socket, 1 ) ) {  /* make it non blocking */
       /* what should we do if it fails? */
-      ui_error( UI_ERROR_ERROR, "ttx2000s: failed to set socket non-blocking errno %d: %s\n", compat_socket_get_error(), compat_socket_get_strerror() );
+      ui_error( UI_ERROR_ERROR,
+                "ttx2000s: failed to set socket non-blocking errno %d: %s\n",
+                compat_socket_get_error(), compat_socket_get_strerror() );
       return;
     }
-    
+
     struct sockaddr_in teletext_serv_addr;
     const char *addr = teletext_socket_ips[channel & 3];
     teletext_serv_addr.sin_family = AF_INET; /* address family Internet */
-    teletext_serv_addr.sin_port = htons (teletext_socket_ports[channel & 3]); /* Target port */
-    teletext_serv_addr.sin_addr.s_addr = inet_addr (addr); /* Target IP */
-    
-    if (connect( teletext_socket, (compat_sockaddr *)&teletext_serv_addr, sizeof(teletext_serv_addr) ) ) {
+    teletext_serv_addr.sin_port = htons( teletext_socket_ports[channel & 3] ); /* Target port */
+    teletext_serv_addr.sin_addr.s_addr = inet_addr( addr ); /* Target IP */
+
+    if( connect( teletext_socket, (compat_sockaddr *)&teletext_serv_addr,
+                 sizeof( teletext_serv_addr ) ) ) {
       errno = compat_socket_get_error();
-      if (errno == COMPAT_ECONNREFUSED)
-      {
+      if( errno == COMPAT_ECONNREFUSED ) {
         /* the connection was refused */
         return;
       }
 
-      if (errno == COMPAT_EWOULDBLOCK || errno == COMPAT_EINPROGRESS)
-      {
+      if( errno == COMPAT_EWOULDBLOCK || errno == COMPAT_EINPROGRESS ) {
         /* we expect this as socket is non-blocking */
         ttx2000s_connected = 1; /* assume we are connected */
-      }
-      else
-      {
+      } else {
         /* TODO: what should we do when there's an unexpected error? */
-        ui_error( UI_ERROR_ERROR, "ttx2000s: connect returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
+        ui_error( UI_ERROR_ERROR,
+                  "ttx2000s: connect returned unexpected errno %d: %s\n", errno,
+                  compat_socket_get_strerror() );
       }
     }
   }
 }
 
 static void
-ttx2000s_field_event ( libspectrum_dword last_tstates GCC_UNUSED, int event, void *user_data )
+ttx2000s_field_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
+                      void *user_data )
 {
   int bytes_read;
   int i;
   libspectrum_byte ttx2000s_socket_buffer[672];
-  
+
   /* do stuff */
-  if ( teletext_socket != compat_socket_invalid && ttx2000s_connected )
-  {
-    bytes_read = recv(teletext_socket, (char*) ttx2000s_socket_buffer, 672, 0);
-    /* packet server sends 16 lines of 42 bytes, unusued lines are padded with 0x00 */
-    if (bytes_read == 672) {
-      for ( i = 0; i < 12; i++ ) {
+  if( teletext_socket != compat_socket_invalid && ttx2000s_connected ) {
+    bytes_read =
+      recv( teletext_socket, (char *)ttx2000s_socket_buffer, 672, 0 );
+    /* packet server sends 16 lines of 42 bytes, unused lines are padded with 0x00 */
+    if( bytes_read == 672 ) {
+      for( i = 0; i < 12; i++ ) {
         /* TTX2000S logic only reads the first 12 lines */
-        if (ttx2000s_socket_buffer[i*42] != 0) {
+        if( ttx2000s_socket_buffer[i * 42] != 0 ) {
           /* I think they are stored at 0x2100 onwards */
           ttx2000s_ram[i*64+256] = 0x27;
-          memcpy(ttx2000s_ram + (i * 64) + 257, ttx2000s_socket_buffer + (i * 42), 42);
+          memcpy( ttx2000s_ram + (i * 64) + 257,
+                  ttx2000s_socket_buffer + (i * 42), 42 );
         }
       }
       /* only generate NMI when ROM is paged in and there is signal */
-      if (ttx2000s_paged)
+      if( ttx2000s_paged )
         event_add( 0, z80_nmi_event );    /* pull /NMI */
-    } else if (bytes_read == -1) {
+    } else if( bytes_read == -1 ) {
       errno = compat_socket_get_error();
-      if (errno == COMPAT_ECONNREFUSED)
-      {
+      if( errno == COMPAT_ECONNREFUSED ) {
         /* the connection was refused */
         ttx2000s_connected = 0;
-      }
-      else if (errno == COMPAT_ENOTCONN || errno == COMPAT_EWOULDBLOCK)
-      {
+      } else if( errno == COMPAT_ENOTCONN || errno == COMPAT_EWOULDBLOCK ) {
         /* just ignore if the socket is not connected or recv would block */
       } else {
         /* TODO: what should we do when there's an unexpected error */
-        ui_error( UI_ERROR_ERROR, "ttx2000s: recv returned unexpected errno %d: %s\n", errno, compat_socket_get_strerror() );
+        ui_error( UI_ERROR_ERROR,
+                  "ttx2000s: recv returned unexpected errno %d: %s\n", errno,
+                  compat_socket_get_strerror() );
         ttx2000s_connected = 0; /* the connection has failed */
       }
     }
   }
-  
+
   event_remove_type( field_event );
   event_add_with_data( tstates + 2 *        /* 20ms delay */
-                machine_current->timings.processor_speed / 100,
-                field_event, 0 );
+                       machine_current->timings.processor_speed / 100,
+                       field_event, 0 );
 }
 
 int

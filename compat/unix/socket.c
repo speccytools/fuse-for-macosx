@@ -55,11 +55,11 @@ compat_socket_networking_end( void )
 int
 compat_socket_blocking_mode( compat_socket_t fd, int blocking )
 {
-   int flags = fcntl( fd, F_GETFL, 0 );
-   if ( flags == -1 ) 
-     return -1;
-   flags = blocking ? ( flags | O_NONBLOCK ) : ( flags & ~O_NONBLOCK );
-   return ( fcntl( fd, F_SETFL, flags ) != 0 );
+  int flags = fcntl( fd, F_GETFL, 0 );
+  if( flags == -1 )
+    return -1;
+  flags = blocking ? ( flags | O_NONBLOCK ) : ( flags & ~O_NONBLOCK );
+  return ( fcntl( fd, F_SETFL, flags ) != 0 );
 }
 
 int
