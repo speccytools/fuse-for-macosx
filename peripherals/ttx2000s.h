@@ -26,5 +26,7 @@ void ttx2000s_register_startup( void );
 void ttx2000s_page( void );
 void ttx2000s_unpage( void );
 int ttx2000s_unittest( void );
+libspectrum_byte ttx2000s_sram_read( libspectrum_word address );
+void ttx2000s_sram_write( libspectrum_word address, libspectrum_byte b );
 
 #endif				/* #ifndef FUSE_TTX2000S_H */

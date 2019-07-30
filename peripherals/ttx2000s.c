@@ -37,7 +37,12 @@
 
 static memory_page ttx2000s_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page ttx2000s_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
-static libspectrum_byte ttx2000s_ram[2048];	/* this should really be 1k */
+static libspectrum_byte ttx2000s_ram[2048];
+/* FIXME: our pages are really 1k but the minimum is currently 2k 
+   this is fixed as far as the z80 is concerned by masking off the address
+   in ttx2000s_sram_read and ttx2000s_sram_write, but the debugger etc. will
+   see holes in the RAM. */
+
 
 static int ttx2000s_rom_memory_source;
 static int ttx2000s_ram_memory_source;
@@ -46,6 +51,8 @@ int ttx2000s_paged = 0;
 
 compat_socket_t teletext_socket;
 int ttx2000s_connected = 0;
+
+int ttx2000s_line_counter = 0;
 
 /* default addresses and ports for the four channels */
 char teletext_socket_ips[4][16] = { "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1" };
@@ -232,6 +239,22 @@ ttx2000s_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
     ttx2000s_page();
 }
 
+libspectrum_byte
+ttx2000s_sram_read( libspectrum_word address )
+{
+  /* reading from SRAM affects internal counter */
+  ttx2000s_line_counter = ( address >> 6 ) & 0xF;
+  return ttx2000s_ram[ address & 0x3FF ]; /* actual read from SRAM */
+}
+
+void
+ttx2000s_sram_write( libspectrum_word address, libspectrum_byte b )
+{
+  /* writing to SRAM affects internal counter */
+  ttx2000s_line_counter = ( address >> 6 ) & 0xF;
+  ttx2000s_ram[ address & 0x3FF ] = b; /* actual write to SRAM */
+}
+
 static void
 ttx2000s_change_channel( int channel )
 {
@@ -298,16 +321,22 @@ ttx2000s_field_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
     bytes_read =
       recv( teletext_socket, (char *)ttx2000s_socket_buffer, 672, 0 );
     /* packet server sends 16 lines of 42 bytes, unused lines are padded with 0x00 */
+    
     if( bytes_read == 672 ) {
-      for( i = 0; i < 12; i++ ) {
-        /* TTX2000S logic only reads the first 12 lines */
-        if( ttx2000s_socket_buffer[i * 42] != 0 ) {
-          /* I think they are stored at 0x2100 onwards */
-          ttx2000s_ram[i*64+256] = 0x27;
-          memcpy( ttx2000s_ram + (i * 64) + 257,
+      /* 11 line syncs occur before the first teletext line */
+      ttx2000s_line_counter = ( ttx2000s_line_counter + 11 ) & 0xF;
+      i = 0;
+      while( 1 )
+      {
+        if( ttx2000s_socket_buffer[i * 42] != 0 ) /* packet isn't blank */
+          ttx2000s_ram[ ttx2000s_line_counter << 6 ] = 0x27; /* framing code */
+        memcpy( ttx2000s_ram + (ttx2000s_line_counter << 6) + 1,
                   ttx2000s_socket_buffer + (i * 42), 42 );
-        }
+        i++;
+        if( ++ttx2000s_line_counter > 15 )
+          break; /* ignore packets once line counter overflows */
       }
+      
       /* only generate NMI when ROM is paged in and there is signal */
       if( ttx2000s_paged )
         event_add( 0, z80_nmi_event );    /* pull /NMI */
