@@ -747,6 +747,13 @@ case "$host_os" in
 esac
 fi
 AM_CONDITIONAL(HAVE_SOCKETS, test "$sockets" = yes)
+if test "$sockets" = yes; then
+  build_ttx2000s=yes
+  AC_DEFINE([BUILD_TTX2000S], 1, [Defined if we support ttx2000s])
+else
+  build_ttx2000s=no
+fi
+AM_CONDITIONAL(BUILD_TTX2000S, test "$build_ttx2000s" = yes)
 
 dnl See if POSIX threads are supported
 AC_MSG_CHECKING([whether pthread support requested])
@@ -963,6 +970,7 @@ echo "libpng support: ${libpng}"
 echo "Audio driver: ${audio_driver}"
 echo "Spectranet support: ${build_spectranet}"
 echo "SpeccyBoot support: ${linux_tap:-no}"
+echo "TTX2000 S support: ${build_ttx2000s}"
 echo "Desktop integration: ${desktopintegration}"
 echo ""
 echo "Type 'make' to compile Fuse"

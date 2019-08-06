@@ -35,6 +35,9 @@
 #include "z80/z80.h"
 #include <string.h>
 
+int ttx2000s_paged = 0;
+
+#ifdef BUILD_TTX2000S
 static memory_page ttx2000s_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page ttx2000s_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
 static libspectrum_byte ttx2000s_ram[2048];
@@ -46,8 +49,6 @@ static libspectrum_byte ttx2000s_ram[2048];
 
 static int ttx2000s_rom_memory_source;
 static int ttx2000s_ram_memory_source;
-
-int ttx2000s_paged = 0;
 
 compat_socket_t teletext_socket;
 int ttx2000s_connected = 0;
@@ -363,11 +364,34 @@ ttx2000s_field_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
                        field_event, 0 );
 }
 
+#else /* #ifdef BUILD_TTX2000S */
+
+/* No TTX2000S support */
+
+void
+ttx2000s_register_startup( void )
+{
+}
+
+libspectrum_byte
+ttx2000s_sram_read( libspectrum_word address )
+{
+  return 0xff;
+}
+
+void
+ttx2000s_sram_write( libspectrum_word address, libspectrum_byte b )
+{
+}
+
+#endif /* #ifdef BUILD_TTX2000S */
+
 int
 ttx2000s_unittest( void )
 {
   int r = 0;
 
+  #ifdef BUILD_TTX2000S
   ttx2000s_paged = 1;
   ttx2000s_memory_map();
   machine_current->ram.romcs = 1;
@@ -386,6 +410,8 @@ ttx2000s_unittest( void )
   machine_current->ram.romcs = 0;
 
   r += unittests_paging_test_48( 2 );
+  
+  #endif
 
   return r;
 }
