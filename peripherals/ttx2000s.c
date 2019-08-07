@@ -55,10 +55,6 @@ int ttx2000s_connected = 0;
 
 int ttx2000s_line_counter = 0;
 
-/* default addresses and ports for the four channels */
-char teletext_socket_ips[4][16] = { "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1" };
-libspectrum_word teletext_socket_ports[4] = { 19761, 19762, 19763, 19764 };
-
 int ttx2000s_channel;
 
 static void ttx2000s_write( libspectrum_word port, libspectrum_byte val );
@@ -269,12 +265,47 @@ ttx2000s_change_channel( int channel )
                   compat_socket_get_error(), compat_socket_get_strerror() );
       }
     }
-
-    teletext_socket = socket( AF_INET, SOCK_STREAM, 0 ); /* create a new socket */
-
+    teletext_socket = compat_socket_invalid;
+    
     ttx2000s_channel = channel;
 
-    if( compat_socket_blocking_mode( teletext_socket, 1 ) ) {  /* make it non blocking */
+    struct addrinfo *teletext_serv_addr;
+    const char *teletext_socket_addr;
+    const char *teletext_socket_port;
+    
+    switch( channel & 3 ) {
+    default:
+      teletext_socket_addr = settings_current.teletext_addr_1;
+      teletext_socket_port = settings_current.teletext_port_1;
+      break;
+    case 1:
+      teletext_socket_addr = settings_current.teletext_addr_2;
+      teletext_socket_port = settings_current.teletext_port_2;
+      break;
+    case 2:
+      teletext_socket_addr = settings_current.teletext_addr_3;
+      teletext_socket_port = settings_current.teletext_port_3;
+      break;
+    case 3:
+      teletext_socket_addr = settings_current.teletext_addr_4;
+      teletext_socket_port = settings_current.teletext_port_4;
+      break;
+    }
+    
+    if( getaddrinfo( teletext_socket_addr, teletext_socket_port, 0,
+                     &teletext_serv_addr ) ){
+      ui_error( UI_ERROR_ERROR,
+                "ttx2000s: getaddrinfo returned %d for %s: %s\n",
+                compat_socket_get_error(), teletext_socket_addr,
+                compat_socket_get_strerror() );
+      return;
+    }
+
+    /* create a new socket */
+    teletext_socket = socket( teletext_serv_addr->ai_family, SOCK_STREAM, 0 );
+
+    /* make it non blocking */
+    if( compat_socket_blocking_mode( teletext_socket, 1 ) ) {
       /* what should we do if it fails? */
       ui_error( UI_ERROR_ERROR,
                 "ttx2000s: failed to set socket non-blocking errno %d: %s\n",
@@ -282,14 +313,8 @@ ttx2000s_change_channel( int channel )
       return;
     }
 
-    struct sockaddr_in teletext_serv_addr;
-    const char *addr = teletext_socket_ips[channel & 3];
-    teletext_serv_addr.sin_family = AF_INET; /* address family Internet */
-    teletext_serv_addr.sin_port = htons( teletext_socket_ports[channel & 3] ); /* Target port */
-    teletext_serv_addr.sin_addr.s_addr = inet_addr( addr ); /* Target IP */
-
-    if( connect( teletext_socket, (compat_sockaddr *)&teletext_serv_addr,
-                 sizeof( teletext_serv_addr ) ) ) {
+    if( connect( teletext_socket, (compat_sockaddr *)teletext_serv_addr->ai_addr,
+                 (int)teletext_serv_addr->ai_addrlen ) ) {
       errno = compat_socket_get_error();
       if( errno == COMPAT_ECONNREFUSED ) {
         /* the connection was refused */
