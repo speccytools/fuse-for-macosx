@@ -176,6 +176,7 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
                   "ttx2000s: close returned unexpected errno %d: %s\n",
                   compat_socket_get_error(), compat_socket_get_strerror() );
       }
+      teletext_socket = compat_socket_invalid;
       ttx2000s_connected = 0; /* disconnected */
     }
 
