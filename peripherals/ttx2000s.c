@@ -256,6 +256,11 @@ ttx2000s_sram_write( libspectrum_word address, libspectrum_byte b )
 static void
 ttx2000s_change_channel( int channel )
 {
+  struct addrinfo *teletext_serv_addr;
+  const char *teletext_socket_addr;
+  int teletext_socket_port;
+  char teletext_socket_port_str[80];
+
   if( channel != ttx2000s_channel ) {
     /* only reconnect if channel preset changed */
     if( teletext_socket != compat_socket_invalid ) {
@@ -266,14 +271,10 @@ ttx2000s_change_channel( int channel )
                   compat_socket_get_error(), compat_socket_get_strerror() );
       }
     }
+
     teletext_socket = compat_socket_invalid;
-    
     ttx2000s_channel = channel;
 
-    struct addrinfo *teletext_serv_addr;
-    const char *teletext_socket_addr;
-    const char *teletext_socket_port;
-    
     switch( channel & 3 ) {
     default:
       teletext_socket_addr = settings_current.teletext_addr_1;
@@ -292,8 +293,11 @@ ttx2000s_change_channel( int channel )
       teletext_socket_port = settings_current.teletext_port_4;
       break;
     }
-    
-    if( getaddrinfo( teletext_socket_addr, teletext_socket_port, 0,
+
+    snprintf( teletext_socket_port_str, sizeof( teletext_socket_port_str ),
+              "%d", teletext_socket_port );
+
+    if( getaddrinfo( teletext_socket_addr, teletext_socket_port_str, 0,
                      &teletext_serv_addr ) ){
       ui_error( UI_ERROR_ERROR,
                 "ttx2000s: getaddrinfo returned %d for %s: %s\n",

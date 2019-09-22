@@ -289,7 +289,7 @@ teletext_addr_1, string, "127.0.0.1"
 teletext_addr_2, string, "127.0.0.1"
 teletext_addr_3, string, "127.0.0.1"
 teletext_addr_4, string, "127.0.0.1"
-teletext_port_1, string, "19761"
-teletext_port_2, string, "19762"
-teletext_port_3, string, "19763"
-teletext_port_4, string, "19764"
+teletext_port_1, numeric, 19761
+teletext_port_2, numeric, 19762
+teletext_port_3, numeric, 19763
+teletext_port_4, numeric, 19764
