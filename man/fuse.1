@@ -1265,6 +1265,9 @@ are not.
 .B \-\-rom\-speccyboot
 .I file
 .br
+.B \-\-rom\-ttx2000s
+.I file
+.br
 .B \-\-rom\-usource
 .I file
 .RS
@@ -1290,6 +1293,8 @@ the Opus Discovery ROM
 .RI ( opus.rom ),
 the SpeccyBoot ROM
 .RI ( speccyboot\-1.4.rom ),
+the TTX2000S ROM
+.RI ( ttx2000s.rom ),
 and the \(mcSource ROM
 .RI ( usource.rom ).
 .PP
@@ -1808,6 +1813,36 @@ meanings may vary graphics card by graphics card.
 Specify a virtual tape file to use. It must be in PZX, TAP or TZX format.
 .RE
 .PP
+.B \-\-teletext\-addr\-1
+.I address
+.br
+.B \-\-teletext\-addr\-2
+.I address
+.br
+.B \-\-teletext\-addr\-3
+.I address
+.br
+.B \-\-teletext\-addr\-4
+.I address
+.RS
+Specify address or hostname of teletext packet servers.
+.RE
+.PP
+.B \-\-teletext\-port\-1
+.I port
+.br
+.B \-\-teletext\-port\-2
+.I port
+.br
+.B \-\-teletext\-port\-3
+.I port
+.br
+.B \-\-teletext\-port\-4
+.I port
+.RS
+Specify TCP port of teletext packet servers.
+.RE
+.PP
 .B \-\-textfile
 .I file
 .RS
@@ -1825,6 +1860,16 @@ you can use
 to disable). Same as the Media Options dialog's
 .I "Use tape traps"
 option.
+.RE
+.PP
+.B \-\-ttx2000s
+.RS
+Emulate a TTX2000S teletext adaptor. Same as the General Peripherals Options
+dialog's
+.I "TTX2000S"
+option. See the
+.B "TTX2000S EMULATION"
+section for more details.
 .RE
 .PP
 .B \-\-unittests
@@ -2751,6 +2796,14 @@ section for more details.
 This option controls the state of the Spectranet automatic page-in jumper
 (J2). See the
 .B "SPECTRANET EMULATION"
+section for more details.
+.RE
+.PP
+.I "TTX2000S"
+.RS
+If this option is selected, Fuse will emulate the OEL/Volex TTX2000S
+teletext adaptor. Available for the 16K and 48K machines. See the
+.B "TTX2000S EMULATION"
 section for more details.
 .RE
 .PP
@@ -4447,6 +4500,36 @@ Congratulations! You have now installed the Spectranet firmware. To
 save having to go through all that every time you start Fuse, save a .szx
 snapshot at this point, and load that in every time you want to
 use the Spectranet.
+
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "TTX2000S EMULATION"
+Fuse supports emulating the OEL/Volex TTX2000S teletext adaptor with
+16K and 48K machines.
+.PP
+The interface has four tuning presets and extracts teletext signals
+from the vertical blanking interval of the selected television channel.
+These teletext signals are emulated by means of a simple TCP socket
+interface provided by an external server application. An example server
+written in Python is available from
+.I https://github.com/ZXGuesser/teletext-packet-server
+.PP
+The default address for the four packet servers is 127.0.0.1 (loopback
+address), ports 19761 to 19764. Connections can also be made to other
+computers on a fast LAN by IP address or hostname. Connecting a packet
+server via the internet is not recommended.
+.PP
+Only one connection is active at a time. Changing channel preset on
+the emulated interface closes any active connection and opens a new
+connection to the appropriate server. The same packet server can be
+set for multiple tuning presets.
+.PP
+Note that a limitation of the TTX2000S ROM means that it only decodes
+the first 12 lines of a teletext signal. This can be fixed by entering
+BASIC and executing `POKE 23394,33' then re-entering the teletext ROM
+with `RANDOMIZE USR 23500'. Alternatively just use teletext packet
+sources with 12 lines per field or fewer.
 .\"
 .\"------------------------------------------------------------------
 .\"
