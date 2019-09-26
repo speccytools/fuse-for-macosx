@@ -168,7 +168,7 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
   ttx2000s_paged = 0;
 
   event_remove_type( field_event );
-  if( !( settings_current.ttx2000s ) ) {
+  if( !periph_is_active( PERIPH_TYPE_TTX2000S ) ) {
     if( teletext_socket != compat_socket_invalid ) {  /* close the socket */
       if( compat_socket_close( teletext_socket ) ) {
         /* what should we do if closing the socket fails? */
