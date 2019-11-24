@@ -152,6 +152,11 @@ ui_init( int *argc, char ***argv )
   GtkAccelGroup *accel_group;
   GtkSettings *settings;
 
+#if GTK_CHECK_VERSION( 3, 10, 0 )
+  /* The Wayland output is buggy, see #367 */
+  gdk_set_allowed_backends( "quartz,win32,mir,x11,*" );
+#endif
+
   gtk_init(argc,argv);
 
 #if !GTK_CHECK_VERSION( 3, 0, 0 )
