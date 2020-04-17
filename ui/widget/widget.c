@@ -90,9 +90,6 @@ typedef struct widget_recurse_t {
 
 static widget_recurse_t widget_return[10]; /* The stack to recurse on */
 
-/* The settings used whilst playing with an options dialog box */
-settings_info widget_options_settings;
-
 static int widget_read_font( const char *filename )
 {
   utils_file file;
