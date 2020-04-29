@@ -277,26 +277,53 @@ if test -z "$UI"; then
   fi
 fi
 
-dnl Look for SDL (default=no)
-SDL_VERSION=1.2.4
-AM_PATH_SDL($SDL_VERSION, sdl_available=yes, sdl_available=no)
+dnl Check if the user wants the SDL UI
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether SDL UI requested)
   AC_ARG_WITH(sdl,
   [  --with-sdl              use SDL for user interface],
-  if test "$withval" = no; then sdl=no; else sdl=yes; fi,
-  sdl=no)
-  AC_MSG_RESULT($sdl)
-  if test "$sdl" = yes; then
-    if test "$sdl_available" = yes; then
-      AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
-      AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
-      UI=sdl
-      WIDGET=widget
-      use_sdl=yes
-    else
-      AC_MSG_ERROR([SDL version $SDL_VERSION not found])
-    fi
+  if test "$withval" = no; then sdl_ui=no; else sdl_ui=yes; fi,
+  sdl_ui=no)
+  AC_MSG_RESULT($sdl_ui)
+fi
+
+dnl Check if the user prefers SDL 1 over SDL 2
+AC_ARG_ENABLE(sdl2,
+  AS_HELP_STRING([--disable-sdl2],[prefer SDL 1 to SDL 2]),
+  if test "$enableval" = yes; then sdl2=yes; else sdl2=no; fi,
+  sdl2=yes
+)
+
+dnl SDL 2 is not supported for the UI yet, so warn the user
+if test "$sdl_ui" = yes -a "$sdl2" = yes; then
+  AC_MSG_WARN([SDL 2 not supported for the UI, using SDL 1 instead])
+  sdl2=no
+fi
+
+dnl Look for SDL 2
+sdl_available=no
+if test "$sdl2" = yes; then
+  PKG_CHECK_MODULES([SDL], [sdl2], [sdl_available=yes], [
+                    AC_MSG_WARN([SDL 2 not found, looking for SDL 1])
+                    sdl2=no])
+fi
+
+dnl Look for SDL 1 if we don't have or want SDL 2
+SDL_VERSION=1.2.4
+if test "$sdl_available" = no; then
+  AM_PATH_SDL($SDL_VERSION, sdl_available=yes, sdl_available=no)
+fi
+
+dnl Enable the SDL UI if all conditions are met
+if test "$sdl_ui" = yes; then
+  if test "$sdl_available" = yes; then
+    AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
+    AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
+    UI=sdl
+    WIDGET=widget
+    use_sdl=yes
+  else
+    AC_MSG_ERROR([SDL version $SDL_VERSION not found])
   fi
 fi
 
@@ -1050,6 +1077,9 @@ echo ""
 echo "User interface: ${UI}"
 if test "${UI}" = "gtk"; then
    echo "Using GTK 3: ${gtk3}"
+fi
+if test "${use_sdl}" = "yes"; then
+   echo "Using SDL 2: ${sdl2}"
 fi
 if test x"${gpm}" != "x"; then
    echo "libgpm support: ${gpm}"

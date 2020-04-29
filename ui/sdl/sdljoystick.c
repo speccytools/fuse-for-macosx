@@ -57,7 +57,7 @@ ui_joystick_init( void )
   error = SDL_InitSubSystem( SDL_INIT_JOYSTICK );
 #else
   /* Other UIs could handle joysticks by the SDL library */
-  error = SDL_Init(SDL_INIT_JOYSTICK|SDL_INIT_VIDEO);
+  error = SDL_Init( SDL_INIT_JOYSTICK );
 #endif
 
   if ( error ) {
