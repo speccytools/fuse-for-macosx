@@ -66,6 +66,10 @@ static int field_event;
 static void ttx2000s_field_event( libspectrum_dword last_tstates, int event,
                                   void *user_data );
 
+static void ttx2000s_enabled_snapshot( libspectrum_snap *snap );
+static void ttx2000s_from_snapshot( libspectrum_snap *snap );
+static void ttx2000s_to_snapshot( libspectrum_snap *snap );
+
 /* Debugger events */
 static const char * const event_type_string = "ttx2000s";
 static int page_event, unpage_event;
@@ -97,9 +101,9 @@ ttx2000s_unpage( void )
 static module_info_t ttx2000s_module_info = {
   /* .reset = */ ttx2000s_reset,
   /* .romcs = */ ttx2000s_memory_map,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ NULL,
-  /* .snapshot_to = */ NULL,
+  /* .snapshot_enabled = */ ttx2000s_enabled_snapshot,
+  /* .snapshot_from = */ ttx2000s_from_snapshot,
+  /* .snapshot_to = */ ttx2000s_to_snapshot,
 };
 
 static const periph_port_t ttx2000s_ports[] = {
@@ -179,7 +183,6 @@ ttx2000s_reset( int hard_reset GCC_UNUSED )
       teletext_socket = compat_socket_invalid;
       ttx2000s_connected = 0; /* disconnected */
     }
-
     return;
   }
 
@@ -352,7 +355,6 @@ ttx2000s_field_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
     bytes_read =
       recv( teletext_socket, (char *)ttx2000s_socket_buffer, 672, 0 );
     /* packet server sends 16 lines of 42 bytes, unused lines are padded with 0x00 */
-    
     if( bytes_read == 672 ) {
       /* 11 line syncs occur before the first teletext line */
       ttx2000s_line_counter = ( ttx2000s_line_counter + 11 ) & 0xF;
@@ -392,6 +394,28 @@ ttx2000s_field_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
   event_add_with_data( tstates + 2 *        /* 20ms delay */
                        machine_current->timings.processor_speed / 100,
                        field_event, 0 );
+}
+
+static void
+ttx2000s_enabled_snapshot( libspectrum_snap *snap )
+{
+  settings_current.ttx2000s = libspectrum_snap_ttx2000s_active( snap );
+}
+
+static void
+ttx2000s_from_snapshot( libspectrum_snap *snap )
+{
+  if( !libspectrum_snap_ttx2000s_active( snap ) ) return;
+}
+
+static void
+ttx2000s_to_snapshot( libspectrum_snap *snap )
+{
+  if( !periph_is_active( PERIPH_TYPE_TTX2000S ) ) return;
+
+  libspectrum_snap_set_ttx2000s_active( snap, 1 );
+
+  /* TODO: proper snapshot support */
 }
 
 #else /* #ifdef BUILD_TTX2000S */
