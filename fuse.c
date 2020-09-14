@@ -95,6 +95,7 @@
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "slt.h"
 #include "snapshot.h"
@@ -327,6 +328,7 @@ run_startup_manager( int *argc, char ***argv )
   psg_register_startup();
   rzx_register_startup();
   scld_register_startup();
+  screenshot_register_startup();
   settings_register_startup();
   setuid_register_startup();
   simpleide_register_startup();
@@ -415,7 +417,7 @@ creator_init( void *context )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
-  char *custom, osname[ 256 ];
+  char *custom, osname[ 192 ];
   static const size_t CUSTOM_SIZE = 256;
   
   libspectrum_error error; int sys_error;

@@ -21,4 +21,5 @@
 
 */
 
-#define IDD_PICTURE    1200
+#define IDD_PICTURE          1200
+#define IDC_PICTURE_FRAME    1201

@@ -27,7 +27,6 @@
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
-#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
 #include <glib.h>
@@ -153,6 +152,11 @@ ui_init( int *argc, char ***argv )
   GtkAccelGroup *accel_group;
   GtkSettings *settings;
 
+#if GTK_CHECK_VERSION( 3, 10, 0 )
+  /* The Wayland output is buggy, see #367 */
+  gdk_set_allowed_backends( "quartz,win32,mir,x11,*" );
+#endif
+
   gtk_init(argc,argv);
 
 #if !GTK_CHECK_VERSION( 3, 0, 0 )
@@ -163,6 +167,10 @@ ui_init( int *argc, char ***argv )
 #endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
   gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+#ifdef FUSE_ICON_AVAILABLE
+  gtk_window_set_icon_name( GTK_WINDOW( gtkui_window ), "fuse" );
+#endif
 
   settings = gtk_widget_get_settings( GTK_WIDGET( gtkui_window ) );
   g_object_set( settings, "gtk-menu-bar-accel", "F1", NULL );
@@ -217,14 +225,7 @@ ui_init( int *argc, char ***argv )
   gtk_widget_set_size_request( gtkui_drawing_area, DISPLAY_ASPECT_WIDTH,
                                DISPLAY_SCREEN_HEIGHT );
 
-  gtk_widget_add_events( GTK_WIDGET( gtkui_drawing_area ),
-    GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
-  g_signal_connect( G_OBJECT( gtkui_drawing_area ), "motion-notify-event",
-		    G_CALLBACK( gtkmouse_position ), NULL );
-  g_signal_connect( G_OBJECT( gtkui_drawing_area ), "button-press-event",
-		    G_CALLBACK( gtkmouse_button ), NULL );
-  g_signal_connect( G_OBJECT( gtkui_drawing_area ), "button-release-event",
-		    G_CALLBACK( gtkmouse_button ), NULL );
+  gtkmouse_init();
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, TRUE, TRUE, 0 );
 
@@ -663,18 +664,21 @@ ui_widgets_reset( void )
 void
 menu_help_keyboard( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  gtkui_picture( "keyboard.scr", 0 );
+  gtkui_picture( "keyboard.png", 0 );
 }
 
 void
 menu_help_about( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  /* TODO: show Fuse icon */
   gtk_show_about_dialog( GTK_WINDOW( gtkui_window ),
                          "program-name", "Fuse",
                          "comments", "The Free Unix Spectrum Emulator",
                          "copyright", FUSE_COPYRIGHT,
+#ifdef FUSE_ICON_AVAILABLE
+                         "logo-icon-name", "fuse",
+#else
                          "logo-icon-name", NULL,
+#endif
                          "version", VERSION,
                          "website", PACKAGE_URL,
                          NULL );
@@ -798,7 +802,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
  */
 
 int
-gtkui_get_monospaced_font( gtkui_font *font )
+gtkui_get_monospaced_font( PangoFontDescription **font )
 {
   *font = pango_font_description_from_string( "Monospace 10" );
   if( !(*font) ) {
@@ -810,15 +814,9 @@ gtkui_get_monospaced_font( gtkui_font *font )
 }
 
 void
-gtkui_free_font( gtkui_font font )
+gtkui_free_font( PangoFontDescription *font )
 {
   pango_font_description_free( font );
-}
-
-void
-gtkui_set_font( GtkWidget *widget, gtkui_font font )
-{
-  gtk_widget_override_font( widget, font );
 }
 
 void

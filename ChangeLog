@@ -1,3 +1,63 @@
+2019-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Emulation core improvements:
+          * Fix activation of joystick and IF2 peripherals when loading a
+            snapshot (thanks, ICEknight) (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
+            (Sergio Baldoví).
+          * Fix antialiasing effect of AdvMAME3x scaler (Sergio Baldoví).
+          * Add 4x, TV 4x and HQ 4x scalers on GTK+, SDL, win32 and Xlib UIs
+            (Sergio Baldoví and Gergely Szasz).
+          * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
+            Baldoví).
+          * GTK+ UI: Add Fuse icon to the about dialog and the main window
+            (Alberto Garcia).
+          * GTK+ UI: Load/save binary dialog remember last values (Derek
+            Fountain).
+          * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
+            (Alberto Garcia).
+          * Allow selection of audio driver at build time (thanks, kov_serg)
+            (Alberto Garcia).
+          * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
+            (Sergio Baldoví).
+          * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
+            Kendall) (Sergio Baldoví).
+          * Suppress a couple of -Wunused-result warnings from gcc
+            (Alberto Garcia).
+          * New higher resolution keyboard picture on GTK+ and win32 UIs
+            (thanks, Andrew Owen for the picture) (Sergio Baldoví and Philip
+            Kendall).
+          * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
+            (Jools Wills).
+          * WidgetUI: Enable HOME and END keys in menus on widget UIs (Gergely
+            Szasz).
+
+2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.7 released.
+
+        * UI improvements:
+          * GTK+ 3: Make the offset entry wider in memory browser (Derek
+            Fountain).
+          * GTK+: Remove duplicated surface creation code (Philip Kendall).
+          * GTK+: Remove use of deprecated gtk_device_(un)grab functions
+            (Philip Kendall).
+          * GTK+/Win32: Add *.bin as an allowed filetype to file selectors and
+            amend .fmf filetype (thanks, Allan Turvey) (Sergio Baldoví).
+          * Improve Fuse's window sizing under Wayland; still not right, but
+            better than it was before (Sergio Baldoví).
+          * Improve Fuse's Kempston mouse handling under GTK+ 3.x (Philip
+            Kendall).
+          * Stop Kempston mouse causing a crash under Wayland; still doesn't
+            work properly though (Philip Kendall).
+
+        * Miscellaneous improvements:
+          * "Save binary" command can now save 65536 bytes again (regression
+            introduced in 1.5.6; thanks, thrice) (Philip Kendall).
+          * Remove gcc 8 string overflow warnings (Philip Kendall).
+
 2018-08-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.6 released.

@@ -29,6 +29,10 @@
 
 #include <gtk/gtk.h>
 
+#ifdef GDK_WINDOWING_WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
+
 #include "display.h"
 #include "fuse.h"
 #include "gtkinternals.h"
@@ -37,6 +41,11 @@
 #include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
 #include "settings.h"
+
+/* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
+   DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
+   creating via the scalers */
+#define MAX_SCALE 4
 
 /* The size of a 1x1 image in units of
    DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
@@ -58,9 +67,9 @@ static guchar rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
 static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
-static guchar scaled_image[ 3 * DISPLAY_SCREEN_HEIGHT *
-                            6 * DISPLAY_SCREEN_WIDTH ];
-static const ptrdiff_t scaled_pitch = 6 * DISPLAY_SCREEN_WIDTH;
+static guchar scaled_image[ MAX_SCALE * DISPLAY_SCREEN_HEIGHT *
+                            MAX_SCALE * DISPLAY_SCREEN_WIDTH * 2 ];
+static const ptrdiff_t scaled_pitch = MAX_SCALE * DISPLAY_SCREEN_WIDTH * 2;
 
 /* The colour palette */
 static const guchar rgb_colours[16][3] = {
@@ -235,6 +244,26 @@ uidisplay_init( int width, int height )
   return 0;
 }
 
+/* Ensure that an appropriate Cairo surface exists */
+static void
+ensure_appropriate_surface( void )
+{
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+
+  /* Create a bigger surface for the new display size */
+  float scale = (float)gtkdisplay_current_size / image_scale;
+  if( surface ) cairo_surface_destroy( surface );
+
+  surface =
+      cairo_image_surface_create_for_data( scaled_image,
+                                           CAIRO_FORMAT_RGB24,
+                                           scale * image_width,
+                                           scale * image_height,
+                                           scaled_pitch );
+
+#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+}
+
 static int
 drawing_area_resize( int width, int height, int force_scaler )
 {
@@ -253,20 +282,7 @@ drawing_area_resize( int width, int height, int force_scaler )
 
   memset( scaled_image, 0, sizeof( scaled_image ) );
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
-
-  /* Create a bigger surface for the new display size */
-  float scale = (float)gtkdisplay_current_size / image_scale;
-  if( surface ) cairo_surface_destroy( surface );
-
-  surface =
-      cairo_image_surface_create_for_data( scaled_image,
-                                           CAIRO_FORMAT_RGB24,
-                                           scale * image_width,
-                                           scale * image_height,
-                                           scaled_pitch );
-
-#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+  ensure_appropriate_surface();
 
   display_refresh_all();
 
@@ -286,15 +302,19 @@ register_scalers( int force_scaler )
     scaler_register( SCALER_HALFSKIP );
     scaler_register( SCALER_TIMEXTV );
     scaler_register( SCALER_TIMEX1_5X );
+    scaler_register( SCALER_TIMEX2X );
   } else {
     scaler_register( SCALER_DOUBLESIZE );
     scaler_register( SCALER_TRIPLESIZE );
+    scaler_register( SCALER_QUADSIZE );
     scaler_register( SCALER_TV2X );
     scaler_register( SCALER_TV3X );
+    scaler_register( SCALER_TV4X );
     scaler_register( SCALER_PALTV2X );
     scaler_register( SCALER_PALTV3X );
     scaler_register( SCALER_HQ2X );
     scaler_register( SCALER_HQ3X );
+    scaler_register( SCALER_HQ4X );
     scaler_register( SCALER_ADVMAME2X );
     scaler_register( SCALER_ADVMAME3X );
     scaler_register( SCALER_2XSAI );
@@ -321,6 +341,9 @@ register_scalers( int force_scaler )
       break;
     case 3: scaler = machine_current->timex ? SCALER_TIMEX1_5X :
                                               SCALER_TRIPLESIZE;
+      break;
+    case 4: scaler = machine_current->timex ? SCALER_TIMEX2X :
+                                              SCALER_QUADSIZE;
       break;
     }
   }
@@ -538,16 +561,7 @@ static gboolean
 gtkdisplay_draw( GtkWidget *widget, cairo_t *cr, gpointer user_data )
 {
   /* Create a new surface for this gfx mode */
-  if( !surface ) {
-    float scale = (float)gtkdisplay_current_size / image_scale;
-
-    surface =
-      cairo_image_surface_create_for_data( scaled_image,
-                                           CAIRO_FORMAT_RGB24,
-                                           scale * image_width,
-                                           scale * image_height,
-                                           scaled_pitch );
-  }
+  if( !surface ) ensure_appropriate_surface();
 
   /* Repaint the drawing area */
   cairo_set_source_surface( cr, surface, 0, 0 );
@@ -583,6 +597,9 @@ gtkdisplay_update_geometry( void )
 
   scale = scaler_get_scaling_factor( current_scaler );
 
+  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
+          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
+
 #if GTK_CHECK_VERSION( 3, 0, 0 )
 
   /* Since GTK+ 3.20 it is intended that gtk_window_set_geometry_hints
@@ -597,19 +614,27 @@ gtkdisplay_update_geometry( void )
     extra_height += gtkstatusbar_get_height();
   }
 
-#else
+#ifdef GDK_WINDOWING_WAYLAND
+  /* We don't calculate the window size enough accurately on wayland
+     backend to force the window geometry (bug #367) */
+  GdkDisplay *display = gdk_display_get_default();
+
+  if( GDK_IS_WAYLAND_DISPLAY( display ) ) {
+    hints &= ~GDK_HINT_RESIZE_INC;
+  }
+#endif                /* #ifdef GDK_WINDOWING_WAYLAND */
+
+#else                 /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
 
   geometry_widget = gtkui_drawing_area;
 
 #endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
 
-  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
-          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
 
   geometry.min_width = DISPLAY_ASPECT_WIDTH;
   geometry.min_height = DISPLAY_SCREEN_HEIGHT + extra_height;
-  geometry.max_width = 3 * DISPLAY_ASPECT_WIDTH;
-  geometry.max_height = 3 * DISPLAY_SCREEN_HEIGHT + extra_height;
+  geometry.max_width = MAX_SCALE * DISPLAY_ASPECT_WIDTH;
+  geometry.max_height = MAX_SCALE * DISPLAY_SCREEN_HEIGHT + extra_height;
   geometry.base_width = scale * image_width;
   geometry.base_height = scale * image_height + extra_height;
   geometry.width_inc = DISPLAY_ASPECT_WIDTH;

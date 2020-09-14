@@ -71,7 +71,7 @@ struct joystick_info {
 
 typedef enum key_item_t {
   ITEM = 0,
-  GROUP,
+  KEY_GROUP,
   SUBITEM,
 } key_item_t;
 
@@ -96,7 +96,7 @@ static key_menu_t key_menu[] = {
 
     { ITEM, "Joystick Fire", KEYBOARD_JOYSTICK_FIRE }, 
 
-    { GROUP, "Numbers", KEYBOARD_NONE }, 
+    { KEY_GROUP, "Numbers", KEYBOARD_NONE },
     { SUBITEM, "0", KEYBOARD_0 },
     { SUBITEM, "1", KEYBOARD_1 },
     { SUBITEM, "2", KEYBOARD_2 },
@@ -108,7 +108,7 @@ static key_menu_t key_menu[] = {
     { SUBITEM, "8", KEYBOARD_8 },
     { SUBITEM, "9", KEYBOARD_9 },
 
-    { GROUP, "A - M", KEYBOARD_NONE },
+    { KEY_GROUP, "A - M", KEYBOARD_NONE },
     { SUBITEM, "A", KEYBOARD_a },
     { SUBITEM, "B", KEYBOARD_b },
     { SUBITEM, "C", KEYBOARD_c },
@@ -123,7 +123,7 @@ static key_menu_t key_menu[] = {
     { SUBITEM, "L", KEYBOARD_l },
     { SUBITEM, "M", KEYBOARD_m },
 
-    { GROUP, "N - Z", KEYBOARD_NONE },
+    { KEY_GROUP, "N - Z", KEYBOARD_NONE },
     { SUBITEM, "N", KEYBOARD_n },
     { SUBITEM, "O", KEYBOARD_o },
     { SUBITEM, "P", KEYBOARD_p },
@@ -160,7 +160,7 @@ create_joystick_options_store( void )
     switch( key_menu[i].item ) {
 
       case ITEM:
-      case GROUP:
+      case KEY_GROUP:
         gtk_tree_store_append( store, &iter, NULL );
         gtk_tree_store_set( store, &iter,
                             COL_TEXT, key_menu[i].text,
@@ -375,7 +375,7 @@ create_fire_button_selector( const char *title, struct button_info *info,
 
     key = key_menu[i].key;
 
-    if( key_menu[i].item != GROUP && key == (unsigned int)*info->setting ) {
+    if( key_menu[i].item != KEY_GROUP && key == (unsigned int)*info->setting ) {
       set_key_text( info->label, key );
       break;
     }
