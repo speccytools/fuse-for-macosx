@@ -1,5 +1,8 @@
 2019-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
+        * New features:
+          * Add TTX2000S emulation (Guesser).
+
         * Emulation core improvements:
           * Fix activation of joystick and IF2 peripherals when loading a
             snapshot (thanks, ICEknight) (Sergio Baldoví).

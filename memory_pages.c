@@ -43,6 +43,7 @@
 #include "module.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/spectranet.h"
+#include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "spectrum.h"
@@ -393,6 +394,11 @@ readbyte( libspectrum_word address )
     if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 )
       return spectranet_w5100_read( mapping, address );
   }
+  
+  if( ttx2000s_paged ) {
+    if( address >= 0x2000 && address < 0x4000 )
+      return ttx2000s_sram_read( address );
+  }
 
   return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
 }
@@ -482,6 +488,13 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
     }
     if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 ) {
       spectranet_w5100_write( mapping, address, b );
+      return;
+    }
+  }
+  
+  if( ttx2000s_paged ) {
+    if( address >= 0x2000 && address < 0x4000 ) {
+      ttx2000s_sram_write( address, b );
       return;
     }
   }
