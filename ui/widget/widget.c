@@ -276,8 +276,10 @@ size_t widget_substringwidth( const char *s, size_t count )
 {
   size_t width = 0;
   int c;
-  if( !s )
+
+  if( !s || !count )
     return 0;
+
   while( count-- && (c = *(libspectrum_byte *)s++) != 0 ) {
     if( c < 18 )
       continue;
