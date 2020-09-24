@@ -36,6 +36,9 @@
 static INT_PTR CALLBACK dialog_proc( HWND hwndDlg, UINT uMsg,
                                      WPARAM wParam, LPARAM lParam );
 
+/* About window handle */
+HWND fuse_hABOWnd;
+
 static HFONT hBoldFont;
 
 void

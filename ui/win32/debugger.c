@@ -111,6 +111,9 @@ static INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
 static LRESULT CALLBACK
 disassembly_listview_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
+/* Debugger window handle */
+HWND fuse_hDBGWnd;
+
 /* The top line of the current disassembly */
 static libspectrum_word disassembly_top;
 

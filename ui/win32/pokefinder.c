@@ -44,6 +44,9 @@ static void win32ui_pokefinder_search( void );
 static void win32ui_pokefinder_reset( void );
 static void win32ui_pokefinder_close( void );
 
+/* Pokefinder window handle */
+HWND fuse_hPFWnd;
+
 #define MAX_POSSIBLE 20
 
 int possible_page[ MAX_POSSIBLE ];

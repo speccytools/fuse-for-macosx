@@ -46,6 +46,12 @@
 #include "win32internals.h"
 #include "win32joystick.h"
 
+/* Window handler */
+HWND fuse_hWnd;
+
+/* Application instance */
+HINSTANCE fuse_hInstance;
+
 /* fuse_hPrevInstance is needed only to register window class */
 static HINSTANCE fuse_hPrevInstance;
 
