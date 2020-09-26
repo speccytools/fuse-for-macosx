@@ -84,7 +84,7 @@ update_display( HWND hwndDlg, libspectrum_word base )
       libspectrum_byte b = readbyte_internal( base );
 
       _sntprintf( buffer2, 4, TEXT( "%02X " ), b );
-      _tcsncat( text[1], buffer2, 4 );
+      _tcsncat( text[1], buffer2, 64 - _tcslen( text[1] ) - 1 );
 
       text[2][j] = ( b >= 32 && b < 127 ) ? b : '.';
     }

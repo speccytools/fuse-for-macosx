@@ -976,6 +976,7 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
   _sntprintf( event_text[0], 40, "%d", ptr->tstates );
   /* FIXME: event_name() is not unicode compliant */
   _tcsncpy( event_text[1], event_name( ptr->type ), 40 );
+  event_text[1][39] = '\0';
 
   /* append the item */
   lvi.iItem = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS,
