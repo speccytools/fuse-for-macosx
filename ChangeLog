@@ -7,7 +7,26 @@
           * Fix activation of joystick and IF2 peripherals when loading a
             snapshot (thanks, ICEknight) (Sergio Baldoví).
 
-        * Miscellaneous improvements:
+        * UI improvements:
+          * New higher resolution keyboard picture on GTK+ and win32 UIs
+            (thanks, Andrew Owen for the picture) (Sergio Baldoví and Philip
+            Kendall).
+          * GTK+ UI: Add Fuse icon to the about dialog and the main window
+            (Alberto Garcia).
+          * GTK+ UI: Load/save binary dialog remember last values (Derek
+            Fountain).
+          * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
+            (Sergio Baldoví).
+          * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
+            Kendall) (Sergio Baldoví).
+          * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
+            (Jools Wills).
+          * WidgetUI: Enable HOME and END keys in menus on widget UIs (Gergely
+            Szasz).
+          * WidgetUI: Fix crash when trying to overwrite read-only files (Pedro
+            Luis Rodríguez González).
+
+        * Scaler improvements:
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
             (Sergio Baldoví).
           * Fix antialiasing effect of AdvMAME3x scaler (Sergio Baldoví).
@@ -15,27 +34,18 @@
             (Sergio Baldoví and Gergely Szasz).
           * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
             Baldoví).
-          * GTK+ UI: Add Fuse icon to the about dialog and the main window
-            (Alberto Garcia).
-          * GTK+ UI: Load/save binary dialog remember last values (Derek
-            Fountain).
-          * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
-            (Alberto Garcia).
+
+        * Miscellaneous improvements:
           * Allow selection of audio driver at build time (thanks, kov_serg)
             (Alberto Garcia).
-          * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
-            (Sergio Baldoví).
-          * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
-            Kendall) (Sergio Baldoví).
-          * Suppress a couple of -Wunused-result warnings from gcc
+          * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
             (Alberto Garcia).
-          * New higher resolution keyboard picture on GTK+ and win32 UIs
-            (thanks, Andrew Owen for the picture) (Sergio Baldoví and Philip
-            Kendall).
-          * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
-            (Jools Wills).
-          * WidgetUI: Enable HOME and END keys in menus on widget UIs (Gergely
-            Szasz).
+          * Fix GTK+ build with Wayland, Quartz and Windows backends (thanks,
+            Stuart Brady) (Sergio Baldoví).
+          * Various fixes to allow compilation with GCC 10 (Alberto Garcia and
+            Sergio Baldoví).
+          * Suppress a couple of -Wunused-result warnings from gcc (Alberto
+            Garcia).
 
 2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
