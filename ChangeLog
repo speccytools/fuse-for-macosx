@@ -21,6 +21,7 @@
             Kendall) (Sergio Baldoví).
           * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
             (Jools Wills).
+          * WidgetUI: New dialog to load/save binary data (Gergely Szasz).
           * WidgetUI: Enable HOME and END keys in menus on widget UIs (Gergely
             Szasz).
           * WidgetUI: Fix crash when trying to overwrite read-only files (Pedro
