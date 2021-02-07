@@ -690,6 +690,7 @@ widget_t widget_data[] = {
   { widget_query_draw,    widget_query_finish,	 widget_query_keyhandler    },
   { widget_query_save_draw,widget_query_finish,	 widget_query_save_keyhandler },
   { widget_diskoptions_draw, widget_options_finish, widget_diskoptions_keyhandler  },
+  { widget_binary_draw, widget_binary_finish, widget_binary_keyhandler  },
 };
 
 #ifndef UI_SDL

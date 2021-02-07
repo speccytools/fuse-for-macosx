@@ -267,6 +267,10 @@ int widget_query_save_draw( void *data );
 void widget_query_save_keyhandler( input_key key );
 int widget_query_finish( widget_finish_state finished );
 
+int widget_binary_draw( void *data );
+void widget_binary_keyhandler( input_key key );
+int widget_binary_finish( widget_finish_state finished );
+
 /* The widgets actually available */
 
 extern widget_t widget_data[];

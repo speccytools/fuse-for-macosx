@@ -67,11 +67,9 @@ File/Movie/_Pause, Item
 File/Movie/_Continue, Item,, menu_file_movie_pause
 File/Movie/_Stop, Item
 
-#ifndef USE_WIDGET
 File/separator, Separator
 File/Loa_d binary data..., Item
 File/Save _binary data..., Item
-#endif
 
 File/separator, Separator
 File/E_xit..., Item, F10
