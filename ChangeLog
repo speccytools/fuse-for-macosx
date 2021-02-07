@@ -2,6 +2,8 @@
 
         * New features:
           * Add TTX2000S emulation (Guesser).
+          * Experimental PulseAudio sound driver (Grzegorz Jablonski and Sergio
+            Baldoví).
 
         * Emulation core improvements:
           * Fix activation of joystick and IF2 peripherals when loading a

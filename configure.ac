@@ -611,6 +611,16 @@ if test "$wii" = yes; then
   audio_driver_list="$audio_driver_list wii"
 fi
 
+dnl Check if pulseaudio is available (experimental)
+AC_CHECK_LIB( pulse-simple, pa_simple_new,
+  [AC_CHECK_HEADER(
+    pulse/simple.h,
+    [audio_driver_list="$audio_driver_list pulseaudio"],
+    [AC_MSG_WARN(pulse/simple.h not found - no pulseaudio output)]
+  )],
+  [AC_MSG_WARN(pa_simple_new not found - no pulseaudio output)]
+)
+
 dnl No audio driver - this is the last one of the list
 audio_driver_list="$audio_driver_list null"
 
@@ -677,6 +687,9 @@ case $audio_driver in
     ;;
   wii)
     SOUND_LIBADD='sound/wiisound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+    ;;
+  pulseaudio)
+    SOUND_LIBADD='sound/pulsesound.$(OBJEXT)' SOUND_LIBS='-lpulse-simple -lpulse'
     ;;
   null)
     SOUND_LIBADD='sound/nullsound.$(OBJEXT)' SOUND_LIBS=''

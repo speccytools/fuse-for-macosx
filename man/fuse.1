@@ -1683,6 +1683,49 @@ causes Fuse to use the first card and parallel save the raw audio samples
 into
 .IR /tmp/aufwm.raw " file."
 .br
+.PP
+If you are using
+.IR PulseAudio
+for sound output, the
+.I "device"
+parameter allows you to specify some parameters to be used for that
+soud buffer. In general, the
+.I "device"
+parameter has the form
+.br
+.IR param[=value][,param[=value][,...] .
+.IP \[bu]
+.IR param " and " values :
+.RS
+.IP \[bu]
+.IR "tlength=[num]ms" :
+set target length of the PulseAudio sound buffer in milliseconds. Smaller
+value cause smaller sound delay but more buffer underruns (pops and clicks),
+larger value cause longer delay but fewer underruns. By default Fuse set the
+buffer size to 30ms of sound delay.
+.IP \[bu]
+.IR "tlength=num" :
+set target length of the PulseAudio sound buffer in bytes. By default Fuse
+set the buffer size to 30ms of sound delay.
+.IP \[bu]
+.IR verbose " :
+if given, Fuse report PulseAudio buffer underruns to
+.IR stderr
+and PulseAudio buffer options to
+.IR stdout .
+.RE
+.PP
+Some examples of use:
+.PP
+.B "fuse \-d tlength=40ms"
+.PP
+causes Fuse to target 40ms of sound delay instead of the default 30ms.
+.PP
+.B "fuse -d verbose,tlength=2646"
+.PP
+causes Fuse to request a sound buffer of 2646 bytes and print info to
+.IR stdout .
+.br
 .RE
 .PP
 .B \-\-sound\-force\-8bit

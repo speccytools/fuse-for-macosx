@@ -30,6 +30,7 @@ EXTRA_fuse_SOURCES += \
                       sound/hpsound.c \
                       sound/nullsound.c \
                       sound/osssound.c \
+                      sound/pulsesound.c \
                       sound/sdlsound.c \
                       sound/sfifo.c \
                       sound/sunsound.c \
