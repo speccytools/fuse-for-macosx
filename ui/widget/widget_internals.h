@@ -69,7 +69,11 @@ void widget_draw_line_vert( int x, int y, int length, int colour );
 void widget_draw_rectangle_outline( int x, int y, int w, int h, int colour );
 void widget_draw_rectangle_solid( int x, int y, int w, int h, int colour );
 void widget_draw_rectangle_outline_rounded( int x, int y, int w, int h, int colour );
-int widget_printstring( int x, int y, int col, const char *s );
+int widget_printstring1( int x, int y, int col, const char *s, int ms );
+#define widget_printstring( x, y, col, s ) \
+          widget_printstring1( x, y, col, s, 0 )
+#define widget_printstring_ms( x, y, col, s ) \
+          widget_printstring1( x, y, col, s, 1 )
 int widget_printstring_fixed( int x, int y, int col, const char *s );
 void widget_printchar_fixed( int x, int y, int col, int c );
 void widget_print_title( int y, int col, const char *s );

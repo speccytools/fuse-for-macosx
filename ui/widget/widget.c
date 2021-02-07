@@ -180,12 +180,13 @@ printchar( int x, int y, int col, int ch )
 }
 
 int
-widget_printstring( int x, int y, int col, const char *s )
+widget_printstring1( int x, int y, int col, const char *s, int ms )
 {
-  int c;
+  int ms_x, c;
   int shadow = 0;
   if( !s ) return x;
 
+  ms_x = x;
   while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
 	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
     if( col == WIDGET_COLOUR_DISABLED && c < 26 ) continue;
@@ -203,6 +204,9 @@ widget_printstring( int x, int y, int col, const char *s )
       x = printchar( x, y, (col & 7) ^ 8, c );
     } else
       x = printchar( x, y, col, c );
+
+    if( ms )
+      ms_x = x = ms_x + 8;
   }
   return x;
 }
@@ -217,7 +221,7 @@ widget_printstring_fixed( int x, int y, int col, const char *s )
   while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
 	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
     widget_printchar_fixed(x, y, col, c);
-    ++x;
+    x += 8;
   }
   return x;
 }
@@ -228,8 +232,6 @@ widget_printchar_fixed( int x, int y, int col, int c )
   int mx, my;
   int inverse = 0;
   const widget_font_character *bitmap;
-
-  x *= 8; y *= 8;
 
   if( c < 128 )
     bitmap = widget_char( c );
@@ -259,12 +261,13 @@ void widget_print_title( int y, int col, const char *s )
 {
   char buffer[128];
   snprintf( buffer, sizeof( buffer ), "\x0A%s", s );
-  widget_printstring( 128 - widget_stringwidth( buffer ) / 2, y, col, buffer );
+  widget_printstring1( 128 - widget_stringwidth( buffer ) / 2, y, col, buffer,
+                       0 );
 }
 
 void widget_printstring_right( int x, int y, int col, const char *s )
 {
-  widget_printstring( x - widget_stringwidth( s ), y, col, s );
+  widget_printstring1( x - widget_stringwidth( s ), y, col, s, 0 );
 }
 
 size_t widget_stringwidth( const char *s )

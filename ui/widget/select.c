@@ -42,7 +42,7 @@ static void print_item (int left_edge, int width, int index, int colour)
   char key[] = "\x0A ";
   key[1] = 'A' + index;
   left_edge = ( left_edge + 1 ) * 8 + 1;
-  left_edge = widget_printstring( left_edge, index * 8 + 24, colour, key );
+  left_edge = widget_printstring_ms( left_edge, index * 8 + 24, colour, key );
   left_edge = widget_printstring( left_edge + 1, index * 8 + 24, colour, ": " );
   widget_printstring( left_edge + 1, index * 8 + 24, colour, options[index] );
 }
