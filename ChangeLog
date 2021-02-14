@@ -42,8 +42,8 @@
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
             (Sergio Baldoví).
           * Fix antialiasing effect of AdvMAME3x scaler (Sergio Baldoví).
-          * Add 4x, TV 4x and HQ 4x scalers on GTK+, SDL, win32 and Xlib UIs
-            (Sergio Baldoví and Gergely Szasz).
+          * Add 4x, TV 4x, Pal TV 4x and HQ 4x scalers on GTK+, SDL, win32 and
+            Xlib UIs (Sergio Baldoví and Gergely Szasz).
           * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
             Baldoví).
 

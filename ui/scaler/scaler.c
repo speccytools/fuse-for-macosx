@@ -116,6 +116,8 @@ static const struct scaler_info available_scalers[] = {
     scaler_PalTV2x_16,    scaler_PalTV2x_32,    expand_pal          },
   { "PAL TV 3x",       "paltv3x",   SCALER_FLAGS_EXPAND,       3.0,
     scaler_PalTV3x_16,    scaler_PalTV3x_32,    expand_pal          },
+  { "PAL TV 4x",       "paltv4x",   SCALER_FLAGS_EXPAND,       4.0,
+    scaler_PalTV4x_16,    scaler_PalTV4x_32,    expand_pal          },
   { "HQ 2x",           "hq2x",      SCALER_FLAGS_EXPAND,       2.0,
     scaler_HQ2x_16,       scaler_HQ2x_32,       expand_1            },
   { "HQ 3x",           "hq3x",      SCALER_FLAGS_EXPAND,       3.0,

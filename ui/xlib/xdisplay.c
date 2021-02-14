@@ -637,6 +637,7 @@ register_scalers( void )
 
         scaler_register( SCALER_QUADSIZE );
         scaler_register( SCALER_TV4X );
+        scaler_register( SCALER_PALTV4X );
         scaler_register( SCALER_HQ4X );
       }
     }

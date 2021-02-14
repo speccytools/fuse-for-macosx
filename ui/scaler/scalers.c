@@ -1912,6 +1912,152 @@ FUNCTION( scaler_PalTV3x )( const libspectrum_byte *srcPtr,
   }
 }
 
+void
+FUNCTION( scaler_PalTV4x )( const libspectrum_byte *srcPtr,
+                              libspectrum_dword srcPitch,
+                              libspectrum_byte *dstPtr,
+                              libspectrum_dword dstPitch,
+                              int width, int height )
+{
+/*
+   1.a. RGB => 255,255,255 RGB
+   1.b. RGB => YUV
+   2. 4:2:2 cosited color subsampling
+   3.a. YUV => RGB
+   3.b  255,255,255 RGB => RGB
+*/
+  int i, j;
+  unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
+  const scaler_data_type *p, *p0 = (const scaler_data_type *)srcPtr;
+
+  unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
+  scaler_data_type *q, *q0 = (scaler_data_type *)dstPtr;
+
+  libspectrum_byte  r0, g0, b0,
+                    r1, g1, b1,
+                    rx, gx, bx;
+  libspectrum_signed_dword y1, y2, u1, v1, u2, v2;
+
+/*
+ 422 cosited
+    # + # +             + only Y
+                        # Y and Cb Cr
+    # + # +
+
+    abcd...    =>  1/2a + a + 1/2b / 2; ...; 1/2a + b + 1/2c; ... ; ...
+    always 3 sample/proc
+
+*/
+  for( j = height; j; j-- ) {
+    p = p0 - 1; q = q0;
+#if SCALER_DATA_SIZE == 2
+    r0 = R_TO_R( *p );
+    g0 = G_TO_G( *p );
+    b0 = B_TO_B( *p );
+    p++;
+    r1 = R_TO_R( *p );
+    g1 = G_TO_G( *p );
+    b1 = B_TO_B( *p );
+#else
+    r0 = *p & redMask;
+    g0 = (*p & greenMask) >> 8;
+    b0 = (*p & blueMask) >> 16;
+    p++;
+    r1 = *(p) & redMask;
+    g1 = (*(p) & greenMask) >> 8;
+    b1 = (*(p) & blueMask) >> 16;
+#endif
+    y1 = RGB_TO_Y( r1, g1, b1 );
+    u1 = ( RGB_TO_U( r0, g0, b0 ) + 3 * RGB_TO_U( r1, g1, b1 ) ) >> 2;
+    v1 = ( RGB_TO_V( r0, g0, b0 ) + 3 * RGB_TO_V( r1, g1, b1 ) ) >> 2;
+    for( i = width; i; i-- ) {
+      p++;      /* next point */
+#if SCALER_DATA_SIZE == 2
+      /* 1.a. RGB => RGB */
+      r0 = R_TO_R( *p );
+      g0 = G_TO_G( *p );
+      b0 = B_TO_B( *p );
+#else
+      r0 = (*p & redMask);
+      g0 = (*p & greenMask) >> 8;
+      b0 = (*p & blueMask) >> 16;
+#endif
+/* 1.b. RGB => YUV && 2. YUV subsampling */
+      y2 = RGB_TO_Y( r0, g0, b0 );
+      u2 = ( RGB_TO_U( r1, g1, b1 ) + 3 * RGB_TO_U( r0, g0, b0 ) ) >> 2;
+      v2 = ( RGB_TO_V( r1, g1, b1 ) + 3 * RGB_TO_V( r0, g0, b0 ) ) >> 2;
+
+/* 3.a. YUV => RGB  */
+      rx = YUV_TO_R( y1, u1, v1 );      /* [x0][  ]*/
+      gx = YUV_TO_G( y1, u1, v1 );
+      bx = YUV_TO_B( y1, u1, v1 );
+
+      u1 = ( u1 + u2 ) >> 1;
+      v1 = ( v1 + v2 ) >> 1;
+
+      r1 = YUV_TO_R( y1, u1, v1 );
+      g1 = YUV_TO_G( y1, u1, v1 );
+      b1 = YUV_TO_B( y1, u1, v1 );
+
+#if SCALER_DATA_SIZE == 2
+/*
+   q q+1 | q+2 q+3
+   q q+1 | q+2 q+3
+   _______________
+
+*/
+/* 3.b. RGB => RGB */
+      if( green6bit ) {
+        *q = *(q+1) = RGB_TO_PIXEL_565( rx, gx, bx );
+      } else {
+        *q = *(q+1) = RGB_TO_PIXEL_555( rx, gx, bx );
+      }
+#else
+      *q = *(q+1) = rx + ( gx << 8 ) + ( bx << 16 );
+#endif
+
+      if( settings_current.pal_tv2x )
+        *(q + nextlineDst) = *(q + nextlineDst + 1) =
+        *(q + 2 * nextlineDst) = *(q + 2 * nextlineDst + 1) =
+        *(q + 3 * nextlineDst) = *(q + 3 * nextlineDst + 1) =
+            ((((*q & redblueMask) * 7) >> 3) & redblueMask) |
+                ((((*q & greenMask  ) * 7) >> 3) & greenMask);
+      else
+        *(q + nextlineDst) = *(q + nextlineDst + 1) =
+        *(q + 2 * nextlineDst) = *(q + 2 * nextlineDst + 1) =
+        *(q + 3 * nextlineDst) = *(q + 3 * nextlineDst + 1) = *q;
+
+      q++; q++;
+#if SCALER_DATA_SIZE == 2
+/* 3.b. RGB => RGB */
+      if( green6bit ) {
+        *q = *(q + 1) = RGB_TO_PIXEL_565( r1, g1, b1 );
+      } else {
+        *q = *(q + 1) = RGB_TO_PIXEL_555( r1, g1, b1 );
+      }
+#else
+      *q = *(q + 1) = r1 + ( g1 << 8 ) + ( b1 << 16 );
+#endif
+      if( settings_current.pal_tv2x )
+        *(q + nextlineDst) = *(q + nextlineDst + 1) =
+        *(q + 2 * nextlineDst) = *(q + 2 * nextlineDst + 1) =
+        *(q + 3 * nextlineDst) = *(q + 3 * nextlineDst + 1) =
+            ((((*q & redblueMask) * 7) >> 3) & redblueMask) |
+                ((((*q & greenMask  ) * 7) >> 3) & greenMask);
+      else
+        *(q + nextlineDst) = *(q + nextlineDst + 1) =
+        *(q + 2 * nextlineDst) = *(q + 2 * nextlineDst + 1) =
+        *(q + 3 * nextlineDst) = *(q + 3 * nextlineDst + 1) = *q;
+
+      q++; q++;
+      y1 = y2; u1 = u2; v1 = v2;        /* save for next point */
+      r1 = r0; g1 = g0; b1 = b0;
+    }
+    p0 += nextlineSrc;
+    q0 += nextlineDst << 2;
+  }
+}
+
 #define prevline (-nextlineSrc)
 #define nextline nextlineSrc
 #define MOVE_B_TO_A(A,B) \
