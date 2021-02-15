@@ -37,6 +37,8 @@
           * WidgetUI: Fix crash when trying to overwrite read-only files (Pedro
             Luis Rodríguez González).
           * Win32: Fix bitwise operation in debugger (Sergio Baldoví).
+          * Xlib UI: Try to keep graphic filter when the user resize the window
+            (Gergely Szasz).
 
         * Scaler improvements:
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
