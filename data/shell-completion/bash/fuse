@@ -91,7 +91,7 @@ _fuse()
             COMPREPLY=( $( compgen -W '2x 2xsai 3x 4x advmame2x
                 advmame3x dotmatrix half halfskip hq2x hq3x hq4x normal
                 super2xsai supereagle timex15x timex2x timextv tv2x tv3x tv4x
-                paltv paltv2x paltv3x' -- "$cur" ) )
+                paltv paltv2x paltv3x paltv4x' -- "$cur" ) )
             return 0
             ;;
         --graphicsfile)

@@ -515,8 +515,9 @@ which uses no filtering. The available options are
 .IR tv4x ,
 .IR paltv ,
 .IR paltv2x ,
+.IR paltv3x ,
 and
-.IR paltv3x .
+.IR paltv4x .
 See the
 .B "GRAPHICS FILTERS"
 section for more details.
@@ -982,8 +983,8 @@ Insert the specified file into the emulated Opus Discovery's drive\ 1.
 .PP
 .B \-\-pal\-tv2x
 .RS
-Specify whether the PAL\ TV\ 2x and PAL\ TV\ 3x scalers should also produce
-scanlines along the lines of the TV\ 2x and Timex\ TV scalers.
+Specify whether the PAL\ TV\ 2x, PAL\ TV\ 3x and PAL\ TV\ 4x scalers should
+also produce scanlines along the lines of the TV\ 2x and Timex\ TV scalers.
 The same as the General Options dialog's
 .I "PAL-TV use TV2x effect"
 option.
@@ -4261,8 +4262,10 @@ and Timex\ TV produce the same size output).
 .IR "PAL\ TV\ 2x " ( paltv2x )
 .br
 .IR "PAL\ TV\ 3x " ( paltv3x )
+.br
+.IR "PAL\ TV\ 4x " ( paltv4x )
 .RS
-Three filters which attempt to emulate the effect of the PAL TV system
+Four filters which attempt to emulate the effect of the PAL TV system
 which layers a lower-resolution colour image over the top of a
 higher-resolution black-and-white image. The filters can also optionally
 add scanlines like the other TV series scalers.
