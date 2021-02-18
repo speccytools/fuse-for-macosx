@@ -603,7 +603,7 @@ register_scalers( void )
       if( machine_current->timex ) {
         scaler_register( SCALER_HALFSKIP );
         scaler_register( SCALER_TIMEX1_5X );
-        scaler_register( SCALER_DOUBLESIZE );
+        scaler_register( SCALER_TIMEX2X );
         scaler_register( SCALER_ADVMAME2X );
       } else {
         scaler_register( SCALER_DOUBLESIZE );
@@ -620,7 +620,7 @@ register_scalers( void )
         scaler_register( SCALER_HALFSKIP );
         scaler_register( SCALER_TIMEXTV );
         scaler_register( SCALER_TIMEX1_5X );
-        scaler_register( SCALER_DOUBLESIZE );
+        scaler_register( SCALER_TIMEX2X );
         scaler_register( SCALER_2XSAI );
         scaler_register( SCALER_SUPER2XSAI );
         scaler_register( SCALER_SUPEREAGLE );
@@ -770,7 +770,7 @@ register_scalers( void )
     case 4:
       if( xdisplay_depth == 4 ) {
           new_scaler = SCALER_QUADSIZE;
-          new_timex_scaler = SCALER_DOUBLESIZE;
+          new_timex_scaler = SCALER_TIMEX2X;
       } else {
         switch( current_scaler ) {
         case SCALER_PALTV:
@@ -802,7 +802,7 @@ register_scalers( void )
           break;
         default:
           new_scaler = SCALER_QUADSIZE;
-          new_timex_scaler = SCALER_DOUBLESIZE;
+          new_timex_scaler = SCALER_TIMEX2X;
           break;
         }
       }
