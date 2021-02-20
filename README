@@ -1,4 +1,4 @@
-The Free Unix Spectrum Emulator (Fuse) 1.5.7
+The Free Unix Spectrum Emulator (Fuse) 1.6.0
 ============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
@@ -17,8 +17,8 @@ What Fuse does have:
   Scorpion ZS 256 emulation.
 * Runs at true Speccy speed on any computer you're likely to try it on.
 * Support for loading from .tzx files, including accelerated loading.
-* Sound (on systems supporting the Open Sound System, SDL, or OpenBSD/
-  Solaris's /dev/audio).
+* Sound (on systems supporting the Open Sound System, SDL, OpenBSD/
+  Solaris's /dev/audio, CoreAudio or PulseAudio).
 * Emulation of most of the common joysticks used on the Spectrum
   (including Kempston, Sinclair and Cursor joysticks).
 * Emulation of some of the printers you could attach to a Spectrum.
@@ -33,6 +33,7 @@ What Fuse does have:
 * Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery
   disk interfaces.
 * Emulation of the Spectranet and SpeccyBoot network interfaces.
+* Emulation of the TTX2000 S Teletext adapter.
 * Support for the Recreated ZX Spectrum Bluetooth keyboard.
 
 Help! <xyz> doesn't work
@@ -113,4 +114,4 @@ Usenet newsgroup `comp.sys.sinclair' or the World of Spectrum forums
 <http://www.worldofspectrum.org/forums/>.
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-9th December, 2018
+20th February, 2021

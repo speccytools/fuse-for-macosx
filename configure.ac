@@ -19,18 +19,18 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.5.7])
+m4_define([fuse_version], [1.6.0])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
-m4_define([fuse_minor_version], [5])
-m4_define([fuse_micro_version], [7])
+m4_define([fuse_minor_version], [6])
+m4_define([fuse_micro_version], [0])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
 
 dnl Package info
-m4_define([fuse_copyright], ["(c) 1999-2018 Philip Kendall and others"])
+m4_define([fuse_copyright], ["(c) 1999-2021 Philip Kendall and others"])
 m4_define([fuse_url], [http://fuse-emulator.sourceforge.net/])
 m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs/])
 
