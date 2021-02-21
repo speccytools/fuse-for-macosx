@@ -96,11 +96,11 @@ option.
 .PP
 .B \-\-aspect\-hint
 .RS
-Specify whether the GTK+ and Xlib user interfaces should `hint' to the
+Specify whether the GTK and Xlib user interfaces should `hint' to the
 window manager about the preferred aspect ratio for the graphics
 window, thus preventing resizing to non-square sizes which lead to
 Fuse not displaying correctly. This option has been observed to cause
-problems with some window managers when using the GTK+ UI which can
+problems with some window managers when using the GTK UI which can
 prevent the window from being resized or moved at all. (Enabled by
 default, but you can use
 .RB ` \-\-no\-aspect\-hint '
@@ -156,7 +156,7 @@ and select Pentagon mode on startup.
 .B \-\-bw\-tv
 .RS
 Specify whether the display should simulate a colour or black and
-white television. This option is effective under the GTK+, Win32, Xlib
+white television. This option is effective under the GTK, Win32, Xlib
 and SDL user interfaces: the others will always simulate a colour TV.
 The same as the General Options dialog's
 .I "Black and white TV"
@@ -1814,7 +1814,7 @@ option.
 .PP
 .B \-\-statusbar
 .RS
-For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
+For the GTK and Win32 UI, enables the statusbar beneath the display. For the
 Xlib and SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. Same as the General Options dialog's
 .I "Show statusbar"
@@ -1823,7 +1823,7 @@ option.
 .PP
 .B \-\-strict\-aspect\-hint
 .RS
-For the GTK+ UI, use stricter limits for the aspect ratio limits set
+For the GTK UI, use stricter limits for the aspect ratio limits set
 by the
 .RB ` \-\-aspect\-hint '
 option. This can cause some window managers (for example,
@@ -2089,10 +2089,10 @@ section for details.
 .\"
 .SH "THE VARIOUS FRONT-ENDS"
 Fuse supports various front-ends, or UIs (user interfaces). The usual
-one is GTK+-based, but there are also SDL, Win32, Xlib, SVGAlib and
+one is GTK-based, but there are also SDL, Win32, Xlib, SVGAlib and
 framebuffer ones.
 .PP
-The important difference to note is that GTK+ and Win32 versions uses
+The important difference to note is that GTK and Win32 versions uses
 `native' dialog boxes etc. (behaving like a fairly normal GUI-based
 program) while the others use an alternative, Fuse-specific `widget
 UI'. This latter front-end is easily spotted by the way it uses the
@@ -2107,7 +2107,7 @@ Spectrum's keyboard, the primary way of controlling Fuse itself
 (rather than the emulated machine) is via the menus. There are also
 function key shortcuts for some menu options.
 .PP
-In the GTK+ and Win32 version, the menu bar is always visible at the top
+In the GTK and Win32 version, the menu bar is always visible at the top
 of the Fuse window. You can click on a menu name to pop it up. Alternatively,
 you can press
 .I F1
@@ -2116,7 +2116,7 @@ navigate with the cursor keys or mouse.
 .PP
 In the widget UI pressing
 .I F1
-is the only way to get the main menu; and unlike the GTK+ version, the
+is the only way to get the main menu; and unlike the GTK version, the
 emulator pauses while the menus are being navigated. The menus show
 which key to press for each menu option in brackets. Pressing
 .I Esc
@@ -2445,7 +2445,7 @@ options.
 .I "Black and white TV"
 .RS
 This option allows you to choose whether to simulate a colour or black
-and white television. This is effective only under the GTK+, Win32, Xlib and
+and white television. This is effective only under the GTK, Win32, Xlib and
 SDL user interfaces: the others will always simulate a colour TV.
 .RE
 .PP
@@ -2458,7 +2458,7 @@ scalers.
 .PP
 .I "Show statusbar"
 .RS
-For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
+For the GTK and Win32 UI, enables the statusbar beneath the display. For the
 SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. This option has no effect for the other user
 interfaces.
@@ -3395,7 +3395,7 @@ shouldn't be too hard to edit by hand if you really want to.
 .I "Machine, Pause"
 .RS
 Pause or unpause emulation. This option is available only under the
-GTK+ and Win32 UIs; to pause the other user interfaces, simply press F1 to bring
+GTK and Win32 UIs; to pause the other user interfaces, simply press F1 to bring
 up the main menu.
 .RE
 .PP
@@ -3629,7 +3629,7 @@ stop-the-tape request (which Fuse obeys).
 .RS
 Browse through the current tape. A brief display of each of the data
 blocks on the current tape will appear, from which you can select
-which block Fuse will play next. With the GTK+ UI, emulation will
+which block Fuse will play next. With the GTK UI, emulation will
 continue while the browser is displayed; double-clicking on a block
 will select it. In the other UIs, emulation is paused and you can use
 the cursor keys and press
@@ -4066,7 +4066,7 @@ entries above, but for the memory card slot of the DivMMC interface.
 .RS
 Display a diagram showing the Spectrum keyboard, and the various
 keywords that can be generated with each key from (48K) BASIC. Under
-the GTK+ and Win32 UIs, this will appear in a separate window and emulation
+the GTK and Win32 UIs, this will appear in a separate window and emulation
 continues. With the other UIs, the picture remains onscreen (and the
 emulator paused) until you press
 .I Esc
@@ -4139,7 +4139,7 @@ section below.
 .\"
 .SH "DISPLAY SIZE"
 Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
-For the window-based ones (GTK+, Win32 and Xlib), you can resize the window
+For the window-based ones (GTK, Win32 and Xlib), you can resize the window
 by, well, resizing it. :\-) Exactly how this works depends on your
 window manager; you may have to make the window over twice the width
 and height of the original size before it actually scales up. Fuse
@@ -4149,7 +4149,7 @@ this problem, the
 .RB ` \-\-no\-aspect\-hint '
 option may help.
 .PP
-If you're using the SDL UI under X11 or GTK+, the window will
+If you're using the SDL UI under X11 or GTK, the window will
 automatically resize to be the correct size for the graphics filter
 selected.
 .\"
@@ -4161,7 +4161,7 @@ building its image of the Spectrum's screen, and displaying it on the
 emulating machine's monitor. These filters can be used to do various
 forms of smoothing, emulation of TV scanlines and various other
 possibilities. Support for graphics filters varies between the
-different user interfaces, but there are two general classes: the GTK+,
+different user interfaces, but there are two general classes: the GTK,
 Win32, Xlib, SVGAlib and SDL user interfaces (and the saving of .png
 screenshots) support `interpolating' filters which use a palette larger
 than the Spectrum's 16\ colours, while the framebuffer user interface
@@ -4173,7 +4173,7 @@ resolution. To deal with this, Fuse treats these machines as having a
 `normal' display size which is twice the size of a normal Spectrum's
 screen, leading to a different set of filters being available for
 these machines. Note that any of the double or triple-sizing filters
-are available for Timex machines only when using the SDL, Win32 or GTK+
+are available for Timex machines only when using the SDL, Win32 or GTK
 user interfaces.
 .PP
 The available filters, along with their short name used to select them
@@ -4206,14 +4206,14 @@ Scale the displayed screen up to double size.
 .IR "Triple size " ( 3x )
 .RS
 Scale the displayed screen up to triple size. Available only with the
-GTK+, Win32, Xlib and SDL user interfaces or when saving screenshots of
+GTK, Win32, Xlib and SDL user interfaces or when saving screenshots of
 non-Timex machines.
 .RE
 .PP
 .IR "Quadruple size " ( 4x )
 .RS
 Scale the displayed screen up to quadruple size. Available only with the
-GTK+, Win32 and SDL user interfaces.
+GTK, Win32 and SDL user interfaces.
 .RE
 .PP
 .IR "2xSaI " ( 2xsai )
@@ -4237,7 +4237,7 @@ diagonal lines.
 Very similar to
 .IR AdvMAME2x ,
 except that it triples the size of the displayed screen. Available
-only with the GTK+, Win32, Xlib and SDL user interfaces or when saving
+only with the GTK, Win32, Xlib and SDL user interfaces or when saving
 screenshots of non-Timex machines.
 .RE
 .PP
@@ -4281,7 +4281,7 @@ display.
 .RS
 An interpolating Timex-specific filter which scales the Timex screen
 up to 1.5\(mu its usual size (which is therefore 3\(mu the size of a
-`normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
+`normal' Spectrum screen). Available only for the GTK, Win32 and SDL
 user interfaces or when saving screenshots.
 .RE
 .PP
@@ -4289,7 +4289,7 @@ user interfaces or when saving screenshots.
 .RS
 A non-interpolating Timex-specific filter which scales the Timex screen
 up to 2\(mu its usual size (which is therefore 4\(mu the size of a
-`normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
+`normal' Spectrum screen). Available only for the GTK, Win32 and SDL
 user interfaces or when saving screenshots.
 .RE
 .PP
@@ -4611,7 +4611,7 @@ sources with 12 lines per field or fewer.
 .\"
 .SH "FILE SELECTION"
 The way you select a file (whether snapshot or tape file) depends on
-which UI you're using. So firstly, here's how to use the GTK+ file
+which UI you're using. So firstly, here's how to use the GTK file
 selector.
 .PP
 The selector shows the directories and files in the current directory
@@ -4674,12 +4674,12 @@ files are shown, whether Fuse would be able to load them or not.
 .SH MONITOR/DEBUGGER
 .PP
 Firstly, note that the vast majority of this section applies only if
-you're using the GTK+ user interface; if you're using one of the
+you're using the GTK user interface; if you're using one of the
 widget user interfaces, you'll get a very basic monitor which shows
 the current values of the registers and allows you to single step
 through execution or continue.
 .PP
-If you are using the GTK+ user interface, Fuse features a moderately
+If you are using the GTK user interface, Fuse features a moderately
 powerful, completely transparent monitor/debugger, which can be
 activated via the
 .I "Machine, Debugger..."
@@ -5303,7 +5303,7 @@ Sets the 128K memory bank (values `0' to `7') or the current memory mapping
 .I Address
 .RS
 Memory address to modify. Values in range 16384 to 65535 for 48K memory mode
-or 0 to 65535 for 128K memory banks. GTK+ UI also accepts hex addresses.
+or 0 to 65535 for 128K memory banks. GTK UI also accepts hex addresses.
 .RE
 .PP
 .I Value
@@ -5314,7 +5314,7 @@ to the user later\(rq.
 .PP
 It is possible to load POKEs from an external file using the
 .I "File, Open..."
-menu option or the drag-and-drop functionality in the GTK+ and Win32 UIs.
+menu option or the drag-and-drop functionality in the GTK and Win32 UIs.
 After loading a snapshot or tape, Fuse will try to automatically locate a
 POK file with the same file name. This means that if we open `GAME.TAP',
 then Fuse will try to open `GAME.POK' and `POKES/GAME.POK'. See
@@ -5470,7 +5470,7 @@ is no `X' option to exit the menu.  Also, printing of screenshots requires
 GDOS to be loaded.  Depending on the UI that you're using, holding down
 Caps Shift whilst choosing the
 .I "Machine, NMI"
-menu option may be slightly tricky, or even impossible.  For the GTK+ UI,
+menu option may be slightly tricky, or even impossible.  For the GTK UI,
 ensure that the Shift key is held before entering on the
 .I Machine
 menu.  For the widget UI, it does not seem possible to perform this
@@ -5676,7 +5676,7 @@ or Beta disk images.
 .\"
 .SH BUGS
 Selecting a startup filter doesn't work properly with user interfaces
-other than SDL, Win32 and GTK+.
+other than SDL, Win32 and GTK.
 .PP
 Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the
@@ -5685,7 +5685,7 @@ option.
 .PP
 The poke finder can't search outside `normal' RAM.
 .PP
-The libao file output devices not work properly with the GTK+ UI.
+The libao file output devices not work properly with the GTK UI.
 No error reporting, but the created file does not contain any sound data.
 If you use a `weak' machine alsa09 makes a lot of clicks and pops and
 will output

@@ -1,4 +1,4 @@
-/* pokemem.c: GTK+ interface that handles pok files
+/* pokemem.c: GTK interface that handles pok files
    Copyright (c) 2011-2015 Philip Kendall, Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify

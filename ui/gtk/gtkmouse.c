@@ -1,4 +1,4 @@
-/* gtkmouse.c: GTK+ routines for emulating Spectrum mice
+/* gtkmouse.c: GTK routines for emulating Spectrum mice
    Copyright (c) 2004 Darren Salt
    Copyright (c) 2015 Sergio Baldoví
 
@@ -111,11 +111,11 @@ gtkmouse_reset_pointer( void )
 
      The logic here is a bit hairy:
 
-     * On GTK+ 2.x, we warp relative to the drawing area
-     * On GTK+ 3.x on X11, we warp relative to the top-level window
-     * On GTK+ 3.x on Wayland, we don't warp at all because it causes a
+     * On GTK 2.x, we warp relative to the drawing area
+     * On GTK 3.x on X11, we warp relative to the top-level window
+     * On GTK 3.x on Wayland, we don't warp at all because it causes a
        segfault (see bug #435)
-     * On GTK+ 3.x on win32, we don't warp at all
+     * On GTK 3.x on win32, we don't warp at all
    */
 
 #ifdef GDK_WINDOWING_WAYLAND

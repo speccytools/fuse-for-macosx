@@ -314,11 +314,11 @@ if test -z "$UI"; then
   fi
 fi
 
-dnl Look for GTK+ (default=yes)
+dnl Look for GTK (default=yes)
 if test -z "$UI"; then
-  AC_MSG_CHECKING(whether GTK+ UI requested)
+  AC_MSG_CHECKING(whether GTK UI requested)
   AC_ARG_WITH(gtk,
-  [  --without-gtk           don't use GTK+ for user interface],
+  [  --without-gtk           don't use GTK for user interface],
   if test "$withval" = no; then gtk=no; else gtk=yes; fi,
   if test "$fakeglib" = yes; then gtk=no; else gtk=yes; fi)
   AC_MSG_RESULT($gtk)
@@ -327,25 +327,25 @@ if test -z "$UI"; then
 
     if test "$fakeglib" = yes; then
       AC_MSG_ERROR([libspectrum is using its own internal GLib replacement
-GTK+ requires the real GLib library, so the GTK+ UI cannot be used with
+GTK requires the real GLib library, so the GTK UI cannot be used with
 the libspectrum that was found.  Rebuild libspectrum to use the real GLib
 library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
     fi
 
     AC_ARG_ENABLE(gtk3,
-      AS_HELP_STRING([--disable-gtk3],[prefer GTK+ 2 to GTK+ 3]),
+      AS_HELP_STRING([--disable-gtk3],[prefer GTK 2 to GTK 3]),
       if test "$enableval" = yes; then gtk3=yes; else gtk3=no; fi,
       gtk3=auto
     )
 
     if test "$gtk3" = yes; then
       PKG_CHECK_MODULES(GTK, [gtk+-3.0],,
-        AC_MSG_ERROR([GTK+ not found])
+        AC_MSG_ERROR([GTK not found])
       )
 
     elif test "$gtk3" = no; then
       AM_PATH_GTK_2_0(2.18.0,,
-        AC_MSG_ERROR([GTK+ not found])
+        AC_MSG_ERROR([GTK not found])
       )
 
     elif test "$gtk3" = auto; then
@@ -354,7 +354,7 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
       if test "$gtk3" = auto; then
         AM_PATH_GTK_2_0(2.18.0,
           gtk3=no,
-          AC_MSG_WARN([GTK+ not found. Reverting to Xlib])
+          AC_MSG_WARN([GTK not found. Reverting to Xlib])
           gtk3=no
           gtk=no
         )
@@ -364,9 +364,9 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
   fi
 
   if test "$gtk" = yes; then
-    AC_DEFINE([UI_GTK], 1, [Defined if GTK+ UI is in use])
+    AC_DEFINE([UI_GTK], 1, [Defined if GTK UI is in use])
     UI=gtk;
-    AC_MSG_CHECKING(whether GTK+ supports x11 backend)
+    AC_MSG_CHECKING(whether GTK supports x11 backend)
     ac_save_CPPFLAGS="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
     AC_COMPILE_IFELSE(
@@ -1049,7 +1049,7 @@ echo "********************"
 echo ""
 echo "User interface: ${UI}"
 if test "${UI}" = "gtk"; then
-   echo "Using GTK+ 3: ${gtk3}"
+   echo "Using GTK 3: ${gtk3}"
 fi
 if test x"${gpm}" != "x"; then
    echo "libgpm support: ${gpm}"

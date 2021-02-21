@@ -39,7 +39,7 @@
 
 /* We need to include SDL.h on Mac O X and Windows to do some magic
    bootstrapping by redefining main. As we now allow SDL joystick code to be
-   used in the GTK+ and Xlib UIs we need to also do the magic when that code is
+   used in the GTK and Xlib UIs we need to also do the magic when that code is
    in use, feel free to look away for the next line */
 #if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
 #include <SDL.h>		/* Needed on MacOS X and Windows */

@@ -1,4 +1,4 @@
-/* gtkcompat.h: various compatibility bits between GTK+ versions
+/* gtkcompat.h: various compatibility bits between GTK versions
    Copyright (c) 2012 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify

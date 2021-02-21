@@ -1,4 +1,4 @@
-/* debugger.c: the GTK+ debugger
+/* debugger.c: the GTK debugger
    Copyright (c) 2002-2015 Philip Kendall
    Copyright (c) 2013 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady

@@ -42,7 +42,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include <config.h>
 
-#ifdef UI_GTK                /* Use this file if we're using GTK+ */
+#ifdef UI_GTK                /* Use this file if we're using GTK */
 
 #include <stdio.h>
 #include <stdlib.h>

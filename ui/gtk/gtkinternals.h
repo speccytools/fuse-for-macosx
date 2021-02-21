@@ -1,4 +1,4 @@
-/* gtkinternals.h: stuff internal to the GTK+ UI
+/* gtkinternals.h: stuff internal to the GTK UI
    Copyright (c) 2003-2015 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify

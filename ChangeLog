@@ -12,18 +12,18 @@
             snapshot (thanks, ICEknight) (Sergio Baldoví).
 
         * UI improvements:
-          * New higher resolution keyboard picture on GTK+ and win32 UIs
+          * New higher resolution keyboard picture on GTK and win32 UIs
             (thanks, Andrew Owen for the picture) (Sergio Baldoví and Philip
             Kendall).
-          * GTK+ UI: Add Fuse icon to the about dialog and the main window
+          * GTK UI: Add Fuse icon to the about dialog and the main window
             (Alberto Garcia).
-          * GTK+ UI: Load/save binary dialog remembers last values (Derek
+          * GTK UI: Load/save binary dialog remembers last values (Derek
             Fountain).
-          * GTK+ 3 UI: Improve moving and sizing Fuse's window under Wayland
+          * GTK 3 UI: Improve moving and sizing Fuse's window under Wayland
             (Sergio Baldoví).
-          * GTK+ 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
+          * GTK 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
             Kendall) (Sergio Baldoví).
-          * GTK+ 3 UI: Fix bug when resizing from 2x to 3x on GTK+ UI (Sergio
+          * GTK 3 UI: Fix bug when resizing from 2x to 3x on GTK UI (Sergio
             Baldoví)
           * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
             (Jools Wills).
@@ -44,7 +44,7 @@
           * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
             (Sergio Baldoví).
           * Fix antialiasing effect of AdvMAME3x scaler (Sergio Baldoví).
-          * Add 4x, TV 4x, Pal TV 4x and HQ 4x scalers on GTK+, SDL, win32 and
+          * Add 4x, TV 4x, Pal TV 4x and HQ 4x scalers on GTK, SDL, win32 and
             Xlib UIs (Sergio Baldoví and Gergely Szasz).
           * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
             Baldoví).
@@ -52,9 +52,9 @@
         * Miscellaneous improvements:
           * Allow selection of audio driver at build time (thanks, kov_serg)
             (Alberto Garcia).
-          * Fix GTK+ 3 build when the GTK+ version is < 3.20 (thanks, Thrice)
+          * Fix GTK 3 build when the GTK version is < 3.20 (thanks, Thrice)
             (Alberto Garcia).
-          * Fix GTK+ build with Wayland, Quartz and Windows backends (thanks,
+          * Fix GTK build with Wayland, Quartz and Windows backends (thanks,
             Stuart Brady) (Sergio Baldoví).
           * Various fixes to allow compilation with GCC 10 (Alberto Garcia and
             Sergio Baldoví).
