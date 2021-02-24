@@ -52,6 +52,7 @@
         * Miscellaneous improvements:
           * Allow selection of audio driver at build time (thanks, kov_serg)
             (Alberto Garcia).
+          * Support of SDL 2 for joystick and audio drivers (Alberto Garcia).
           * Fix GTK 3 build when the GTK version is < 3.20 (thanks, Thrice)
             (Alberto Garcia).
           * Fix GTK build with Wayland, Quartz and Windows backends (thanks,
