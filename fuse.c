@@ -274,7 +274,7 @@ setuid_init( void *context )
 }
 
 static void
-setuid_register_startup()
+setuid_register_startup( void )
 {
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DISPLAY,

@@ -136,7 +136,7 @@ widget_binary_draw( void *data )
 }
 
 static void
-ask_filename()
+ask_filename( void )
 {
   widget_filesel_data filesel;
 
@@ -216,7 +216,7 @@ ask_value( int what )
 }
 
 static void
-load_data()
+load_data( void )
 {
   libspectrum_dword i;
 
@@ -226,7 +226,7 @@ load_data()
 }
 
 static void
-save_data()
+save_data( void )
 {
   int error;
   error = utils_save_binary( widget_binary.start, widget_binary.length,
@@ -365,7 +365,7 @@ widget_binary_finish( widget_finish_state finished )
 }
 
 static void
-init_widget_binary()
+init_widget_binary( void )
 {
   char str[8];
 
