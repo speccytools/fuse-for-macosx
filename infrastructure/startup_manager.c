@@ -53,7 +53,7 @@ startup_manager_init( void )
     g_array_new( FALSE, FALSE, sizeof( startup_manager_end_fn ) );
 }
 
-void
+static void
 startup_manager_end( void )
 {
   g_array_free( registered_modules, TRUE );

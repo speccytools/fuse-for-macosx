@@ -145,7 +145,7 @@ svg_write_metadata( void )
   return 0;
 }
 
-void
+static void
 svg_openfile( void )
 {
   int err;
@@ -190,7 +190,7 @@ svg_openfile( void )
   }
 }
 
-void
+static void
 svg_rect( int xpos, int ypos, const char *xsize, const char *ysize,
           const char *opacity, const char *color )
 {
@@ -225,7 +225,7 @@ svg_rect( int xpos, int ypos, const char *xsize, const char *ysize,
   }
 }
 
-void
+static void
 svg_openpath( void )
 {
   int err;
@@ -263,7 +263,7 @@ svg_openpath( void )
   }
 }
 
-void
+static void
 svg_closepath( void )
 {
   if( xmlTextWriterEndElement( writer ) < 0 ) {
@@ -272,7 +272,7 @@ svg_closepath( void )
   }
 }
 
-void
+static void
 svg_closefile( void )
 {
   FILE *fp;
@@ -349,7 +349,7 @@ svg_stopcapture( void )
   }
 }
 
-void
+static void
 svg_capture_draw( void )
 {
   char path_element[ BUFSZ ];
@@ -426,7 +426,7 @@ svg_capture_draw( void )
   return;
 }
 
-void
+static void
 svg_byte( int xpos, int ypos, int udg_byte, char *color )
 {
   int i;
@@ -462,7 +462,7 @@ svg_byte( int xpos, int ypos, int udg_byte, char *color )
   }
 }
 
-void
+static void
 svg_capture_char( void )
 {
   char path_element[ BUFSZ ];
@@ -593,7 +593,7 @@ svg_capture_char( void )
   return;
 }
 
-void
+static void
 svg_capture_cls( void )
 {
   if( svg_flag ) {
@@ -614,7 +614,7 @@ svg_capture_cls( void )
   return;
 }
 
-void
+static void
 svg_capture_scroll( void )
 {
   char svgcolor[ BUFSZ ];

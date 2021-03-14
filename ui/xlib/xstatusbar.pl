@@ -138,7 +138,7 @@ xstatusbar_put_icon( int x, int w, int h )
   dx -= 4; /* 4px space */
 }
 
-void
+static void
 xstatusbar_overlay( void )
 {
   int x = 0, w = 0, h;
