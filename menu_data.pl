@@ -340,6 +340,7 @@ sub dump_win32 ($$) {
     if( $mode eq 'c' ) {
 	print << "CODE";
 #include "ui/win32/menu_data.h"
+#include "ui/win32/win32internals.h"
 
 int handle_menu( DWORD cmd, HWND window )
 {

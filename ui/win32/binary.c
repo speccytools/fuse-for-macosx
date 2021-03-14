@@ -28,6 +28,7 @@
 #include <windows.h>
 
 #include "fuse.h"
+#include "menu.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "win32internals.h"

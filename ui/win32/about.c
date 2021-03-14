@@ -28,6 +28,7 @@
 
 #include "fuse.h"
 #include "hyperlinks.h"
+#include "menu.h"
 #include "win32internals.h"
 
 #include "about.h"
