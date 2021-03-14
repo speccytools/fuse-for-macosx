@@ -238,8 +238,6 @@ divmmc_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 static void
 divmmc_card_select( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-//  printf("divmmc_card_select( 0x%02x )\n", data );
-
   /* D0 = MMC0, D1 = MMC1, active LOW
      somehow logic prevents enabling both cards at the same time */
   switch( data & 0x03 ) {
