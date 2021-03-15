@@ -24,7 +24,7 @@
 #ifndef FUSE_ZXATASP_H
 #define FUSE_ZXATASP_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void zxatasp_register_startup( void );
 int zxatasp_insert( const char *filename, libspectrum_ide_unit unit );

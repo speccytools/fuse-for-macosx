@@ -24,12 +24,12 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <ctype.h>
 #include <string.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger_internals.h"
 #include "event.h"

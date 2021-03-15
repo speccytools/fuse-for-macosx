@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <windows.h>
 #include <windowsx.h> /* for GET_X_LPARAM and GET_Y_LPARAM */

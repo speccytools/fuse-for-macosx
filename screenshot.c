@@ -21,13 +21,13 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "display.h"
 #include "infrastructure/startup_manager.h"

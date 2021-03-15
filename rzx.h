@@ -24,7 +24,7 @@
 #ifndef FUSE_RZX_H
 #define FUSE_RZX_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* The offset used to get the count of instructions from the R register */
 extern int rzx_instructions_offset;

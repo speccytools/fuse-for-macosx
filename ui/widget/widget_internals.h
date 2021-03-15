@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "settings.h"
 #include "widget.h"

@@ -25,7 +25,7 @@
 #ifndef FUSE_SPECPLUS3_H
 #define FUSE_SPECPLUS3_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "machine.h"
 #include "periph.h"

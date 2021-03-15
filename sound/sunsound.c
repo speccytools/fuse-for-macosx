@@ -17,7 +17,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #if defined(__SVR4) && defined(__sun)
 #define solaris

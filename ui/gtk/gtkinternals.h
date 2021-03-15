@@ -25,7 +25,7 @@
 #define FUSE_GTKINTERNALS_H
 
 #include <gtk/gtk.h>
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /*
  * Display routines (gtkdisplay.c)

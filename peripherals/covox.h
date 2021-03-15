@@ -26,7 +26,7 @@
 #ifndef FUSE_COVOX_H
 #define FUSE_COVOX_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 typedef struct covox_info {
   libspectrum_byte covox_dac; /* Current byte in the Covox 8bit DAC */

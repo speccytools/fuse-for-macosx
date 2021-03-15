@@ -17,9 +17,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "compat.h"
 #include "debugger/debugger.h"

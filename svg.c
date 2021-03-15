@@ -23,7 +23,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_LIB_XML2
 #include <errno.h>

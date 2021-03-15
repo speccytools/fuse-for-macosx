@@ -32,7 +32,7 @@ typedef enum disciple_drive_number {
   DISCIPLE_NUM_DRIVES,
 } disciple_drive_number;
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fdd.h"
 

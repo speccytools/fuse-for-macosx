@@ -23,14 +23,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #ifdef HAVE_STRINGS_STRCASECMP
 #include <strings.h>
 #endif      /* #ifdef HAVE_STRINGS_STRCASECMP */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger/debugger.h"
 #include "display.h"

@@ -25,9 +25,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "crc.h"
 #include "event.h"

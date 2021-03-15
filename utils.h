@@ -24,7 +24,7 @@
 #ifndef FUSE_UTILS_H
 #define FUSE_UTILS_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "compat.h"
 

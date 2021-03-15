@@ -25,11 +25,11 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "scaler.h"
 #include "scaler_internals.h"

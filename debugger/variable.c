@@ -22,7 +22,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
@@ -30,7 +30,7 @@
 #include <glib.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger_internals.h"
 #include "ui/ui.h"

@@ -31,7 +31,7 @@
 #include <glib.h>
 #endif
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "compat.h"
 #include "machines/specplus3.h"

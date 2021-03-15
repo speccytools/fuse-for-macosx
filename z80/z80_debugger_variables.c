@@ -21,9 +21,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger/debugger.h"
 #include "z80.h"

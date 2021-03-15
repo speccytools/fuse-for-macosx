@@ -26,7 +26,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #ifdef HAVE_LIBGEN_H
@@ -36,7 +36,7 @@
 #include <ui/ui.h>
 #include <unistd.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "machines/specplus3.h"

@@ -17,7 +17,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 /* This is necessary to prevent warnings from the calls to
    snd_pcm_[hs]w_params_alloca() */

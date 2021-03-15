@@ -22,9 +22,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"

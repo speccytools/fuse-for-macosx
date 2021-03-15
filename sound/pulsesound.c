@@ -17,12 +17,12 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <string.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 #include <pulse/error.h>
 #include <pulse/simple.h>
 #include <pulse/timeval.h>

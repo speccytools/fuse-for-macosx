@@ -33,7 +33,7 @@
           because WIN32_LEAN_AND_MEAN is defined along the way somewhere */
 #include <mmsystem.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #define ID_STATUSBAR 900
 

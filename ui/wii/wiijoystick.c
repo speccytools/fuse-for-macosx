@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 #include "fuse.h"
 #include "input.h"
 #include "ui/ui.h"

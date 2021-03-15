@@ -25,7 +25,7 @@
 #ifndef FUSE_TS2068_H
 #define FUSE_TS2068_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "machine.h"
 

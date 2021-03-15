@@ -27,7 +27,7 @@
 #ifndef FUSE_BETA_H
 #define FUSE_BETA_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "memory_pages.h"
 #include "fdd.h"

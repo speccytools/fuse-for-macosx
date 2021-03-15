@@ -26,7 +26,7 @@
 #ifndef FUSE_OPUS_H
 #define FUSE_OPUS_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fdd.h"
 

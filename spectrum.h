@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "memory_pages.h"
 

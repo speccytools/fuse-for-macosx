@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>

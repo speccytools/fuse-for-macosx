@@ -26,7 +26,7 @@
 
 #include <stddef.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* The width and height of the Speccy's screen */
 #define DISPLAY_WIDTH_COLS  32

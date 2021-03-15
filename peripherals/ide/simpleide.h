@@ -22,7 +22,7 @@
 #ifndef FUSE_SIMPLEIDE_H
 #define FUSE_SIMPLEIDE_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void simpleide_register_startup( void );
 void simpleide_reset( int hard_reset );

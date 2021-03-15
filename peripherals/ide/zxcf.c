@@ -23,11 +23,11 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger/debugger.h"
 #include "ide.h"

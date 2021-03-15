@@ -23,7 +23,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -48,7 +48,7 @@
 #include <X11/extensions/XShm.h>
 #endif				/* #ifdef X_USE_SHM */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "display.h"
 #include "fuse.h"

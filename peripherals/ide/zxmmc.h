@@ -24,7 +24,7 @@
 #ifndef FUSE_ZXMMC_H
 #define FUSE_ZXMMC_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void zxmmc_register_startup( void );
 int zxmmc_insert( const char *filename );

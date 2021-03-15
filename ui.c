@@ -22,14 +22,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "peripherals/if1.h"

@@ -25,7 +25,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 #include "peripherals/joystick.h"
 
 #if !defined USE_JOYSTICK || defined HAVE_JSW_H
@@ -40,7 +40,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 #include <vgajoystick.h>
 
 #include "fuse.h"

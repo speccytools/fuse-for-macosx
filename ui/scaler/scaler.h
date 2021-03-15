@@ -25,7 +25,7 @@
 #ifndef SCALER_H
 #define SCALER_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 typedef enum scaler_type {
   SCALER_HALF = 0,

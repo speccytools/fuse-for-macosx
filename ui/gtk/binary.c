@@ -22,13 +22,13 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <stdio.h>
 
 #include <gtk/gtk.h>
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "gtkinternals.h"

@@ -25,7 +25,7 @@
 #ifndef FUSE_SOUND_H
 #define FUSE_SOUND_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void sound_register_startup( void );
 

@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #ifdef HAVE_STRINGS_STRCASECMP
@@ -31,7 +31,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "bitmap.h"
 #include "crc.h"

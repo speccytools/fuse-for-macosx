@@ -23,7 +23,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@
 #include <limits.h>
 #include <sys/stat.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "beta.h"
 #include "compat.h"

@@ -24,7 +24,7 @@
 #ifndef FUSE_MODULE_H
 #define FUSE_MODULE_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 typedef void (*module_reset_fn)( int hard_reset );
 typedef void (*module_romcs_fn)( void );

@@ -24,14 +24,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 /* FIXME: is that needed?
 #include <stdio.h>
 #include <string.h>
 */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 #include <stdlib.h>
 #include <tchar.h>
 #include <windows.h>

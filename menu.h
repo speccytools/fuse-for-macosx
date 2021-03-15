@@ -24,9 +24,9 @@
 #ifndef FUSE_MENU_H
 #define FUSE_MENU_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
-#include <config.h>
+#include "config.h"
 
 #include "ui/scaler/scaler.h"
 

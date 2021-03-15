@@ -24,7 +24,7 @@
 #ifndef FUSE_DIVMMC_H
 #define FUSE_DIVMMC_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* Whether DivMMC is currently paged in */
 extern int divmmc_active;

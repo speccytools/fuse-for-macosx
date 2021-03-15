@@ -23,7 +23,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 #include <tchar.h>
 
 #include "debugger/debugger.h"

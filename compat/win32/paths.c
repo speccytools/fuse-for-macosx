@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>

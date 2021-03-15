@@ -24,7 +24,7 @@
 #ifndef FUSE_DIVIDE_H
 #define FUSE_DIVIDE_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* Whether DivIDE is currently paged in */
 extern int divide_active;

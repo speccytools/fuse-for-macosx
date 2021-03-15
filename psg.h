@@ -24,7 +24,7 @@
 #ifndef FUSE_PSG_H
 #define FUSE_PSG_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* Are we currently recording a .psg file? */
 extern int psg_recording;

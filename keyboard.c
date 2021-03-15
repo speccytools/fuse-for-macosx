@@ -21,13 +21,13 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_LIB_GLIB
 #include <glib.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "infrastructure/startup_manager.h"
 #include "keyboard.h"
