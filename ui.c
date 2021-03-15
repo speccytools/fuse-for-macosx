@@ -113,13 +113,13 @@ print_error_to_stderr( ui_error_level severity, const char *message )
      informational */
   if( severity > UI_ERROR_INFO ) {
 
-    /* For the fb and svgalib UIs, we don't want to write to stderr if
+    /* For the fb UI, we don't want to write to stderr if
        it's a terminal, as it's then likely to be what we're currently
        using for graphics output, and writing text to it isn't a good
        idea. Things are OK if we're exiting though */
-#if defined( UI_FB ) || defined( UI_SVGA )
+#ifdef UI_FB
     if( isatty( STDERR_FILENO ) && !fuse_exiting ) return 1;
-#endif			/* #if defined( UI_FB ) || defined( UI_SVGA ) */
+#endif			/* #ifdef UI_FB */
 
     fprintf( stderr, "%s: ", fuse_progname );
 

@@ -51,7 +51,7 @@ Unix, Linux, BSD, etc.
 
 Required:
 
-* X, SDL, svgalib or framebuffer support. If you have GTK, you'll get
+* X, SDL or framebuffer support. If you have GTK, you'll get
   a (much) nicer user interface under X.
 * libspectrum: this is available from
   http://fuse-emulator.sourceforge.net/libspectrum.php

@@ -191,7 +191,6 @@ include ui/gtk/Makefile.am
 include ui/null/Makefile.am
 include ui/scaler/Makefile.am
 include ui/sdl/Makefile.am
-include ui/svga/Makefile.am
 include ui/widget/Makefile.am
 include ui/wii/Makefile.am
 include ui/win32/Makefile.am

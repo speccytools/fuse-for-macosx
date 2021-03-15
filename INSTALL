@@ -10,7 +10,6 @@ There are now some options you can give to configure; `configure
 
 --with-fb		Use the framebuffer interface, rather than GTK.
 --with-sdl		Use the SDL interface, rather than GTK.
---with-svgalib		Use the SVGAlib interface.
 --without-gtk		Use the plain Xlib interface.
 
 If glib is installed on your system, Fuse will use this for a couple

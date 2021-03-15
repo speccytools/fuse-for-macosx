@@ -1834,25 +1834,6 @@ prevent others (for example,
 from being able resize the window away from square.
 .RE
 .PP
-.B \-\-svga\-modes
-.I mode1,mode2,mode3
-.RS
-Specify which SVGA mode to use for the SVGAlib UI at different screen
-sizes. Available values for
-.IR mode1 ", " mode2 " and " mode3
-are listed in a table, when Fuse called with
-.B \-\-svga\-modes
-.I list
-command line option.
-When user select a not available mode for a size, Fuse just ignore
-and try to find the best mode for it. e.g. with
-.B "\-\-svga\-modes 0,0,12"
-Fuse use the specified 1024\(mu768\(mu256 SVGA mode for triple size filters,
-but select SVGA modes automatically for normal or double size filters.
-The above mode number is just an example, and mode numbers and their
-meanings may vary graphics card by graphics card.
-.RE
-.PP
 .B \-t
 .I file
 .br
@@ -2089,7 +2070,7 @@ section for details.
 .\"
 .SH "THE VARIOUS FRONT-ENDS"
 Fuse supports various front-ends, or UIs (user interfaces). The usual
-one is GTK-based, but there are also SDL, Win32, Xlib, SVGAlib and
+one is GTK-based, but there are also SDL, Win32, Xlib and
 framebuffer ones.
 .PP
 The important difference to note is that GTK and Win32 versions uses
@@ -4162,7 +4143,7 @@ emulating machine's monitor. These filters can be used to do various
 forms of smoothing, emulation of TV scanlines and various other
 possibilities. Support for graphics filters varies between the
 different user interfaces, but there are two general classes: the GTK,
-Win32, Xlib, SVGAlib and SDL user interfaces (and the saving of .png
+Win32, Xlib and SDL user interfaces (and the saving of .png
 screenshots) support `interpolating' filters which use a palette larger
 than the Spectrum's 16\ colours, while the framebuffer user interface
 currently does not support filters at all.
@@ -4205,15 +4186,13 @@ Scale the displayed screen up to double size.
 .PP
 .IR "Triple size " ( 3x )
 .RS
-Scale the displayed screen up to triple size. Available only with the
-GTK, Win32, Xlib and SDL user interfaces or when saving screenshots of
-non-Timex machines.
+Scale the displayed screen up to triple size. Available when saving
+screenshots of non-Timex machines.
 .RE
 .PP
 .IR "Quadruple size " ( 4x )
 .RS
-Scale the displayed screen up to quadruple size. Available only with the
-GTK, Win32 and SDL user interfaces.
+Scale the displayed screen up to quadruple size.
 .RE
 .PP
 .IR "2xSaI " ( 2xsai )
@@ -4236,9 +4215,8 @@ diagonal lines.
 .RS
 Very similar to
 .IR AdvMAME2x ,
-except that it triples the size of the displayed screen. Available
-only with the GTK, Win32, Xlib and SDL user interfaces or when saving
-screenshots of non-Timex machines.
+except that it triples the size of the displayed screen. Available when
+saving screenshots of non-Timex machines.
 .RE
 .PP
 .IR "TV\ 2x " ( tv2x )
@@ -4281,16 +4259,14 @@ display.
 .RS
 An interpolating Timex-specific filter which scales the Timex screen
 up to 1.5\(mu its usual size (which is therefore 3\(mu the size of a
-`normal' Spectrum screen). Available only for the GTK, Win32 and SDL
-user interfaces or when saving screenshots.
+`normal' Spectrum screen).
 .RE
 .PP
 .IR "Timex\ 2x " ( timex2x )
 .RS
 A non-interpolating Timex-specific filter which scales the Timex screen
 up to 2\(mu its usual size (which is therefore 4\(mu the size of a
-`normal' Spectrum screen). Available only for the GTK, Win32 and SDL
-user interfaces or when saving screenshots.
+`normal' Spectrum screen).
 .RE
 .PP
 .IR "HQ\ 2x " ( hq2x )
@@ -5675,14 +5651,6 @@ or Beta disk images.
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
-Selecting a startup filter doesn't work properly with user interfaces
-other than SDL, Win32 and GTK.
-.PP
-Changing virtual consoles when using SVGAlib for joystick support
-causes Fuse to exit. If this is a problem, compile Fuse with the
-.RB ` \-\-disable\-ui\-joystick '
-option.
-.PP
 The poke finder can't search outside `normal' RAM.
 .PP
 The libao file output devices not work properly with the GTK UI.

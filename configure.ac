@@ -198,25 +198,6 @@ if test "$win32" = yes; then
                   AC_MSG_ERROR([Win32 UI not found]))
 fi
 
-dnl Look for svgalib (default=no)
-if test -z "$UI"; then
-  AC_MSG_CHECKING(whether svgalib UI requested)
-  AC_ARG_WITH(svgalib,
-  [  --with-svgalib          use svgalib for user interface],
-  if test "$withval" = no; then svgalib=no; else svgalib=yes; fi,
-  svgalib=no)
-  AC_MSG_RESULT($svgalib)
-  if test "$svgalib" = yes; then
-    AC_CHECK_HEADER(vga.h,
-                    LIBS="$LIBS -lvga";
-                    AC_DEFINE([UI_SVGA], 1, [Defined if svgalib UI in use])
-                    AC_DEFINE([USE_WIDGET], 1,
-                              [Defined if we're using a widget-based UI])
-                    UI=svga; WIDGET=widget,
-                    AC_MSG_ERROR([svgalib not found]))
-  fi
-fi
-
 dnl Look for framebuffer interface for SA1110 (default=no)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether framebuffer UI requested)
@@ -424,7 +405,7 @@ fi
 dnl Look for Xlib UI (default=yes)
 if test -z "$UI"; then
   if test "$with_x" = no; then
-    AC_MSG_ERROR([Please specify --with-svgalib or --with-fb, not --without-x.])
+    AC_MSG_ERROR([Please specify --with-fb, not --without-x.])
   fi
   AC_PATH_XTRA
   CFLAGS="$CFLAGS $X_CFLAGS";
@@ -462,7 +443,6 @@ AM_CONDITIONAL(UI_FB, test "$UI" = fb)
 AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
 AM_CONDITIONAL(UI_NULL, test "$UI" = null)
 AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
-AM_CONDITIONAL(UI_SVGA, test "$UI" = svga)
 AM_CONDITIONAL(UI_WII, test "$UI" = wii)
 AM_CONDITIONAL(UI_WIN32, test "$UI" = win32)
 AM_CONDITIONAL(UI_X, test "$UI" = xlib)
@@ -756,10 +736,9 @@ AC_MSG_RESULT($stick)
 if test "$stick" = yes; then
   dnl We prefer to use UI-specific joystick code. (Default.)
   dnl If there is none, or you override this here, we use libjsw.
-  dnl (svgalib appears to dislike switched joysticks on the parallel port...)
   case "$UI" in
-    svga|sdl|win32)
-      dnl Libraries such as svgalib provide their own joystick code.
+    sdl|win32)
+      dnl Libraries provide their own joystick code
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
       AS_HELP_STRING([--disable-ui-joystick], [use libjsw joystick code (where supported)]),

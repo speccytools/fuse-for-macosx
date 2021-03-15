@@ -170,7 +170,7 @@ _fuse()
         --joystick-keyboard-output|--joystick-keyboard-right| \
         --joystick-keyboard-up|--mdr-len|--rate| \
         --sdl-fullscreen-mode|--snet|--sound-device|-d| \
-        --sound-freq|-f|--speccyboot-tap|--speed|--svga-modes| \
+        --sound-freq|-f|--speccyboot-tap|--speed| \
         --teletext-addr-[1-4]|--teletext-port-[1-4]|--volume-ay| \
         --volume-beeper|--volume-covox|--volume-specdrum)
             # argument required but no completions available
@@ -271,7 +271,7 @@ _fuse()
             --snapshot --snet --sound --sound-device --sound-force-8bit
             --sound-freq --speaker-type --speccyboot --speccyboot-tap
             --specdrum --spectranet --spectranet-disable --speed
-            --statusbar --strict-aspect-hint --svga-modes --tape
+            --statusbar --strict-aspect-hint --tape
             --teletext-addr-1 --teletext-addr-2 --teletext-addr-3
             --teletext-addr-4 --teletext-port-1 --teletext-port-2
             --teletext-port-3 --teletext-port-4 --textfile --traps --ttx2000s
