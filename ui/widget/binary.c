@@ -90,30 +90,41 @@ widget_binary_entry_draw( int index, int highlight )
   widget_display_rasters( binary_entry[index].y, 8 );
 }
 
-/* 0 - all, 1 - filename, 2 - start, 3 - length, 4 - DEC/HEX/OCT */
 static void
-display_values( int what )
+display_filename( void )
 {
-  if( !what || what == 1 ) {
-    const char *fn;
-    fn = widget_binary.filename;
-    while( widget_stringwidth( fn ) >= 136 ) fn++;
-    widget_rectangle( 68, 28, 136, 8, WIDGET_COLOUR_BACKGROUND );
-    widget_printstring( 68, 28, WIDGET_COLOUR_DISABLED, fn );
-    widget_display_lines( 3, 2 );
-  }
-  if( !what || what == 2 ) {
-    widget_rectangle( 68, 40, 136, 8, WIDGET_COLOUR_BACKGROUND );
-    widget_printstring( 68, 40, WIDGET_COLOUR_FOREGROUND,
-                        widget_binary.start_str );
-    widget_display_lines( 5, 1 );
-  }
-  if( !what || what == 3 ) {
-    widget_rectangle( 68, 48, 136, 8, WIDGET_COLOUR_BACKGROUND );
-    widget_printstring( 68, 48, WIDGET_COLOUR_FOREGROUND,
-                        widget_binary.length_str );
-    widget_display_lines( 6, 1 );
-  }
+  const char *fn;
+  fn = widget_binary.filename;
+  while( widget_stringwidth( fn ) >= 136 ) fn++;
+  widget_rectangle( 68, 28, 136, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 68, 28, WIDGET_COLOUR_DISABLED, fn );
+  widget_display_lines( 3, 2 );
+}
+
+static void
+display_start( void )
+{
+  widget_rectangle( 68, 40, 136, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 68, 40, WIDGET_COLOUR_FOREGROUND,
+                      widget_binary.start_str );
+  widget_display_lines( 5, 1 );
+}
+
+static void
+display_length( void )
+{
+  widget_rectangle( 68, 48, 136, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 68, 48, WIDGET_COLOUR_FOREGROUND,
+                      widget_binary.length_str );
+  widget_display_lines( 6, 1 );
+}
+
+static void
+display_all( void )
+{
+  display_filename();
+  display_start();
+  display_length();
 }
 
 int
@@ -125,7 +136,7 @@ widget_binary_draw( void *data )
   widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, widget_binary.title );
   widget_printstring( 16, 28, WIDGET_COLOUR_FOREGROUND, "Filename: " );
 
-  display_values( 0 );
+  display_all();
 
   for( i = 0; binary_entry[i].text != NULL; i++ ) {
     widget_binary_entry_draw( i, ( highlight_entry == i ) );
@@ -155,26 +166,19 @@ ask_filename( void )
 
   widget_binary.filename = utils_safe_strdup( widget_filesel_name );
 
-  display_values( 1 );
+  display_filename();
 }
 
-/* 1 - filename, 2 - start, 3 - length */
 static void
-ask_value( int what )
+ask_start( void )
 {
   long int value;
-  char *s;
+  char *s = widget_binary.start_str;
   widget_text_t text_data;
 
   text_data.allow = WIDGET_INPUT_ALNUM;
   text_data.max_length = 9;
-  if( what == 2 ) {
-    text_data.title = "Enter start value";
-    s = widget_binary.start_str;
-  } else if( what == 3 ) {
-    text_data.title = "Enter length";
-    s = widget_binary.length_str;
-  }
+  text_data.title = "Enter start value";
   snprintf( text_data.text, sizeof( text_data.text ), "%s", s );
   widget_do_text( &text_data );
   if( !widget_text_text ) return;
@@ -185,34 +189,55 @@ ask_value( int what )
     return;
   }
 
-  if( what == 2 ) {
-    if( value < 0 || value > 0xffff ) {
-      ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
-    } else if( value + widget_binary.length > 0x10000 ) {
-      ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
-    } else {
-      free( widget_binary.start_str );
-      widget_binary.start_str = utils_safe_strdup( widget_text_text );
-      widget_binary.start = value;
-    }
-  } else if( what == 3 ) {
-    if( value < 1 || value > 0x10000 ) {
-      ui_error( UI_ERROR_ERROR, "Length must be between 1 and 65536" );
-    } else if( value + widget_binary.start > 0x10000 ) {
-      ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
-    } else if( widget_binary.load && value > widget_binary.file.length ) {
-      ui_error( UI_ERROR_ERROR, "'%s' contains only %lu bytes",
-                widget_binary.filename, (unsigned long)widget_binary.file.length
-                );
-      return;
-    } else {
-      free( widget_binary.length_str );
-      widget_binary.length_str = utils_safe_strdup( widget_text_text );
-      widget_binary.length = value;
-    }
+  if( value < 0 || value > 0xffff ) {
+    ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
+  } else if( value + widget_binary.length > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+  } else {
+    free( widget_binary.start_str );
+    widget_binary.start_str = utils_safe_strdup( widget_text_text );
+    widget_binary.start = value;
   }
 
-  display_values( what );
+  display_start();
+}
+
+static void
+ask_length( void )
+{
+  long int value;
+  char *s = widget_binary.length_str;
+  widget_text_t text_data;
+
+  text_data.allow = WIDGET_INPUT_ALNUM;
+  text_data.max_length = 9;
+  text_data.title = "Enter length";
+  snprintf( text_data.text, sizeof( text_data.text ), "%s", s );
+  widget_do_text( &text_data );
+  if( !widget_text_text ) return;
+
+  value = strtol( widget_text_text, &s, 0 );
+  if( *s != '\0' ) {
+    ui_error( UI_ERROR_ERROR, "Invalid number" );
+    return;
+  }
+
+  if( value < 1 || value > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Length must be between 1 and 65536" );
+  } else if( value + widget_binary.start > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+  } else if( widget_binary.load && value > widget_binary.file.length ) {
+    ui_error( UI_ERROR_ERROR, "'%s' contains only %lu bytes",
+              widget_binary.filename, (unsigned long)widget_binary.file.length
+              );
+    return;
+  } else {
+    free( widget_binary.length_str );
+    widget_binary.length_str = utils_safe_strdup( widget_text_text );
+    widget_binary.length = value;
+  }
+
+  display_length();
 }
 
 static void
@@ -244,13 +269,13 @@ widget_browse_click( void )
 static void
 widget_start_click( void )
 {
-  ask_value( 2 );
+  ask_start();
 }
 
 static void
 widget_length_click( void )
 {
-  ask_value( 3 );
+  ask_length();
 }
 
 static void
