@@ -1,3 +1,11 @@
+2021-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.?.? released.
+
+        * UI improvements:
+         * Timex: don't abort if the Timex dock cartridge image is not
+           found (Alberto Garcia).
+
 2021-02-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.6.0 released.
