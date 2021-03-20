@@ -2,6 +2,9 @@
 
         * Fuse 1.?.? released.
 
+        * Emulation core improvements:
+          * Speed up reading emulated memory locations (Jindřich Makovička).
+
         * UI improvements:
          * Timex: don't abort if the Timex dock cartridge image is not
            found (Alberto Garcia).
