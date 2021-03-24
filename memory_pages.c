@@ -396,10 +396,8 @@ readbyte( libspectrum_word address )
         return spectranet_w5100_read( mapping, address );
     }
 
-    if( ttx2000s_paged ) {
-      if( address >= 0x2000 && address < 0x4000 )
+    if( ttx2000s_paged && address >= 0x2000 )
         return ttx2000s_sram_read( address );
-    }
   }
 
   return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
