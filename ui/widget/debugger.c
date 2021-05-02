@@ -309,7 +309,7 @@ static void display_registers( void )
   show_register0( LC(36), LR(2), "IFF2", IFF2 );
   show_register2( LC(3),  LR(3), "HL",   HL );
   show_register2( LC(12), LR(3), "HL'",  HL_ );
-  widget_printstring_fixed( LC(20), LR(3), 5, "SZ5H3PNC" );
+  widget_printstring_fixed( LC(18), LR(3), 5, "SZ5H3PNC" );
   show_register0( LC(36), LR(3), "HALTED", z80.halted );
   show_register1( LC(36), LR(4), "ULA",  ula_last_byte() );
 
@@ -319,12 +319,12 @@ static void display_registers( void )
   for( i = 0; i < 8; ++i )
     pbuf[i] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
   pbuf[8] = 0;
-  widget_printstring_fixed( LC(20), LR(4), 7, pbuf );
+  widget_printstring_fixed( LC(18), LR(4), 7, pbuf );
 
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY )
-    show_register1( LC(37), LR(4), "AY",
+    show_register1( LC(29), LR(4), "AY",
 		    machine_current->ay.current_register );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )

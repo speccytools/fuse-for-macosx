@@ -8,6 +8,8 @@
         * UI improvements:
          * Timex: don't abort if the Timex dock cartridge image is not
            found (Alberto Garcia).
+         * WidgetUI: rearrange AY register and Z80 flags in the debugger
+           (Gergely Szasz).
 
 2021-02-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
