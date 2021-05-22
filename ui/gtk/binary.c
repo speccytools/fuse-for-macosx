@@ -200,7 +200,7 @@ menu_file_loadbinarydata( GtkAction *gtk_action GCC_UNUSED,
    * If the filename is blank it's not been selected previously.
    * Pop up the file selector.
    */
-  if( !load_info.filename )
+  if( !load_info.filename || !compat_file_exists( load_info.filename ) )
   {
     load_info.filename = ui_get_open_filename( "Fuse - Load Binary Data" );
     if( !load_info.filename )
