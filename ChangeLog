@@ -6,11 +6,15 @@
           * Speed up reading emulated memory locations (Jindřich Makovička).
 
         * UI improvements:
-         * Timex: don't abort if the Timex dock cartridge image is not
-           found (Alberto Garcia).
-         * WidgetUI: rearrange AY register and Z80 flags in the debugger
-           (Gergely Szasz).
-         * GTK UI: Fix loading binary data from deleted files (thanks, Crisis).
+          * Timex: don't abort if the Timex dock cartridge image is not
+            found (Alberto Garcia).
+          * WidgetUI: rearrange AY register and Z80 flags in the debugger
+            (Gergely Szasz).
+          * GTK UI: Fix loading binary data from deleted files (thanks, Crisis)
+            (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Add ZIP files to the bash completion script (Alberto Garcia).
 
 2021-02-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 

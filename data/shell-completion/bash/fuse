@@ -281,7 +281,7 @@ _fuse()
             --zxatasp-write-protect --zxcf --zxcf-cffile --zxcf-upload
             --zxmmc --zxmmc-file --zxprinter' -- "$cur" ) )
     else
-        _filedir '@(csw|CSW|ltp|LTP|pzx|PZX|spc|SPC|sta|STA|tap|TAP|tzx|TZX|wav|WAV|slt|SLT|sna?(pshot)|SNA?(PSHOT)|?(mgt)snp|?(MGT)SNP|sp|SP|szx|SZX|z80|Z80|zxs|ZXS|d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|trd|TRD|udi|UDI|rzx|RZX|dck|DCK|hdf|HDF|mdr|MDR)'
+        _filedir '@(csw|CSW|ltp|LTP|pzx|PZX|spc|SPC|sta|STA|tap|TAP|tzx|TZX|wav|WAV|slt|SLT|sna?(pshot)|SNA?(PSHOT)|?(mgt)snp|?(MGT)SNP|sp|SP|szx|SZX|z80|Z80|zxs|ZXS|d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|trd|TRD|udi|UDI|rzx|RZX|dck|DCK|hdf|HDF|mdr|MDR|zip|ZIP)'
     fi
 } &&
 complete -F _fuse -o filenames fuse
