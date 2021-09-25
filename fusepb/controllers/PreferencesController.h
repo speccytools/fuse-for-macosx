@@ -47,6 +47,7 @@
   IBOutlet NSView *romPrefsView;
   IBOutlet NSView *machinePrefsView;
   IBOutlet NSView *filterPrefsView;
+  IBOutlet NSView *debuggerPrefsView;
 
   JoystickConfigurationController *joystickConfigurationController;
 

@@ -29,7 +29,10 @@ fuse_SOURCES += \
                 debugger/disassemble.c \
                 debugger/event.c \
                 debugger/expression.c \
+                debugger/gdbserver.c \
+                debugger/gdbserver_utils.c \
                 debugger/system_variable.c \
+                debugger/packets.c \
                 debugger/variable.c
 
 debugger/commandl.c: debugger/commandy.c

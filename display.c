@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "display.h"
+#include "debugger/gdbserver.h"
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
 #include "machine.h"
@@ -1031,6 +1032,8 @@ void display_refresh_all(void)
   memset( display_last_screen, 0xff,
           DISPLAY_SCREEN_WIDTH_COLS * DISPLAY_SCREEN_HEIGHT 
           * sizeof(libspectrum_dword) );
+
+  gdbserver_refresh_status();
 }
 
 /* Fetch pixel (x, y). On a Timex this will be a point on a 640x480 canvas,

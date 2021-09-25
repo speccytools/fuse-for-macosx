@@ -33,6 +33,9 @@
 
 #ifdef WIN32
 #include <winsock2.h>
+#else
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #endif
 
 /* Remove the gcc-specific incantations if we're not using gcc */

@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include "fuse.h"
+#include "utils.h"
 #include "ui/ui.h"
 #include "w5100.h"
 #include "w5100_internals.h"
@@ -145,8 +146,8 @@ nic_w5100_alloc( void )
   int error;
   int i;
   nic_w5100_t *self;
-  
-  compat_socket_networking_init();
+
+  utils_networking_init();
 
   self = libspectrum_new( nic_w5100_t, 1 );
 

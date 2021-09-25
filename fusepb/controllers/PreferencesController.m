@@ -555,7 +555,9 @@
     prefsView = machinePrefsView;
   } else if( [sender isEqualToString:@"Video"] ) {
     prefsView = filterPrefsView;
-  }
+  } else if( [sender isEqualToString:@"Debugger"] ) {
+     prefsView = debuggerPrefsView;
+   }
 
   // to stop flicker, we make a temp blank view.
   NSView *tempView = [[NSView alloc] initWithFrame:[[window contentView] frame]];
