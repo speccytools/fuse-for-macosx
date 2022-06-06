@@ -605,8 +605,8 @@ static DisplayOpenGLView *instance = nil;
   GLuint i;
 
   [[self openGLContext] makeCurrentContext];
-  [[self openGLContext] update];
-
+  [self performSelectorOnMainThread:@selector(update) withObject:[self openGLContext] waitUntilDone:YES];
+  
   glGenTextures( MAX_SCREEN_BUFFERS, screenTexId );
 
   for(i = 0; i < MAX_SCREEN_BUFFERS; i++)
