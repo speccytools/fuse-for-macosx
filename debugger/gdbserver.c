@@ -235,7 +235,7 @@ static uint8_t process_packet()
         return 0;
     }
   
-    printf("r: %.*s\n", inbuf_size, inbuf);
+    // printf("r: %.*s\n", inbuf_size, inbuf);
   
     if (inbuf_size >= 1 && *inbuf == INTERRUPT_CHAR)
     {
@@ -934,7 +934,7 @@ static uint8_t action_step_instruction(const void* arg, void* response)
 
 int gdbserver_activate()
 {
-    printf("Execution stopped: trapped.\n");
+    // printf("Execution stopped: trapped.\n");
 
     if (gdbserver_do_not_report_trap == 0)
     {
@@ -983,7 +983,7 @@ int gdbserver_activate()
     if (halt == 0)
     {
         debugger_mode = DEBUGGER_MODE_ACTIVE;
-        printf("Execution resumed.\n");
+        // printf("Execution resumed.\n");
     }
     else
     {
