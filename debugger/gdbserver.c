@@ -44,6 +44,7 @@ static pthread_t network_thread_id;
 static trapped_action_t scheduled_action = NULL;
 static const void* scheduled_action_data = NULL;
 static void* scheduled_action_response = NULL;
+static uint8_t scheduled_action_response_delivered = 0;
 
 static pthread_cond_t trapped_cond;
 static pthread_cond_t response_cond;
@@ -62,7 +63,9 @@ static libspectrum_word* registers[] = {
     &AF_,
     &BC_,
     &DE_,
-    &HL_
+    &HL_,
+    &CLOCKL,
+    &CLOCKH
 };
 
 static uint8_t gdbserver_detrap();
@@ -564,6 +567,10 @@ static void* network_thread(void* arg)
         int ret;
         while ((ret = process_network(gdbserver_client_socket)) == 0) ;
         printf("Socket closed: %d\n", gdbserver_client_socket);
+        
+        debugger_breakpoint_remove_all();
+        printf("Deleted all breakpoints.\n");
+        
         compat_socket_close(gdbserver_client_socket);
         gdbserver_client_socket = -1;
 
@@ -731,14 +738,20 @@ static uint8_t gdbserver_execute_on_main_thread(trapped_action_t call, const voi
     scheduled_action = call;
     scheduled_action_data = data;
     scheduled_action_response = response;
+    scheduled_action_response_delivered = 0;
 
     // execute
     pthread_cond_signal(&trapped_cond);
     pthread_mutex_unlock(&trap_process_mutex);
+    
+    pthread_yield_np();
 
     pthread_mutex_lock(&trap_process_mutex);
     // wait for the response
-    pthread_cond_wait(&response_cond, &trap_process_mutex);
+    while (scheduled_action_response_delivered == 0)
+    {
+        pthread_cond_wait(&response_cond, &trap_process_mutex);
+    }
     pthread_mutex_unlock(&trap_process_mutex);
     return 1;
 }
@@ -959,7 +972,8 @@ int gdbserver_activate()
         {
             halt = scheduled_action(scheduled_action_data, scheduled_action_response);
             scheduled_action = NULL;
-          
+            scheduled_action_response_delivered = 1;
+            
             // notify the waiter that we're done
             pthread_cond_signal(&response_cond);
         }

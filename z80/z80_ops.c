@@ -354,6 +354,9 @@ z80_do_opcodes( void )
 
   end_opcode:
     PC++; R++;
+    if (++CLOCKL == 0) {
+      CLOCKH++;
+    }
     last_Q = Q; /* keep Q value from previous opcode for SCF and CCF */
     Q = 0;      /* preempt Q value assuming next opcode doesn't set flags */
 

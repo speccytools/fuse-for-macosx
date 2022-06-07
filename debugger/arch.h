@@ -18,6 +18,8 @@
     "<reg name=\"bc'\" bitsize=\"16\" type=\"int\"/>"\
     "<reg name=\"de'\" bitsize=\"16\" type=\"int\"/>"\
     "<reg name=\"hl'\" bitsize=\"16\" type=\"int\"/>"\
+    "<reg name=\"clockl\" bitsize=\"16\" type=\"int\"/>"\
+    "<reg name=\"clockh\" bitsize=\"16\" type=\"int\"/>"\
     "</feature>"\
     "<architecture>z80</architecture>"\
     "</target>"

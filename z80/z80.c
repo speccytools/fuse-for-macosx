@@ -152,6 +152,8 @@ static void z80_init_tables(void)
 void
 z80_reset( int hard_reset )
 {
+  CLOCKL = 0;
+  CLOCKH = 0;
   AF =AF_=0xffff;
   I=R=R7=0;
   PC=0;

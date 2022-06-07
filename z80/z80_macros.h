@@ -78,6 +78,9 @@
 #define R  z80.r
 #define R7 z80.r7
 
+#define CLOCKH  z80.clockh
+#define CLOCKL  z80.clockl
+
 #define IFF1 z80.iff1
 #define IFF2 z80.iff2
 #define IM   z80.im

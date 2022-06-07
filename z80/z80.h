@@ -48,6 +48,9 @@ typedef struct {
   int iff2_read;
   libspectrum_byte iff1, iff2, im;
   int halted;
+  
+  libspectrum_word clockl;
+  libspectrum_word clockh;
 
   /* Presumably, internal register where Z80 assembles the new content of the
      F register, before moving it back to F. The behaviour is deterministic in
