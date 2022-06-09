@@ -265,7 +265,7 @@ static uint8_t process_packet()
         return 1;
     }
   
-    char recv_data[1024];
+    static char recv_data[8196];
     strcpy(recv_data, (char*)&inbuf[1]);
     inbuf_erase_head(packetend + 3);
   
