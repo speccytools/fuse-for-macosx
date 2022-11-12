@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -34,56 +34,74 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5" userLabel="Preferences" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="24" y="202" width="632" height="403"/>
+            <rect key="contentRect" x="24" y="202" width="807" height="403"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="632" height="403"/>
+                <rect key="frame" x="0.0" y="0.0" width="807" height="403"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             </view>
             <toolbar key="toolbar" implicitIdentifier="2B5EC7EB-5A6C-4F96-8405-91E5B21A019C" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="1279">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="75749378-6992-4894-9B4C-43B464285D3E" label="General" paletteLabel="General" image="NSPreferencesGeneral" autovalidates="NO" id="1287">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1296"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="1D3C684F-4B0A-4828-ADF3-E4106D08C1CD" label="Sound" paletteLabel="Sound" tag="1" image="Sound" autovalidates="NO" id="1288">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1297"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="4F5A5E26-7A02-464D-80D8-F49DECE3E69B" label="Peripherals" paletteLabel="Peripherals" tag="2" image="Peripherals" autovalidates="NO" id="1289">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1298"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="BE697B6E-7F18-4D78-9F89-364AF4806055" label="Recording" paletteLabel="Recording" tag="3" image="RZX" autovalidates="NO" id="1290">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1299"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="F897F259-A5D7-4274-A9C8-9D7D7C86199E" label="Inputs" paletteLabel="Inputs" tag="4" image="qs2t_icon" autovalidates="NO" id="1291">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1300"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="D64DF5CD-B687-4DAB-8B9B-CB7BCB98DECE" label="ROM" paletteLabel="ROM" tag="5" image="Select_ROMs" autovalidates="NO" id="1292">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1301"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="FD445694-259E-4F31-A40E-117D01F46BB6" label="Machine" paletteLabel="Machine" tag="6" image="Machine" autovalidates="NO" id="1293">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1302"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="2C4BF74A-9900-4A0E-A2FC-50ADDA64B166" label="Video" paletteLabel="Video" tag="7" image="Graphics_Filter" autovalidates="NO" id="1294">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="1303"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="845D751E-C14A-488D-809A-A86120524F62" label="Debugger" paletteLabel="Debugger" tag="7" image="debug" autovalidates="NO" id="uKw-Zp-8C2" userLabel="Debugger">
+                        <size key="minSize" width="22" height="22"/>
+                        <size key="maxSize" width="22" height="22"/>
                         <connections>
                             <action selector="selectPrefPanel:" target="-2" id="e14-J6-1Cs"/>
                         </connections>
@@ -108,7 +126,7 @@
                 <outlet property="delegate" destination="-2" id="504"/>
                 <outlet property="initialFirstResponder" destination="6" id="1305"/>
             </connections>
-            <point key="canvasLocation" x="-560" y="133.5"/>
+            <point key="canvasLocation" x="-451.5" y="133.5"/>
         </window>
         <customView id="1347" userLabel="General">
             <rect key="frame" x="0.0" y="0.0" width="576" height="299"/>
@@ -1440,20 +1458,19 @@
                 <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1587">
                     <rect key="frame" x="20" y="20" width="137" height="303"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <clipView key="contentView" ambiguous="YES" id="RVo-Sg-mDk">
-                        <rect key="frame" x="1" y="0.0" width="135" height="302"/>
+                    <clipView key="contentView" id="RVo-Sg-mDk">
+                        <rect key="frame" x="1" y="1" width="135" height="301"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1631" id="1634">
-                                <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <rect key="frame" x="0.0" y="0.0" width="135" height="284"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1635">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Machines">
-                                            <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                         </tableHeaderCell>
@@ -1582,20 +1599,19 @@
                 <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1597">
                     <rect key="frame" x="-149" y="171" width="137" height="303"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <clipView key="contentView" ambiguous="YES" id="7ih-tq-3PK">
-                        <rect key="frame" x="1" y="0.0" width="135" height="302"/>
+                    <clipView key="contentView" id="7ih-tq-3PK">
+                        <rect key="frame" x="1" y="1" width="135" height="301"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1612" id="1615">
-                                <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <rect key="frame" x="0.0" y="0.0" width="135" height="284"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1616">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Machines">
-                                            <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
                                         </tableHeaderCell>

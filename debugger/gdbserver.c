@@ -403,7 +403,10 @@ static uint8_t process_packet()
                     gdbserver_detrap();
                 }
             }
-          
+            else
+            {
+                write_packet("E01");
+            }
           
             break;
         }

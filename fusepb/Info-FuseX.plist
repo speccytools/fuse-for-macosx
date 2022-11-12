@@ -581,7 +581,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>Fuse</string>
+	<string>FuseX</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Free Unix Spectrum Emulator</string>
 	<key>CFBundleHelpBookFolder</key>
@@ -604,6 +604,8 @@
 	<string>FUSE</string>
 	<key>CFBundleVersion</key>
 	<string>1.5.6</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.games</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

@@ -114,3 +114,6 @@ xcuserdata
 /fusepb/settings.h
 /fusepb/settings.m
 .DS_Store
+/fusepb/DerivedData
+/fusepb/FuseHelp/.jekyll-cache
+/fusepb/FuseX.xcodeproj/xcshareddata

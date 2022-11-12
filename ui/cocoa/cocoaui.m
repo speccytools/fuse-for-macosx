@@ -67,7 +67,7 @@ int
 ui_statusbar_update_speed( float speed )
 {
   [[FuseController singleton] performSelectorOnMainThread:@selector(setTitle:)
-              withObject:[NSString stringWithFormat:@"Fuse - %3.0f%%", speed]
+              withObject:[NSString stringWithFormat:@"FuseX - %3.0f%%", speed]
               waitUntilDone:NO];
 
   return 0;

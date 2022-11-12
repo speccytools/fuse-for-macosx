@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 47;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -226,8 +226,8 @@
 		B6D0E1091CFD54B800202683 /* svg.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D0E1071CFD54B800202683 /* svg.c */; };
 		B6D0E10B1CFD54D400202683 /* uimedia.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D0E10A1CFD54D400202683 /* uimedia.c */; };
 		B6D65C3718A6431500170B64 /* gcrypt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; };
-		B6D65C3818A645A100170B64 /* gcrypt.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; };
-		B6D670501DD6D2440014914E /* FuseHelp.help in Resources */ = {isa = PBXBuildFile; fileRef = B6D670451DD6CB6B0014914E /* FuseHelp.help */; };
+		B6D65C3818A645A100170B64 /* gcrypt.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		B6D670501DD6D2440014914E /* FuseXHelp.help in Resources */ = {isa = PBXBuildFile; fileRef = B6D670451DD6CB6B0014914E /* FuseXHelp.help */; };
 		B6D71DD21F6A94750000D666 /* divmmc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DCC1F6A94750000D666 /* divmmc.c */; };
 		B6D71DD31F6A94750000D666 /* divxxx.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DCE1F6A94750000D666 /* divxxx.c */; };
 		B6D71DD41F6A94750000D666 /* zxmmc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DD01F6A94750000D666 /* zxmmc.c */; };
@@ -287,7 +287,7 @@
 		B6F5E1801EE16CA70005178D /* covox.c in Sources */ = {isa = PBXBuildFile; fileRef = B6F5E17E1EE16CA70005178D /* covox.c */; };
 		B6F66E351E473D68005B270A /* memory_pages.c in Sources */ = {isa = PBXBuildFile; fileRef = B6F66E331E473D68005B270A /* memory_pages.c */; };
 		B6FA759D0C1D7507007F5A10 /* audiofile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; };
-		B6FA75C60C1D76A5007F5A10 /* audiofile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; };
+		B6FA75C60C1D76A5007F5A10 /* audiofile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D15E8F93259F5C0C0006FC79 /* gdbserver_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F8D259F5C0B0006FC79 /* gdbserver_utils.c */; };
 		D15E8F94259F5C0C0006FC79 /* packets.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F8F259F5C0B0006FC79 /* packets.c */; };
 		D15E8F95259F5C0C0006FC79 /* gdbserver.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F91259F5C0B0006FC79 /* gdbserver.c */; };
@@ -306,7 +306,8 @@
 			outputFiles = (
 				"${SRCROOT}/libspectrum.h",
 			);
-			script = "perl -p ${SRCROOT}/generate.pl ${INPUT_FILE_PATH} > ${SRCROOT}/libspectrum.h";
+			runOncePerArchitecture = 0;
+			script = "perl -p ${SRCROOT}/generate.pl ${INPUT_FILE_PATH} > ${SRCROOT}/libspectrum.h\n";
 		};
 		B6DCBC47114FA3E100DC9A11 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -320,7 +321,8 @@
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).c",
 				"$(DERIVED_FILE_DIR)/tape_set.c",
 			);
-			script = "perl ${SRCROOT}/libspectrum/tape_accessors.pl ${INPUT_FILE_PATH} > ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c\nperl ${SRCROOT}/libspectrum/tape_set.pl ${INPUT_FILE_PATH} > ${DERIVED_FILE_DIR}/tape_set.c";
+			runOncePerArchitecture = 0;
+			script = "perl ${SRCROOT}/libspectrum/tape_accessors.pl ${INPUT_FILE_PATH} > ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c\nperl ${SRCROOT}/libspectrum/tape_set.pl ${INPUT_FILE_PATH} > ${DERIVED_FILE_DIR}/tape_set.c\n";
 		};
 		B6DCBC48114FA3E100DC9A11 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -333,7 +335,8 @@
 			outputFiles = (
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).c",
 			);
-			script = "perl ${SRCROOT}/libspectrum/accessor.pl ${INPUT_FILE_PATH} > ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c";
+			runOncePerArchitecture = 0;
+			script = "perl ${SRCROOT}/libspectrum/accessor.pl ${INPUT_FILE_PATH} > ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c\n";
 		};
 /* End PBXBuildRule section */
 
@@ -422,7 +425,7 @@
 		B61700F6163EAFC600142336 /* PokeMemoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PokeMemoryController.m; path = controllers/PokeMemoryController.m; sourceTree = "<group>"; };
 		B61EEB950D1A917D006FEA80 /* FuseGenerator.qlgenerator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.bundle"; name = FuseGenerator.qlgenerator; path = ../../FuseGenerator/build/Release/FuseGenerator.qlgenerator; sourceTree = SOURCE_ROOT; };
 		B61F46A909121DF100C8096C /* Info-Fuse.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Fuse.plist"; sourceTree = "<group>"; };
-		B61F46AA09121DF200C8096C /* Fuse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fuse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B61F46AA09121DF200C8096C /* FuseX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FuseX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B621A11E062E92FB00F63DBC /* if2.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = if2.c; sourceTree = "<group>"; };
 		B621A11F062E92FB00F63DBC /* if2.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = if2.h; sourceTree = "<group>"; };
 		B6251C3D0C2EB24500BD5543 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
@@ -648,7 +651,7 @@
 		B6D2989105B061CB00C2AA14 /* MemoryBrowserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemoryBrowserController.h; path = controllers/MemoryBrowserController.h; sourceTree = "<group>"; };
 		B6D2989205B061CB00C2AA14 /* MemoryBrowserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MemoryBrowserController.m; path = controllers/MemoryBrowserController.m; sourceTree = "<group>"; };
 		B6D65C3618A6431500170B64 /* gcrypt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gcrypt.framework; path = ../../libgcrypt/build/Deployment/gcrypt.framework; sourceTree = "<group>"; };
-		B6D670451DD6CB6B0014914E /* FuseHelp.help */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuseHelp.help; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6D670451DD6CB6B0014914E /* FuseXHelp.help */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuseXHelp.help; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6D670471DD6CB6B0014914E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6D71DCC1F6A94750000D666 /* divmmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = divmmc.c; sourceTree = "<group>"; };
 		B6D71DCD1F6A94750000D666 /* divmmc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = divmmc.h; sourceTree = "<group>"; };
@@ -748,6 +751,7 @@
 		D15E8F90259F5C0B0006FC79 /* packets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = packets.h; sourceTree = "<group>"; };
 		D15E8F91259F5C0B0006FC79 /* gdbserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gdbserver.c; sourceTree = "<group>"; };
 		D15E8F92259F5C0C0006FC79 /* gdbserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gdbserver.h; sourceTree = "<group>"; };
+		D1DA9AD7291EF817001911F7 /* FuseX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FuseX.entitlements; sourceTree = "<group>"; };
 		D1DF6DD726F8077F004A4AB7 /* debug.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = debug.png; sourceTree = "<group>"; };
 		F520C8BC038D022E01A804BA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		F536B56503A0C275011517A0 /* utils.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = utils.c; path = ../utils.c; sourceTree = SOURCE_ROOT; };
@@ -891,8 +895,8 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B61F46AA09121DF200C8096C /* Fuse.app */,
-				B6D670451DD6CB6B0014914E /* FuseHelp.help */,
+				B61F46AA09121DF200C8096C /* FuseX.app */,
+				B6D670451DD6CB6B0014914E /* FuseXHelp.help */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -900,6 +904,7 @@
 		29B97314FDCFA39411CA2CEA /* Fuse */ = {
 			isa = PBXGroup;
 			children = (
+				D1DA9AD7291EF817001911F7 /* FuseX.entitlements */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -1599,9 +1604,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B61F459009121DF100C8096C /* Fuse */ = {
+		B61F459009121DF100C8096C /* FuseX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B61F46A509121DF100C8096C /* Build configuration list for PBXNativeTarget "Fuse" */;
+			buildConfigurationList = B61F46A509121DF100C8096C /* Build configuration list for PBXNativeTarget "FuseX" */;
 			buildPhases = (
 				B61F459109121DF100C8096C /* ShellScript */,
 				B61F459209121DF100C8096C /* CopyFiles */,
@@ -1620,15 +1625,15 @@
 			dependencies = (
 				B6D6704F1DD6D1430014914E /* PBXTargetDependency */,
 			);
-			name = Fuse;
+			name = FuseX;
 			productInstallPath = "$(HOME)/Applications";
 			productName = Fuse;
-			productReference = B61F46AA09121DF200C8096C /* Fuse.app */;
+			productReference = B61F46AA09121DF200C8096C /* FuseX.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B6D670441DD6CB6B0014914E /* FuseHelp */ = {
+		B6D670441DD6CB6B0014914E /* FuseXHelp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B6D6704B1DD6CB6B0014914E /* Build configuration list for PBXNativeTarget "FuseHelp" */;
+			buildConfigurationList = B6D6704B1DD6CB6B0014914E /* Build configuration list for PBXNativeTarget "FuseXHelp" */;
 			buildPhases = (
 				B6D670411DD6CB6B0014914E /* Sources */,
 				B6D670421DD6CB6B0014914E /* Frameworks */,
@@ -1639,9 +1644,9 @@
 			);
 			dependencies = (
 			);
-			name = FuseHelp;
+			name = FuseXHelp;
 			productName = FuseHelp;
-			productReference = B6D670451DD6CB6B0014914E /* FuseHelp.help */;
+			productReference = B6D670451DD6CB6B0014914E /* FuseXHelp.help */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -1658,7 +1663,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B63319B3086803BA00732AA3 /* Build configuration list for PBXProject "Fuse" */;
+			buildConfigurationList = B63319B3086803BA00732AA3 /* Build configuration list for PBXProject "FuseX" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1672,8 +1677,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B61F459009121DF100C8096C /* Fuse */,
-				B6D670441DD6CB6B0014914E /* FuseHelp */,
+				B61F459009121DF100C8096C /* FuseX */,
+				B6D670441DD6CB6B0014914E /* FuseXHelp */,
 			);
 		};
 /* End PBXProject section */
@@ -1742,7 +1747,7 @@
 				B61159C50EEE99FA0029FEA3 /* qs2t_icon.png in Resources */,
 				B61159C70EEE9A080029FEA3 /* RZX.png in Resources */,
 				B61159C90EEE9A140029FEA3 /* Select_ROMs.png in Resources */,
-				B6D670501DD6D2440014914E /* FuseHelp.help in Resources */,
+				B6D670501DD6D2440014914E /* FuseXHelp.help in Resources */,
 				B61159CB0EEE9A1E0029FEA3 /* Sound.png in Resources */,
 				B665EE031052A29F00FCFED8 /* Debugger.xib in Resources */,
 				B665EE081052A34700FCFED8 /* JoystickConfiguration.xib in Resources */,
@@ -1779,7 +1784,8 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = make;
+			shellScript = "make
+";
 		};
 		B6D6704D1DD6CEF10014914E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2010,7 +2016,7 @@
 /* Begin PBXTargetDependency section */
 		B6D6704F1DD6D1430014914E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B6D670441DD6CB6B0014914E /* FuseHelp */;
+			target = B6D670441DD6CB6B0014914E /* FuseXHelp */;
 			targetProxy = B6D6704E1DD6D1430014914E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -2030,9 +2036,13 @@
 		B61F46A609121DF100C8096C /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 48UV5KV3FB;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					../../,
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
@@ -2052,17 +2062,20 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
 					..,
+					"/Users/desertkun/Documents/Work/fuse-for-macos/fuse/fusepb",
+					/usr/local/include,
 				);
-				INFOPLIST_FILE = "Info-Fuse.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
+				INFOPLIST_FILE = "Info-FuseX.plist";
+				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
 				OTHER_CFLAGS = "";
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-lz",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = FusePreferences;
-				PRODUCT_NAME = Fuse;
+				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
+				PRODUCT_NAME = FuseX;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -2076,9 +2089,13 @@
 		B61F46A709121DF100C8096C /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 48UV5KV3FB;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					../../,
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
@@ -2097,17 +2114,20 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
 					..,
+					"/Users/desertkun/Documents/Work/fuse-for-macos/fuse/fusepb",
+					/usr/local/include,
 				);
-				INFOPLIST_FILE = "Info-Fuse.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
+				INFOPLIST_FILE = "Info-FuseX.plist";
+				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
 				OTHER_CFLAGS = "";
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-lz",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = FusePreferences;
-				PRODUCT_NAME = Fuse;
+				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
+				PRODUCT_NAME = FuseX;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -2121,8 +2141,12 @@
 		B61F46A809121DF100C8096C /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 48UV5KV3FB;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					../../,
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
@@ -2141,17 +2165,20 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
 					..,
+					"/Users/desertkun/Documents/Work/fuse-for-macos/fuse/fusepb",
+					/usr/local/include,
 				);
-				INFOPLIST_FILE = "Info-Fuse.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
+				INFOPLIST_FILE = "Info-FuseX.plist";
+				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
 				OTHER_CFLAGS = "";
+				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-lz",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = FusePreferences;
-				PRODUCT_NAME = Fuse;
+				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
+				PRODUCT_NAME = FuseX;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -2164,6 +2191,7 @@
 		B63319B4086803BA00732AA3 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_TESTABILITY = YES;
@@ -2179,6 +2207,7 @@
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				YACCFLAGS = "-d";
@@ -2190,6 +2219,7 @@
 		B63319B5086803BA00732AA3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -2204,6 +2234,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				YACCFLAGS = "-d";
@@ -2215,6 +2246,7 @@
 		B63319B6086803BA00732AA3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = c89;
@@ -2227,6 +2259,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				YACCFLAGS = "-d";
@@ -2386,7 +2419,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B61F46A509121DF100C8096C /* Build configuration list for PBXNativeTarget "Fuse" */ = {
+		B61F46A509121DF100C8096C /* Build configuration list for PBXNativeTarget "FuseX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B61F46A609121DF100C8096C /* Development */,
@@ -2396,7 +2429,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		B63319B3086803BA00732AA3 /* Build configuration list for PBXProject "Fuse" */ = {
+		B63319B3086803BA00732AA3 /* Build configuration list for PBXProject "FuseX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B63319B4086803BA00732AA3 /* Development */,
@@ -2406,7 +2439,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		B6D6704B1DD6CB6B0014914E /* Build configuration list for PBXNativeTarget "FuseHelp" */ = {
+		B6D6704B1DD6CB6B0014914E /* Build configuration list for PBXNativeTarget "FuseXHelp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B6D670481DD6CB6B0014914E /* Development */,
