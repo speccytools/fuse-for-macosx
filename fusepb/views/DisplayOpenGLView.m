@@ -550,16 +550,12 @@ static DisplayOpenGLView *instance = nil;
   [view_lock unlock];
 }
 
-/* scrolled, moved or resized */
--(void) reshape
+-(void) doReshape
 {
   [view_lock lock];
   NSRect rect;
 
-  [super reshape];
-
   [[self openGLContext] makeCurrentContext];
-  [[self openGLContext] update];
 
   rect = [self bounds];
 
@@ -570,9 +566,18 @@ static DisplayOpenGLView *instance = nil;
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
+  
+  [[self openGLContext] update];
 
   statusbar_updated = YES;
   [view_lock unlock];
+}
+
+/* scrolled, moved or resized */
+-(void) reshape
+{
+  [super reshape];
+  [self performSelectorOnMainThread:@selector(doReshape) withObject:self waitUntilDone:NO];
 }
 
 -(void) destroyTexture

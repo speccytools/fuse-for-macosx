@@ -241,4 +241,6 @@
 -(void) displayLinkStop;
 -(void) displayLinkStart;
 
+-(void) doReshape;
+
 @end
