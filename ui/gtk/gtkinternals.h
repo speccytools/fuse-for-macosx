@@ -1,4 +1,4 @@
-/* gtkinternals.h: stuff internal to the GTK+ UI
+/* gtkinternals.h: stuff internal to the GTK UI
    Copyright (c) 2003-2015 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 #define FUSE_GTKINTERNALS_H
 
 #include <gtk/gtk.h>
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /*
  * Display routines (gtkdisplay.c)
@@ -51,8 +51,7 @@ int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
  * Mouse routines (gtkmouse.c)
  */
 
-gboolean gtkmouse_position( GtkWidget*, GdkEventMotion*, gpointer );
-gboolean gtkmouse_button( GtkWidget*, GdkEventButton*, gpointer);
+void gtkmouse_init( void );
 
 /*
  * General user interface routines (gtkui.c)
@@ -118,11 +117,8 @@ GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 
 GtkWidget *gtkstock_dialog_new( const gchar *title, GCallback destroy );
 
-typedef PangoFontDescription *gtkui_font;
-
-int gtkui_get_monospaced_font( gtkui_font *font );
-void gtkui_free_font( gtkui_font font );
-void gtkui_set_font( GtkWidget *widget, gtkui_font font );
+int gtkui_get_monospaced_font( PangoFontDescription **font );
+void gtkui_free_font( PangoFontDescription *font );
 
 int gtkui_menubar_get_height( void );
 

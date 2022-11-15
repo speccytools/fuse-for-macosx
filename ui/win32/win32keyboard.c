@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@
 #include <glib.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "display.h"
 #include "fuse.h"

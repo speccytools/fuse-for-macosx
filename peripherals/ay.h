@@ -25,7 +25,7 @@
 #ifndef FUSE_AY_H
 #define FUSE_AY_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #define AY_REGISTERS 16
 

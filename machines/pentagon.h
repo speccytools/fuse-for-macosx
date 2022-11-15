@@ -25,7 +25,7 @@
 #ifndef FUSE_PENTAGON_H
 #define FUSE_PENTAGON_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "machine.h"
 

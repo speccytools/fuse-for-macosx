@@ -25,7 +25,7 @@
 #ifndef FUSE_IF1_H
 #define FUSE_IF1_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* IF1 */
 extern int if1_active;

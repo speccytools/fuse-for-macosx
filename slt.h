@@ -24,7 +24,7 @@
 #ifndef FUSE_SLT_H
 #define FUSE_SLT_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void slt_register_startup( void );
 

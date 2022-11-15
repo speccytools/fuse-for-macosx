@@ -26,7 +26,7 @@
 #ifndef FUSE_IF2_H
 #define FUSE_IF2_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* IF2 cart inserted? */
 extern int if2_active;

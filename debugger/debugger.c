@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include "debugger.h"
 #include "gdbserver.h"

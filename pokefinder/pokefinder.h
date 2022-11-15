@@ -24,7 +24,7 @@
 #ifndef FUSE_POKEFINDER_H
 #define FUSE_POKEFINDER_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 extern libspectrum_byte pokefinder_possible[][ MEMORY_PAGE_SIZE ];
 extern libspectrum_byte pokefinder_impossible[][ MEMORY_PAGE_SIZE / 8 ];

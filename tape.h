@@ -25,7 +25,7 @@
 #ifndef FUSE_TAPE_H
 #define FUSE_TAPE_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void tape_register_startup( void );
 

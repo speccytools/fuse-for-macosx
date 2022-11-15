@@ -29,7 +29,7 @@
 #define PROP_UNDERLINE_FONT     TEXT("_Hyperlink_Underline_Font_")
 
 
-LRESULT CALLBACK 
+static LRESULT CALLBACK
 _HyperlinkParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   WNDPROC pfnOrigProc = (WNDPROC) GetProp(hwnd, PROP_ORIGINAL_PROC);
@@ -58,7 +58,7 @@ _HyperlinkParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
   return CallWindowProc(pfnOrigProc, hwnd, message, wParam, lParam);
 }
 
-LRESULT CALLBACK 
+static LRESULT CALLBACK
 _HyperlinkProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   WNDPROC pfnOrigProc = (WNDPROC) GetProp(hwnd, PROP_ORIGINAL_PROC);

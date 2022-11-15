@@ -25,7 +25,7 @@
 #ifndef FUSE_ZXCF_H
 #define FUSE_ZXCF_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void zxcf_register_startup( void );
 int zxcf_insert( const char *filename );

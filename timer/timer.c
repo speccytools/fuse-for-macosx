@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include "event.h"
 #include "infrastructure/startup_manager.h"

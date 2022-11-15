@@ -18,7 +18,7 @@ partially reimplemented in C by Gergely Szasz for FUSE
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <limits.h>
 #include <string.h>

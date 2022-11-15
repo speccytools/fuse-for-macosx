@@ -1,8 +1,7 @@
 /* am29f010.c 1Mbit flash chip emulation
-   
    Emulates the AMD 29F010 flash chip
 
-   Copyright (c) 2011-2015 Guesser, Philip Kendall
+   Copyright (c) 2011-2015 Alistair Cree, Philip Kendall
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +19,7 @@
  
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 

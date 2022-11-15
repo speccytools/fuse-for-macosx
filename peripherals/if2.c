@@ -24,7 +24,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
@@ -49,6 +49,7 @@ static int if2_memory_source;
 
 static void if2_reset( int hard_reset );
 static void if2_memory_map( void );
+static void if2_enabled_snapshot( libspectrum_snap *snap );
 static void if2_from_snapshot( libspectrum_snap *snap );
 static void if2_to_snapshot( libspectrum_snap *snap );
 
@@ -56,7 +57,7 @@ static module_info_t if2_module_info = {
 
   /* .reset = */ if2_reset,
   /* .romcs = */ if2_memory_map,
-  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_enabled = */ if2_enabled_snapshot,
   /* .snapshot_from = */ if2_from_snapshot,
   /* .snapshot_to = */ if2_to_snapshot,
 
@@ -163,6 +164,12 @@ if2_memory_map( void )
   if( !if2_active ) return;
 
   memory_map_romcs_full( if2_memory_map_romcs );
+}
+
+static void
+if2_enabled_snapshot( libspectrum_snap *snap )
+{
+  settings_current.interface2 = libspectrum_snap_interface2_active( snap );
 }
 
 static void

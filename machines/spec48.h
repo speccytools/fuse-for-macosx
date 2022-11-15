@@ -24,7 +24,7 @@
 #ifndef FUSE_SPEC48_H
 #define FUSE_SPEC48_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "machine.h"
 

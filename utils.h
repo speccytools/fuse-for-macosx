@@ -24,7 +24,7 @@
 #ifndef FUSE_UTILS_H
 #define FUSE_UTILS_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "compat.h"
 
@@ -56,7 +56,7 @@ int utils_read_screen( const char *filename, utils_file *screen );
 char* utils_safe_strdup( const char *src );
 
 int
-utils_save_binary( libspectrum_word start, libspectrum_word length,
+utils_save_binary( libspectrum_word start, size_t length,
                    const char *filename );
 
 void utils_networking_init( void );

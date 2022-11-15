@@ -1,6 +1,5 @@
 /* menu.c: general menu callbacks
-   Copyright (c) 2004-2017 Philip Kendall, Alex Badea, Sergio Baldoví,
-     Stuart Brady, Gergely Szasz, Stefano Bodrato, Fredrick Meunier
+   Copyright (c) 2004-2018 Philip Kendall and others
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +21,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "event.h"
 #include "fuse.h"
@@ -293,7 +292,8 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
   case  8: menu_select_peripheral_roms( "Multiface 3",     7, 1 ); return;
   case  9: menu_select_peripheral_roms( "Opus Discovery",  8, 1 ); return;
   case 10: menu_select_peripheral_roms( "SpeccyBoot",      9, 1 ); return;
-  case 11: menu_select_peripheral_roms( "uSource",        10, 1 ); return;
+  case 11: menu_select_peripheral_roms( "TTX2000S",       10, 1 ); return;
+  case 12: menu_select_peripheral_roms( "uSource",        11, 1 ); return;
 
   }
 

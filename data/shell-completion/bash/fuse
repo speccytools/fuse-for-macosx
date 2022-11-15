@@ -88,10 +88,10 @@ _fuse()
             return 0
             ;;
         --graphics-filter|-g)
-            COMPREPLY=( $( compgen -W '2x 2xsai 3x advmame2x
-                advmame3x dotmatrix half halfskip hq2x hq3x normal
-                super2xsai supereagle timex15x timextv tv2x paltv
-                paltv2x paltv3x' -- "$cur" ) )
+            COMPREPLY=( $( compgen -W '2x 2xsai 3x 4x advmame2x
+                advmame3x dotmatrix half halfskip hq2x hq3x hq4x normal
+                super2xsai supereagle timex15x timex2x timextv tv2x tv3x tv4x
+                paltv paltv2x paltv3x paltv4x' -- "$cur" ) )
             return 0
             ;;
         --graphicsfile)
@@ -170,7 +170,8 @@ _fuse()
         --joystick-keyboard-output|--joystick-keyboard-right| \
         --joystick-keyboard-up|--mdr-len|--rate| \
         --sdl-fullscreen-mode|--snet|--sound-device|-d| \
-        --sound-freq|-f|--speccyboot-tap|--speed|--svga-modes|--volume-ay| \
+        --sound-freq|-f|--speccyboot-tap|--speed| \
+        --teletext-addr-[1-4]|--teletext-port-[1-4]|--volume-ay| \
         --volume-beeper|--volume-covox|--volume-specdrum)
             # argument required but no completions available
             return 0
@@ -242,8 +243,8 @@ _fuse()
             --no-rzx-autosaves --no-simpleide --no-slt --no-sound
             --no-sound-force-8bit --no-speccyboot --no-specdrum
             --no-spectranet --no-spectranet-disable --no-statusbar
-            --no-strict-aspect-hint --no-traps --no-unittests --no-usource
-            --no-writable-roms --no-zxatasp --no-zxatasp-upload
+            --no-strict-aspect-hint --no-traps --no-ttx2000s --no-unittests
+            --no-usource --no-writable-roms --no-zxatasp --no-zxatasp-upload
             --no-zxatasp-write-protect --no-zxcf --no-zxcf-upload --no-zxmmc
             --no-zxprinter --opus --opusdisk --pal-tv2x --phantom-typist-mode
             --playback --plus3-detect-speedlock --plus3disk --plusd --plusddisk
@@ -263,20 +264,24 @@ _fuse()
             --rom-scorpion-1 --rom-scorpion-2 --rom-scorpion-3
             --rom-speccyboot --rom-spec-se-0 --rom-spec-se-1
             --rom-tc2048 --rom-tc2068-0 --rom-tc2068-1 --rom-ts2068-0
-            --rom-ts2068-1 --rom-usource --rs232-handshake --rs232-rx
-            --rs232-tx --rzx-autosaves --sdl-fullscreen-mode --separation
+            --rom-ts2068-1 --rom-ttx2000s --rom-usource
+            --rs232-handshake --rs232-rx --rs232-tx
+            --rzx-autosaves --sdl-fullscreen-mode --separation
             --simpleide --simpleide-masterfile --simpleide-slavefile --slt
             --snapshot --snet --sound --sound-device --sound-force-8bit
             --sound-freq --speaker-type --speccyboot --speccyboot-tap
             --specdrum --spectranet --spectranet-disable --speed
-            --statusbar --strict-aspect-hint --svga-modes --tape
-            --textfile --traps --unittests --usource --version --volume-ay
+            --statusbar --strict-aspect-hint --tape
+            --teletext-addr-1 --teletext-addr-2 --teletext-addr-3
+            --teletext-addr-4 --teletext-port-1 --teletext-port-2
+            --teletext-port-3 --teletext-port-4 --textfile --traps --ttx2000s
+            --unittests --usource --version --volume-ay
             --volume-beeper --volume-covox --volume-specdrum --writable-roms
             --zxatasp --zxatasp-masterfile --zxatasp-slavefile --zxatasp-upload
             --zxatasp-write-protect --zxcf --zxcf-cffile --zxcf-upload
             --zxmmc --zxmmc-file --zxprinter' -- "$cur" ) )
     else
-        _filedir '@(csw|CSW|ltp|LTP|pzx|PZX|spc|SPC|sta|STA|tap|TAP|tzx|TZX|wav|WAV|slt|SLT|sna?(pshot)|SNA?(PSHOT)|?(mgt)snp|?(MGT)SNP|sp|SP|szx|SZX|z80|Z80|zxs|ZXS|d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|trd|TRD|udi|UDI|rzx|RZX|dck|DCK|hdf|HDF|mdr|MDR)'
+        _filedir '@(csw|CSW|ltp|LTP|pzx|PZX|spc|SPC|sta|STA|tap|TAP|tzx|TZX|wav|WAV|slt|SLT|sna?(pshot)|SNA?(PSHOT)|?(mgt)snp|?(MGT)SNP|sp|SP|szx|SZX|z80|Z80|zxs|ZXS|d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|trd|TRD|udi|UDI|rzx|RZX|dck|DCK|hdf|HDF|mdr|MDR|zip|ZIP)'
     fi
 } &&
 complete -F _fuse -o filenames fuse

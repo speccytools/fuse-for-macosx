@@ -27,7 +27,7 @@
 #ifndef FUSE_UPD_FDC_H
 #define FUSE_UPD_FDC_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "event.h"
 #include "fdd.h"

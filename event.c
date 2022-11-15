@@ -21,11 +21,11 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "event.h"
 #include "infrastructure/startup_manager.h"

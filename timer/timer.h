@@ -24,7 +24,7 @@
 #ifndef FUSE_TIMER_H
 #define FUSE_TIMER_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 int timer_estimate_reset( void );
 int timer_estimate_speed( void );

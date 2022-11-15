@@ -1,4 +1,4 @@
-/* debugger.c: the GTK+ debugger
+/* debugger.c: the GTK debugger
    Copyright (c) 2002-2015 Philip Kendall
    Copyright (c) 2013 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady
@@ -24,7 +24,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -33,7 +33,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger/debugger.h"
 #include "event.h"
@@ -121,11 +121,11 @@ static void toggle_display_disassembly( GtkToggleAction* action,
                                         gpointer data );
 static void toggle_display_stack( GtkToggleAction* action, gpointer data );
 static void toggle_display_events( GtkToggleAction* action, gpointer data );
-static int create_register_display( GtkBox *parent, gtkui_font font );
+static int create_register_display( GtkBox *parent, PangoFontDescription *font );
 static int create_memory_map( GtkBox *parent );
 static void create_breakpoints( GtkBox *parent );
-static void create_disassembly( GtkBox *parent, gtkui_font font );
-static void create_stack_display( GtkBox *parent, gtkui_font font );
+static void create_disassembly( GtkBox *parent, PangoFontDescription *font );
+static void create_stack_display( GtkBox *parent, PangoFontDescription *font );
 static void stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
 			    GtkTreeViewColumn *column, gpointer user_data );
 static void create_events( GtkBox *parent );
@@ -357,7 +357,7 @@ create_dialog( void )
   GtkWidget *hbox, *vbox, *hbox2, *content_area;
   GtkAccelGroup *accel_group;
 
-  gtkui_font font;
+  PangoFontDescription *font;
 
   error = gtkui_get_monospaced_font( &font ); if( error ) return error;
 
@@ -500,7 +500,7 @@ toggle_display_events( GtkToggleAction* action, gpointer data GCC_UNUSED )
 }
 
 static int
-create_register_display( GtkBox *parent, gtkui_font font )
+create_register_display( GtkBox *parent, PangoFontDescription *font )
 {
   size_t i;
 
@@ -519,8 +519,16 @@ create_register_display( GtkBox *parent, gtkui_font font )
   gtk_box_pack_start( parent, register_display, FALSE, FALSE, 0 );
 
   for( i = 0; i < 18; i++ ) {
+    PangoAttrList *list;
+    PangoAttribute *attr;
+
     registers[i] = gtk_label_new( "" );
-    gtkui_set_font( registers[i], font );
+
+    list = pango_attr_list_new();
+    attr = pango_attr_font_desc_new( font );
+    pango_attr_list_insert( list, attr );
+    gtk_label_set_attributes( GTK_LABEL( registers[i] ), list );
+    pango_attr_list_unref( list );
 
 #if GTK_CHECK_VERSION( 3, 0, 0 )
     gtk_grid_attach( GTK_GRID( register_display ), registers[i],
@@ -601,7 +609,7 @@ create_breakpoints( GtkBox *parent )
 }
 
 static void
-create_disassembly( GtkBox *parent, gtkui_font font )
+create_disassembly( GtkBox *parent, PangoFontDescription *font )
 {
   size_t i;
 
@@ -649,7 +657,7 @@ create_disassembly( GtkBox *parent, gtkui_font font )
 }
 
 static void
-create_stack_display( GtkBox *parent, gtkui_font font )
+create_stack_display( GtkBox *parent, PangoFontDescription *font )
 {
   size_t i;
   static const gchar *const titles[] = { "Address", "Instruction" };

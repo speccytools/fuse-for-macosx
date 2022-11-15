@@ -22,6 +22,7 @@
 
 lib_files = \
             lib/cassette.bmp \
+            lib/keyboard.png \
             lib/keyboard.scr \
             lib/microdrive.bmp \
             lib/plus3disk.bmp

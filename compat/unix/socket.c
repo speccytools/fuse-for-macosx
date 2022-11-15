@@ -21,11 +21,12 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "compat.h"
 #include "fuse.h"
@@ -49,6 +50,16 @@ void
 compat_socket_networking_end( void )
 {
   /* No action necessary */
+}
+
+int
+compat_socket_blocking_mode( compat_socket_t fd, int blocking )
+{
+  int flags = fcntl( fd, F_GETFL, 0 );
+  if( flags == -1 )
+    return -1;
+  flags = blocking ? ( flags | O_NONBLOCK ) : ( flags & ~O_NONBLOCK );
+  return ( fcntl( fd, F_SETFL, flags ) != 0 );
 }
 
 int
@@ -103,7 +114,8 @@ compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *se
 void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
 {
   const char dummy = 0;
-  write( self->write_fd, &dummy, 1 );
+  ssize_t unused = write( self->write_fd, &dummy, 1 );
+  (void) unused;
 }
 
 void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )

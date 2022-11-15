@@ -1,4 +1,4 @@
-/* memory.c: the GTK+ memory browser
+/* memory.c: the GTK memory browser
    Copyright (c) 2004-2005 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
@@ -22,7 +22,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -56,7 +56,7 @@ update_display( GtkTreeModel *model, libspectrum_word base )
 
   gchar buffer[ 8 + 64 + 20 ];
   gchar *text[] = { &buffer[0], &buffer[ 8 ], &buffer[ 8 + 64 ] };
-  char buffer2[ 8 ];
+  char buffer2[ 4 ];
 
   memaddr = base;
   gtk_list_store_clear( GTK_LIST_STORE( model ) );
@@ -154,7 +154,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
   GtkAdjustment *adjustment;
   GtkTreeModel *model;
   int error;
-  gtkui_font font;
+  PangoFontDescription *font;
 
   fuse_emulation_pause();
 
@@ -170,7 +170,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   /* The list itself */
   list = create_mem_list();
-  gtkui_set_font( list, font );
+  gtk_widget_override_font( list, font );
   model = gtk_tree_view_get_model( GTK_TREE_VIEW( list ) );
   update_display( GTK_TREE_MODEL( model ), memaddr );
   gtk_box_pack_start( GTK_BOX( box ), list, TRUE, TRUE, 0 );

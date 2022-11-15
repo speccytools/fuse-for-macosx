@@ -1,6 +1,5 @@
 # settings.dat: configuration options for Fuse
-# Copyright (c) 2002-2017 Philip Kendall
-# Copyright (c) 2003-2005 Fredrick Meunier
+# Copyright (c) 2002-2018 Philip Kendall, Alistair Cree
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -84,6 +83,7 @@ speccyboot, boolean, 0
 specdrum, boolean, 0
 spectranet, boolean, 0
 spectranet_disable, boolean, 0
+ttx2000s, boolean, 0
 usource, boolean, 0
 zxprinter, boolean, 1
 covox, boolean, 0
@@ -268,6 +268,7 @@ rom_multiface128, string, "mf128.rom",
 rom_multiface3, string, "mf3.rom",
 rom_opus, string, "opus.rom",
 rom_speccyboot, string, "speccyboot-1.4.rom",
+rom_ttx2000s, string, "ttx2000s.rom",
 rom_usource, string, "usource.rom",
 
 drive_plus3a_type, string, "Single-sided 40 track", option_enumerate_string_diskoptions_drive_plus3a_type
@@ -297,3 +298,13 @@ recent_snapshots, nsarray, nil,,, recentsnapshots
 preferences_tab, numeric, 0,,, preferencestab
 bilinear_filter, boolean, 0,,, bilinear
 full_screen_panorama, boolean, 1
+
+teletext_addr_1, string, "127.0.0.1"
+teletext_addr_2, string, "127.0.0.1"
+teletext_addr_3, string, "127.0.0.1"
+teletext_addr_4, string, "127.0.0.1"
+teletext_port_1, numeric, 19761
+teletext_port_2, numeric, 19762
+teletext_port_3, numeric, 19763
+teletext_port_4, numeric, 19764
+

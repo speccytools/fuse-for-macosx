@@ -23,7 +23,7 @@
 #ifndef FUSE_AM29F010_H
 #define FUSE_AM29F010_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 typedef struct flash_am29f010_t flash_am29f010_t;
 

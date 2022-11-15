@@ -24,7 +24,7 @@
 #ifndef FUSE_LOADER_H
 #define FUSE_LOADER_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void loader_frame( libspectrum_dword frame_length );
 void loader_tape_play( void );

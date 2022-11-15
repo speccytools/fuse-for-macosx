@@ -22,7 +22,7 @@ Some thanks (in alphabetical order):
 
 * Ivan Ruiz Etxabe: for helping test RZX competition mode recording.
 
-* Martin Garton: making the GTK+ user interface compatible with GTK+ 2.0,
+* Martin Garton: making the GTK user interface compatible with GTK 2.0,
   although I then went and broke it in other ways.
 
 * Ian Greenway: for information about reading from unattached ports. If
@@ -59,6 +59,9 @@ Some thanks (in alphabetical order):
   the code as this has already been done by Fred :-(
 
 * David Muriel: for helping test RZX competition mode recording.
+
+* Andrew Owen: for providing the PNG keyboard image used in GTK and
+  win32 UIs.
 
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.

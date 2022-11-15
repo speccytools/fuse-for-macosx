@@ -21,13 +21,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <tchar.h>
 #include <windows.h>
 
 #include "fuse.h"
 #include "hyperlinks.h"
+#include "menu.h"
 #include "win32internals.h"
 
 #include "about.h"
@@ -35,6 +36,9 @@
 
 static INT_PTR CALLBACK dialog_proc( HWND hwndDlg, UINT uMsg,
                                      WPARAM wParam, LPARAM lParam );
+
+/* About window handle */
+HWND fuse_hABOWnd;
 
 static HFONT hBoldFont;
 

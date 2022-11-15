@@ -25,7 +25,7 @@
 #ifndef FUSE_MEMORY_PAGES_H
 #define FUSE_MEMORY_PAGES_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* Register a new memory source */
 int memory_source_register( const char *description );

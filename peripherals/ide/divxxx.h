@@ -24,7 +24,7 @@
 #ifndef FUSE_DIVXXX_H
 #define FUSE_DIVXXX_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* Type definition */
 

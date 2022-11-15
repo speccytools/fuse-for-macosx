@@ -32,7 +32,7 @@ Fuse has been brought to you by:
 * Matthew Wescott: the AY logging code.
 
 * Marek Januszewski: Some patches making Fuse much closer to compiling under
-  Win32, and fixing up the GTK+ 2.0 interface.
+  Win32, and fixing up the GTK 2.0 interface.
 
 * Sergio Baldoví: improvements to the Win32 UI.
 

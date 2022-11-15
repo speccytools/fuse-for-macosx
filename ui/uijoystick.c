@@ -34,7 +34,7 @@
  * #endif
  */
 
-#include <config.h>
+#include "config.h"
 
 #include "input.h"
 #include "uijoystick.h"
@@ -47,7 +47,7 @@
 
 #include <jsw.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "keyboard.h"

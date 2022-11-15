@@ -1,3 +1,111 @@
+2021-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.?.? released.
+
+        * Emulation core improvements:
+          * Speed up reading emulated memory locations (Jindřich Makovička).
+
+        * UI improvements:
+          * Timex: don't abort if the Timex dock cartridge image is not
+            found (Alberto Garcia).
+          * WidgetUI: rearrange AY register and Z80 flags in the debugger
+            (Gergely Szasz).
+          * GTK UI: Fix loading binary data from deleted files (thanks, Crisis)
+            (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Add ZIP files to the bash completion script (Alberto Garcia).
+
+2021-02-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.6.0 released.
+
+        * New features:
+          * Add TTX2000S emulation (Guesser).
+          * Experimental PulseAudio sound driver (Grzegorz Jablonski and Sergio
+            Baldoví).
+
+        * Emulation core improvements:
+          * Fix activation of joystick and IF2 peripherals when loading a
+            snapshot (thanks, ICEknight) (Sergio Baldoví).
+
+        * UI improvements:
+          * New higher resolution keyboard picture on GTK and win32 UIs
+            (thanks, Andrew Owen for the picture) (Sergio Baldoví and Philip
+            Kendall).
+          * GTK UI: Add Fuse icon to the about dialog and the main window
+            (Alberto Garcia).
+          * GTK UI: Load/save binary dialog remembers last values (Derek
+            Fountain).
+          * GTK 3 UI: Improve moving and sizing Fuse's window under Wayland
+            (Sergio Baldoví).
+          * GTK 3 UI: Fix kempston mouse values on Wayland (thanks, Philip
+            Kendall) (Sergio Baldoví).
+          * GTK 3 UI: Fix bug when resizing from 2x to 3x on GTK UI (Sergio
+            Baldoví)
+          * SDL UI: Fix crash when using dispmanx backend on the Raspberry Pi
+            (Jools Wills).
+          * SDL UI: Allow forcing fullscreen mode when SDL doesn't report
+            available screen modes (Sergio Baldoví).
+          * WidgetUI: New dialog to load/save binary data (Gergely Szasz).
+          * WidgetUI: Enable HOME and END keys in menus on widget UIs (Gergely
+            Szasz).
+          * WidgetUI: Use monospaced characters on memory browser (Gergely
+            Szasz).
+          * WidgetUI: Fix crash when trying to overwrite read-only files (Pedro
+            Luis Rodríguez González).
+          * Win32: Fix bitwise operation in debugger (Sergio Baldoví).
+          * Xlib UI: Try to keep graphic filter when the user resize the window
+            (Gergely Szasz).
+
+        * Scaler improvements:
+          * Fix display corruption with HQ 3x scaler (thanks, Philip Kendall)
+            (Sergio Baldoví).
+          * Fix antialiasing effect of AdvMAME3x scaler (Sergio Baldoví).
+          * Add 4x, TV 4x, Pal TV 4x and HQ 4x scalers on GTK, SDL, win32 and
+            Xlib UIs (Sergio Baldoví and Gergely Szasz).
+          * Allow screenshots with TV 3x, PAL TV and Timex 1.5x scalers (Sergio
+            Baldoví).
+
+        * Miscellaneous improvements:
+          * Allow selection of audio driver at build time (thanks, kov_serg)
+            (Alberto Garcia).
+          * Support of SDL 2 for joystick and audio drivers (Alberto Garcia).
+          * Fix GTK 3 build when the GTK version is < 3.20 (thanks, Thrice)
+            (Alberto Garcia).
+          * Fix GTK build with Wayland, Quartz and Windows backends (thanks,
+            Stuart Brady) (Sergio Baldoví).
+          * Various fixes to allow compilation with GCC 10 (Alberto Garcia and
+            Sergio Baldoví).
+          * Suppress a couple of -Wunused-result warnings from gcc (Alberto
+            Garcia).
+          * Improve error message when opening a directory from the command
+            line (thanks, Philip Kendall) (Alberto Garcia and Sergio Baldoví).
+
+2018-12-09  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.5.7 released.
+
+        * UI improvements:
+          * GTK+ 3: Make the offset entry wider in memory browser (Derek
+            Fountain).
+          * GTK+: Remove duplicated surface creation code (Philip Kendall).
+          * GTK+: Remove use of deprecated gtk_device_(un)grab functions
+            (Philip Kendall).
+          * GTK+/Win32: Add *.bin as an allowed filetype to file selectors and
+            amend .fmf filetype (thanks, Allan Turvey) (Sergio Baldoví).
+          * Improve Fuse's window sizing under Wayland; still not right, but
+            better than it was before (Sergio Baldoví).
+          * Improve Fuse's Kempston mouse handling under GTK+ 3.x (Philip
+            Kendall).
+          * Stop Kempston mouse causing a crash under Wayland; still doesn't
+            work properly though (Philip Kendall).
+
+        * Miscellaneous improvements:
+          * "Save binary" command can now save 65536 bytes again (regression
+            introduced in 1.5.6; thanks, thrice) (Philip Kendall).
+          * Remove gcc 8 string overflow warnings (Philip Kendall).
+
 2018-08-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.5.6 released.

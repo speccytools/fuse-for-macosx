@@ -28,7 +28,7 @@
  * Well, `based' is an understatement, it's almost exactly the same. :-)
  */
    
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <string.h>

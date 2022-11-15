@@ -22,7 +22,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <SDL.h>
 #include <libspectrum.h>
@@ -52,7 +52,7 @@ ui_joystick_init( void )
   error = SDL_InitSubSystem( SDL_INIT_JOYSTICK );
 #else
   /* Other UIs could handle joysticks by the SDL library */
-  error = SDL_Init(SDL_INIT_JOYSTICK|SDL_INIT_VIDEO);
+  error = SDL_Init( SDL_INIT_JOYSTICK );
 #endif
 
   if ( error ) {

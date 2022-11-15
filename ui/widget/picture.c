@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include "display.h"
 #include "ui/uidisplay.h"

@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -37,6 +37,13 @@ struct compat_socket_selfpipe_t {
   SOCKET self_socket;
   libspectrum_word port;
 };
+
+int
+compat_socket_blocking_mode( compat_socket_t fd, int blocking )
+{
+  u_long mode = blocking ? 1 : 0;
+  return ( ioctlsocket( fd, FIONBIO, &mode ) );
+}
 
 int
 compat_socket_close( compat_socket_t fd )

@@ -22,14 +22,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "peripherals/if1.h"
@@ -113,13 +113,13 @@ print_error_to_stderr( ui_error_level severity, const char *message )
      informational */
   if( severity > UI_ERROR_INFO ) {
 
-    /* For the fb and svgalib UIs, we don't want to write to stderr if
+    /* For the fb UI, we don't want to write to stderr if
        it's a terminal, as it's then likely to be what we're currently
        using for graphics output, and writing text to it isn't a good
        idea. Things are OK if we're exiting though */
-#if defined( UI_FB ) || defined( UI_SVGA )
+#ifdef UI_FB
     if( isatty( STDERR_FILENO ) && !fuse_exiting ) return 1;
-#endif			/* #if defined( UI_FB ) || defined( UI_SVGA ) */
+#endif			/* #ifdef UI_FB */
 
     fprintf( stderr, "%s: ", fuse_progname );
 
@@ -193,7 +193,9 @@ void
 ui_mouse_suspend( void )
 {
   mouse_grab_suspended = ui_mouse_grabbed ? 2 : 1;
-  ui_mouse_grabbed = ui_mouse_release( 1 );
+
+  if( ui_mouse_grabbed )
+    ui_mouse_grabbed = ui_mouse_release( 1 );
 }
 
 void

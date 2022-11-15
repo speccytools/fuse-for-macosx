@@ -24,7 +24,7 @@
 
 %{
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>		/* Needed by NetBSD yacc */
 #include <stdlib.h>

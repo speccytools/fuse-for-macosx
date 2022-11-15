@@ -22,9 +22,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
@@ -84,15 +84,15 @@ const char *joystick_connection[ JOYSTICK_CONN_COUNT ] = {
   "Joystick 2",
 };
 
-static void joystick_from_snapshot( libspectrum_snap *snap );
+static void joystick_enabled_snapshot( libspectrum_snap *snap );
 static void joystick_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t joystick_module_info = {
 
   /* .reset = */ NULL,
   /* .romcs = */ NULL,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ joystick_from_snapshot,
+  /* .snapshot_enabled = */ joystick_enabled_snapshot,
+  /* .snapshot_from = */ NULL,
   /* .snapshot_to = */ joystick_to_snapshot,
 
 };
@@ -123,7 +123,7 @@ static const periph_t kempston_loose_periph = {
 
 /* Init/shutdown functions. Errors aren't important here */
 
-int
+static int
 joystick_init( void *context )
 {
   joysticks_supported = ui_joystick_init();
@@ -137,7 +137,7 @@ joystick_init( void *context )
   return 0;
 }
 
-void
+static void
 joystick_end( void )
 {
   ui_joystick_end();
@@ -263,7 +263,7 @@ joystick_fuller_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attach
 }
 
 static void
-joystick_from_snapshot( libspectrum_snap *snap )
+joystick_enabled_snapshot( libspectrum_snap *snap )
 {
   size_t i;
   size_t num_joysticks = libspectrum_snap_joystick_active_count( snap );

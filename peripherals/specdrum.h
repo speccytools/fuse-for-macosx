@@ -26,7 +26,7 @@
 #ifndef FUSE_SPECDRUM_H
 #define FUSE_SPECDRUM_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 typedef struct specdrum_info {
   libspectrum_signed_byte specdrum_dac; /* Current byte in the SpecDrum 8bit DAC */

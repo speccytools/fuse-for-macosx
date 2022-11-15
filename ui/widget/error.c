@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <ctype.h>
 #include <stddef.h>
@@ -105,6 +105,7 @@ split_message( const char *message, char ***lines, size_t *count,
 
     /* Skip any whitespace */
     while( *ptr && isspace( *ptr ) ) ptr++;
+    if( *ptr == '\0' ) break;
     message = ptr;
 
     /* Find end of word */

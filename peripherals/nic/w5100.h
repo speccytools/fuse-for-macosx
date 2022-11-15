@@ -27,7 +27,7 @@
 #ifndef FUSE_W5100_H
 #define FUSE_W5100_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 typedef struct nic_w5100_t nic_w5100_t;
 

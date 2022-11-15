@@ -21,13 +21,13 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #ifdef HAVE_LIB_GLIB
 #include <glib.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "startup_manager.h"
 #include "ui/ui.h"
@@ -53,7 +53,7 @@ startup_manager_init( void )
     g_array_new( FALSE, FALSE, sizeof( startup_manager_end_fn ) );
 }
 
-void
+static void
 startup_manager_end( void )
 {
   g_array_free( registered_modules, TRUE );

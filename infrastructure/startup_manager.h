@@ -1,5 +1,5 @@
 /* startup_manager.h: handle Fuse's startup routines
-   Copyright (c) 2016-2017 Philip Kendall
+   Copyright (c) 2016-2018 Philip Kendall, Alistair Cree
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ typedef enum startup_manager_module {
   STARTUP_MANAGER_MODULE_PSG,
   STARTUP_MANAGER_MODULE_RZX,
   STARTUP_MANAGER_MODULE_SCLD,
+  STARTUP_MANAGER_MODULE_SCREENSHOT,
   STARTUP_MANAGER_MODULE_SETTINGS_END,
   STARTUP_MANAGER_MODULE_SETUID,
   STARTUP_MANAGER_MODULE_SIMPLEIDE,
@@ -71,6 +72,7 @@ typedef enum startup_manager_module {
   STARTUP_MANAGER_MODULE_SPECTRANET,
   STARTUP_MANAGER_MODULE_SPECTRUM,
   STARTUP_MANAGER_MODULE_TAPE,
+  STARTUP_MANAGER_MODULE_TTX2000S,
   STARTUP_MANAGER_MODULE_TIMER,
   STARTUP_MANAGER_MODULE_ULA,
   STARTUP_MANAGER_MODULE_USOURCE,

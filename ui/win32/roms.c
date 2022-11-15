@@ -22,12 +22,13 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <tchar.h>
 #include <windows.h>
 
 #include "fuse.h"
+#include "menu.h"
 #include "roms.h"
 #include "settings.h"
 #include "ui/ui.h"

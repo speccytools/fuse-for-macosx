@@ -23,7 +23,7 @@
 
 #define _POSIX_THREADS
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 #include <errno.h>

@@ -33,7 +33,7 @@
           because WIN32_LEAN_AND_MEAN is defined along the way somewhere */
 #include <mmsystem.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #define ID_STATUSBAR 900
 
@@ -43,26 +43,31 @@
 #endif
 
 /* window handler */
-HWND fuse_hWnd;
+extern HWND fuse_hWnd;
 
 /* application instance */
-HINSTANCE fuse_hInstance;
+extern HINSTANCE fuse_hInstance;
 
 /* status bar handle */
-HWND fuse_hStatusWindow;
+extern HWND fuse_hStatusWindow;
 
 /* pokefinder window handle */
-HWND fuse_hPFWnd;
+extern HWND fuse_hPFWnd;
 
 /* debugger window handle */
-HWND fuse_hDBGWnd;
+extern HWND fuse_hDBGWnd;
 
 /* about window handle */
-HWND fuse_hABOWnd;
+extern HWND fuse_hABOWnd;
 
 /*
  * Display routines (win32display.c)
  */
+
+/* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
+   DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
+   creating via the scalers */
+#define MAX_SCALE 4
 
 /* The colour palette in use */
 extern libspectrum_dword win32display_colours[16];
@@ -105,7 +110,12 @@ void win32ui_fuse_resize( int width, int height );
 
 int win32ui_confirm( const char *string );
 
-int win32ui_picture( const char *filename, int border );
+typedef enum win32ui_picture_format {
+  PICTURE_SCR,
+  PICTURE_PNG,
+} win32ui_picture_format;
+
+int win32ui_picture( const char *filename, win32ui_picture_format format );
 
 int win32ui_get_monospaced_font( HFONT *font );
 void win32ui_set_font( HWND hDlg, int nIDDlgItem, HFONT font );

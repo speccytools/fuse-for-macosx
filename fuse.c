@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2017 Philip Kendall and others
+   Copyright (c) 1999-2018 Philip Kendall and others
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -39,7 +39,7 @@
 
 /* We need to include SDL.h on Mac O X and Windows to do some magic
    bootstrapping by redefining main. As we now allow SDL joystick code to be
-   used in the GTK+ and Xlib UIs we need to also do the magic when that code is
+   used in the GTK and Xlib UIs we need to also do the magic when that code is
    in use, feel free to look away for the next line */
 #if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
 #include <SDL.h>		/* Needed on MacOS X and Windows */
@@ -88,6 +88,7 @@
 #include "peripherals/scld.h"
 #include "peripherals/speccyboot.h"
 #include "peripherals/spectranet.h"
+#include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
 #include "phantom_typist.h"
@@ -95,6 +96,7 @@
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "slt.h"
 #include "snapshot.h"
@@ -268,7 +270,7 @@ setuid_init( void *context )
 }
 
 static void
-setuid_register_startup()
+setuid_register_startup( void )
 {
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DISPLAY,
@@ -322,6 +324,7 @@ run_startup_manager( int *argc, char ***argv )
   psg_register_startup();
   rzx_register_startup();
   scld_register_startup();
+  screenshot_register_startup();
   settings_register_startup();
   setuid_register_startup();
   simpleide_register_startup();
@@ -332,6 +335,7 @@ run_startup_manager( int *argc, char ***argv )
   spectranet_register_startup();
   spectrum_register_startup();
   tape_register_startup();
+  ttx2000s_register_startup();
   timer_register_startup();
   ula_register_startup();
   usource_register_startup();
@@ -413,7 +417,7 @@ creator_init( void *context )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
-  char *custom, osname[ 256 ];
+  char *custom, osname[ 192 ];
   static const size_t CUSTOM_SIZE = 256;
   
   libspectrum_error error; int sys_error;

@@ -23,7 +23,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -89,9 +89,6 @@ typedef struct widget_recurse_t {
 } widget_recurse_t;
 
 static widget_recurse_t widget_return[10]; /* The stack to recurse on */
-
-/* The settings used whilst playing with an options dialog box */
-settings_info widget_options_settings;
 
 static int widget_read_font( const char *filename )
 {
@@ -183,12 +180,13 @@ printchar( int x, int y, int col, int ch )
 }
 
 int
-widget_printstring( int x, int y, int col, const char *s )
+widget_printstring1( int x, int y, int col, const char *s, int ms )
 {
-  int c;
+  int ms_x, c;
   int shadow = 0;
   if( !s ) return x;
 
+  ms_x = x;
   while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
 	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
     if( col == WIDGET_COLOUR_DISABLED && c < 26 ) continue;
@@ -206,6 +204,9 @@ widget_printstring( int x, int y, int col, const char *s )
       x = printchar( x, y, (col & 7) ^ 8, c );
     } else
       x = printchar( x, y, col, c );
+
+    if( ms )
+      ms_x = x = ms_x + 8;
   }
   return x;
 }
@@ -220,7 +221,7 @@ widget_printstring_fixed( int x, int y, int col, const char *s )
   while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
 	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
     widget_printchar_fixed(x, y, col, c);
-    ++x;
+    x += 8;
   }
   return x;
 }
@@ -231,8 +232,6 @@ widget_printchar_fixed( int x, int y, int col, int c )
   int mx, my;
   int inverse = 0;
   const widget_font_character *bitmap;
-
-  x *= 8; y *= 8;
 
   if( c < 128 )
     bitmap = widget_char( c );
@@ -262,12 +261,13 @@ void widget_print_title( int y, int col, const char *s )
 {
   char buffer[128];
   snprintf( buffer, sizeof( buffer ), "\x0A%s", s );
-  widget_printstring( 128 - widget_stringwidth( buffer ) / 2, y, col, buffer );
+  widget_printstring1( 128 - widget_stringwidth( buffer ) / 2, y, col, buffer,
+                       0 );
 }
 
 void widget_printstring_right( int x, int y, int col, const char *s )
 {
-  widget_printstring( x - widget_stringwidth( s ), y, col, s );
+  widget_printstring1( x - widget_stringwidth( s ), y, col, s, 0 );
 }
 
 size_t widget_stringwidth( const char *s )
@@ -279,8 +279,10 @@ size_t widget_substringwidth( const char *s, size_t count )
 {
   size_t width = 0;
   int c;
-  if( !s )
+
+  if( !s || !count )
     return 0;
+
   while( count-- && (c = *(libspectrum_byte *)s++) != 0 ) {
     if( c < 18 )
       continue;
@@ -691,6 +693,7 @@ widget_t widget_data[] = {
   { widget_query_draw,    widget_query_finish,	 widget_query_keyhandler    },
   { widget_query_save_draw,widget_query_finish,	 widget_query_save_keyhandler },
   { widget_diskoptions_draw, widget_options_finish, widget_diskoptions_keyhandler  },
+  { widget_binary_draw, widget_binary_finish, widget_binary_keyhandler  },
 };
 
 #ifndef UI_SDL

@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "display.h"
 #include "peripherals/ay.h"

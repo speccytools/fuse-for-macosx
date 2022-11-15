@@ -17,7 +17,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 /* Dummy functions for when we don't have a sound device; should never be
    called, so just abort if they are */
@@ -27,7 +27,8 @@
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
-  fuse_abort();
+  /* Audio driver not initialised */
+  return 1;
 }
 
 void

@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <tchar.h>
 
@@ -55,6 +55,9 @@ ui_statusbar_state icons_status[5] = {
 int icons_part_width = 140; /* will be calculated dynamically later */
 int icons_part_height = 27;
 int icons_part_margin = 2;
+
+/* Status bar handle */
+HWND fuse_hStatusWindow;
 
 void
 win32statusbar_create( HWND hWnd )

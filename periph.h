@@ -1,7 +1,6 @@
 /* periph.h: code for handling peripherals
-   Copyright (c) 2004-2016 Philip Kendall
-   Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2004-2018 Philip Kendall, Stuart Brady, Gergely Szasz,
+     Alistair Cree
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,7 +25,7 @@
 #ifndef FUSE_PERIPH_H
 #define FUSE_PERIPH_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* The types of peripheral Fuse knows about */
 typedef enum periph_type {
@@ -72,6 +71,7 @@ typedef enum periph_type {
   PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */
   PERIPH_TYPE_SPECDRUM,       /* SpecDrum interface */
   PERIPH_TYPE_SPECTRANET,     /* Spectranet interface */
+  PERIPH_TYPE_TTX2000S,       /* Volex TTX2000S */
   PERIPH_TYPE_ULA,            /* Standard ULA */
   PERIPH_TYPE_ULA_FULL_DECODE,/* Standard ULA responding only to 0xfe */
   PERIPH_TYPE_UPD765,         /* +3 uPD765 FDC */

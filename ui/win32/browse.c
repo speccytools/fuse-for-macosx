@@ -22,13 +22,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 #include <tchar.h>
 #include <windows.h>
 
 #include "fuse.h"
+#include "menu.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "win32internals.h"

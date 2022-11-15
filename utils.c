@@ -26,7 +26,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #ifdef HAVE_LIBGEN_H
@@ -36,7 +36,7 @@
 #include <ui/ui.h>
 #include <unistd.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "fuse.h"
 #include "machines/specplus3.h"
@@ -453,7 +453,7 @@ utils_safe_strdup( const char *src )
 }
 
 int
-utils_save_binary( libspectrum_word start, libspectrum_word length,
+utils_save_binary( libspectrum_word start, size_t length,
                    const char *filename )
 {
   libspectrum_byte *buffer;

@@ -24,14 +24,14 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 /* FIXME: is that needed?
 #include <stdio.h>
 #include <string.h>
 */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 #include <stdlib.h>
 #include <tchar.h>
 #include <windows.h>
@@ -111,6 +111,9 @@ static INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
 static LRESULT CALLBACK
 disassembly_listview_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
+/* Debugger window handle */
+HWND fuse_hDBGWnd;
+
 /* The top line of the current disassembly */
 static libspectrum_word disassembly_top;
 
@@ -184,8 +187,8 @@ hide_hidden_panes( void )
     mii.cbSize = sizeof( MENUITEMINFO );
     if( ! GetMenuItemInfo( GetMenu( fuse_hDBGWnd ), checkitem, FALSE, &mii ) )
       return 1;
-    
-    if( mii.fState && MFS_CHECKED ) continue;
+
+    if( mii.fState & MFS_CHECKED ) continue;
 
     if( ! show_hide_pane( i, SW_HIDE ) ) return 1;
   }
@@ -340,7 +343,7 @@ toggle_display( debugger_pane pane, UINT menu_item_id )
     
   /* Windows doesn't automatically checks/unchecks
      the menus when they're clicked */
-  if( mii.fState && MFS_CHECKED ) {
+  if( mii.fState & MFS_CHECKED ) {
     show_hide_pane( pane, SW_HIDE );
     mii.fState = MFS_UNCHECKED;
     SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), menu_item_id, FALSE, &mii );
@@ -973,6 +976,7 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
   _sntprintf( event_text[0], 40, "%d", ptr->tstates );
   /* FIXME: event_name() is not unicode compliant */
   _tcsncpy( event_text[1], event_name( ptr->type ), 40 );
+  event_text[1][39] = '\0';
 
   /* append the item */
   lvi.iItem = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS,

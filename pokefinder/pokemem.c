@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -490,7 +490,7 @@ pokemem_find_pokfile( const char *path )
     n = length; /* Append file extension */
   }
 
-  strncat( test_file, ".pok", 4 );
+  strcat( test_file, ".pok" );
   if( compat_file_exists( test_file ) ) {
     pokfile = test_file;
     return 0;
@@ -511,18 +511,18 @@ pokemem_find_pokfile( const char *path )
       ( has_extension )? (unsigned int) ( last_dot - last_slash - 1 ) :
                          strlen( &path[n] );
     test_file[ n ] = '\0';
-    strncat( test_file, "POKES", 5 );
+    strcat( test_file, "POKES" );
   } else {
     n = 0; /* prepend directory */
     filename_size = ( has_extension )? (unsigned int) last_dot : length;
-    strncpy( test_file, "POKES", 5 );
+    strcpy( test_file, "POKES" );
     test_file[ 5 ] = '\0';
   }
 
   /* Try .pok extension */
-  strncat( test_file, FUSE_DIR_SEP_STR, 1 );
+  strcat( test_file, FUSE_DIR_SEP_STR );
   strncat( test_file, &path[ n ], filename_size );
-  strncat( test_file, ".pok", 4 );
+  strcat( test_file, ".pok" );
 
   if( compat_file_exists( test_file ) ) {
     pokfile = test_file;

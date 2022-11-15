@@ -8,9 +8,8 @@ $ ./configure
 There are now some options you can give to configure; `configure
 --help' will list them all, but the most important are:
 
---with-fb		Use the framebuffer interface, rather than GTK+.
---with-sdl		Use the SDL interface, rather than GTK+.
---with-svgalib		Use the SVGAlib interface.
+--with-fb		Use the framebuffer interface, rather than GTK.
+--with-sdl		Use the SDL interface, rather than GTK.
 --without-gtk		Use the plain Xlib interface.
 
 If glib is installed on your system, Fuse will use this for a couple
@@ -143,7 +142,7 @@ PKG_CONFIG_LIBDIR=/usr/local/i686-w64-mingw32/lib/pkgconfig \
             --prefix=/usr/local/i686-w64-mingw32
 make
 
-Note: you need `libspectrum-8.dll' and the `roms' directory and the `lib'
+Note: you need `libspectrum-9.dll' and the `roms' directory and the `lib'
   directory to `fuse' run perfectly. You may copy this file and directories
   into that directory where `fuse.exe' exists. On Windows you may need to
   copy all files from `lib/uncompressed' into `lib'. Alternatively, you could

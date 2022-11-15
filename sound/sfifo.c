@@ -18,7 +18,7 @@ TODO:
 -----------------------------------------------------------
  */
 
-#include <config.h>
+#include "config.h"
 
 #ifdef __KERNEL__
 #	include	<linux/string.h>

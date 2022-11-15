@@ -1,5 +1,5 @@
-/* svgadisplay.h: Routines for dealing with the svgalib display
-   Copyright (c) 2003 Philip Kendall
+/* ttx2000s.h: Routines for handling the TTX2000S teletext adapter
+   Copyright (c) 2018 Alistair Cree
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,16 +15,18 @@
    with this program; if not, write to the Free Software Foundation, Inc.,
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-   Author contact information:
-
-   E-mail: philip-fuse@shadowmagic.org.uk
-
 */
 
-#ifndef FUSE_SVGADISPLAY_H
-#define FUSE_SVGADISPLAY_H
+#ifndef FUSE_TTX2000S_H
+#define FUSE_TTX2000S_H
 
-int svgadisplay_init( void );
-int svgadisplay_end( void );
+extern int ttx2000s_paged;
 
-#endif			/* #ifndef FUSE_SVGADISPLAY_H */
+void ttx2000s_register_startup( void );
+void ttx2000s_page( void );
+void ttx2000s_unpage( void );
+int ttx2000s_unittest( void );
+libspectrum_byte ttx2000s_sram_read( libspectrum_word address );
+void ttx2000s_sram_write( libspectrum_word address, libspectrum_byte b );
+
+#endif				/* #ifndef FUSE_TTX2000S_H */

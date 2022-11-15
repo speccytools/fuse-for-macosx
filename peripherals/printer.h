@@ -24,7 +24,7 @@
 #ifndef FUSE_PRINTER_H
 #define FUSE_PRINTER_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 void printer_frame( void );
 void printer_serial_write( libspectrum_byte b );

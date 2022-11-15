@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #ifdef HAVE_STRINGS_STRCASECMP
@@ -32,7 +32,7 @@
 #include <glib.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger_internals.h"
 #include "fuse.h"

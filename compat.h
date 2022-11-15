@@ -182,10 +182,24 @@ int compat_get_tap( const char *interface_name );
 
 /* Socket handling */
 
-#ifndef WIN32
-typedef int compat_socket_t;
-#else                           /* #ifndef WIN32 */
+#ifdef WIN32
+#include <winsock2.h>
+#define COMPAT_ENOTCONN WSAENOTCONN
+#define COMPAT_EWOULDBLOCK WSAEWOULDBLOCK
+#define COMPAT_EINPROGRESS WSAEINPROGRESS
+#define COMPAT_ECONNREFUSED WSAECONNREFUSED
 typedef SOCKET compat_socket_t;
+typedef SOCKADDR compat_sockaddr;
+#else  /* #ifndef WIN32 */
+#include <sys/socket.h>
+#include <netdb.h>
+#include <errno.h>
+#define COMPAT_ENOTCONN ENOTCONN
+#define COMPAT_EWOULDBLOCK EWOULDBLOCK
+#define COMPAT_EINPROGRESS EINPROGRESS
+#define COMPAT_ECONNREFUSED ECONNREFUSED
+typedef int compat_socket_t;
+typedef struct sockaddr compat_sockaddr;
 #endif
 
 extern const compat_socket_t compat_socket_invalid;
@@ -194,6 +208,7 @@ extern const int compat_socket_EBADF;
 void compat_socket_networking_init( void );
 void compat_socket_networking_end( void );
 
+int compat_socket_blocking_mode( compat_socket_t fd, int blocking );
 int compat_socket_close( compat_socket_t fd );
 int compat_socket_get_error( void );
 const char *compat_socket_get_strerror( void );

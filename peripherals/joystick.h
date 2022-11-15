@@ -26,7 +26,7 @@
 #ifndef FUSE_JOYSTICK_H
 #define FUSE_JOYSTICK_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* Number of joysticks known about & initialised */
 extern int joysticks_supported;

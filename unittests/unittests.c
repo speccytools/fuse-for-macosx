@@ -22,9 +22,9 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "debugger/debugger.h"
 #include "fuse.h"
@@ -44,6 +44,7 @@
 #include "peripherals/if2.h"
 #include "peripherals/multiface.h"
 #include "peripherals/speccyboot.h"
+#include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
 #include "settings.h"
@@ -758,6 +759,7 @@ paging_test( void )
     r += if2_unittest();
     r += multiface_unittest();
     r += speccyboot_unittest();
+    r += ttx2000s_unittest();
     r += usource_unittest();
 
     r += beta_unittest();

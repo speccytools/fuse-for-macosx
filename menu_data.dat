@@ -1,5 +1,5 @@
 # menu_data.dat: Menu structure for Fuse
-# Copyright (c) 2004-2015 Philip Kendall
+# Copyright (c) 2004-2018 Philip Kendall, Alistair Cree
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -67,11 +67,9 @@ File/Movie/_Pause, Item
 File/Movie/_Continue, Item,, menu_file_movie_pause
 File/Movie/_Stop, Item
 
-#ifndef USE_WIDGET
 File/separator, Separator
 File/Loa_d binary data..., Item
 File/Save _binary data..., Item
-#endif
 
 File/separator, Separator
 File/E_xit..., Item, F10
@@ -125,7 +123,8 @@ Options/Select ROMs/Peripheral ROMs/Multiface _128..., Item,, menu_options_selec
 Options/Select ROMs/Peripheral ROMs/Multiface _3..., Item,, menu_options_selectroms_peripheral_select,, 8
 Options/Select ROMs/Peripheral ROMs/_Opus Discovery..., Item,, menu_options_selectroms_peripheral_select,, 9
 Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_peripheral_select,, 10
-Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 11
+Options/Select ROMs/Peripheral ROMs/TT_X2000S..., Item,, menu_options_selectroms_peripheral_select,, 11
+Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 12
 
 Options/_Filter..., Item,,, menu_filter_detail
 

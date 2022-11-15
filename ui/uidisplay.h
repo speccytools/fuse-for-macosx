@@ -24,7 +24,7 @@
 #ifndef FUSE_UIDISPLAY_H
 #define FUSE_UIDISPLAY_H
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 /* User interface specific functions */
 

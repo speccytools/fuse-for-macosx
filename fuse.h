@@ -27,7 +27,7 @@
 #include <limits.h>
 #include <sys/syslimits.h>
 
-#include <libspectrum.h>
+#include "libspectrum.h"
 
 #include "compat.h"
 

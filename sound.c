@@ -26,7 +26,7 @@
  * MAME's licence explicitly permits free use of info (even encourages it).
  */
 
-#include <config.h>
+#include "config.h"
 
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"

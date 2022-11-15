@@ -21,7 +21,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <stdio.h>
 
@@ -124,8 +124,8 @@ ui_init( int *argc, char ***argv )
   sizeHints->min_height   =     DISPLAY_SCREEN_HEIGHT;
   sizeHints->width_inc    =     DISPLAY_ASPECT_WIDTH;
   sizeHints->height_inc   =     DISPLAY_SCREEN_HEIGHT;
-  sizeHints->max_width    = 3 * DISPLAY_ASPECT_WIDTH;
-  sizeHints->max_height   = 3 * DISPLAY_SCREEN_HEIGHT;
+  sizeHints->max_width    = 4 * DISPLAY_ASPECT_WIDTH;
+  sizeHints->max_height   = 4 * DISPLAY_SCREEN_HEIGHT;
 
   if( settings_current.aspect_hint ) {
     sizeHints->flags |= PAspect;

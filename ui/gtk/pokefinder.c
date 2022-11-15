@@ -1,4 +1,4 @@
-/* pokefinder.c: GTK+ interface to the poke finder
+/* pokefinder.c: GTK interface to the poke finder
    Copyright (c) 2003-2015 Philip Kendall
    Copyright (c) 2014 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady
@@ -23,7 +23,7 @@
 
 */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -291,7 +291,7 @@ update_pokefinder( void )
     }
 
     /* Show widget when the GtkTreeView has been filled with data. Fix an empty
-       list on GTK+ 3.10 (and maybe other versions) */
+       list on GTK 3.10 (and maybe other versions) */
     g_idle_add( (GSourceFunc)widget_delayed_show, location_list );
 
   } else {
