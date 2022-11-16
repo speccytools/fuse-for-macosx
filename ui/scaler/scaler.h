@@ -68,6 +68,7 @@ typedef enum scale_factor_t {
   SCALE_FACTOR_TWO         = 1 << 2,
   SCALE_FACTOR_THREE       = 1 << 3,
   SCALE_FACTOR_ONE_HALF    = 1 << 4,
+  SCALE_FACTOR_FOUR        = 1 << 5,
 } scale_factor_t;
 
 typedef void ScalerProc( const libspectrum_byte *srcPtr,

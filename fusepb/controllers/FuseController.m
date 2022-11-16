@@ -2128,7 +2128,10 @@ save_as_exit:
 
   if( !filename ) return;
 
-  if( utils_read_file( filename, &file ) ) fuse_abort();
+  if( utils_read_file( filename, &file ) )
+  {
+    return;
+  }
 
   if( libspectrum_identify_file( &type, filename, file.buffer, file.length ) ) {
     utils_close_file( &file );

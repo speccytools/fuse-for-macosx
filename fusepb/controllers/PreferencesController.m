@@ -384,6 +384,7 @@
   settings_current.usource = 0;
   settings_current.divmmc_enabled = 0;
   settings_current.zxmmc_enabled = 0;
+  settings_current.ttx2000s = 0;
 
   // Read mass storage type box and set text boxes appropriately
   switch( [[massStorageType selectedCell] tag] ) {
@@ -431,6 +432,9 @@
   case 14: // ZXMMC
     settings_current.zxmmc_enabled = 1;
     break;
+  case 15: // ttx2000s
+    settings_current.ttx2000s = 1;
+    break;
   default: // WTF?
     break;
   }
@@ -449,6 +453,7 @@
   [self setCurrentValue:settings_current.usource forKey:@"usource" inValues:currentValues];
   [self setCurrentValue:settings_current.divmmc_enabled forKey:@"divmmc" inValues:currentValues];
   [self setCurrentValue:settings_current.zxmmc_enabled forKey:@"zxmmc" inValues:currentValues];
+  [self setCurrentValue:settings_current.ttx2000s forKey:@"ttx2000s" inValues:currentValues];
 
   [currentValues synchronize];
 }
@@ -619,6 +624,8 @@
     value = 13;
   } else if ( settings_current.zxmmc_enabled ) {
     value = 14;
+  } else if ( settings_current.ttx2000s ) {
+    value = 15;
   }
 
   [massStorageType selectCellWithTag:value];

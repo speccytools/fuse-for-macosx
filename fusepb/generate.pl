@@ -3,6 +3,10 @@ if( /LIBSPECTRUM_DEFINE_TYPES/ ) {
   $_ = << "CODE";
 #include <stdint.h>
 
+#ifndef	WIN32_DLL
+#define	WIN32_DLL
+#endif
+
 typedef  uint8_t libspectrum_byte;
 typedef   int8_t libspectrum_signed_byte;
 typedef uint16_t libspectrum_word;
@@ -239,6 +243,10 @@ if( /LIBSPECTRUM_SNAP_ACCESSORS/ ) {
   $_ = '';
   while( <DATAFILE> ) {
 
+		# Remove comments and blank lines
+		s/#.*//;
+		s/\/\*.*?\*\///gs;
+
     next if /^\s*$/; next if /^\s*#/;
 
     my( $type, $name, $indexed ) = split;
@@ -278,6 +286,7 @@ if( /LIBSPECTRUM_TAPE_ACCESSORS/ ) {
 
 	# Remove comments and blank lines
 	s/#.*//;
+	s/\/\*.*?\*\///gs;
 	next if /^\s*$/;
 
 	# Skip which block types each accessor applies to

@@ -292,6 +292,7 @@
 		D15E8F94259F5C0C0006FC79 /* packets.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F8F259F5C0B0006FC79 /* packets.c */; };
 		D15E8F95259F5C0C0006FC79 /* gdbserver.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F91259F5C0B0006FC79 /* gdbserver.c */; };
 		D1DF6DD826F8077F004A4AB7 /* debug.png in Resources */ = {isa = PBXBuildFile; fileRef = D1DF6DD726F8077F004A4AB7 /* debug.png */; };
+		D1ECC73E2924069800147252 /* ttx2000s.c in Sources */ = {isa = PBXBuildFile; fileRef = D1ECC73D2924069800147252 /* ttx2000s.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -744,6 +745,7 @@
 		B6FEA44B0444C2CC0013916D /* tc2068-0.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "tc2068-0.rom"; path = "../roms/tc2068-0.rom"; sourceTree = SOURCE_ROOT; };
 		B6FEA44C0444C2CC0013916D /* tc2068-1.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "tc2068-1.rom"; path = "../roms/tc2068-1.rom"; sourceTree = SOURCE_ROOT; };
 		B6FEA44F0444C3370013916D /* tc2068.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = tc2068.c; sourceTree = "<group>"; };
+		D12E7FEC29258CF400185E4D /* libspectrum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libspectrum.h; path = fusepb/libspectrum.h; sourceTree = "<group>"; };
 		D15E8F8C259F5C0B0006FC79 /* arch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arch.h; sourceTree = "<group>"; };
 		D15E8F8D259F5C0B0006FC79 /* gdbserver_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gdbserver_utils.c; sourceTree = "<group>"; };
 		D15E8F8E259F5C0B0006FC79 /* gdbserver_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gdbserver_utils.h; sourceTree = "<group>"; };
@@ -753,6 +755,8 @@
 		D15E8F92259F5C0C0006FC79 /* gdbserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gdbserver.h; sourceTree = "<group>"; };
 		D1DA9AD7291EF817001911F7 /* FuseX.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FuseX.entitlements; sourceTree = "<group>"; };
 		D1DF6DD726F8077F004A4AB7 /* debug.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = debug.png; sourceTree = "<group>"; };
+		D1ECC73C2924069800147252 /* ttx2000s.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ttx2000s.h; sourceTree = "<group>"; };
+		D1ECC73D2924069800147252 /* ttx2000s.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ttx2000s.c; sourceTree = "<group>"; };
 		F520C8BC038D022E01A804BA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		F536B56503A0C275011517A0 /* utils.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = utils.c; path = ../utils.c; sourceTree = SOURCE_ROOT; };
 		F541FB5E03B0B33401FF8235 /* scaler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = scaler.h; path = ../ui/scaler/scaler.h; sourceTree = SOURCE_ROOT; };
@@ -921,6 +925,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				D12E7FEC29258CF400185E4D /* libspectrum.h */,
 				B6DCBB5D114FA0E700DC9A11 /* libspectrum */,
 				B63225E50C66B9D500BB081B /* compat */,
 				B68CB2BC03DD91D800A804BA /* debugger */,
@@ -1449,6 +1454,8 @@
 				B6E1F1AA14F653FB00600EB0 /* specdrum.h */,
 				B69BE5431660E04000C5D0CE /* spectranet.c */,
 				B69BE5441660E04000C5D0CE /* spectranet.h */,
+				D1ECC73D2924069800147252 /* ttx2000s.c */,
+				D1ECC73C2924069800147252 /* ttx2000s.h */,
 				B6AB429D0677466E007C50EF /* ula.c */,
 				B6AB429E0677466E007C50EF /* ula.h */,
 				B6D0E1041CFD549200202683 /* usource.c */,
@@ -1934,6 +1941,7 @@
 				B684A19E0E93A8CD00A5B097 /* event.c in Sources */,
 				B684A1A00E93A8D700A5B097 /* variable.c in Sources */,
 				B684A1A20E93A8FC00A5B097 /* file.c in Sources */,
+				D1ECC73E2924069800147252 /* ttx2000s.c in Sources */,
 				B69D8D501D6B388A0031BAFC /* trdos.c in Sources */,
 				B6374FA50F178298003CE6E2 /* timer.c in Sources */,
 				B6168CE91F0BC0AC008C99E6 /* buffer.c in Sources */,

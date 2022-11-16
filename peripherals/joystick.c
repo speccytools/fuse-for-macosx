@@ -123,7 +123,7 @@ static const periph_t kempston_loose_periph = {
 
 /* Init/shutdown functions. Errors aren't important here */
 
-static int
+int
 joystick_init( void *context )
 {
   joysticks_supported = ui_joystick_init();
@@ -137,7 +137,7 @@ joystick_init( void *context )
   return 0;
 }
 
-static void
+void
 joystick_end( void )
 {
   ui_joystick_end();

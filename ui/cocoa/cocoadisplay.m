@@ -108,8 +108,10 @@ init_scalers( void )
   } else {
     scaler_register( SCALER_TV2X );
     scaler_register( SCALER_TV3X );
+    scaler_register( SCALER_TV4X );
     scaler_register( SCALER_PALTV2X );
     scaler_register( SCALER_PALTV3X );
+    scaler_register( SCALER_PALTV4X );
     scaler_register( SCALER_2XSAI );
     scaler_register( SCALER_SUPER2XSAI );
     scaler_register( SCALER_SUPEREAGLE );
@@ -118,6 +120,7 @@ init_scalers( void )
     scaler_register( SCALER_DOTMATRIX );
     scaler_register( SCALER_HQ2X );
     scaler_register( SCALER_HQ3X );
+    scaler_register( SCALER_HQ4X );
   }
   
   if( scaler_is_supported( current_scaler ) ) {
