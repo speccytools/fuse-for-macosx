@@ -38,6 +38,7 @@
 #import "RollbackController.h"
 #import "SaveBinaryController.h"
 #import "TapeBrowserController.h"
+#import "AppSandboxFileAccess.h"
 
 #import "DisplayOpenGLView.h"
 
@@ -638,7 +639,7 @@ error:
 
   if( !settings_current.full_screen ) {
     [[DisplayOpenGLView instance] pause];
-
+    
     filename = cocoaui_openpanel_get_filename( @"Open Spectrum File", allFileTypes );
 
     if( !filename ) { [[DisplayOpenGLView instance] unpause]; return; }
@@ -2121,15 +2122,32 @@ save_as_exit:
 - (void)openFile:(const char *)filename
 {
   char *snapshot;
-  utils_file file; libspectrum_id_t type;
+  utils_file file = {}; libspectrum_id_t type;
   libspectrum_class_t lsclass;
   libspectrum_error libspec_error;
   libspectrum_snap* snap;
 
   if( !filename ) return;
+  
+  AppSandboxFileAccess *fileAccess = [AppSandboxFileAccess fileAccess];
+  NSString *fName = [NSString stringWithCString:filename
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1040
+    encoding:NSWindowsCP1252StringEncoding
+#endif
+  ];
+  [fileAccess persistPermissionPath:fName];
+  
+  BOOL accessAllowed = [fileAccess accessFilePath:fName persistPermission:YES withBlock: ^{
+      (void)file;
+      if( utils_read_file( filename, &file ) )
+      {
+        return;
+      }
+  }];
 
-  if( utils_read_file( filename, &file ) )
+  if (!accessAllowed)
   {
+    ui_error(UI_ERROR_ERROR, "Cannot obtain access to file %s", filename);
     return;
   }
 
@@ -2735,6 +2753,10 @@ cocoaui_openpanel_get_filename( NSString *title, NSArray *fileTypes )
   if (result == NSOKButton) {
     NSArray *filesToOpen = [oPanel URLs];
     NSString *aFile = [[filesToOpen objectAtIndex:0] path];
+    
+    AppSandboxFileAccess *fileAccess = [AppSandboxFileAccess fileAccess];
+    [fileAccess persistPermissionPath:aFile];
+    
     [aFile getFileSystemRepresentation:buffer maxLength:PATH_MAX];
     filename = strdup ( buffer );
   }

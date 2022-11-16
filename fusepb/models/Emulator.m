@@ -23,6 +23,7 @@
 
 #import "DisplayOpenGLView.h"
 #import "Emulator.h"
+#import "AppSandboxFileAccess.h"
 
 #include "dck.h"
 #include "debugger/debugger.h"
@@ -202,7 +203,24 @@ static Emulator *instance = nil;
 
 -(void) openFile:(const char *)filename
 {
-  utils_open_file( filename, auto_load_is_enabled(), NULL );
+  AppSandboxFileAccess *fileAccess = [AppSandboxFileAccess fileAccess];
+  NSString *fName = [NSString stringWithCString:filename
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1040
+    encoding:NSWindowsCP1252StringEncoding
+#endif
+  ];
+  
+  [fileAccess persistPermissionPath:fName];
+  
+  BOOL accessAllowed = [fileAccess accessFilePath:fName persistPermission:YES withBlock: ^{
+    utils_open_file( filename, auto_load_is_enabled(), NULL );
+  }];
+
+  if (!accessAllowed)
+  {
+    ui_error(UI_ERROR_ERROR, "Cannot obtain access to file %s", filename);
+    return;
+  }
 
   display_refresh_all();
 }

@@ -288,6 +288,9 @@
 		B6F66E351E473D68005B270A /* memory_pages.c in Sources */ = {isa = PBXBuildFile; fileRef = B6F66E331E473D68005B270A /* memory_pages.c */; };
 		B6FA759D0C1D7507007F5A10 /* audiofile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; };
 		B6FA75C60C1D76A5007F5A10 /* audiofile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D12E7FF3292596B200185E4D /* AppSandboxFileAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E7FED292596B100185E4D /* AppSandboxFileAccess.m */; };
+		D12E7FF4292596B200185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E7FEE292596B100185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m */; };
+		D12E7FF5292596B200185E4D /* AppSandboxFileAccessPersist.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E7FF2292596B200185E4D /* AppSandboxFileAccessPersist.m */; };
 		D15E8F93259F5C0C0006FC79 /* gdbserver_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F8D259F5C0B0006FC79 /* gdbserver_utils.c */; };
 		D15E8F94259F5C0C0006FC79 /* packets.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F8F259F5C0B0006FC79 /* packets.c */; };
 		D15E8F95259F5C0C0006FC79 /* gdbserver.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F91259F5C0B0006FC79 /* gdbserver.c */; };
@@ -746,6 +749,12 @@
 		B6FEA44C0444C2CC0013916D /* tc2068-1.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "tc2068-1.rom"; path = "../roms/tc2068-1.rom"; sourceTree = SOURCE_ROOT; };
 		B6FEA44F0444C3370013916D /* tc2068.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = tc2068.c; sourceTree = "<group>"; };
 		D12E7FEC29258CF400185E4D /* libspectrum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libspectrum.h; path = fusepb/libspectrum.h; sourceTree = "<group>"; };
+		D12E7FED292596B100185E4D /* AppSandboxFileAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppSandboxFileAccess.m; sourceTree = "<group>"; };
+		D12E7FEE292596B100185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppSandboxFileAccessOpenSavePanelDelegate.m; sourceTree = "<group>"; };
+		D12E7FEF292596B100185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSandboxFileAccessOpenSavePanelDelegate.h; sourceTree = "<group>"; };
+		D12E7FF0292596B200185E4D /* AppSandboxFileAccessPersist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSandboxFileAccessPersist.h; sourceTree = "<group>"; };
+		D12E7FF1292596B200185E4D /* AppSandboxFileAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSandboxFileAccess.h; sourceTree = "<group>"; };
+		D12E7FF2292596B200185E4D /* AppSandboxFileAccessPersist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppSandboxFileAccessPersist.m; sourceTree = "<group>"; };
 		D15E8F8C259F5C0B0006FC79 /* arch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arch.h; sourceTree = "<group>"; };
 		D15E8F8D259F5C0B0006FC79 /* gdbserver_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gdbserver_utils.c; sourceTree = "<group>"; };
 		D15E8F8E259F5C0B0006FC79 /* gdbserver_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gdbserver_utils.h; sourceTree = "<group>"; };
@@ -857,6 +866,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				D12E7FF62925970100185E4D /* Sandbox */,
 				B6B076AB0B59FE7400D4F95C /* Models */,
 				B6CE7FCF0B28FBEC00EB65B3 /* Views */,
 				B6DD457908134943008E9F7E /* Content Arrays */,
@@ -1475,6 +1485,19 @@
 			path = nic;
 			sourceTree = "<group>";
 		};
+		D12E7FF62925970100185E4D /* Sandbox */ = {
+			isa = PBXGroup;
+			children = (
+				D12E7FF1292596B200185E4D /* AppSandboxFileAccess.h */,
+				D12E7FED292596B100185E4D /* AppSandboxFileAccess.m */,
+				D12E7FEF292596B100185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.h */,
+				D12E7FEE292596B100185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m */,
+				D12E7FF0292596B200185E4D /* AppSandboxFileAccessPersist.h */,
+				D12E7FF2292596B200185E4D /* AppSandboxFileAccessPersist.m */,
+			);
+			name = Sandbox;
+			sourceTree = "<group>";
+		};
 		F541FB5C03B0B31601FF8235 /* scaler */ = {
 			isa = PBXGroup;
 			children = (
@@ -1854,6 +1877,7 @@
 				B6D71DD21F6A94750000D666 /* divmmc.c in Sources */,
 				B61F465909121DF100C8096C /* command.c in Sources */,
 				B61F465B09121DF100C8096C /* commandy.y in Sources */,
+				D12E7FF5292596B200185E4D /* AppSandboxFileAccessPersist.m in Sources */,
 				B61F465A09121DF100C8096C /* commandl.l in Sources */,
 				B61F465C09121DF100C8096C /* debugger.c in Sources */,
 				B6772EF71FDFECC1002B4AAD /* phantom_typist.c in Sources */,
@@ -1988,6 +2012,7 @@
 				B635EAE7116A0FE500A166F2 /* keystate.c in Sources */,
 				B6501DF411AABD6800898AD1 /* blipbuffer.c in Sources */,
 				B6501DF711AABD9300898AD1 /* sound.c in Sources */,
+				D12E7FF4292596B200185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m in Sources */,
 				B6501DFC11AABE2300898AD1 /* rectangle.c in Sources */,
 				B6BDE2DB125DF4A800B81C58 /* spec48_ntsc.c in Sources */,
 				B6E1F19C14F6527300600EB0 /* pzx_read.c in Sources */,
@@ -2005,6 +2030,7 @@
 				B69BE53C1660E01000C5D0CE /* am29f010.c in Sources */,
 				D15E8F94259F5C0C0006FC79 /* packets.c in Sources */,
 				B69BE5411660E02500C5D0CE /* w5100_socket.c in Sources */,
+				D12E7FF3292596B200185E4D /* AppSandboxFileAccess.m in Sources */,
 				B69BE5421660E02500C5D0CE /* w5100.c in Sources */,
 				B69D8D4D1D6B34490031BAFC /* zip.c in Sources */,
 				B69BE5451660E04000C5D0CE /* spectranet.c in Sources */,
@@ -2044,6 +2070,7 @@
 		B61F46A609121DF100C8096C /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2063,7 +2090,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = "";
@@ -2099,6 +2126,7 @@
 		B61F46A709121DF100C8096C /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2118,7 +2146,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
@@ -2153,6 +2181,7 @@
 		B61F46A809121DF100C8096C /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2171,7 +2200,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
