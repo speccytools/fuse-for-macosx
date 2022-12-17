@@ -2098,7 +2098,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
 					..,
-					"/Users/desertkun/Documents/Work/fuse-for-macos/fuse/fusepb",
+					"$(PROJECT_DIR)",
 					/usr/local/include,
 				);
 				INFOPLIST_FILE = "Info-FuseX.plist";
@@ -2207,7 +2207,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
 					..,
-					"/Users/desertkun/Documents/Work/fuse-for-macos/fuse/fusepb",
+					"$(PROJECT_DIR)",
 					/usr/local/include,
 				);
 				INFOPLIST_FILE = "Info-FuseX.plist";
