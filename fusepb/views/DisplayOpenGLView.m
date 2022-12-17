@@ -311,6 +311,8 @@ static DisplayOpenGLView *instance = nil;
   currentScreenTex = 0;
 
   statusbar_updated = NO;
+  
+  [self registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
   return self;
 }
@@ -326,6 +328,22 @@ static DisplayOpenGLView *instance = nil;
   buffered_screen_lock = nil;
   
   [super dealloc];
+}
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
+  return NSDragOperationCopy;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender {
+  NSPasteboard *pboard;
+  
+  pboard = [sender draggingPasteboard];
+
+  if ( [[pboard types] containsObject:NSFilenamesPboardType] ) {
+    NSString *fileURL = [[NSURL URLFromPasteboard:pboard] path];
+    [[FuseController singleton] openFile:[fileURL UTF8String]];
+  }
+  return YES;
 }
 
 -(void) awakeFromNib

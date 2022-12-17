@@ -90,6 +90,9 @@
 -(id) initWithFrame:(NSRect)frameRect;
 -(void) awakeFromNib;
 
+-(NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
+-(BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
+
 -(void) loadPicture:(NSString *) name
            greenTex:(Texture*) greenTexture
              redTex:(Texture*) redTexture
