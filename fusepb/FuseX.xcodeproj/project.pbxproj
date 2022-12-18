@@ -226,7 +226,7 @@
 		B6D0E1091CFD54B800202683 /* svg.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D0E1071CFD54B800202683 /* svg.c */; };
 		B6D0E10B1CFD54D400202683 /* uimedia.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D0E10A1CFD54D400202683 /* uimedia.c */; };
 		B6D65C3718A6431500170B64 /* gcrypt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; };
-		B6D65C3818A645A100170B64 /* gcrypt.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		B6D65C3818A645A100170B64 /* gcrypt.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = B6D65C3618A6431500170B64 /* gcrypt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		B6D670501DD6D2440014914E /* FuseXHelp.help in Resources */ = {isa = PBXBuildFile; fileRef = B6D670451DD6CB6B0014914E /* FuseXHelp.help */; };
 		B6D71DD21F6A94750000D666 /* divmmc.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DCC1F6A94750000D666 /* divmmc.c */; };
 		B6D71DD31F6A94750000D666 /* divxxx.c in Sources */ = {isa = PBXBuildFile; fileRef = B6D71DCE1F6A94750000D666 /* divxxx.c */; };
@@ -287,7 +287,7 @@
 		B6F5E1801EE16CA70005178D /* covox.c in Sources */ = {isa = PBXBuildFile; fileRef = B6F5E17E1EE16CA70005178D /* covox.c */; };
 		B6F66E351E473D68005B270A /* memory_pages.c in Sources */ = {isa = PBXBuildFile; fileRef = B6F66E331E473D68005B270A /* memory_pages.c */; };
 		B6FA759D0C1D7507007F5A10 /* audiofile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; };
-		B6FA75C60C1D76A5007F5A10 /* audiofile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		B6FA75C60C1D76A5007F5A10 /* audiofile.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D12E7FF3292596B200185E4D /* AppSandboxFileAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E7FED292596B100185E4D /* AppSandboxFileAccess.m */; };
 		D12E7FF4292596B200185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E7FEE292596B100185E4D /* AppSandboxFileAccessOpenSavePanelDelegate.m */; };
 		D12E7FF5292596B200185E4D /* AppSandboxFileAccessPersist.m in Sources */ = {isa = PBXBuildFile; fileRef = D12E7FF2292596B200185E4D /* AppSandboxFileAccessPersist.m */; };
@@ -296,6 +296,7 @@
 		D15E8F95259F5C0C0006FC79 /* gdbserver.c in Sources */ = {isa = PBXBuildFile; fileRef = D15E8F91259F5C0B0006FC79 /* gdbserver.c */; };
 		D1DF6DD826F8077F004A4AB7 /* debug.png in Resources */ = {isa = PBXBuildFile; fileRef = D1DF6DD726F8077F004A4AB7 /* debug.png */; };
 		D1ECC73E2924069800147252 /* ttx2000s.c in Sources */ = {isa = PBXBuildFile; fileRef = D1ECC73D2924069800147252 /* ttx2000s.c */; };
+		FE3FF185294F1220009F571F /* spectranet.rom in Resources */ = {isa = PBXBuildFile; fileRef = FE3FF184294F1220009F571F /* spectranet.rom */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -345,12 +346,12 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
-		B6D6704E1DD6D1430014914E /* PBXContainerItemProxy */ = {
+		FEE4C220294E40C80083753A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B6D670441DD6CB6B0014914E;
-			remoteInfo = FuseHelp;
+			remoteInfo = FuseXHelp;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -365,24 +366,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B61F459209121DF100C8096C /* CopyFiles */ = {
+		B61F459209121DF100C8096C /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B61F45A109121DF100C8096C /* CopyFiles */ = {
+		B61F45A109121DF100C8096C /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B6FA75C60C1D76A5007F5A10 /* audiofile.framework in CopyFiles */,
-				B6D65C3818A645A100170B64 /* gcrypt.framework in CopyFiles */,
+				B6FA75C60C1D76A5007F5A10 /* audiofile.framework in Copy Files */,
+				B6D65C3818A645A100170B64 /* gcrypt.framework in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B61F46A309121DF100C8096C /* CopyFiles */ = {
@@ -832,6 +835,7 @@
 		F5F291060396932B01730B00 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		F5F876370399540D011FA3A4 /* FuseController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FuseController.h; path = controllers/FuseController.h; sourceTree = SOURCE_ROOT; };
 		F5F876380399540D011FA3A4 /* FuseController.m */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; name = FuseController.m; path = controllers/FuseController.m; sourceTree = SOURCE_ROOT; tabWidth = 2; };
+		FE3FF184294F1220009F571F /* spectranet.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = spectranet.rom; path = ../roms/spectranet.rom; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1512,6 +1516,7 @@
 		F559854A038920FD01A804BA /* roms */ = {
 			isa = PBXGroup;
 			children = (
+				FE3FF184294F1220009F571F /* spectranet.rom */,
 				F559854D0389212301A804BA /* 128-0.rom */,
 				F559854E0389212301A804BA /* 128-1.rom */,
 				F559854C0389212301A804BA /* 48.rom */,
@@ -1639,8 +1644,8 @@
 			buildConfigurationList = B61F46A509121DF100C8096C /* Build configuration list for PBXNativeTarget "FuseX" */;
 			buildPhases = (
 				B61F459109121DF100C8096C /* ShellScript */,
-				B61F459209121DF100C8096C /* CopyFiles */,
-				B61F45A109121DF100C8096C /* CopyFiles */,
+				B61F459209121DF100C8096C /* Copy Files */,
+				B61F45A109121DF100C8096C /* Copy Files */,
 				B61F45FE09121DF100C8096C /* Resources */,
 				B61F463809121DF100C8096C /* Sources */,
 				B61F469909121DF100C8096C /* Frameworks */,
@@ -1653,7 +1658,7 @@
 				B6DCBC42114FA33300DC9A11 /* PBXBuildRule */,
 			);
 			dependencies = (
-				B6D6704F1DD6D1430014914E /* PBXTargetDependency */,
+				FEE4C221294E40C80083753A /* PBXTargetDependency */,
 			);
 			name = FuseX;
 			productInstallPath = "$(HOME)/Applications";
@@ -1668,7 +1673,6 @@
 				B6D670411DD6CB6B0014914E /* Sources */,
 				B6D670421DD6CB6B0014914E /* Frameworks */,
 				B6D670431DD6CB6B0014914E /* Resources */,
-				B6D6704D1DD6CEF10014914E /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1689,7 +1693,6 @@
 				TargetAttributes = {
 					B6D670441DD6CB6B0014914E = {
 						CreatedOnToolsVersion = 8.1;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -1764,6 +1767,7 @@
 				B61F463109121DF100C8096C /* tzx.icns in Resources */,
 				B61F463209121DF100C8096C /* z80.icns in Resources */,
 				B6F0481B0952B5FD006D8005 /* zxs.icns in Resources */,
+				FE3FF185294F1220009F571F /* spectranet.rom in Resources */,
 				B639B7D10A6BB45600927E24 /* raw.icns in Resources */,
 				B6CADD690C48E188004BA954 /* cassette_green.png in Resources */,
 				B6CADD6A0C48E188004BA954 /* cassette_red.png in Resources */,
@@ -1816,19 +1820,6 @@
 			shellPath = /bin/sh;
 			shellScript = "make
 ";
-		};
-		B6D6704D1DD6CEF10014914E /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/bin/make -C \"$(dirname \"$PRODUCT_SETTINGS_PATH\")\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2048,10 +2039,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		B6D6704F1DD6D1430014914E /* PBXTargetDependency */ = {
+		FEE4C221294E40C80083753A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B6D670441DD6CB6B0014914E /* FuseXHelp */;
-			targetProxy = B6D6704E1DD6D1430014914E /* PBXContainerItemProxy */;
+			targetProxy = FEE4C220294E40C80083753A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2073,11 +2064,14 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 48UV5KV3FB;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					../../,
@@ -2104,6 +2098,7 @@
 				INFOPLIST_FILE = "Info-FuseX.plist";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 1.6.0;
 				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -2113,6 +2108,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
 				PRODUCT_NAME = FuseX;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -2129,65 +2125,14 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 48UV5KV3FB;
-				ENABLE_HARDENED_RUNTIME = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					../../,
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../audiofile/build/Deployment\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../libgcrypt/build/Deployment\"";
-				GCC_C_LANGUAGE_STANDARD = gnu89;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
-					..,
-					"/Users/desertkun/Documents/Work/fuse-for-macos/fuse/fusepb",
-					/usr/local/include,
-				);
-				INFOPLIST_FILE = "Info-FuseX.plist";
-				INSTALL_PATH = /Applications;
-				LIBRARY_SEARCH_PATHS = .;
-				MARKETING_VERSION = 1.6.0;
-				OTHER_CFLAGS = "";
-				OTHER_CODE_SIGN_FLAGS = "--deep";
-				OTHER_LDFLAGS = (
-					"-lbz2",
-					"-lz",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
-				PRODUCT_NAME = FuseX;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = macosx;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wall";
-				WRAPPER_EXTENSION = app;
-				YACC = /usr/bin/bison;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		B61F46A809121DF100C8096C /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 48UV5KV3FB;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					../../,
@@ -2213,6 +2158,7 @@
 				INFOPLIST_FILE = "Info-FuseX.plist";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 1.6.0;
 				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -2222,6 +2168,66 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
 				PRODUCT_NAME = FuseX;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
+				SDKROOT = macosx;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+				YACC = /usr/bin/bison;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		B61F46A809121DF100C8096C /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_ENTITLEMENTS = FuseX.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					../../,
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../audiofile/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../libgcrypt/build/Deployment\"";
+				GCC_C_LANGUAGE_STANDARD = gnu89;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
+					..,
+					"$(PROJECT_DIR)",
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "Info-FuseX.plist";
+				INSTALL_PATH = /Applications;
+				LIBRARY_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 1.6.0;
+				OTHER_CFLAGS = "";
+				OTHER_CODE_SIGN_FLAGS = "--deep";
+				OTHER_LDFLAGS = (
+					"-lbz2",
+					"-lz",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
+				PRODUCT_NAME = FuseX;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -2333,9 +2339,13 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2359,6 +2369,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.projects.fuse-for-macosx.FuseHelp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = help;
@@ -2387,9 +2398,13 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2406,6 +2421,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.projects.fuse-for-macosx.FuseHelp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = help;
@@ -2434,9 +2450,13 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2453,6 +2473,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.projects.fuse-for-macosx.FuseHelp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = help;
