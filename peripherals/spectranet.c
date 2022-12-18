@@ -38,6 +38,7 @@
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "spectranet.h"
+#include "utils.h"
 #include "ui/ui.h"
 
 #ifdef BUILD_SPECTRANET
@@ -241,6 +242,13 @@ spectranet_activate( void )
 
     /* Pages 0xc0 to 0xff are the RAM */
     ram = memory_pool_allocate_persistent( SPECTRANET_RAM_LENGTH, 1 );
+    
+    utils_file spectranet_rom;
+    if( utils_read_auxiliary_file( "spectranet.rom", &spectranet_rom, UTILS_AUXILIARY_ROM ) != -1 ) {
+      memcpy(rom, spectranet_rom.buffer, SPECTRANET_ROM_LENGTH);
+      memcpy(ram, spectranet_rom.buffer + SPECTRANET_ROM_LENGTH, SPECTRANET_RAM_LENGTH);
+      utils_close_file(&spectranet_rom);
+    }
 
     for( i = 0; i < SPECTRANET_RAM_LENGTH / SPECTRANET_PAGE_LENGTH; i++ ) {
       int base = (SPECTRANET_RAM_BASE + i) * MEMORY_PAGES_IN_4K;
