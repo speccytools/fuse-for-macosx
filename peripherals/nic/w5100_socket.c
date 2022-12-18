@@ -226,7 +226,7 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
   memset( &sa, 0, sizeof(sa) );
   sa.sin_family = AF_INET;
   memcpy( &sa.sin_port, socket->port, 2 );
-  memcpy( &sa.sin_addr.s_addr, self->sip, 4 );
+  sa.sin_addr.s_addr = INADDR_ANY;
 
   nic_w5100_debug( "w5100: attempting to bind socket %d to %s:%d\n", socket->id, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port) );
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
