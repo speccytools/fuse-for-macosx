@@ -1,6 +1,6 @@
 SETUP_CHECK( profile, profile_active )
 SETUP_CHECK( rzx, rzx_playback )
-SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE )
+SETUP_CHECK( debugger, (debugger_mode != DEBUGGER_MODE_INACTIVE) || is_debugger_enabled() )
 SETUP_CHECK( beta, beta_available )
 SETUP_CHECK( plusd, plusd_available )
 SETUP_CHECK( didaktik80, didaktik80_available )

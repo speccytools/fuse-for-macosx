@@ -63,6 +63,7 @@ debugger_init( void *context )
   debugger_breakpoint_event = event_register( debugger_breakpoint_time_fn, "Breakpoint" );
 
   debugger_event_init();
+  debugger_reset_tstates();
   debugger_system_variable_init();
   debugger_variable_init();
   debugger_reset();
@@ -97,6 +98,12 @@ debugger_register_startup( void )
   startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
                             ARRAY_SIZE( dependencies ), debugger_init, NULL,
                             debugger_end );
+}
+
+int
+is_debugger_enabled()
+{
+  return gdbserver_debugging_enabled;
 }
 
 /* Activate the debugger */

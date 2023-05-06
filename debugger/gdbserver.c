@@ -797,12 +797,16 @@ static uint8_t action_get_mem(const void* arg, void* response)
     struct action_mem_args_t* mem = (struct action_mem_args_t*)arg;
     char* resp_buff = (char*)response;
   
+    uint32_t t = tstates;
+  
     libspectrum_word address = mem->maddr;
     for (i = 0; i < mem->mlen; i++, address++)
     {
         libspectrum_byte data = readbyte(address);
         mem2hex((void *)&data, resp_buff + i * 2, 1);
     }
+  
+    tstates = t;
 
     resp_buff[mem->mlen * 2] = '\0';
     return 0;
@@ -810,6 +814,8 @@ static uint8_t action_get_mem(const void* arg, void* response)
 
 static uint8_t action_set_mem(const void* arg, void* response)
 {
+    uint32_t t = tstates;
+  
     int i;
     struct action_mem_args_t* mem = (struct action_mem_args_t*)arg;
     char* resp_buff = (char*)response;
@@ -821,6 +827,8 @@ static uint8_t action_set_mem(const void* arg, void* response)
         hex2mem((char*)mem->payload + i * 2, (uint8_t *)&data, 1);
         writebyte(address, data);
     }
+  
+    tstates = t;
   
     strcpy(resp_buff, "OK");
     return 0;
@@ -982,7 +990,7 @@ int gdbserver_activate()
         }
       
     } while (1);
-  
+
     if (halt == 0)
     {
         debugger_mode = DEBUGGER_MODE_ACTIVE;

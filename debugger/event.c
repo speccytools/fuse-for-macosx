@@ -85,6 +85,27 @@ debugger_event_is_registered( const char *type, const char *detail )
   return 0;
 }
 
+static uint32_t debugger_tstates = 0;
+
+void
+debugger_reset_tstates()
+{
+  debugger_tstates = tstates;
+}
+
+uint32_t
+debugger_track_tstates()
+{
+  uint32_t diff = tstates - debugger_tstates;
+  debugger_tstates = tstates;
+  return diff;
+}
+
+void debugger_track_frame( libspectrum_dword frame_length )
+{
+  debugger_tstates -= frame_length;
+}
+
 void
 debugger_event( int event_code )
 {

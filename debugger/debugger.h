@@ -52,6 +52,8 @@ void debugger_register_startup( void );
 
 void debugger_reset( void );
 
+int is_debugger_enabled();
+
 int debugger_trap( void );	/* Activate the debugger */
 
 int debugger_step( void );	/* Single step */
@@ -79,6 +81,10 @@ int debugger_event_register( const char *type, const char *detail );
 
 /* Fire off a debugger event */
 void debugger_event( int event_code );
+
+void debugger_reset_tstates();
+void debugger_track_frame( libspectrum_dword frame_length );
+uint32_t debugger_track_tstates();
 
 /* Exit the emulator */
 void debugger_exit_emulator( debugger_expression *exit_code_expression );
