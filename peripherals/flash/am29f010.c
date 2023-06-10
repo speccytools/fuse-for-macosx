@@ -86,7 +86,7 @@ flash_am29f010_program( flash_am29f010_t *self, libspectrum_byte page, libspectr
 void
 flash_am29f010_write( flash_am29f010_t *self, libspectrum_byte page, libspectrum_word address, libspectrum_byte b )
 {
-  libspectrum_word flash_address = address & 0xfff;
+  libspectrum_word flash_address = address & 0x7ff;
 
   /* We implement only the reset, program, chip erase and sector erase
      commands for now */
