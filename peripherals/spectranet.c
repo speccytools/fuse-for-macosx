@@ -246,7 +246,6 @@ spectranet_activate( void )
     utils_file spectranet_rom;
     if( utils_read_auxiliary_file( "spectranet.rom", &spectranet_rom, UTILS_AUXILIARY_ROM ) != -1 ) {
       memcpy(rom, spectranet_rom.buffer, SPECTRANET_ROM_LENGTH);
-      memcpy(ram, spectranet_rom.buffer + SPECTRANET_ROM_LENGTH, SPECTRANET_RAM_LENGTH);
       utils_close_file(&spectranet_rom);
     }
 
