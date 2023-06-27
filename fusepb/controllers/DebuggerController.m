@@ -62,9 +62,9 @@ static DebuggerController *singleton = nil;
   return singleton ? singleton : [[self alloc] init];
 }
 
-- (void)habdleCloseNotification: (NSNotificationCenter*)nc
+- (void)habdleCloseNotification
 {
-    [nc addObserver:self
+    [[NSNotificationCenter defaultCenter] addObserver:self
            selector:@selector(handleWillClose:)
                name:@"NSWindowWillCloseNotification"
              object:[self window]];
@@ -72,8 +72,6 @@ static DebuggerController *singleton = nil;
    
 - (id)init
 {
-  NSNotificationCenter *nc;
-
   if ( singleton ) {
     [self dealloc];
   } else {
@@ -81,9 +79,7 @@ static DebuggerController *singleton = nil;
     self = [super initWithWindowNibName:@"Debugger"];
     singleton = self;
 
-    nc = [NSNotificationCenter defaultCenter];
-    
-    [self performSelectorOnMainThread:@selector(habdleCloseNotification) withObject:nc waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(habdleCloseNotification) withObject:nil waitUntilDone:YES];
     [self setWindowFrameAutosaveName:@"DebuggerWindow"];
   }
 
