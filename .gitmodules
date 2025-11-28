@@ -1,3 +1,9 @@
+[submodule "3rdparty/audiofile"]
+	path = 3rdparty/audiofile
+	url = git://git.code.sf.net/p/fuse-for-macosx/audiofile
+[submodule "3rdparty/libgcrypt"]
+	path = 3rdparty/libgcrypt
+	url = git://git.code.sf.net/p/fuse-for-macosx/libgcrypt
 [submodule "fusepb/libspectrum"]
 	path = fusepb/libspectrum
 	url = https://github.com/speccytools/libspectrum.git
