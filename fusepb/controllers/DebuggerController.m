@@ -80,7 +80,7 @@ static DebuggerController *singleton = nil;
     singleton = self;
 
     [self performSelectorOnMainThread:@selector(habdleCloseNotification) withObject:nil waitUntilDone:YES];
-    [self setWindowFrameAutosaveName:@"DebuggerWindow"];
+    [self performSelectorOnMainThread:@selector(setWindowFrameAutosaveName:) withObject:@"DebuggerWindow" waitUntilDone:YES];
   }
 
   return singleton;
