@@ -657,7 +657,7 @@
 		B6D0E10C1CFD54EE00202683 /* uimedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uimedia.h; sourceTree = "<group>"; };
 		B6D2989105B061CB00C2AA14 /* MemoryBrowserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MemoryBrowserController.h; path = controllers/MemoryBrowserController.h; sourceTree = "<group>"; };
 		B6D2989205B061CB00C2AA14 /* MemoryBrowserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MemoryBrowserController.m; path = controllers/MemoryBrowserController.m; sourceTree = "<group>"; };
-		B6D65C3618A6431500170B64 /* gcrypt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gcrypt.framework; path = ../../libgcrypt/build/Deployment/gcrypt.framework; sourceTree = "<group>"; };
+		B6D65C3618A6431500170B64 /* gcrypt.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gcrypt.framework; path = ../3rdparty/libgcrypt/build/Deployment/gcrypt.framework; sourceTree = "<group>"; };
 		B6D670451DD6CB6B0014914E /* FuseXHelp.help */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuseXHelp.help; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6D670471DD6CB6B0014914E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6D71DCC1F6A94750000D666 /* divmmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = divmmc.c; sourceTree = "<group>"; };
@@ -746,7 +746,7 @@
 		B6F74F9704B855D40059D51C /* LoadBinaryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = LoadBinaryController.m; path = controllers/LoadBinaryController.m; sourceTree = "<group>"; };
 		B6F74F9C04B85B660059D51C /* SaveBinaryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SaveBinaryController.h; path = controllers/SaveBinaryController.h; sourceTree = "<group>"; };
 		B6F74F9D04B85B660059D51C /* SaveBinaryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SaveBinaryController.m; path = controllers/SaveBinaryController.m; sourceTree = "<group>"; };
-		B6FA759C0C1D7507007F5A10 /* audiofile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = audiofile.framework; path = ../../audiofile/build/Deployment/audiofile.framework; sourceTree = "<group>"; };
+		B6FA759C0C1D7507007F5A10 /* audiofile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = audiofile.framework; path = ../3rdparty/audiofile/build/Deployment/audiofile.framework; sourceTree = "<group>"; };
 		B6FD5C7A05A4F5B600A6C4FC /* utils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../utils.h; sourceTree = SOURCE_ROOT; };
 		B6FEA44B0444C2CC0013916D /* tc2068-0.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "tc2068-0.rom"; path = "../roms/tc2068-0.rom"; sourceTree = SOURCE_ROOT; };
 		B6FEA44C0444C2CC0013916D /* tc2068-1.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "tc2068-1.rom"; path = "../roms/tc2068-1.rom"; sourceTree = SOURCE_ROOT; };
@@ -2078,8 +2078,8 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../audiofile/build/Deployment\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../libgcrypt/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../3rdparty/audiofile/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../3rdparty/libgcrypt/build/Deployment\"";
 				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -2139,8 +2139,8 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../audiofile/build/Deployment\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../libgcrypt/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../3rdparty/audiofile/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../3rdparty/libgcrypt/build/Deployment\"";
 				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -2198,8 +2198,8 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../audiofile/build/Deployment\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../../libgcrypt/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../3rdparty/audiofile/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../3rdparty/libgcrypt/build/Deployment\"";
 				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
