@@ -992,15 +992,17 @@ tape_block_details( char *buffer, size_t length,
     break;
 
   normal:
+    /* The -2 here is for the flag and parity bytes */
     snprintf( buffer, length, "%lu bytes",
-	      (unsigned long)libspectrum_tape_block_data_length( block ) );
+          (unsigned long)libspectrum_tape_block_data_length( block ) - 2 );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
   case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    /* The -2 here is for the flag and parity bytes */
     snprintf( buffer, length, "%lu bytes",
-	      (unsigned long)libspectrum_tape_block_data_length( block ) );
+          (unsigned long)libspectrum_tape_block_data_length( block ) - 2 );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
