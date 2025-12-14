@@ -238,7 +238,7 @@ CODE
 
 if( /LIBSPECTRUM_SNAP_ACCESSORS/ ) {
 
-  open( DATAFILE, '<' . "$ENV{SRCROOT}/libspectrum/snap_accessors.txt" ) or die "Couldn't open `$ENV{SRCROOT}/libspectrum/snap_accessors.txt': $!";
+  open( DATAFILE, '<' . "$ENV{SRCROOT}/../3rdparty/libspectrum/snap_accessors.txt" ) or die "Couldn't open `$ENV{SRCROOT}/../3rdparty/libspectrum/snap_accessors.txt': $!";
 
   $_ = '';
   while( <DATAFILE> ) {
@@ -278,8 +278,8 @@ CODE
 
 if( /LIBSPECTRUM_TAPE_ACCESSORS/ ) {
 
-    open( DATAFILE, '<' . "$ENV{SRCROOT}/libspectrum/tape_accessors.txt" )
-	or die "Couldn't open `$ENV{SRCROOT}/libspectrum/tape_accessors.txt': $!";
+    open( DATAFILE, '<' . "$ENV{SRCROOT}/../3rdparty/libspectrum/tape_accessors.txt" )
+	or die "Couldn't open `$ENV{SRCROOT}/../3rdparty/libspectrum/tape_accessors.txt': $!";
 
     $_ = '';
     while( <DATAFILE> ) {
@@ -318,5 +318,5 @@ CODE
 	}
     }
 
-    close DATAFILE or die "Couldn't close `$ENV{SRCROOT}/libspectrum/tape_accessors.txt': $!";
+    close DATAFILE or die "Couldn't close `$ENV{SRCROOT}/../3rdparty/libspectrum/tape_accessors.txt': $!";
 }

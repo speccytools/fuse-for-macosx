@@ -1,9 +1,15 @@
 [submodule "3rdparty/audiofile"]
 	path = 3rdparty/audiofile
-	url = git@github.com:speccytools/fuse-audiofile.git
+	url = ../fuse-audiofile
 [submodule "3rdparty/libgcrypt"]
 	path = 3rdparty/libgcrypt
-	url = git@github.com:speccytools/fuse-libgcrypt.git
-[submodule "fusepb/libspectrum"]
-	path = fusepb/libspectrum
-	url = https://github.com/speccytools/libspectrum.git
+	url = ../fuse-libgcrypt
+[submodule "3rdparty/FuseGenerator"]
+	path = 3rdparty/FuseGenerator
+	url = ../fuse-generator
+[submodule "3rdparty/FuseImporter"]
+	path = 3rdparty/FuseImporter
+	url = ../fuse-importer
+[submodule "3rdparty/libspectrum"]
+	path = 3rdparty/libspectrum
+	url = ../libspectrum

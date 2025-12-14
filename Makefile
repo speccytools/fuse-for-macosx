@@ -1,6 +1,6 @@
-.PHONY: 3rdparty audiofile libgcrypt clean-3rdparty
+.PHONY: 3rdparty audiofile libgcrypt FuseGenerator FuseImporter clean-3rdparty
 
-3rdparty: audiofile libgcrypt
+3rdparty: audiofile libgcrypt FuseGenerator  FuseImporter
 
 audiofile:
 	@echo "Building audiofile Framework..."
@@ -22,7 +22,29 @@ libgcrypt:
 		BUILD_DIR=build \
 		CONFIGURATION_BUILD_DIR=build/Deployment
 
+FuseGenerator:
+	@echo "Building FuseGenerator Framework..."
+	cd 3rdparty/FuseGenerator && \
+	xcodebuild -project FuseGenerator.xcodeproj \
+		-target "FuseGenerator" \
+		-configuration Deployment \
+		SYMROOT=build \
+		BUILD_DIR=build \
+		CONFIGURATION_BUILD_DIR=build/Deployment
+
+FuseImporter:
+	@echo "Building FuseImporter Framework..."
+	cd 3rdparty/FuseImporter && \
+	xcodebuild -project FuseImporter.xcodeproj \
+		-target "FuseImporter" \
+		-configuration Deployment \
+		SYMROOT=build \
+		BUILD_DIR=build \
+		CONFIGURATION_BUILD_DIR=build/Deployment
+
 clean-3rdparty:
 	@echo "Cleaning 3rdparty build artifacts..."
 	rm -rf 3rdparty/audiofile/build
 	rm -rf 3rdparty/libgcrypt/build
+	rm -rf 3rdparty/FuseGenerator/build
+	rm -rf 3rdparty/FuseImporter/build
