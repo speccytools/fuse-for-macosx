@@ -36,6 +36,7 @@
 #include "nic/w5100.h"
 #include "periph.h"
 #include "peripherals/ula.h"
+#include "peripherals/nic/dns_resolver.h"
 #include "settings.h"
 #include "spectranet.h"
 #include "utils.h"
@@ -455,6 +456,7 @@ spectranet_init( void *context )
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
 
+  dns_resolver_init();
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
 

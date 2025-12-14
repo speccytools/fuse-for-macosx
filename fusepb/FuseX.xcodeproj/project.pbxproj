@@ -297,6 +297,12 @@
 		FE3FF185294F1220009F571F /* spectranet.rom in Resources */ = {isa = PBXBuildFile; fileRef = FE3FF184294F1220009F571F /* spectranet.rom */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C972EEF0710008277BA /* FuseGenerator.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */; };
+		FED23B142EE096F10013DD32 /* tls.c in Sources */ = {isa = PBXBuildFile; fileRef = FED23B122EE096F10013DD32 /* tls.c */; };
+		FED24C472EE104C60013DD32 /* mbedtls.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FED24C382EE1002B0013DD32 /* mbedtls.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FED24C482EE104EB0013DD32 /* mbedtls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FED24C382EE1002B0013DD32 /* mbedtls.framework */; };
+		FED24DE32EE108360013DD32 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FED24DE22EE108360013DD32 /* Security.framework */; };
+		FED24DE62EE10B590013DD32 /* dns_resolver.c in Sources */ = {isa = PBXBuildFile; fileRef = FED24DE42EE10B590013DD32 /* dns_resolver.c */; };
+		FED24DE72EE10B590013DD32 /* dns_processor.c in Sources */ = {isa = PBXBuildFile; fileRef = FED24DE52EE10B590013DD32 /* dns_processor.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -383,6 +389,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				B6FA75C60C1D76A5007F5A10 /* audiofile.framework in Copy Files */,
+				FED24C472EE104C60013DD32 /* mbedtls.framework in Copy Files */,
 				B6D65C3818A645A100170B64 /* gcrypt.framework in Copy Files */,
 			);
 			name = "Copy Files";
@@ -836,6 +843,14 @@
 		FE3FF184294F1220009F571F /* spectranet.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = spectranet.rom; path = ../roms/spectranet.rom; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FuseGenerator.qlgenerator; path = ../3rdparty/FuseGenerator/build/Deployment/FuseGenerator.qlgenerator; sourceTree = "<group>"; };
+		FED23B102EE096F10013DD32 /* mbedtls_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mbedtls_config.h; sourceTree = "<group>"; };
+		FED23B112EE096F10013DD32 /* tls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tls.h; sourceTree = "<group>"; };
+		FED23B122EE096F10013DD32 /* tls.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tls.c; sourceTree = "<group>"; };
+		FED24C382EE1002B0013DD32 /* mbedtls.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mbedtls.framework; path = "../3rdparty/mbedtls/build/Deployment/mbedtls.framework"; sourceTree = SOURCE_ROOT; };
+		FED24DE22EE108360013DD32 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		FED24DE42EE10B590013DD32 /* dns_resolver.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dns_resolver.c; sourceTree = "<group>"; };
+		FED24DE52EE10B590013DD32 /* dns_processor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dns_processor.c; sourceTree = "<group>"; };
+		FED24DE82EE10C370013DD32 /* dns_resolver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dns_resolver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -844,9 +859,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6D65C3718A6431500170B64 /* gcrypt.framework in Frameworks */,
+				FED24C482EE104EB0013DD32 /* mbedtls.framework in Frameworks */,
 				B6FA759D0C1D7507007F5A10 /* audiofile.framework in Frameworks */,
 				B61F469A09121DF100C8096C /* Cocoa.framework in Frameworks */,
 				B61F469B09121DF100C8096C /* Foundation.framework in Frameworks */,
+				FED24DE32EE108360013DD32 /* Security.framework in Frameworks */,
 				B61F469C09121DF100C8096C /* AppKit.framework in Frameworks */,
 				B64E2A170A6534A3006863D9 /* Carbon.framework in Frameworks */,
 				B6A6F0EE0B3D5F9E000B88E9 /* CoreAudio.framework in Frameworks */,
@@ -888,6 +905,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FED24C382EE1002B0013DD32 /* mbedtls.framework */,
 				B6FA759C0C1D7507007F5A10 /* audiofile.framework */,
 				B6D65C3618A6431500170B64 /* gcrypt.framework */,
 			);
@@ -946,7 +964,6 @@
 				F559859E038921E201A804BA /* fuse */,
 				B68C32931D3BBEE50082CBD4 /* infrastructure */,
 				B6AD8FE106221F7200C70D75 /* machines */,
-				B6E1F19A14F6514000600EB0 /* peripherals */,
 				B64586CE059BC02C00934482 /* pokefinder */,
 				B678E3E20608FAA600678A33 /* sound */,
 				B63225EF0C66BA4B00BB081B /* timer */,
@@ -954,6 +971,7 @@
 				B6E0CBA11D9E805900426949 /* unittests */,
 				F559859C038921D601A804BA /* z80 */,
 				F5598598038921C501A804BA /* config.h */,
+				B6E1F19A14F6514000600EB0 /* peripherals */,
 			);
 			name = "Other Sources";
 			path = ..;
@@ -978,6 +996,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FED24DE22EE108360013DD32 /* Security.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -1434,6 +1453,7 @@
 		B6E1F19A14F6514000600EB0 /* peripherals */ = {
 			isa = PBXGroup;
 			children = (
+				FED23B132EE096F10013DD32 /* security */,
 				B6CA2A270C33F8970003CF90 /* disk */,
 				B69BE5391660DFB100C5D0CE /* flash */,
 				B64BD1060FF6EB27000B82AE /* ide */,
@@ -1485,6 +1505,9 @@
 				B69BE53E1660E02500C5D0CE /* w5100_socket.c */,
 				B69BE53F1660E02500C5D0CE /* w5100.c */,
 				B69BE5401660E02500C5D0CE /* w5100.h */,
+				FED24DE52EE10B590013DD32 /* dns_processor.c */,
+				FED24DE42EE10B590013DD32 /* dns_resolver.c */,
+				FED24DE82EE10C370013DD32 /* dns_resolver.h */,
 			);
 			path = nic;
 			sourceTree = "<group>";
@@ -1634,6 +1657,16 @@
 				F536B56503A0C275011517A0 /* utils.c */,
 			);
 			name = fuse;
+			sourceTree = "<group>";
+		};
+		FED23B132EE096F10013DD32 /* security */ = {
+			isa = PBXGroup;
+			children = (
+				FED23B102EE096F10013DD32 /* mbedtls_config.h */,
+				FED23B112EE096F10013DD32 /* tls.h */,
+				FED23B122EE096F10013DD32 /* tls.c */,
+			);
+			path = security;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1842,6 +1875,8 @@
 				B61F463C09121DF100C8096C /* display.c in Sources */,
 				B6D71DD31F6A94750000D666 /* divxxx.c in Sources */,
 				B61F463D09121DF100C8096C /* event.c in Sources */,
+				FED24DE62EE10B590013DD32 /* dns_resolver.c in Sources */,
+				FED24DE72EE10B590013DD32 /* dns_processor.c in Sources */,
 				B61F463E09121DF100C8096C /* keyboard.c in Sources */,
 				B68C32991D3BBF620082CBD4 /* z80_debugger_variables.c in Sources */,
 				B61F463F09121DF100C8096C /* printer.c in Sources */,
@@ -2020,6 +2055,7 @@
 				B61700F7163EAFC600142336 /* PokeMemoryController.m in Sources */,
 				D15E8F93259F5C0C0006FC79 /* gdbserver_utils.c in Sources */,
 				B6F66E351E473D68005B270A /* memory_pages.c in Sources */,
+				FED23B142EE096F10013DD32 /* tls.c in Sources */,
 				B69BE5331660DF5300C5D0CE /* socket.c in Sources */,
 				B69BE5381660DF8B00C5D0CE /* movie.c in Sources */,
 				B69BE53C1660E01000C5D0CE /* am29f010.c in Sources */,
@@ -2081,9 +2117,11 @@
 					../../,
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../3rdparty/audiofile/build/Deployment\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../3rdparty/libgcrypt/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../3rdparty/mbedtls/build/Deployment\"";
 				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -2095,6 +2133,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)/mbedtls.framework/Headers",
 					..,
 					"$(PROJECT_DIR)",
 					/usr/local/include,
@@ -2142,9 +2181,11 @@
 					../../,
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../3rdparty/audiofile/build/Deployment\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../3rdparty/libgcrypt/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../3rdparty/mbedtls/build/Deployment\"";
 				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -2155,6 +2196,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)/mbedtls.framework/Headers",
 					..,
 					"$(PROJECT_DIR)",
 					/usr/local/include,
@@ -2201,9 +2243,11 @@
 					../../,
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../3rdparty/audiofile/build/Deployment\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/../3rdparty/libgcrypt/build/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../3rdparty/mbedtls/build/Deployment\"";
 				GCC_C_LANGUAGE_STANDARD = gnu89;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -2214,6 +2258,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)/audiofile.framework/Headers",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)/gcrypt.framework/Headers",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)/mbedtls.framework/Headers",
 					..,
 					"$(PROJECT_DIR)",
 					/usr/local/include,

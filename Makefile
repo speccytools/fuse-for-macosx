@@ -1,6 +1,6 @@
-.PHONY: 3rdparty audiofile libgcrypt FuseGenerator FuseImporter clean-3rdparty
+.PHONY: 3rdparty audiofile libgcrypt FuseGenerator FuseImporter mbedtls clean-3rdparty
 
-3rdparty: audiofile libgcrypt FuseGenerator  FuseImporter
+3rdparty: audiofile libgcrypt FuseGenerator FuseImporter mbedtls
 
 audiofile:
 	@echo "Building audiofile Framework..."
@@ -42,9 +42,20 @@ FuseImporter:
 		BUILD_DIR=build \
 		CONFIGURATION_BUILD_DIR=build/Deployment
 
+mbedtls:
+	@echo "Building mbedtls Framework..."
+	cd 3rdparty/mbedtls && \
+	xcodebuild -project mbedtls.xcodeproj \
+		-target "mbedtls" \
+		-configuration Deployment \
+		SYMROOT=build \
+		BUILD_DIR=build \
+		CONFIGURATION_BUILD_DIR=build/Deployment
+
 clean-3rdparty:
 	@echo "Cleaning 3rdparty build artifacts..."
 	rm -rf 3rdparty/audiofile/build
 	rm -rf 3rdparty/libgcrypt/build
 	rm -rf 3rdparty/FuseGenerator/build
 	rm -rf 3rdparty/FuseImporter/build
+	rm -rf 3rdparty/mbedtls/build
