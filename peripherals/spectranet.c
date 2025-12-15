@@ -37,6 +37,8 @@
 #include "periph.h"
 #include "peripherals/ula.h"
 #include "peripherals/nic/dns_resolver.h"
+#include "peripherals/nic/xfs.h"
+#include "peripherals/nic/spectranext_config.h"
 #include "settings.h"
 #include "spectranet.h"
 #include "utils.h"
@@ -71,6 +73,8 @@ int spectranet_available = 0;
 int spectranet_paged;
 int spectranet_paged_via_io;
 int spectranet_w5100_paged_a = 0, spectranet_w5100_paged_b = 0;
+int spectranet_xfs_paged_a = 0, spectranet_xfs_paged_b = 0;
+int spectranet_spectranext_config_paged_a = 0, spectranet_spectranext_config_paged_b = 0;
 
 /* Whether the programmable trap is active */
 int spectranet_programmable_trap_active;
@@ -142,6 +146,8 @@ spectranet_map_page( int dest, int source )
 {
   int i;
   int w5100_page = source >= 0x40 && source < 0x48;
+  int xfs_page = (source == XFS_SPECTRANET_PAGE);
+  int spectranext_config_page = (source == SPECTRANEXT_CONFIG_PAGE);
 
   for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
     spectranet_current_map[dest * MEMORY_PAGES_IN_4K + i] =
@@ -149,8 +155,16 @@ spectranet_map_page( int dest, int source )
 
   switch( dest )
   {
-    case 1: spectranet_w5100_paged_a = w5100_page; break;
-    case 2: spectranet_w5100_paged_b = w5100_page; break;
+    case 1: 
+      spectranet_w5100_paged_a = w5100_page;
+      spectranet_xfs_paged_a = xfs_page;
+      spectranet_spectranext_config_paged_a = spectranext_config_page;
+      break;
+    case 2: 
+      spectranet_w5100_paged_b = w5100_page;
+      spectranet_xfs_paged_b = xfs_page;
+      spectranet_spectranext_config_paged_b = spectranext_config_page;
+      break;
   }
 }
 
@@ -457,6 +471,8 @@ spectranet_init( void *context )
 				 &unpage_event );
 
   dns_resolver_init();
+  spectranext_config_init();
+  xfs_init();
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
 
@@ -503,6 +519,30 @@ spectranet_w5100_write( memory_page *page, libspectrum_word address, libspectrum
 {
   address &= 0xfff;
   nic_w5100_write( w5100, get_w5100_register( page, address ), b );
+}
+
+libspectrum_byte
+spectranet_xfs_read( memory_page *page, libspectrum_word address )
+{
+  return xfs_read( page, address );
+}
+
+void
+spectranet_xfs_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
+{
+  xfs_write( page, address, b );
+}
+
+libspectrum_byte
+spectranet_spectranext_config_read( memory_page *page, libspectrum_word address )
+{
+  return spectranext_config_read( page, address );
+}
+
+void
+spectranet_spectranext_config_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
+{
+  spectranext_config_write( page, address, b );
 }
 
 void

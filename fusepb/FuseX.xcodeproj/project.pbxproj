@@ -297,6 +297,11 @@
 		FE3FF185294F1220009F571F /* spectranet.rom in Resources */ = {isa = PBXBuildFile; fileRef = FE3FF184294F1220009F571F /* spectranet.rom */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C972EEF0710008277BA /* FuseGenerator.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */; };
+		FEC02C9A2EEF5FBA008277BA /* xfs.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C982EEF5FBA008277BA /* xfs.h */; };
+		FEC02C9B2EEF5FBA008277BA /* xfs.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C992EEF5FBA008277BA /* xfs.c */; };
+		FEC02C9F2EEF65D6008277BA /* spectranext_config.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9C2EEF65D5008277BA /* spectranext_config.c */; };
+		FEC02CA02EEF65D6008277BA /* spectranext.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9D2EEF65D5008277BA /* spectranext.h */; };
+		FEC02CA12EEF65D6008277BA /* spectranext_config.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9E2EEF65D6008277BA /* spectranext_config.h */; };
 		FED23B142EE096F10013DD32 /* tls.c in Sources */ = {isa = PBXBuildFile; fileRef = FED23B122EE096F10013DD32 /* tls.c */; };
 		FED24C472EE104C60013DD32 /* mbedtls.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FED24C382EE1002B0013DD32 /* mbedtls.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FED24C482EE104EB0013DD32 /* mbedtls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FED24C382EE1002B0013DD32 /* mbedtls.framework */; };
@@ -843,10 +848,15 @@
 		FE3FF184294F1220009F571F /* spectranet.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = spectranet.rom; path = ../roms/spectranet.rom; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FuseGenerator.qlgenerator; path = ../3rdparty/FuseGenerator/build/Deployment/FuseGenerator.qlgenerator; sourceTree = "<group>"; };
+		FEC02C982EEF5FBA008277BA /* xfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xfs.h; sourceTree = "<group>"; };
+		FEC02C992EEF5FBA008277BA /* xfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xfs.c; sourceTree = "<group>"; };
+		FEC02C9C2EEF65D5008277BA /* spectranext_config.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_config.c; sourceTree = "<group>"; };
+		FEC02C9D2EEF65D5008277BA /* spectranext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext.h; sourceTree = "<group>"; };
+		FEC02C9E2EEF65D6008277BA /* spectranext_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext_config.h; sourceTree = "<group>"; };
 		FED23B102EE096F10013DD32 /* mbedtls_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mbedtls_config.h; sourceTree = "<group>"; };
 		FED23B112EE096F10013DD32 /* tls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tls.h; sourceTree = "<group>"; };
 		FED23B122EE096F10013DD32 /* tls.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tls.c; sourceTree = "<group>"; };
-		FED24C382EE1002B0013DD32 /* mbedtls.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mbedtls.framework; path = "../3rdparty/mbedtls/build/Deployment/mbedtls.framework"; sourceTree = SOURCE_ROOT; };
+		FED24C382EE1002B0013DD32 /* mbedtls.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mbedtls.framework; path = ../3rdparty/mbedtls/build/Deployment/mbedtls.framework; sourceTree = SOURCE_ROOT; };
 		FED24DE22EE108360013DD32 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		FED24DE42EE10B590013DD32 /* dns_resolver.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dns_resolver.c; sourceTree = "<group>"; };
 		FED24DE52EE10B590013DD32 /* dns_processor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dns_processor.c; sourceTree = "<group>"; };
@@ -1508,6 +1518,11 @@
 				FED24DE52EE10B590013DD32 /* dns_processor.c */,
 				FED24DE42EE10B590013DD32 /* dns_resolver.c */,
 				FED24DE82EE10C370013DD32 /* dns_resolver.h */,
+				FEC02C982EEF5FBA008277BA /* xfs.h */,
+				FEC02C992EEF5FBA008277BA /* xfs.c */,
+				FEC02C9D2EEF65D5008277BA /* spectranext.h */,
+				FEC02C9E2EEF65D6008277BA /* spectranext_config.h */,
+				FEC02C9C2EEF65D5008277BA /* spectranext_config.c */,
 			);
 			path = nic;
 			sourceTree = "<group>";
@@ -1865,6 +1880,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEC02C9F2EEF65D6008277BA /* spectranext_config.c in Sources */,
+				FEC02CA02EEF65D6008277BA /* spectranext.h in Sources */,
+				FEC02CA12EEF65D6008277BA /* spectranext_config.h in Sources */,
+				FEC02C9A2EEF5FBA008277BA /* xfs.h in Sources */,
+				FEC02C9B2EEF5FBA008277BA /* xfs.c in Sources */,
 				B6D0E1061CFD549200202683 /* usource.c in Sources */,
 				B6DCBC96114FA67200DC9A11 /* tape_accessors.txt in Sources */,
 				B6168CEC1F0BC50D008C99E6 /* multiface.c in Sources */,

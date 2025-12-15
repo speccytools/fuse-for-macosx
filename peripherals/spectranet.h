@@ -34,11 +34,17 @@ int spectranet_nmi_flipflop( void );
 
 libspectrum_byte spectranet_w5100_read( memory_page *page, libspectrum_word address );
 void spectranet_w5100_write( memory_page *page, libspectrum_word address, libspectrum_byte b );
+libspectrum_byte spectranet_xfs_read( memory_page *page, libspectrum_word address );
+void spectranet_xfs_write( memory_page *page, libspectrum_word address, libspectrum_byte b );
+libspectrum_byte spectranet_spectranext_config_read( memory_page *page, libspectrum_word address );
+void spectranet_spectranext_config_write( memory_page *page, libspectrum_word address, libspectrum_byte b );
 void spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b );
 
 extern int spectranet_available;
 extern int spectranet_paged;
 extern int spectranet_w5100_paged_a, spectranet_w5100_paged_b;
+extern int spectranet_xfs_paged_a, spectranet_xfs_paged_b;
+extern int spectranet_spectranext_config_paged_a, spectranet_spectranext_config_paged_b;
 extern int spectranet_programmable_trap_active;
 extern libspectrum_word spectranet_programmable_trap;
 
