@@ -182,6 +182,11 @@ _Static_assert(0x008 == offsetof(struct xfs_registers_t, arguments), "arguments 
 extern volatile struct xfs_registers_t xfs_registers;
 
 extern void xfs_init();
+extern void xfs_unmount(void);
+
+// XFS debug functions
+extern void xfs_debug_enable(bool enable);
+extern bool xfs_debug_is_enabled(void);
 
 // XFS register access functions
 libspectrum_byte xfs_read( memory_page *page, libspectrum_word address );

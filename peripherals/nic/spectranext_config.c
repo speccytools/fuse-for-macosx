@@ -7,8 +7,8 @@
 #include "libspectrum.h"
 #include "memory_pages.h"
 
-volatile struct wifi_config_registers_t spectranext_config = {
-    .controller_status = SPECTRANEXT_CONTROLLER_STATUS_OPERATIONAL,
+volatile struct spectranext_controller_registers_t spectranext_config = {
+    .controller_status = WIFI_CONTROLLER_STATUS_OPERATIONAL,
     .connection_status = WIFI_CONNECT_CONNECT_IP_OBTAINED
 };
 
@@ -53,7 +53,7 @@ static void spectranext_config_process_command(void)
 void spectranext_config_init()
 {
     // Initialize with default values
-    spectranext_config.controller_status = SPECTRANEXT_CONTROLLER_STATUS_OPERATIONAL;
+    spectranext_config.controller_status = WIFI_CONTROLLER_STATUS_OPERATIONAL;
     spectranext_config.connection_status = WIFI_CONNECT_CONNECT_IP_OBTAINED;
     spectranext_config.scan_status = WIFI_SCAN_NONE;
     spectranext_config.scan_access_point_count = 0;

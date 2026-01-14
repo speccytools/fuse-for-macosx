@@ -5,7 +5,7 @@
 #include "memory_pages.h"
 #include "spectranext.h"
 
-extern volatile struct wifi_config_registers_t spectranext_config;
+extern volatile struct spectranext_controller_registers_t spectranext_config;
 
 extern void spectranext_config_init();
 

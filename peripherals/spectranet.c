@@ -147,7 +147,7 @@ spectranet_map_page( int dest, int source )
   int i;
   int w5100_page = source >= 0x40 && source < 0x48;
   int xfs_page = (source == XFS_SPECTRANET_PAGE);
-  int spectranext_config_page = (source == SPECTRANEXT_CONFIG_PAGE);
+  int spectranext_config_page = (source == SPECTRANEXT_CONTROLLER_PAGE);
 
   for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
     spectranet_current_map[dest * MEMORY_PAGES_IN_4K + i] =
