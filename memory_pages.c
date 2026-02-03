@@ -43,7 +43,7 @@
 #include "module.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/spectranet.h"
-#include "peripherals/nic/xfs.h"
+#include "peripherals/fs/xfs.h"
 #include "peripherals/nic/spectranext_config.h"
 #include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
