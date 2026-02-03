@@ -19,6 +19,7 @@
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "vfile.h"
 
 #include <pthread.h>
 #include <assert.h>
@@ -35,7 +36,7 @@ typedef uint8_t (*trapped_action_t)(const void* data, void* response);
 
 static int gdbserver_socket;
 static int gdbserver_client_socket = -1;
-static uint8_t tmpbuf[0x20000];
+uint8_t tmpbuf[0x20000];  // Made non-static so vfile_ext.c can access it
 static volatile char gdbserver_trapped = 0;
 static volatile char gdbserver_do_not_report_trap = 0;
 static int gdbserver_port = 0;
@@ -138,7 +139,7 @@ static void process_query(char *payload)
     if (!strcmp(name, "Offsets"))
         write_packet("");
     if (!strcmp(name, "Supported"))
-        write_packet("PacketSize=4000;qXfer:features:read+;qXfer:auxv:read+");
+        write_packet("PacketSize=4000;qXfer:features:read+;qXfer:auxv:read+;vSpectranext+");
     if (!strcmp(name, "Symbol"))
         write_packet("OK");
     if (name == strstr(name, "ThreadExtraInfo"))
@@ -173,9 +174,20 @@ static void process_vpacket(char *payload)
         *args++ = '\0';
     name = payload;
 
+    // Try vfile handler first (handles vFile: and vSpectranext: packets)
+    if (strncmp(name, "File:", 5) == 0 || strncmp(name, "Spectranext:", 12) == 0)
+    {
+        const char* response = vfile_handle_v(name, args ? args : "", args ? strlen(args) : 0);
+        if (response)
+        {
+            write_packet(response);
+        }
+        return;
+    }
+
     if (!strcmp("Cont", name))
     {
-        if (args[0] == 'c')
+        if (args && args[0] == 'c')
         {
             if (gdbserver_detrap())
             {
@@ -186,7 +198,7 @@ static void process_vpacket(char *payload)
                 write_packet("E01");
             }
         }
-        if (args[0] == 's')
+        if (args && args[0] == 's')
         {
             if (gdbserver_trapped)
             {

@@ -36,29 +36,16 @@ bool xfs_debug_is_enabled(void)
 }
 
 // XFS base directory path
-char *xfs_base_path = NULL;
+char xfs_base_path[512];
 
 void xfs_init()
 {
-    const char *home_dir = compat_get_config_path();
-    size_t home_len = strlen(home_dir);
-    size_t xfs_path_len = home_len + strlen("/xfs") + 1;
+    snprintf(xfs_base_path, sizeof(xfs_base_path), "%s/xfs", compat_get_config_path());
     
-    // Allocate memory for full path: home_dir + "/xfs"
-    xfs_base_path = libspectrum_malloc( xfs_path_len );
-    if (xfs_base_path)
+    // Create "xfs" directory in Application Support directory
+    if (mkdir(xfs_base_path, 0755) != 0 && errno != EEXIST)
     {
-        snprintf(xfs_base_path, xfs_path_len, "%s/xfs", home_dir);
-        
-        // Create "xfs" directory in user's home directory
-        if (mkdir(xfs_base_path, 0755) != 0 && errno != EEXIST)
-        {
-            ui_error( UI_ERROR_WARNING, "xfs: failed to create xfs directory: %s\n", strerror(errno) );
-        }
-    }
-    else
-    {
-        ui_error( UI_ERROR_WARNING, "xfs: failed to allocate memory for base path\n" );
+        ui_error( UI_ERROR_WARNING, "xfs: failed to create xfs directory: %s\n", strerror(errno) );
     }
     
     XFS_DEBUG("xfs: initialized with base path: %s\n", xfs_base_path ? xfs_base_path : "(null)");
@@ -70,13 +57,6 @@ void xfs_reset(void)
     
     // Call xfs_free() from xfs.c to clean up all resources
     xfs_free();
-    
-    // Free base path if allocated
-    if (xfs_base_path)
-    {
-        libspectrum_free(xfs_base_path);
-        xfs_base_path = NULL;
-    }
     
     XFS_DEBUG("xfs: reset complete\n");
 }

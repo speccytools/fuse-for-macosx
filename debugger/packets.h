@@ -13,6 +13,7 @@ void inbuf_reset();
 void inbuf_erase_head(ssize_t end);
 void write_flush(int sockfd);
 void write_packet(const char *data);
+void write_packet_bytes(const uint8_t *data, size_t num_bytes);
 void write_binary_packet(const char *pfx, const uint8_t *data, ssize_t num_bytes);
 int read_packet(int sockfd);
 void acknowledge_packet(int sockfd);

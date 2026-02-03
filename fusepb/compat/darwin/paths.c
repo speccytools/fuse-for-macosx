@@ -26,9 +26,15 @@
 #include <config.h>
 
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <pwd.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFBundle.h>
+#include <CoreFoundation/CFURL.h>
 #include <CoreServices/CoreServices.h>
 
 #include "compat.h"

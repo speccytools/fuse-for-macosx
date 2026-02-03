@@ -300,6 +300,8 @@
 		FE2DAC752F32A23C009AC45A /* http_sck.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC722F32A23C009AC45A /* http_sck.c */; };
 		FE2DAC772F32A480009AC45A /* xfs_https.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC762F32A480009AC45A /* xfs_https.c */; };
 		FE2DAC7B2F32A500009AC45A /* httpc.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC7A2F32A500009AC45A /* httpc.c */; };
+		FE2DAC802F32AB6C009AC45A /* vfile_ext.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC7F2F32AB6C009AC45A /* vfile_ext.c */; };
+		FE2DAC812F32AB6C009AC45A /* vfile.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC7D2F32AB6C009AC45A /* vfile.c */; };
 		FE3FF185294F1220009F571F /* spectranet.rom in Resources */ = {isa = PBXBuildFile; fileRef = FE3FF184294F1220009F571F /* spectranet.rom */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C972EEF0710008277BA /* FuseGenerator.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */; };
@@ -861,6 +863,10 @@
 		FE2DAC762F32A480009AC45A /* xfs_https.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xfs_https.c; sourceTree = "<group>"; };
 		FE2DAC792F32A4F3009AC45A /* localely.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = localely.h; sourceTree = "<group>"; };
 		FE2DAC7A2F32A500009AC45A /* httpc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = httpc.c; sourceTree = "<group>"; };
+		FE2DAC7C2F32AB6C009AC45A /* vfile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vfile.h; sourceTree = "<group>"; };
+		FE2DAC7D2F32AB6C009AC45A /* vfile.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfile.c; sourceTree = "<group>"; };
+		FE2DAC7E2F32AB6C009AC45A /* vfile_ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vfile_ext.h; sourceTree = "<group>"; };
+		FE2DAC7F2F32AB6C009AC45A /* vfile_ext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfile_ext.c; sourceTree = "<group>"; };
 		FE3FF184294F1220009F571F /* spectranet.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = spectranet.rom; path = ../roms/spectranet.rom; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FuseGenerator.qlgenerator; path = ../3rdparty/FuseGenerator/build/Deployment/FuseGenerator.qlgenerator; sourceTree = "<group>"; };
@@ -1256,6 +1262,10 @@
 				B604635E04C5F37B00C225C9 /* expression.c */,
 				B68C32911D3BBEC20082CBD4 /* system_variable.c */,
 				B684A19F0E93A8D700A5B097 /* variable.c */,
+				FE2DAC7C2F32AB6C009AC45A /* vfile.h */,
+				FE2DAC7D2F32AB6C009AC45A /* vfile.c */,
+				FE2DAC7E2F32AB6C009AC45A /* vfile_ext.h */,
+				FE2DAC7F2F32AB6C009AC45A /* vfile_ext.c */,
 			);
 			path = debugger;
 			sourceTree = "<group>";
@@ -2123,6 +2133,8 @@
 				B69BE5331660DF5300C5D0CE /* socket.c in Sources */,
 				B69BE5381660DF8B00C5D0CE /* movie.c in Sources */,
 				B69BE53C1660E01000C5D0CE /* am29f010.c in Sources */,
+				FE2DAC802F32AB6C009AC45A /* vfile_ext.c in Sources */,
+				FE2DAC812F32AB6C009AC45A /* vfile.c in Sources */,
 				D15E8F94259F5C0C0006FC79 /* packets.c in Sources */,
 				B69BE5411660E02500C5D0CE /* w5100_socket.c in Sources */,
 				D12E7FF3292596B200185E4D /* AppSandboxFileAccess.m in Sources */,

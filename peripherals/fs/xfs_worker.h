@@ -9,7 +9,9 @@
 extern volatile struct xfs_registers_t xfs_registers;
 
 // XFS base directory path (used by xfs_fs.c)
-extern char *xfs_base_path;
+extern char xfs_base_path[];
+
+void xfs_init();
 
 // Fuse-specific memory access functions
 libspectrum_byte xfs_read( memory_page *page GCC_UNUSED, libspectrum_word address );

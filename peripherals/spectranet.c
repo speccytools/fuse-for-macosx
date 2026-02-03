@@ -194,8 +194,13 @@ spectranet_reset( int hard_reset )
   spectranet_available = 1;
   spectranet_paged = !settings_current.spectranet_disable;
 
-  if( hard_reset )
+  if( hard_reset ) {
     spectranet_hard_reset();
+  }
+  
+  // Reset XFS filesystem whenever Spectranet resets (hard or soft)
+  // This ensures XFS state is clean on Spectrum reboot
+  xfs_reset();
 
   if( spectranet_paged ) {
     machine_current->ram.romcs = 1;
