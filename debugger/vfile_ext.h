@@ -28,17 +28,8 @@ void vfile_ext_delay_ms(uint32_t milliseconds);
 // System reset
 void vfile_ext_trigger_reset(void);
 
-// Configuration management
-// Configuration section/item constants (platform-specific)
-#define VFILE_EXT_CONFIG_SECTION_AUTO_MOUNT (0x01FF)
-#define VFILE_EXT_CONFIG_ITEM_MOUNT_RESOURCE (0x00)  // String: mount resource
-#define VFILE_EXT_CONFIG_ITEM_AUTO_BOOT      (0x81)  // Byte: auto-boot flag
-
-int vfile_ext_config_set_string(uint8_t section, uint8_t item, const char* value);
-int vfile_ext_config_set_byte(uint8_t section, uint8_t item, uint8_t value);
-
-// Reboot monitor
-void vfile_ext_reboot_monitor_enable(int enable);
+// Autoboot configuration (sets mount point and enables auto-boot, then resets)
+void vfile_ext_autoboot(void);
 
 // XFS reset
 void vfile_ext_xfs_reset(void);

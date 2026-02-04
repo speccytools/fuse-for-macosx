@@ -2,9 +2,12 @@
 
 #include "vfile_ext.h"
 
+#include "machine.h"
+#include "debugger/gdbserver.h"
 #include "peripherals/fs/xfs.h"
 #include "peripherals/fs/xfs_engines.h"
 #include "peripherals/fs/xfs_worker.h"
+#include "peripherals/spectranet.h"
 #include "packets.h"
 
 #include <stdarg.h>
@@ -62,30 +65,26 @@ void hex_to_bin(const char* hex, uint16_t data_len, uint8_t* result)
 }
 
 // External buffer from gdbserver.c
-extern uint8_t tmpbuf[0x20000];
+static uint8_t response_buf[0x20000];
 
 // Buffer management
 char* vfile_ext_get_response_buf(void)
 {
-    return (char*)tmpbuf;
+    return (char*)response_buf;
 }
 
 size_t vfile_ext_get_response_buf_size(void)
 {
-    return sizeof(tmpbuf);
+    return sizeof(response_buf);
 }
 
 // Message sending (for debugger responses)
 void vfile_ext_send_message(const uint8_t* data, size_t len)
 {
-    // Use write_packet_bytes for binary data
-    // Note: The packet will be flushed automatically by the network thread
-    // when write_flush is called during normal packet processing
-    extern void write_packet_bytes(const uint8_t *data, size_t num_bytes);
-    write_packet_bytes(data, len);
-    // Note: We don't flush here because gdbserver_client_socket is static
-    // The packet will be flushed when the next packet is processed or when
-    // the network thread calls write_flush
+    // Use packet_send_message for binary data
+    // Packets are sent immediately, no flush needed
+    extern void packet_send_message(const uint8_t *data, size_t len);
+    packet_send_message(data, len);
 }
 
 // Delay (platform-specific sleep)
@@ -94,37 +93,36 @@ void vfile_ext_delay_ms(uint32_t milliseconds)
     usleep(milliseconds * 1000);
 }
 
-// System reset - not supported in Fuse (emulator)
+// System reset
 void vfile_ext_trigger_reset(void)
 {
-    // In Fuse, we can't actually reset the emulator from here
-    // This would need to be handled differently
+    // Schedule reset on main thread (required for thread safety)
+    gdbserver_schedule_reset();
 }
 
-// Configuration management - not implemented in Fuse
-int vfile_ext_config_set_string(uint8_t section, uint8_t item, const char* value)
+// Configuration section/item constants (internal)
+#define VFILE_EXT_CONFIG_SECTION_AUTO_MOUNT (0x01FF)
+#define VFILE_EXT_CONFIG_ITEM_MOUNT_RESOURCE (0x00)  // String: mount resource
+#define VFILE_EXT_CONFIG_ITEM_AUTO_BOOT      (0x81)  // Byte: auto-boot flag
+
+// Internal configuration management functions (not exposed in header)
+static int vfile_ext_config_set_string(uint8_t section, uint8_t item, const char* value)
 {
-    (void)section;
-    (void)item;
-    (void)value;
-    // Configuration not implemented in Fuse
-    return -1;
+    // Convert uint8_t section/item to uint16_t/uint8_t for configuration API
+    return spectranet_config_set_string((uint16_t)section, item, value);
 }
 
-int vfile_ext_config_set_byte(uint8_t section, uint8_t item, uint8_t value)
+static int vfile_ext_config_set_byte(uint8_t section, uint8_t item, uint8_t value)
 {
-    (void)section;
-    (void)item;
-    (void)value;
-    // Configuration not implemented in Fuse
-    return -1;
+    // Convert uint8_t section/item to uint16_t/uint8_t for configuration API
+    return spectranet_config_set_byte((uint16_t)section, item, value);
 }
 
-// Reboot monitor - not implemented in Fuse
-void vfile_ext_reboot_monitor_enable(int enable)
+// Autoboot configuration (sets mount point and enables auto-boot, then resets)
+void vfile_ext_autoboot(void)
 {
-    (void)enable;
-    // Not implemented in Fuse
+    // Schedule autoboot on main thread (required for thread safety)
+    gdbserver_schedule_autoboot();
 }
 
 // XFS reset

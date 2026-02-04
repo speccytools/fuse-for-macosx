@@ -321,6 +321,9 @@ static char* handle_vfile_pwrite(const char* args, uint32_t n)
         return "F-1,9";  // EBADF
     }
     
+    // Validate args and length
+    if (!args || n == 0) return "F-1,22";  // EINVAL
+    
     const char* end = args + n;
     const char* p = args;
     
@@ -330,16 +333,44 @@ static char* handle_vfile_pwrite(const char* args, uint32_t n)
     if (!p || p >= end || *p != ',') return "F-1,22";  // EINVAL
     p++;
     
-    // Decode hex data in-place (two hex digits per byte)
+    // Validate we have data after the comma
+    if (p >= end) return "F-1,22";  // EINVAL
+    
+    // Decode hex data (two hex digits per byte)
     const size_t hex_len = (size_t)(end - p);
+    if (hex_len == 0) return "F-1,22";  // EINVAL - no data
+    if (hex_len % 2 != 0) return "F-1,22";  // EINVAL - odd number of hex digits
     const size_t decoded_len = hex_len / 2;
     
-    // Decode in-place: hex_to_bin reads from positions >= i*2 and writes to position i,
-    // so it never overwrites unread data
-    hex_to_bin(p, (uint16_t)decoded_len, (uint8_t*)p);
+    // Use tmpbuf for decoding to avoid buffer overflow in recv_data
+    // tmpbuf is large enough (128KB = 0x20000) and shared with vfile_ext
+    char* decode_buf = vfile_ext_get_response_buf();
+    size_t decode_buf_size = vfile_ext_get_response_buf_size();
     
-    // Write data (now decoded in-place at p)
-    const int16_t bytes_written = xfs_ram_engine.write(&vfile_xfs_ram_mount, &active_handle, (const uint8_t*)p, decoded_len);
+    // Limit decoded_len to what fits in decode buffer
+    size_t actual_decoded_len = decoded_len;
+    if (actual_decoded_len > decode_buf_size) {
+        actual_decoded_len = decode_buf_size;
+    }
+    
+    // Limit hex_len to match (must be even)
+    size_t actual_hex_len = actual_decoded_len * 2;
+    if (actual_hex_len > hex_len) {
+        actual_hex_len = hex_len;
+        actual_decoded_len = actual_hex_len / 2;
+    }
+    
+    // Validate p is within bounds before decoding
+    // p points into args, which should be within the packet buffer
+    if (p < args || p + actual_hex_len > args + n) {
+        return "F-1,22";  // EINVAL - bounds check failed
+    }
+    
+    // Decode hex data into tmpbuf (safe, large buffer)
+    hex_to_bin(p, (uint16_t)actual_decoded_len, (uint8_t*)decode_buf);
+    
+    // Write data from decode buffer
+    const int16_t bytes_written = xfs_ram_engine.write(&vfile_xfs_ram_mount, &active_handle, (const uint8_t*)decode_buf, actual_decoded_len);
     if (bytes_written < 0)
     {
         const int errno_val = xfs_errno_to_gdb_errno(bytes_written);
@@ -464,25 +495,7 @@ static char* handle_vspectranext_autoboot(const char* args, uint32_t n)
     (void)args;
     (void)n;
     
-    // Set mount point to "xfs://ram/"
-    if (vfile_ext_config_set_string(VFILE_EXT_CONFIG_SECTION_AUTO_MOUNT, 
-                                      VFILE_EXT_CONFIG_ITEM_MOUNT_RESOURCE, 
-                                      "xfs://ram/") != 0)
-    {
-        return "E5";  // EIO
-    }
-    
-    // Enable auto-boot
-    if (vfile_ext_config_set_byte(VFILE_EXT_CONFIG_SECTION_AUTO_MOUNT, 
-                                    VFILE_EXT_CONFIG_ITEM_AUTO_BOOT, 
-                                    1) != 0)
-    {
-        return "E5";  // EIO
-    }
-    
-    vfile_ext_reboot_monitor_enable(0);
-    vfile_ext_xfs_reset();
-    vfile_ext_trigger_reset();
+    vfile_ext_autoboot();
     return "OK";
 }
 
@@ -717,7 +730,7 @@ char* vfile_handle_v(const char* name, const char* args, uint32_t n)
         
         if (colon)
         {
-            // Subcommand has arguments after ':'
+            // Subcommand has arguments after ':' - arguments are in name string
             size_t subcmd_len = colon - subcmd_with_args;
             if (subcmd_len >= sizeof(subcmd_buf))
             {
@@ -727,7 +740,8 @@ char* vfile_handle_v(const char* name, const char* args, uint32_t n)
             subcmd_buf[subcmd_len] = '\0';
             subcmd = subcmd_buf;
             actual_args = colon + 1;
-            actual_args_len = (uint32_t)(n - (actual_args - name));
+            // Since actual_args points into name, use strlen to get the length
+            actual_args_len = (uint32_t)strlen(actual_args);
         }
         else
         {
