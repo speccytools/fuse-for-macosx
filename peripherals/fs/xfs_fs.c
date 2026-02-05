@@ -135,10 +135,20 @@ static int16_t fs_open(const struct xfs_engine_mount_t* engine, struct xfs_handl
     // Convert XFS flags to POSIX flags
     int open_flags = 0;
     
-    // Determine access mode
-    if ((flags & XFS_O_RDWR) == XFS_O_RDWR)
+    // Determine access mode (check lower 2 bits)
+    uint8_t accmode = flags & 0x0003;
+    
+    // If O_CREAT is set, force read-write access (you can't create a file read-only)
+    if (flags & XFS_O_CREAT) {
+        accmode = XFS_O_RDWR;
+    }
+    
+    XFS_DEBUG("fs: open xfs_flags=0x%x accmode=%d (XFS_O_RDONLY=%d XFS_O_WRONLY=%d XFS_O_RDWR=%d)\n", 
+              flags, accmode, XFS_O_RDONLY, XFS_O_WRONLY, XFS_O_RDWR);
+    
+    if (accmode == XFS_O_RDWR)
         open_flags = O_RDWR;
-    else if ((flags & XFS_O_WRONLY) == XFS_O_WRONLY)
+    else if (accmode == XFS_O_WRONLY)
         open_flags = O_WRONLY;
     else
         open_flags = O_RDONLY;
@@ -150,6 +160,9 @@ static int16_t fs_open(const struct xfs_engine_mount_t* engine, struct xfs_handl
         open_flags |= O_CREAT;
     if (flags & XFS_O_TRUNC)
         open_flags |= O_TRUNC;
+    
+    XFS_DEBUG("fs: open open_flags=0x%x (O_RDONLY=0x%x O_WRONLY=0x%x O_RDWR=0x%x O_CREAT=0x%x O_TRUNC=0x%x)\n",
+              open_flags, O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC);
     
     struct xfs_fs_file_handle_t* file_handle = libspectrum_malloc(sizeof(struct xfs_fs_file_handle_t));
     if (!file_handle) {
@@ -164,6 +177,7 @@ static int16_t fs_open(const struct xfs_engine_mount_t* engine, struct xfs_handl
         return xfs_error_from_errno(errno);
     }
     
+    handle->type = XFS_HANDLE_TYPE_FILE;
     handle->data = file_handle;
     XFS_DEBUG("fs: open success fd=%d\n", file_handle->fd);
     return XFS_ERR_OK;
@@ -191,15 +205,58 @@ static int16_t fs_read(const struct xfs_engine_mount_t* engine, struct xfs_handl
 // Write to file
 static int16_t fs_write(const struct xfs_engine_mount_t* engine, struct xfs_handle_t* handle, const void* buffer, uint16_t size)
 {
+    if (!handle) {
+        XFS_DEBUG("fs: write failed: handle is NULL\n");
+        return XFS_ERR_BADF;
+    }
+    
+    XFS_DEBUG("fs: write handle->type=%d handle->data=%p\n", handle->type, handle->data);
+    
+    if (handle->type != XFS_HANDLE_TYPE_FILE) {
+        XFS_DEBUG("fs: write failed: wrong handle type=%d (expected %d)\n", handle->type, XFS_HANDLE_TYPE_FILE);
+        return XFS_ERR_BADF;
+    }
+    
+    if (!handle->data) {
+        XFS_DEBUG("fs: write failed: handle->data is NULL\n");
+        return XFS_ERR_BADF;
+    }
+    
     struct xfs_fs_file_handle_t* file_handle = get_file_handle(handle);
     if (!file_handle) {
+        XFS_DEBUG("fs: write failed: file_handle is NULL\n");
+        return XFS_ERR_BADF;
+    }
+    
+    XFS_DEBUG("fs: write file_handle=%p fd=%d size=%d\n", (void*)file_handle, file_handle->fd, size);
+    
+    if (file_handle->fd < 0) {
+        XFS_DEBUG("fs: write failed: invalid fd=%d\n", file_handle->fd);
+        return XFS_ERR_BADF;
+    }
+    
+    // Verify file descriptor is still valid by checking its flags
+    int fd_flags = fcntl(file_handle->fd, F_GETFL);
+    if (fd_flags < 0) {
+        XFS_DEBUG("fs: write failed: fd=%d is invalid (fcntl F_GETFL failed: %s)\n", file_handle->fd, strerror(errno));
+        return XFS_ERR_BADF;
+    }
+    
+    XFS_DEBUG("fs: write fd=%d flags=0x%x (O_WRONLY=0x%x O_RDWR=0x%x O_RDONLY=0x%x O_ACCMODE=0x%x)\n", 
+              file_handle->fd, fd_flags, O_WRONLY, O_RDWR, O_RDONLY, O_ACCMODE);
+    
+    // Check if file descriptor is opened for writing
+    int accmode = fd_flags & O_ACCMODE;
+    XFS_DEBUG("fs: write fd=%d accmode=0x%x\n", file_handle->fd, accmode);
+    if (accmode == O_RDONLY) {
+        XFS_DEBUG("fs: write failed: fd=%d opened read-only (accmode=0x%x)\n", file_handle->fd, accmode);
         return XFS_ERR_BADF;
     }
     
     ssize_t bytes_written = write(file_handle->fd, buffer, size);
     
     if (bytes_written < 0) {
-        XFS_DEBUG("fs: write failed: %s\n", strerror(errno));
+        XFS_DEBUG("fs: write failed: fd=%d error=%s (errno=%d)\n", file_handle->fd, strerror(errno), errno);
         return xfs_error_from_errno(errno);
     }
     
@@ -275,6 +332,7 @@ static int16_t fs_opendir(const struct xfs_engine_mount_t* engine, struct xfs_ha
         return xfs_error_from_errno(errno);
     }
     
+    handle->type = XFS_HANDLE_TYPE_DIR;
     handle->data = dir_handle;
     XFS_DEBUG("fs: opendir %s success\n", full_path);
     return XFS_ERR_OK;

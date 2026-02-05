@@ -1,27 +1,15 @@
 #include "xfs.h"
 #include "xfs_engines.h"
+#include <stdio.h>
 #include <string.h>
 
 // Mounted engines array - shared between task and emulator
 struct xfs_engine_mount_t xfs_mounted_engines[4] = {0};
 
 // Handles array - shared between task and emulator  
-struct xfs_handle_t xfs_handles[XFS_MAX_FDS] = {};
+struct xfs_handle_t xfs_handles[XFS_MAX_FDS] = {0};
 
-// Debug callback - can be set by emulator or task
-static void (*xfs_debug_callback)(const char* format, ...) = NULL;
-
-void xfs_set_debug_callback(void (*callback)(const char* format, ...))
-{
-    xfs_debug_callback = callback;
-}
-
-// Debug macro that works with or without callback
-#define XFS_DEBUG(...) do { \
-    if (xfs_debug_callback) { \
-        xfs_debug_callback(__VA_ARGS__); \
-    } \
-} while(0)
+#define XFS_DEBUG(...) do { if (xfs_debug_is_enabled()) printf(__VA_ARGS__); } while(0)
 
 // Helper functions
 static inline struct xfs_handle_t* get_handle(uint8_t handle)
@@ -55,6 +43,7 @@ static inline void free_handle(const uint8_t handle, const uint8_t mount_point)
             current_engine->free_handle(&xfs_mounted_engines[mount_point], h);
         }
         h->type = XFS_HANDLE_TYPE_NONE;
+        h->data = NULL;
     }
 }
 
@@ -852,6 +841,7 @@ void xfs_free(void)
             
             // Clear handle state
             h->type = XFS_HANDLE_TYPE_NONE;
+            h->data = NULL;
         }
     }
     
