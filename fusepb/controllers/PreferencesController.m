@@ -95,7 +95,12 @@
 - (void)windowDidLoad 
 { 
   [super windowDidLoad];
-  [[self window] setFrameUsingName:@"PreferencesWindow"];
+  NSWindow *window = [self window];
+  
+  // Try to restore saved frame, but if it doesn't exist, center the window
+  if (![window setFrameUsingName:@"PreferencesWindow"]) {
+    [window center];
+  }
 } 
 
 - (void)windowDidMove: (NSNotification *)aNotification 
@@ -423,7 +428,7 @@
   case 11: // Didaktik 80
     settings_current.didaktik80 = 1;
     break;
-  case 12: // Currah µSource
+  case 12: // Currah ÂµSource
     settings_current.usource = 1;
     break;
   case 13: // DivMMC

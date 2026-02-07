@@ -34,6 +34,11 @@ ifneq ($(PROVISIONING_PROFILE_SPECIFIER),)
 	XCODEBUILD_SIGN_ARGS += PROVISIONING_PROFILE_SPECIFIER="$(PROVISIONING_PROFILE_SPECIFIER)"
 endif
 
+all: 3rdparty
+
+fusepb:
+	cd fusepb && make clean && make
+
 3rdparty: audiofile libgcrypt FuseGenerator FuseImporter mbedtls
 
 audiofile:
@@ -110,7 +115,7 @@ list-teams:
 		echo "No code signing identities found. Make sure you have certificates installed in your keychain."; \
 	fi
 
-fusex: 3rdparty
+fusex: 3rdparty fusepb
 	@echo "Building FuseX app..."
 	cd fusepb && \
 	xcodebuild -project FuseX.xcodeproj \
@@ -121,7 +126,7 @@ fusex: 3rdparty
 		CONFIGURATION_BUILD_DIR=build/Deployment \
 		$(XCODEBUILD_SIGN_ARGS)
 
-archive: 3rdparty
+archive: 3rdparty fusepb
 	@echo "Archiving FuseX app..."
 	@mkdir -p build
 	cd fusepb && \
