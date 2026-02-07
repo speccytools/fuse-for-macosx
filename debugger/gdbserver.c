@@ -14,14 +14,18 @@
 #include "memory.h"
 #include "mempool.h"
 #include "periph.h"
+#include "peripherals/fs/xfs.h"
+#include "peripherals/spectranet.h"
 #include "settings.h"
 #include "utils.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "vfile.h"
 
 #include <pthread.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include "compat.h"
@@ -34,8 +38,8 @@
 typedef uint8_t (*trapped_action_t)(const void* data, void* response);
 
 static int gdbserver_socket;
-static int gdbserver_client_socket = -1;
-static uint8_t tmpbuf[0x20000];
+int gdbserver_client_socket = -1;  // Made non-static so packets.c can access it
+uint8_t tmpbuf[0x20000];  // Made non-static so vfile_ext.c can access it
 static volatile char gdbserver_trapped = 0;
 static volatile char gdbserver_do_not_report_trap = 0;
 static int gdbserver_port = 0;
@@ -80,6 +84,8 @@ static uint8_t action_set_register(const void* arg, void* response);
 static uint8_t action_set_breakpoint(const void* arg, void* response);
 static uint8_t action_remove_breakpoint(const void* arg, void* response);
 static uint8_t action_step_instruction(const void* arg, void* response);
+static uint8_t action_reset(const void* arg, void* response);
+static uint8_t action_autoboot(const void* arg, void* response);
 
 struct action_mem_args_t {
     size_t maddr, mlen;
@@ -110,10 +116,10 @@ static void process_xfer(const char *name, char *args)
   *args++ = '\0';
   
   if (!strcmp(name, "features") && !strcmp(mode, "read")) {
-      write_packet(FEATURE_STR);
+      packet_send_message((const uint8_t*)FEATURE_STR, strlen(FEATURE_STR));
   }
   if (!strcmp(name, "exec-file") && !strcmp(mode, "read")) {
-      write_packet("/fuse/emulated");
+      packet_send_message((const uint8_t*)"/fuse/emulated", strlen("/fuse/emulated"));
   }
 }
 
@@ -129,26 +135,26 @@ static void process_query(char *payload)
     if (!strcmp(name, "C"))
     {
         snprintf((char*)tmpbuf, sizeof(tmpbuf), "QCp%02x.%02x", 1, 1);
-        write_packet((const char*)tmpbuf);
+        packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
     }
     if (!strcmp(name, "Attached"))
     {
-        write_packet("1");
+        packet_send_message((const uint8_t*)"1", 1);
     }
     if (!strcmp(name, "Offsets"))
-        write_packet("");
+        packet_send_message((const uint8_t*)"", 0);
     if (!strcmp(name, "Supported"))
-        write_packet("PacketSize=4000;qXfer:features:read+;qXfer:auxv:read+");
+        packet_send_message((const uint8_t*)"PacketSize=4000;qXfer:features:read+;qXfer:auxv:read+;vSpectranext+", strlen("PacketSize=4000;qXfer:features:read+;qXfer:auxv:read+;vSpectranext+"));
     if (!strcmp(name, "Symbol"))
-        write_packet("OK");
+        packet_send_message((const uint8_t*)"OK", 2);
     if (name == strstr(name, "ThreadExtraInfo"))
     {
         args = payload;
         args = 1 + strchr(args, ',');
-        write_packet("41414141");
+        packet_send_message((const uint8_t*)"41414141", 8);
     }
     if (!strcmp(name, "TStatus"))
-        write_packet("");
+        packet_send_message((const uint8_t*)"", 0);
     if (!strcmp(name, "Xfer"))
     {
         name = args;
@@ -158,35 +164,50 @@ static void process_query(char *payload)
     }
     if (!strcmp(name, "fThreadInfo"))
     {
-        write_packet("mp01.01");
+        packet_send_message((const uint8_t*)"mp01.01", 7);
     }
     if (!strcmp(name, "sThreadInfo"))
-        write_packet("l");
+        packet_send_message((const uint8_t*)"l", 1);
 }
 
 static void process_vpacket(char *payload)
 {
     const char *name;
     char *args;
+    size_t args_len = 0;
     args = strchr(payload, ';');
     if (args)
+    {
         *args++ = '\0';
+        args_len = strlen(args);  // Calculate length after null-terminating
+    }
     name = payload;
+
+    // Try vfile handler first (handles vFile: and vSpectranext: packets)
+    if (strncmp(name, "File:", 5) == 0 || strncmp(name, "Spectranext:", 12) == 0)
+    {
+        const char* response = vfile_handle_v(name, args ? args : "", (uint32_t)args_len);
+        if (response)
+        {
+            packet_send_message((const uint8_t*)response, strlen(response));
+        }
+        return;
+    }
 
     if (!strcmp("Cont", name))
     {
-        if (args[0] == 'c')
+        if (args && args[0] == 'c')
         {
             if (gdbserver_detrap())
             {
-                write_packet("OK");
+                packet_send_message((const uint8_t*)"OK", 2);
             }
             else
             {
-                write_packet("E01");
+                packet_send_message((const uint8_t*)"E01", 3);
             }
         }
-        if (args[0] == 's')
+        if (args && args[0] == 's')
         {
             if (gdbserver_trapped)
             {
@@ -196,13 +217,13 @@ static void process_vpacket(char *payload)
         }
     }
     if (!strcmp("Cont?", name))
-      write_packet("vCont;c;C;s;S;");
+      packet_send_message((const uint8_t*)"vCont;c;C;s;S;", strlen("vCont;c;C;s;S;"));
     if (!strcmp("Kill", name))
     {
-      write_packet("OK");
+      packet_send_message((const uint8_t*)"OK", 2);
     }
     if (!strcmp("MustReplyEmpty", name))
-      write_packet("");
+      packet_send_message((const uint8_t*)"", 0);
 }
 
 static int set_register_value(int reg, libspectrum_word value)
@@ -225,50 +246,17 @@ static int get_register_value(int reg, libspectrum_word* result)
     return 0;
 }
 
-static uint8_t process_packet()
+uint8_t process_packet()
 {
-    uint8_t *inbuf = inbuf_get();
-    int inbuf_size = inbuf_end();
-  
-    if (inbuf_size == 0)
+    // Process the packet from packets subsystem
+    size_t packet_len = packets_get_packet_len();
+    if (packet_len == 0)
     {
-        return 0;
+        return 0;  // No packet to process
     }
-  
-    // printf("r: %.*s\n", inbuf_size, inbuf);
-  
-    if (inbuf_size >= 1 && *inbuf == INTERRUPT_CHAR)
-    {
-        inbuf_erase_head(1);
-        debugger_mode = DEBUGGER_MODE_HALTED;
-        return 1;
-    }
-  
-    uint8_t *packetend_ptr = (uint8_t *)memchr(inbuf, '#', inbuf_size);
-    if (packetend_ptr == NULL)
-    {
-        return 0;
-    }
-  
-    int packetend = packetend_ptr - inbuf;
-    assert('$' == inbuf[0]);
-    inbuf[packetend] = '\0';
-
-    uint8_t checksum = 0;
-    int i;
-    for (i = 1; i < packetend; i++)
-        checksum += inbuf[i];
-  
-    if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
-    {
-        inbuf_erase_head(packetend + 3);
-        return 1;
-    }
-  
-    static char recv_data[8196];
-    strcpy(recv_data, (char*)&inbuf[1]);
-    inbuf_erase_head(packetend + 3);
-  
+    
+    const uint8_t *packet_buf = packets_get_packet();
+    char *recv_data = (char *)packet_buf;
     char request = recv_data[0];
     char *payload = (char *)&recv_data[1];
 
@@ -283,18 +271,18 @@ static uint8_t process_packet()
         {
             if (gdbserver_detrap())
             {
-                write_packet("OK");
+                packet_send_message((const uint8_t*)"OK", 2);
             }
             else
             {
-                write_packet("");
+                packet_send_message((const uint8_t*)"", 0);
             }
             break;
         }
         case 'g':
         {
             if (gdbserver_execute_on_main_thread(action_get_registers, NULL, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
             break;
         }
         case 'G':
@@ -302,18 +290,18 @@ static uint8_t process_packet()
             struct action_set_registers_args_t r = {};
             if (strlen(payload) != ((sizeof(registers) / sizeof(libspectrum_word*)) * 4))
             {
-                write_packet("E01");
+                packet_send_message((const uint8_t*)"E01", 3);
                 break;
             }
             hex2mem(payload, (void *)&r.regs_data, (sizeof(registers) / sizeof(libspectrum_word*)) * 2);
           
             if (gdbserver_execute_on_main_thread(action_set_registers, &r, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
             break;
         }
         case 'H':
         {
-            write_packet("OK");
+            packet_send_message((const uint8_t*)"OK", 2);
             break;
         }
         case 'm':
@@ -327,7 +315,7 @@ static uint8_t process_packet()
             }
           
             if (gdbserver_execute_on_main_thread(action_get_mem, &mem, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
             break;
         }
         case 'M':
@@ -335,12 +323,12 @@ static uint8_t process_packet()
             struct action_mem_args_t mem;
             int offset;
             if (sscanf(payload, "%zx,%zx:%n", &mem.maddr, &mem.mlen, &offset) != 2) {
-                write_packet("E01");
+                packet_send_message((const uint8_t*)"E01", 3);
                 break;
             }
             mem.payload = (uint8_t*)(payload + offset);
             if (gdbserver_execute_on_main_thread(action_set_mem, &mem, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
             break;
         }
         case 'p':
@@ -348,7 +336,7 @@ static uint8_t process_packet()
             struct action_register_args_t r;
             r.reg = strtol(payload, NULL, 16);
             if (gdbserver_execute_on_main_thread(action_get_register, &r, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
             break;
         }
         case 'P':
@@ -360,7 +348,7 @@ static uint8_t process_packet()
             hex2mem(payload, (void *)&r.value, SZ * 2);
           
             if (gdbserver_execute_on_main_thread(action_set_register, &r, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
           
             break;
         }
@@ -405,7 +393,7 @@ static uint8_t process_packet()
             }
             else
             {
-                write_packet("E01");
+                packet_send_message((const uint8_t*)"E01", 3);
             }
           
             break;
@@ -420,13 +408,16 @@ static uint8_t process_packet()
             size_t maddr, mlen;
             int offset, new_len;
             if (sscanf(payload, "%zx,%zx:%n", &maddr, &mlen, &offset) != 2) {
-                write_packet("E01");
+                packet_send_message((const uint8_t*)"E01", 3);
                 break;
             }
             payload += offset;
-            new_len = unescape(payload, (char *)packetend_ptr - payload);
+            // Calculate available length: from payload to end of packet buffer
+            size_t packet_len = packets_get_packet_len();
+            size_t available_len = packet_len - (payload - (char*)packets_get_packet());
+            new_len = unescape(payload, available_len);
             if (new_len != mlen) {
-                write_packet("E01");
+                packet_send_message((const uint8_t*)"E01", 3);
                 break;
             }
           
@@ -436,7 +427,7 @@ static uint8_t process_packet()
             mem.mlen = mlen;
           
             if (gdbserver_execute_on_main_thread(action_set_mem, &mem, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
             break;
         }
         case 'Z':
@@ -448,7 +439,7 @@ static uint8_t process_packet()
             b.maddr = addr;
           
             if (gdbserver_execute_on_main_thread(action_set_breakpoint, &b, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
         
             break;
         }
@@ -461,7 +452,7 @@ static uint8_t process_packet()
             b.maddr = addr;
           
             if (gdbserver_execute_on_main_thread(action_remove_breakpoint, &b, tmpbuf))
-                write_packet((const char*)tmpbuf);
+                packet_send_message((const uint8_t*)tmpbuf, strlen((const char*)tmpbuf));
         
             break;
         }
@@ -471,17 +462,17 @@ static uint8_t process_packet()
             {
                 char tbuf[64];
                 sprintf(tbuf, "T%02xthread:p%02x.%02x;", 5, 1, 1);
-                write_packet(tbuf);
+                packet_send_message((const uint8_t*)tbuf, strlen(tbuf));
             }
             else
             {
-                write_packet("OK");
+                packet_send_message((const uint8_t*)"OK", 2);
             }
             break;
         }
         default:
         {
-            write_packet("");
+            packet_send_message((const uint8_t*)"", 0);
         }
     }
   
@@ -491,16 +482,55 @@ static uint8_t process_packet()
 
 static int process_network(int socket)
 {
-    int ret;
-    if ((ret = read_packet(socket)))
-    {
-        return ret;
-    }
-
     pthread_mutex_lock(&network_mutex);
-    acknowledge_packet(socket);
-    while (process_packet()) ;
-    write_flush(socket);
+    
+    // Read raw bytes from socket
+    int bytes_read = packets_read_socket(socket);
+    if (bytes_read < 0)
+    {
+        pthread_mutex_unlock(&network_mutex);
+        return -1;  // Error or EOF
+    }
+    if (bytes_read == 0)
+    {
+        pthread_mutex_unlock(&network_mutex);
+        return 0;  // No data available
+    }
+    
+    // Get pointer to incoming raw buffer
+    const uint8_t *inbuf = packets_get_incoming_raw();
+    size_t inbuf_size = packets_get_incoming_raw_len();
+    
+    // Feed all bytes to the deframer byte-by-byte
+    for (size_t i = 0; i < inbuf_size; i++)
+    {
+        packets_feed_result_t result = packets_feed_byte(inbuf[i]);
+        
+        if (result == PACKETS_FEED_COMPLETE)
+        {
+            // Packet complete - ACK already sent by packets_feed_byte()
+            // Process the packet
+            process_packet();
+            packets_reset();
+            
+            // Clear consumed bytes
+            packets_clear_incoming_raw();
+            pthread_mutex_unlock(&network_mutex);
+            return 0;
+        }
+        else if (result == PACKETS_FEED_INTERRUPT)
+        {
+            // Interrupt character received in idle state
+            // Deframer already reset itself, just trigger interrupt and continue processing
+            debugger_mode = DEBUGGER_MODE_HALTED;
+            // Continue processing remaining bytes in the buffer
+        }
+        // PACKETS_FEED_CONSUMED means byte consumed by deframer, continue
+        // PACKETS_FEED_NOT_CONSUMED means not consumed (noise) - ignore
+    }
+    
+    // All bytes consumed but no complete packet yet
+    packets_clear_incoming_raw();
     pthread_mutex_unlock(&network_mutex);
   
     return 0;
@@ -555,6 +585,9 @@ static void* network_thread(void* arg)
         printf("Accepted new socket: %d\n", sock);
 
         gdbserver_client_socket = sock;
+        // Reset packets subsystem for new connection
+        packets_reset();
+        packets_clear_incoming_raw();
         gdbserver_do_not_report_trap = 1;
         debugger_mode = DEBUGGER_MODE_HALTED;
 
@@ -588,6 +621,9 @@ void gdbserver_init()
     pthread_cond_init(&response_cond, NULL);
     pthread_mutex_init(&trap_process_mutex, NULL);
     pthread_mutex_init(&network_mutex, NULL);
+    
+    // Initialize packets subsystem
+    packets_init();
     
     gdbserver_refresh_status();
 }
@@ -665,6 +701,16 @@ void gdbserver_stop()
     gdbserver_debugging_enabled = 0;
     pthread_join(network_thread_id, NULL);
     utils_networking_end();
+}
+
+void gdbserver_schedule_reset(void)
+{
+    gdbserver_execute_on_main_thread(action_reset, NULL, NULL);
+}
+
+void gdbserver_schedule_autoboot(void)
+{
+    gdbserver_execute_on_main_thread(action_autoboot, NULL, NULL);
 }
 
 void gdbserver_refresh_status()
@@ -919,6 +965,44 @@ static uint8_t action_remove_breakpoint(const void* arg, void* response)
     return 0;
 }
 
+static uint8_t action_reset(const void* arg, void* response)
+{
+    (void)arg;
+    (void)response;
+    machine_reset(0);
+    return 0;
+}
+
+static uint8_t action_autoboot(const void* arg, void* response)
+{
+    (void)arg;
+    (void)response;
+    
+    // Configuration section/item constants
+    #define CONFIG_SECTION_AUTO_MOUNT (0x01FF)
+    #define CONFIG_ITEM_MOUNT_RESOURCE (0x00)  // String: mount resource
+    #define CONFIG_ITEM_AUTO_BOOT      (0x81)  // Byte: auto-boot flag
+    
+    // Set mount point to "xfs://ram/"
+    spectranet_config_set_string(CONFIG_SECTION_AUTO_MOUNT, 
+                                  CONFIG_ITEM_MOUNT_RESOURCE, 
+                                  "xfs://ram/");
+    
+    // Enable auto-boot
+    spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, 
+                                CONFIG_ITEM_AUTO_BOOT, 
+                                1);
+    
+    // Reset XFS filesystem
+    extern void xfs_reset(void);
+    xfs_reset();
+    
+    // Trigger reset
+    machine_reset(0);
+    
+    return 0;
+}
+
 static uint8_t action_step_instruction(const void* arg, void* response)
 {
     struct action_step_args_t* a = (struct action_step_args_t*)arg;
@@ -945,18 +1029,32 @@ static uint8_t action_step_instruction(const void* arg, void* response)
 
 int gdbserver_activate()
 {
+    // Default to signal received (T02) for backward compatibility
+    return gdbserver_activate_with_reason(DEBUG_TRAP_REASON_SIGNAL_RECEIVED);
+}
+
+int gdbserver_activate_with_reason(int trap_reason)
+{
     // printf("Execution stopped: trapped.\n");
 
     if (gdbserver_do_not_report_trap == 0)
     {
-        pthread_mutex_lock(&network_mutex);
-        inbuf_reset();
         // notify the gdb client that we have trapped
         char tbuf[64];
-        sprintf(tbuf, "T%02xthread:p%02x.%02x;", 5, 1, 1);
-        write_packet(tbuf);
-        write_flush(gdbserver_client_socket);
-        pthread_mutex_unlock(&network_mutex);
+        int signal;
+        switch (trap_reason)
+        {
+            case DEBUG_TRAP_REASON_BREAKPOINT:
+                signal = 5;  // SIGTRAP
+                break;
+            case DEBUG_TRAP_REASON_SIGNAL_RECEIVED:
+            case DEBUG_TRAP_REASON_OTHER:
+            default:
+                signal = 2;  // SIGINT
+                break;
+        }
+        sprintf(tbuf, "T%02xthread:p%02x.%02x;", signal, 1, 1);
+        packet_send_message((const uint8_t*)tbuf, strlen(tbuf));
     }
 
     pthread_mutex_lock(&trap_process_mutex);

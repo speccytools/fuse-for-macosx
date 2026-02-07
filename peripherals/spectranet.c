@@ -36,10 +36,21 @@
 #include "nic/w5100.h"
 #include "periph.h"
 #include "peripherals/ula.h"
+#include "peripherals/nic/dns_resolver.h"
+#include "peripherals/fs/xfs.h"
+#include "peripherals/fs/xfs_worker.h"
+#include "peripherals/nic/spectranext_config.h"
 #include "settings.h"
 #include "spectranet.h"
 #include "utils.h"
 #include "ui/ui.h"
+
+#include "config.h"
+
+#include "peripherals/spectranet.h"
+
+#include <string.h>
+#include <stddef.h>
 
 #ifdef BUILD_SPECTRANET
 
@@ -70,14 +81,14 @@ int spectranet_available = 0;
 int spectranet_paged;
 int spectranet_paged_via_io;
 int spectranet_w5100_paged_a = 0, spectranet_w5100_paged_b = 0;
+int spectranet_xfs_paged_a = 0, spectranet_xfs_paged_b = 0;
+int spectranet_spectranext_config_paged_a = 0, spectranet_spectranext_config_paged_b = 0;
 
 /* Whether the programmable trap is active */
 int spectranet_programmable_trap_active;
 
 /* Where the programmable trap will trigger if active */
 libspectrum_word spectranet_programmable_trap;
-
-#ifdef BUILD_SPECTRANET
 
 /* True if the next write to 0x023b will set the MSB of the programmable trap */
 static int trap_write_msb;
@@ -141,6 +152,8 @@ spectranet_map_page( int dest, int source )
 {
   int i;
   int w5100_page = source >= 0x40 && source < 0x48;
+  int xfs_page = (source == XFS_SPECTRANET_PAGE);
+  int spectranext_config_page = (source == SPECTRANEXT_CONTROLLER_PAGE);
 
   for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
     spectranet_current_map[dest * MEMORY_PAGES_IN_4K + i] =
@@ -148,8 +161,16 @@ spectranet_map_page( int dest, int source )
 
   switch( dest )
   {
-    case 1: spectranet_w5100_paged_a = w5100_page; break;
-    case 2: spectranet_w5100_paged_b = w5100_page; break;
+    case 1: 
+      spectranet_w5100_paged_a = w5100_page;
+      spectranet_xfs_paged_a = xfs_page;
+      spectranet_spectranext_config_paged_a = spectranext_config_page;
+      break;
+    case 2: 
+      spectranet_w5100_paged_b = w5100_page;
+      spectranet_xfs_paged_b = xfs_page;
+      spectranet_spectranext_config_paged_b = spectranext_config_page;
+      break;
   }
 }
 
@@ -178,8 +199,13 @@ spectranet_reset( int hard_reset )
   spectranet_available = 1;
   spectranet_paged = !settings_current.spectranet_disable;
 
-  if( hard_reset )
+  if( hard_reset ) {
     spectranet_hard_reset();
+  }
+  
+  // Reset XFS filesystem whenever Spectranet resets (hard or soft)
+  // This ensures XFS state is clean on Spectrum reboot
+  xfs_reset();
 
   if( spectranet_paged ) {
     machine_current->ram.romcs = 1;
@@ -455,6 +481,9 @@ spectranet_init( void *context )
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
 
+  dns_resolver_init();
+  spectranext_config_init();
+  xfs_init();
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
 
@@ -503,6 +532,30 @@ spectranet_w5100_write( memory_page *page, libspectrum_word address, libspectrum
   nic_w5100_write( w5100, get_w5100_register( page, address ), b );
 }
 
+libspectrum_byte
+spectranet_xfs_read( memory_page *page, libspectrum_word address )
+{
+  return xfs_read( page, address );
+}
+
+void
+spectranet_xfs_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
+{
+  xfs_write( page, address, b );
+}
+
+libspectrum_byte
+spectranet_spectranext_config_read( memory_page *page, libspectrum_word address )
+{
+  return spectranext_config_read( page, address );
+}
+
+void
+spectranet_spectranext_config_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
+{
+  spectranext_config_write( page, address, b );
+}
+
 void
 spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
 {
@@ -517,59 +570,535 @@ spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
   }
 }
 
-#else			/* #ifdef BUILD_SPECTRANET */
-
-/* No spectranet support */
-
-void
-spectranet_register_startup( void )
+libspectrum_byte*
+spectranet_get_config_page( void )
 {
+  if( !spectranet_memory_allocated ) {
+    return NULL;
+  }
+
+  // Configuration page is 0x1F (31)
+  // Get the first memory page of the configuration page
+  const memory_page* first_page = &spectranet_full_map[0x1F * MEMORY_PAGES_IN_4K];
+  
+  // The page->page pointer points to the start of the 4KB ROM page
+  return first_page->page;
 }
 
-void
-spectranet_page( int via_io )
+
+// Access Spectranet ROM page 0x1F (configuration page) via memory map
+const uint8_t* spectranet_config_get_memory(void)
 {
+    return (const uint8_t*)spectranet_get_config_page();
 }
 
-void
-spectranet_nmi( void )
+// Read 16-bit little-endian value from memory
+static uint16_t read_uint16(const uint8_t* memory, uint16_t offset)
 {
+    return memory[offset] | (memory[offset + 1] << 8);
 }
 
-void
-spectranet_unpage( void )
+// Write 16-bit little-endian value to memory
+static void write_uint16(uint8_t* memory, uint16_t offset, uint16_t value)
 {
+    memory[offset] = value & 0xFF;
+    memory[offset + 1] = (value >> 8) & 0xFF;
 }
 
-void
-spectranet_retn( void )
+// Find a section in the configuration
+static const uint8_t* find_section(const uint8_t* memory, uint16_t section_id, uint16_t* section_size)
 {
+    uint16_t total_size = read_uint16(memory, 0);
+    uint16_t pointer = 2;
+
+    while (pointer < total_size && pointer < SPECTRANET_CONFIG_PAGE_SIZE - 4)
+    {
+        uint16_t current_section_id = read_uint16(memory, pointer);
+        pointer += 2;
+        
+        if (current_section_id == section_id)
+        {
+            *section_size = read_uint16(memory, pointer);
+            return memory + pointer;
+        }
+        
+        // Skip this section
+        uint16_t skip_size = read_uint16(memory, pointer);
+        pointer += 2 + skip_size;
+    }
+
+    return NULL;
 }
 
-int
-spectranet_nmi_flipflop( void )
+// Find insertion point for a new section (returns offset where section should be inserted)
+static uint16_t find_section_insertion_point(uint8_t* memory, uint16_t section_id)
 {
-  return 0;
+    uint16_t total_size = read_uint16(memory, 0);
+    
+    // Handle empty or uninitialized configuration
+    if (total_size == 0 || total_size == 0xFFFF || total_size >= SPECTRANET_CONFIG_PAGE_SIZE)
+    {
+        return 2; // Insert right after total_size field
+    }
+    
+    uint16_t pointer = 2;
+
+    while (pointer < total_size && pointer < SPECTRANET_CONFIG_PAGE_SIZE - 4)
+    {
+        uint16_t current_section_id = read_uint16(memory, pointer);
+        pointer += 2;
+        
+        if (current_section_id == section_id)
+        {
+            return pointer - 2; // Section already exists
+        }
+        
+        // Skip this section
+        uint16_t skip_size = read_uint16(memory, pointer);
+        pointer += 2 + skip_size;
+    }
+
+    return pointer; // Insert at end
 }
 
-libspectrum_byte
-spectranet_w5100_read( memory_page *page GCC_UNUSED,
-                       libspectrum_word address GCC_UNUSED )
+// Create a new section if it doesn't exist, return pointer to section
+static uint8_t* ensure_section_exists(uint8_t* memory, uint16_t section_id, uint16_t* section_size_out)
 {
-  return 0xff;
+    uint16_t section_size;
+    const uint8_t* existing = find_section(memory, section_id, &section_size);
+    if (existing != NULL)
+    {
+        *section_size_out = section_size;
+        return (uint8_t*)existing;
+    }
+
+    // Need to create new section
+    uint16_t total_size = read_uint16(memory, 0);
+    
+    // Initialize configuration if empty
+    if (total_size == 0 || total_size == 0xFFFF)
+    {
+        total_size = 2; // Just the total_size field
+        write_uint16(memory, 0, total_size);
+    }
+    
+    uint16_t insert_offset = find_section_insertion_point(memory, section_id);
+    
+    // Check if we have space (section header + terminator)
+    if (insert_offset + 4 + 2 > SPECTRANET_CONFIG_PAGE_SIZE - 2)
+    {
+        return NULL; // Not enough space
+    }
+
+    // Create empty section: [section_id] [size=0] (no items yet)
+    // section-size is the size of items data only, not including section-id and section-size fields
+    write_uint16(memory, insert_offset, section_id);
+    write_uint16(memory, insert_offset + 2, 0); // Size = 0 (no items yet)
+    
+    // Update total size
+    // Total size = insert_offset + 2 (section_id) + 2 (section_size) + 0 (items) = insert_offset + 4
+    uint16_t new_total_size = insert_offset + 4;
+    write_uint16(memory, 0, new_total_size);
+    
+    // Ensure terminator is present
+    memory[new_total_size] = 0xFF;
+    memory[new_total_size + 1] = 0xFF;
+    
+    *section_size_out = 0; // Empty section has 0 items
+    return memory + insert_offset + 2;
 }
 
-void
-spectranet_w5100_write( memory_page *page GCC_UNUSED, 
-                        libspectrum_word address GCC_UNUSED,
-                        libspectrum_byte b GCC_UNUSED )
+// Append a new item to a section
+static int append_item_to_section(uint8_t* section_start, uint16_t* section_size, uint8_t item_id, const void* data, uint16_t data_size)
 {
+    // section_start points to section_size field
+    // section_size is the size of items data only (item IDs + cfg data)
+    uint8_t* section_data_start = section_start + 2; // After section_size field, where items start
+    uint16_t current_items_size = *section_size; // Current size of items data
+    
+    // Check if we have space
+    uint16_t new_item_size = 1 + data_size; // item_id (1 byte) + data
+    uint16_t new_section_size = *section_size + new_item_size; // New size of items data
+    
+    // Calculate absolute offset in memory
+    uint8_t* memory = (uint8_t*)spectranet_config_get_memory();
+    uint16_t section_size_offset = (uint16_t)(section_start - memory); // Offset to section_size field
+    uint16_t section_id_offset = section_size_offset - 2; // Offset to section_id field (section_size is 2 bytes after section_id)
+    uint16_t total_size = read_uint16(memory, 0);
+    
+    // Check bounds: section_id (2) + section_size (2) + section_data (new_section_size)
+    if (section_id_offset + 2 + 2 + new_section_size > SPECTRANET_CONFIG_PAGE_SIZE)
+    {
+        return -1; // Not enough space
+    }
+    
+    // Append item
+    uint8_t* item_ptr = section_data_start + current_items_size;
+    *item_ptr = item_id;
+    memcpy(item_ptr + 1, data, data_size);
+    
+    // Update section size
+    write_uint16(memory, section_size_offset, new_section_size);
+    *section_size = new_section_size;
+    
+    // Update total size if section grew
+    // section_start points to section_size field, so:
+    // - section_id is at section_size_offset - 2
+    // - section_size is at section_size_offset
+    // - section_data starts at section_size_offset + 2
+    // - section_data ends at section_size_offset + 2 + new_section_size
+    // So total_size = section_size_offset + 2 + new_section_size
+    uint16_t new_total_size = section_size_offset + 2 + new_section_size;
+    if (new_total_size > total_size)
+    {
+        write_uint16(memory, 0, new_total_size);
+        // Ensure terminator
+        memory[new_total_size] = 0xFF;
+        memory[new_total_size + 1] = 0xFF;
+    }
+    
+    return 0;
 }
 
-void
-spectranet_flash_rom_write( libspectrum_word address GCC_UNUSED,
-                            libspectrum_byte b GCC_UNUSED )
+// Find an item within a section
+static const uint8_t* find_item(const uint8_t* section_start, uint16_t section_size, uint8_t item_id, uint8_t* item_type, uint16_t* item_data_size)
 {
+    const uint8_t* pointer = section_start + 2; // Skip section size
+    const uint8_t* section_end = section_start + 2 + section_size;
+
+    while (pointer < section_end)
+    {
+        uint8_t current_item_id = *pointer;
+        pointer++;
+
+        if (current_item_id == item_id) // Exact match (type bits are part of the ID)
+        {
+            *item_type = current_item_id & CONFIG_ITEM_TYPE_MASK;
+            
+            switch (*item_type)
+            {
+                case CONFIG_ITEM_TYPE_STRING:
+                {
+                    // Find null terminator
+                    const uint8_t* str_start = pointer;
+                    while (pointer < section_end && *pointer != 0)
+                    {
+                        pointer++;
+                    }
+                    *item_data_size = (pointer - str_start) + 1; // Include null terminator
+                    return str_start;
+                }
+                case CONFIG_ITEM_TYPE_BYTE:
+                    *item_data_size = 1;
+                    return pointer;
+                case CONFIG_ITEM_TYPE_INT:
+                    *item_data_size = 2;
+                    return pointer;
+                default:
+                    return NULL;
+            }
+        }
+
+        // Skip this item
+        uint8_t skip_type = current_item_id & CONFIG_ITEM_TYPE_MASK;
+        switch (skip_type)
+        {
+            case CONFIG_ITEM_TYPE_STRING:
+                while (pointer < section_end && *pointer != 0)
+                {
+                    pointer++;
+                }
+                pointer++; // Skip null terminator
+                break;
+            case CONFIG_ITEM_TYPE_BYTE:
+                pointer++;
+                break;
+            case CONFIG_ITEM_TYPE_INT:
+                pointer += 2;
+                break;
+        }
+    }
+
+    return NULL;
 }
 
-#endif			/* #ifdef BUILD_SPECTRANET */
+// Get total configuration size
+uint16_t spectranet_config_get_total_size(void)
+{
+    const uint8_t* memory = spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return 0;
+    }
+    return read_uint16(memory, 0);
+}
+
+// Check if configuration is valid
+bool spectranet_config_is_valid(void)
+{
+    const uint8_t* memory = spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return false;
+    }
+    
+    uint16_t total_size = read_uint16(memory, 0);
+    
+    // Check for terminator (0xFF 0xFF) at end
+    if (total_size + 2 <= SPECTRANET_CONFIG_PAGE_SIZE)
+    {
+        if (memory[total_size] == 0xFF && memory[total_size + 1] == 0xFF)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// Read string configuration item
+int spectranet_config_get_string(uint16_t section_id, uint8_t item_id, char* buffer, size_t buffer_size)
+{
+    if (buffer == NULL || buffer_size == 0)
+    {
+        return -1;
+    }
+
+    const uint8_t* memory = spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return -1;
+    }
+    
+    uint16_t section_size;
+    const uint8_t* section = find_section(memory, section_id, &section_size);
+    
+    if (section == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t item_type;
+    uint16_t item_data_size;
+    const uint8_t* item_data = find_item(section, section_size, item_id, &item_type, &item_data_size);
+    
+    if (item_data == NULL || item_type != CONFIG_ITEM_TYPE_STRING)
+    {
+        return -1;
+    }
+
+    // Copy string (item_data_size includes null terminator)
+    size_t copy_size = (item_data_size < buffer_size) ? item_data_size : buffer_size - 1;
+    memcpy(buffer, item_data, copy_size);
+    buffer[copy_size] = '\0'; // Ensure null termination
+    
+    return 0;
+}
+
+// Read byte configuration item
+int spectranet_config_get_byte(uint16_t section_id, uint8_t item_id, uint8_t* value)
+{
+    if (value == NULL)
+    {
+        return -1;
+    }
+
+    const uint8_t* memory = spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return -1;
+    }
+    
+    uint16_t section_size;
+    const uint8_t* section = find_section(memory, section_id, &section_size);
+    
+    if (section == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t item_type;
+    uint16_t item_data_size;
+    const uint8_t* item_data = find_item(section, section_size, item_id, &item_type, &item_data_size);
+    
+    if (item_data == NULL || item_type != CONFIG_ITEM_TYPE_BYTE)
+    {
+        return -1;
+    }
+
+    *value = *item_data;
+    return 0;
+}
+
+// Read int configuration item
+int spectranet_config_get_int(uint16_t section_id, uint8_t item_id, uint16_t* value)
+{
+    if (value == NULL)
+    {
+        return -1;
+    }
+
+    const uint8_t* memory = spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return -1;
+    }
+    
+    uint16_t section_size;
+    const uint8_t* section = find_section(memory, section_id, &section_size);
+    
+    if (section == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t item_type;
+    uint16_t item_data_size;
+    const uint8_t* item_data = find_item(section, section_size, item_id, &item_type, &item_data_size);
+    
+    if (item_data == NULL || item_type != CONFIG_ITEM_TYPE_INT)
+    {
+        return -1;
+    }
+
+    *value = read_uint16(item_data, 0);
+    return 0;
+}
+
+// Write string configuration item (modifies ROM memory - use with caution!)
+int spectranet_config_set_string(uint16_t section_id, uint8_t item_id, const char* value)
+{
+    if (value == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t* memory = (uint8_t*)spectranet_config_get_memory(); // Cast away const for writing
+    if (memory == NULL)
+    {
+        return -1;
+    }
+    
+    uint16_t section_size;
+    uint8_t* section = ensure_section_exists(memory, section_id, &section_size);
+    
+    if (section == NULL)
+    {
+        return -1; // Failed to create section
+    }
+
+    uint8_t item_type;
+    uint16_t item_data_size;
+    uint8_t* item_data = (uint8_t*)find_item(section, section_size, item_id, &item_type, &item_data_size);
+    
+    if (item_data == NULL)
+    {
+        // Item doesn't exist - create it
+        size_t value_len = strlen(value);
+        uint16_t data_size = (uint16_t)(value_len + 1); // Include null terminator
+        
+        // Ensure item_id has correct type bits
+        uint8_t typed_item_id = item_id | CONFIG_ITEM_TYPE_STRING;
+        
+        if (append_item_to_section(section, &section_size, typed_item_id, value, data_size) != 0)
+        {
+            return -1; // Failed to append item
+        }
+        return 0;
+    }
+
+    if (item_type != CONFIG_ITEM_TYPE_STRING)
+    {
+        return -1; // Wrong type
+    }
+
+    size_t value_len = strlen(value);
+    if (value_len + 1 > item_data_size)
+    {
+        return -1; // New value too long for existing space
+    }
+
+    // Write new string
+    memcpy(item_data, value, value_len);
+    item_data[value_len] = '\0';
+    
+    return 0;
+}
+
+// Write byte configuration item
+int spectranet_config_set_byte(uint16_t section_id, uint8_t item_id, uint8_t value)
+{
+    uint8_t* memory = (uint8_t*)spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return -1;
+    }
+    
+    uint16_t section_size;
+    uint8_t* section = ensure_section_exists(memory, section_id, &section_size);
+    
+    if (section == NULL)
+    {
+        return -1; // Failed to create section
+    }
+
+    uint8_t item_type;
+    uint16_t item_data_size;
+    uint8_t* item_data = (uint8_t*)find_item(section, section_size, item_id, &item_type, &item_data_size);
+    
+    if (item_data == NULL)
+    {
+        // Item doesn't exist - create it
+        // Ensure item_id has correct type bits
+        uint8_t typed_item_id = item_id | CONFIG_ITEM_TYPE_BYTE;
+        
+        if (append_item_to_section(section, &section_size, typed_item_id, &value, 1) != 0)
+        {
+            return -1; // Failed to append item
+        }
+        return 0;
+    }
+
+    if (item_type != CONFIG_ITEM_TYPE_BYTE)
+    {
+        return -1;
+    }
+
+    *item_data = value;
+    return 0;
+}
+
+// Write int configuration item
+int spectranet_config_set_int(uint16_t section_id, uint8_t item_id, uint16_t value)
+{
+    uint8_t* memory = (uint8_t*)spectranet_config_get_memory();
+    if (memory == NULL)
+    {
+        return -1;
+    }
+    
+    uint16_t section_size;
+    const uint8_t* section = find_section(memory, section_id, &section_size);
+    
+    if (section == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t item_type;
+    uint16_t item_data_size;
+    uint8_t* item_data = (uint8_t*)find_item(section, section_size, item_id, &item_type, &item_data_size);
+    
+    if (item_data == NULL)
+    {
+        return -1;
+    }
+
+    if (item_type != CONFIG_ITEM_TYPE_INT)
+    {
+        return -1;
+    }
+
+    write_uint16(item_data, 0, value);
+    return 0;
+}

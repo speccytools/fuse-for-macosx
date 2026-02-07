@@ -26,6 +26,8 @@
 
 #include "config.h"
 
+#include "gdbserver.h"
+
 #include <ctype.h>
 #include <string.h>
 
@@ -253,6 +255,13 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
           debugger_breakpoints = g_slist_remove( debugger_breakpoints, bp );
           libspectrum_free( bp );
           signal_breakpoints_updated = 1;
+        }
+        
+        // Activate gdbserver with breakpoint trap reason
+        extern char gdbserver_debugging_enabled;
+        extern int gdbserver_activate_with_reason(int trap_reason);
+        if (gdbserver_debugging_enabled) {
+            gdbserver_activate_with_reason(DEBUG_TRAP_REASON_BREAKPOINT);
         }
       }
 

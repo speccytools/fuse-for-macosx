@@ -44,6 +44,8 @@
 #include "ui/ui.h"
 #include "w5100.h"
 #include "w5100_internals.h"
+#include "../security/tls.h"
+#include "dns_resolver.h"
 
 enum w5100_socket_command {
   W5100_SOCKET_COMMAND_OPEN = 1 << 0,
@@ -59,6 +61,7 @@ static void
 w5100_socket_init_common( nic_w5100_socket_t *socket )
 {
   socket->fd = compat_socket_invalid;
+  socket->tls_socket = NULL;
   socket->bind_count = 0;
   socket->socket_bound = 0;
   socket->ok_for_io = 0;
@@ -115,6 +118,11 @@ w5100_socket_clean( nic_w5100_socket_t *socket )
 
   socket->last_send = 0;
   socket->datagram_count = 0;
+
+  if( socket->tls_socket ) {
+    tls_socket_free( socket->tls_socket );
+    socket->tls_socket = NULL;
+  }
 
   if( socket->fd != compat_socket_invalid ) {
     compat_socket_close( socket->fd );
@@ -276,6 +284,7 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->state == W5100_SOCKET_STATE_INIT ) {
     struct sockaddr_in sa;
+    uint16_t port;
     
     if( !socket->socket_bound )
       if( w5100_socket_bind_port( self, socket ) )
@@ -285,6 +294,23 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
     sa.sin_family = AF_INET;
     memcpy( &sa.sin_port, socket->dport, 2 );
     memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
+    port = ntohs( sa.sin_port );
+
+    /* Check if this is a TCP connection to port 443 (HTTPS) */
+    if( socket->mode == W5100_SOCKET_MODE_TCP && port == 443 ) {
+      /* Look up hostname from DNS cache for SNI */
+      uint32_t ipv4_host = ntohl( sa.sin_addr.s_addr );
+      const char *hostname = dns_resolve_hostname( ipv4_host );
+      
+      socket->tls_socket = tls_socket_alloc( socket->fd, hostname );
+      if( !socket->tls_socket ) {
+        nic_w5100_error( UI_ERROR_ERROR,
+          "w5100: failed to allocate TLS socket for socket %d\n", socket->id );
+        socket->ir |= 1 << 3;
+        socket->state = W5100_SOCKET_STATE_CLOSED;
+        return;
+      }
+    }
 
     if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
       nic_w5100_error( UI_ERROR_ERROR,
@@ -292,9 +318,29 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
         socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port),
         compat_socket_get_error(), compat_socket_get_strerror() );
 
+      if( socket->tls_socket ) {
+        tls_socket_free( socket->tls_socket );
+        socket->tls_socket = NULL;
+      }
+
       socket->ir |= 1 << 3;
       socket->state = W5100_SOCKET_STATE_CLOSED;
       return;
+    }
+
+    /* Perform TLS handshake if TLS socket was allocated (blocking) */
+    if( socket->tls_socket ) {
+      int ret = tls_connect( socket->tls_socket );
+      if( ret != 0 ) {
+        nic_w5100_error( UI_ERROR_ERROR,
+          "w5100: TLS handshake failed for socket %d: %d\n", socket->id, ret );
+        tls_socket_free( socket->tls_socket );
+        socket->tls_socket = NULL;
+        socket->ir |= 1 << 3;
+        socket->state = W5100_SOCKET_STATE_CLOSED;
+        return;
+      }
+      /* Handshake completed successfully */
     }
 
     socket->ir |= 1 << 0;
@@ -319,6 +365,11 @@ static void
 w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->fd != compat_socket_invalid ) {
+    if( socket->tls_socket ) {
+      tls_close( socket->tls_socket );
+      tls_socket_free( socket->tls_socket );
+      socket->tls_socket = NULL;
+    }
     compat_socket_close( socket->fd );
     socket->fd = compat_socket_invalid;
     socket->socket_bound = 0;
@@ -555,7 +606,7 @@ nic_w5100_socket_write_tx_buffer( nic_w5100_t *self, libspectrum_word reg, libsp
 }
 
 void
-nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
+nic_w5100_socket_add_to_sets( nic_w5100_t *self, nic_w5100_socket_t *socket, fd_set *readfds,
   fd_set *writefds, int *max_fd )
 {
   w5100_socket_acquire_lock( socket );
@@ -620,7 +671,7 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
 }
 
 static void
-w5100_socket_process_read( nic_w5100_socket_t *socket )
+w5100_socket_process_read( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   libspectrum_byte buffer[0x800];
   int bytes_free = 0x800 - socket->rx_rsr;
@@ -636,9 +687,25 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
     socklen_t sa_length = sizeof(sa);
     bytes_read = recvfrom( socket->fd, (char*)buffer + 8, bytes_free - 8, 0,
       (struct sockaddr*)&sa, &sa_length );
+    
+    /* Process DNS responses from port 53 for reverse DNS cache */
+    if( bytes_read > 0 && ntohs( sa.sin_port ) == 53 ) {
+      dns_answers_process_udp( (const uint8_t*)(buffer + 8), (uint16_t)bytes_read );
+    }
   }
-  else
-    bytes_read = recv( socket->fd, (char*)buffer, bytes_free, 0 );
+  else {
+    /* Use TLS if available, otherwise use regular recv */
+    if( socket->tls_socket && socket->tls_socket->handshake_complete ) {
+      bytes_read = tls_read( socket->tls_socket, buffer, bytes_free );
+      /* Check if there's more data available and wake the I/O thread */
+      if( bytes_read > 0 && socket->tls_socket->has_pending_data ) {
+        compat_socket_selfpipe_wake( self->selfpipe );
+      }
+    }
+    else {
+      bytes_read = recv( socket->fd, (char*)buffer, bytes_free, 0 );
+    }
+  }
 
   nic_w5100_debug( "w5100: read 0x%03x bytes from %s socket %d\n", (int)bytes_read, description, socket->id );
 
@@ -730,7 +797,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
 }
 
 static void
-w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
+w5100_socket_process_tcp_write( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   ssize_t bytes_sent;
   int offset = socket->tx_rr & 0x7ff;
@@ -743,16 +810,26 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
   if( offset + length > 0x800 )
     length = 0x800 - offset;
 
-  bytes_sent = send( socket->fd, (const char*)data, length, 0 );
+  /* Use TLS if available, otherwise use regular send */
+  if( socket->tls_socket && socket->tls_socket->handshake_complete ) {
+    bytes_sent = tls_write( socket->tls_socket, data, length );
+  }
+  else {
+    bytes_sent = send( socket->fd, (const char*)data, length, 0 );
+  }
+  
   nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n",
                    (int)bytes_sent, length, socket->id );
 
-  if( bytes_sent != -1 ) {
+  if( bytes_sent != -1 && bytes_sent > 0 ) {
     socket->tx_rr += bytes_sent;
     if( socket->tx_rr == socket->tx_wr ) {
       socket->write_pending = 0;
       socket->ir |= 1 << 4;
     }
+  }
+  else if( bytes_sent == 0 ) {
+    /* TLS would block, keep write_pending set */
   }
   else
     nic_w5100_debug( "w5100: error %d writing to TCP socket %d: %s\n",
@@ -761,7 +838,7 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
 }
 
 void
-nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
+nic_w5100_socket_process_io( nic_w5100_t *self, nic_w5100_socket_t *socket, fd_set readfds,
   fd_set writefds )
 {
   w5100_socket_acquire_lock( socket );
@@ -769,11 +846,35 @@ nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
   /* Process only if we're an open socket, and we haven't been closed and
      re-opened since the select() started */
   if( socket->fd != compat_socket_invalid && socket->ok_for_io ) {
+    /* Handle TLS handshake if needed */
+    if( socket->tls_socket && !socket->tls_socket->handshake_complete ) {
+      int ret = tls_connect( socket->tls_socket );
+      if( ret == 0 ) {
+        /* Handshake complete */
+        socket->tls_socket->handshake_complete = 1;
+        socket->write_pending = 0;
+        socket->ir |= 1 << 0;
+      }
+      else if( ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE ) {
+        /* Handshake needs more I/O, will be retried on next select */
+        socket->write_pending = 1;
+      }
+      else {
+        /* Handshake failed */
+        nic_w5100_error( UI_ERROR_ERROR,
+          "w5100: TLS handshake failed for socket %d: %d\n", socket->id, ret );
+        tls_socket_free( socket->tls_socket );
+        socket->tls_socket = NULL;
+        socket->ir |= 1 << 3;
+        socket->state = W5100_SOCKET_STATE_CLOSED;
+      }
+    }
+
     if( FD_ISSET( socket->fd, &readfds ) ) {
       if( socket->state == W5100_SOCKET_STATE_LISTEN )
         w5100_socket_process_accept( socket );
       else
-        w5100_socket_process_read( socket );
+        w5100_socket_process_read( self, socket );
     }
 
     if( FD_ISSET( socket->fd, &writefds ) ) {
@@ -781,7 +882,20 @@ nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
         w5100_socket_process_udp_write( socket );
       }
       else if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
-        w5100_socket_process_tcp_write( socket );
+        w5100_socket_process_tcp_write( self, socket );
+      }
+    }
+
+    /* Check for pending TLS data and try to read it immediately */
+    if( socket->tls_socket && socket->tls_socket->handshake_complete &&
+        socket->state == W5100_SOCKET_STATE_ESTABLISHED &&
+        socket->tls_socket->has_pending_data &&
+        0x800 - socket->rx_rsr >= 1 ) {
+      /* More data available in TLS buffer, try to read it */
+      w5100_socket_process_read( self, socket );
+      /* If still has pending data, wake I/O thread for next iteration */
+      if( socket->tls_socket && socket->tls_socket->has_pending_data ) {
+        compat_socket_selfpipe_wake( self->selfpipe );
       }
     }
   }

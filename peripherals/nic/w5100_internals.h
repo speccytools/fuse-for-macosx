@@ -33,6 +33,8 @@
 #include <sys/select.h>
 #endif
 
+#include "../security/tls.h"
+
 typedef enum w5100_socket_mode {
   W5100_SOCKET_MODE_CLOSED = 0x00,
   W5100_SOCKET_MODE_TCP,
@@ -115,6 +117,7 @@ typedef struct nic_w5100_socket_t {
   /* Host properties */
 
   compat_socket_t fd;       /* Socket file descriptor */
+  tls_socket_t *tls_socket; /* TLS socket wrapper (NULL if not using TLS) */
   int bind_count;           /* Number of writes to the Sn_PORTx registers we've received */
   int socket_bound;         /* True once we've bound the socket to a port */
   int write_pending;        /* True if we're waiting to write data on this socket */
@@ -156,9 +159,9 @@ void nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectru
 libspectrum_byte nic_w5100_socket_read_rx_buffer( nic_w5100_t *self, libspectrum_word reg );
 void nic_w5100_socket_write_tx_buffer( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b );
 
-void nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
+void nic_w5100_socket_add_to_sets( nic_w5100_t *self, nic_w5100_socket_t *socket, fd_set *readfds,
   fd_set *writefds, int *max_fd );
-void nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
+void nic_w5100_socket_process_io( nic_w5100_t *self, nic_w5100_socket_t *socket, fd_set readfds,
   fd_set writefds );
 
 /* Debug routines */

@@ -43,6 +43,8 @@
 #include "module.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/spectranet.h"
+#include "peripherals/fs/xfs.h"
+#include "peripherals/nic/spectranext_config.h"
 #include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "settings.h"
@@ -394,6 +396,14 @@ readbyte( libspectrum_word address )
         return spectranet_w5100_read( mapping, address );
       if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 )
         return spectranet_w5100_read( mapping, address );
+      if( spectranet_xfs_paged_a && address >= 0x1000 && address < 0x2000 )
+        return spectranet_xfs_read( mapping, address );
+      if( spectranet_xfs_paged_b && address >= 0x2000 && address < 0x3000 )
+        return spectranet_xfs_read( mapping, address );
+      if( spectranet_spectranext_config_paged_a && address >= 0x1000 && address < 0x2000 )
+        return spectranet_spectranext_config_read( mapping, address );
+      if( spectranet_spectranext_config_paged_b && address >= 0x2000 && address < 0x3000 )
+        return spectranet_spectranext_config_read( mapping, address );
     }
 
     if( ttx2000s_paged && address >= 0x2000 )
@@ -488,6 +498,22 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
     }
     if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 ) {
       spectranet_w5100_write( mapping, address, b );
+      return;
+    }
+    if( spectranet_xfs_paged_a && address >= 0x1000 && address < 0x2000 ) {
+      spectranet_xfs_write( mapping, address, b );
+      return;
+    }
+    if( spectranet_xfs_paged_b && address >= 0x2000 && address < 0x3000 ) {
+      spectranet_xfs_write( mapping, address, b );
+      return;
+    }
+    if( spectranet_spectranext_config_paged_a && address >= 0x1000 && address < 0x2000 ) {
+      spectranet_spectranext_config_write( mapping, address, b );
+      return;
+    }
+    if( spectranet_spectranext_config_paged_b && address >= 0x2000 && address < 0x3000 ) {
+      spectranet_spectranext_config_write( mapping, address, b );
       return;
     }
   }

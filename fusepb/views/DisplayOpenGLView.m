@@ -311,6 +311,7 @@ static DisplayOpenGLView *instance = nil;
   currentScreenTex = 0;
 
   statusbar_updated = NO;
+  isResizing = NO;
   
   [self registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
@@ -571,23 +572,38 @@ static DisplayOpenGLView *instance = nil;
 -(void) doReshape
 {
   [view_lock lock];
+  
+  /* Set resize flag to block rendering during reshape */
+  isResizing = YES;
+  
+  /* Stop display link during reshape to prevent drawing with invalid context */
+  [self displayLinkStop];
+  
   NSRect rect;
 
-  [[self openGLContext] makeCurrentContext];
+  NSOpenGLContext *context = [self openGLContext];
+  if (context) {
+    [context makeCurrentContext];
 
-  rect = [self bounds];
+    rect = [self bounds];
 
-  glViewport( 0, 0, (int) rect.size.width, (int) rect.size.height );
+    glViewport( 0, 0, (int) rect.size.width, (int) rect.size.height );
 
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
 
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
-  
-  [[self openGLContext] update];
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+    
+    [context update];
+  }
 
   statusbar_updated = YES;
+  
+  /* Clear resize flag and restart display link after reshape completes */
+  isResizing = NO;
+  [self displayLinkStart];
+  
   [view_lock unlock];
 }
 
@@ -595,7 +611,9 @@ static DisplayOpenGLView *instance = nil;
 -(void) reshape
 {
   [super reshape];
-  [self performSelectorOnMainThread:@selector(doReshape) withObject:self waitUntilDone:NO];
+  /* Wait for reshape to complete to prevent queuing multiple reshape operations
+     during slow drag resize, which can cause race conditions */
+  [self performSelectorOnMainThread:@selector(doReshape) withObject:self waitUntilDone:YES];
 }
 
 -(void) destroyTexture
@@ -1333,11 +1351,26 @@ static DisplayOpenGLView *instance = nil;
   int i;
   PIG_dirtytable *workdirty = NULL;
  
+  /* Skip rendering if window is being resized to prevent crashes */
+  [view_lock lock];
+  BOOL resizing = isResizing;
+  [view_lock unlock];
+  
+  if (resizing) {
+    return kCVReturnSuccess;
+  }
+ 
   // Is it possible that while waiting for a lock the emulator is stopped?
   // or already holds the lock? If so give up on updating the frame rather
   // than deadlock on getting the lock - may mean that we miss some screen
   // updates if we are invoked while the buffered screen is being updated
   if( !buffered_screen_lock || [buffered_screen_lock tryLock] == NO ) {
+    return kCVReturnSuccess;
+  }
+
+  /* Check if buffered_screen.dirty is initialized - it might be NULL during initialization or cleanup */
+  if( !buffered_screen.dirty ) {
+    [buffered_screen_lock unlock];
     return kCVReturnSuccess;
   }
 
@@ -1353,6 +1386,20 @@ static DisplayOpenGLView *instance = nil;
     // callback is not on the main thread where resizing-related drawing will
     // occur, also cover the screen texture swap
     [view_lock lock];
+
+    // Double-check resize flag after acquiring lock - resize might have started
+    if (isResizing) {
+      [view_lock unlock];
+      [buffered_screen_lock unlock];
+      return kCVReturnSuccess;
+    }
+
+    // Check if textures are initialized - they may be destroyed during window resize
+    if (!screenTexInitialised) {
+      [view_lock unlock];
+      [buffered_screen_lock unlock];
+      return kCVReturnSuccess;
+    }
 
     if (screenTex[currentScreenTex].dirty)
       pig_dirty_copy( &workdirty, screenTex[currentScreenTex].dirty );

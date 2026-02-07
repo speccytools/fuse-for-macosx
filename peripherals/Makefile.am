@@ -67,7 +67,8 @@ if BUILD_SPECTRANET
 fuse_SOURCES += \
                 peripherals/flash/am29f010.c \
                 peripherals/nic/w5100.c \
-                peripherals/nic/w5100_socket.c
+                peripherals/nic/w5100_socket.c \
+                peripherals/security/tls.c
 endif
 
 noinst_HEADERS += \
@@ -111,4 +112,5 @@ noinst_HEADERS += \
                   peripherals/flash/am29f010.h \
                   peripherals/nic/enc28j60.h \
                   peripherals/nic/w5100.h \
-                  peripherals/nic/w5100_internals.h
+                  peripherals/nic/w5100_internals.h \
+                  peripherals/security/tls.h

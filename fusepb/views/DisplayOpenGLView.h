@@ -76,6 +76,7 @@
   CVDisplayLinkRef displayLink;
   CGDirectDisplayID mainViewDisplayID;
   BOOL displayLinkRunning;
+  BOOL isResizing;
 }
 +(DisplayOpenGLView *) instance;
 
