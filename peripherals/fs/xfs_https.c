@@ -403,6 +403,135 @@ static int write_buffer_callback(void *param, unsigned char *buf, size_t length,
     return (int)length;
 }
 
+static int parse_index_line_to_entry(const char* line, struct xfs_handle_https_dir_entry_t* entry);
+static int https_parse_index_txt(const char* buffer, const size_t buffer_len,
+    struct xfs_handle_https_dir_entry_t** entries,
+    const uint8_t max_entries);
+
+// Fetch and parse index.txt for a directory
+// Fetches all entries, allocates and returns entries array in out_entries, returns entry count
+static int16_t https_fetch_and_parse_index(const struct xfs_engine_mount_t* engine, const char* dir_path,
+    struct xfs_handle_https_dir_entry_t*** out_entries, uint8_t* out_entry_count)
+{
+    struct https_engine_mount_data_t* mount_data = get_mount_data(engine);
+    if (!mount_data || mount_data->url[0] == '\0')
+    {
+        XFS_DEBUG("https: fetch_index failed: not mounted\n");
+        return XFS_ERR_IO;
+    }
+
+    // Build index.txt path
+    char index_path[256];
+    if (dir_path)
+    {
+        if (dir_path[strlen(dir_path) - 1] == '/')
+        {
+            snprintf(index_path, sizeof(index_path), "%sindex.txt", dir_path);
+        }
+        else
+        {
+            snprintf(index_path, sizeof(index_path), "%s/index.txt", dir_path);
+        }
+    }
+    else
+    {
+        strcpy(index_path, "/");
+    }
+
+    // Build full URL
+    char url[512];
+    if (build_https_url(mount_data->url, index_path, url, sizeof(url)) != 0)
+    {
+        XFS_DEBUG("https: fetch_index failed: invalid URL\n");
+        return XFS_ERR_INVAL;
+    }
+
+    XFS_DEBUG("https: fetch_index fetching from '%s'\n", url);
+
+    // Allocate buffer and fetch index.txt
+    const size_t buffer_size = 2048;
+    char* buffer = (char*)libspectrum_malloc(buffer_size);
+    if (!buffer)
+    {
+        return XFS_ERR_NOMEM;
+    }
+
+    size_t length = buffer_size;
+    if (httpc_get_buffer(&tls_sck, url, buffer, &length) != HTTPC_OK)
+    {
+        XFS_DEBUG("https: fetch_index failed: httpc_get_buffer error\n");
+        libspectrum_free(buffer);
+        return XFS_ERR_NOENT;
+    }
+
+    XFS_DEBUG("https: fetch_index received %zu bytes\n", length);
+
+    // First pass: count entries (max 128)
+    int entry_count = https_parse_index_txt(buffer, length, NULL, 0);
+    if (entry_count < 0)
+    {
+        XFS_DEBUG("https: fetch_index failed: parse error\n");
+        libspectrum_free(buffer);
+        return XFS_ERR_IO;
+    }
+
+    // Limit to 128 entries
+    if (entry_count > 128)
+    {
+        entry_count = 128;
+    }
+
+    XFS_DEBUG("https: fetch_index found %d entries\n", entry_count);
+
+    if (entry_count == 0)
+    {
+        XFS_DEBUG("https: fetch_index empty directory\n");
+        libspectrum_free(buffer);
+        *out_entries = NULL;
+        *out_entry_count = 0;
+        return XFS_ERR_OK; // Empty directory
+    }
+
+    // Allocate array of pointers
+    struct xfs_handle_https_dir_entry_t** entries = (struct xfs_handle_https_dir_entry_t**)libspectrum_malloc(entry_count *
+    sizeof(struct xfs_handle_https_dir_entry_t*));
+
+    if (!entries)
+    {
+        XFS_DEBUG("https: fetch_index failed: no memory for entries array\n");
+        libspectrum_free(buffer);
+        return XFS_ERR_NOMEM;
+    }
+
+    // Second pass: parse entries
+    const int parsed_count = https_parse_index_txt(buffer, length, entries, entry_count);
+
+    if (parsed_count < 0)
+    {
+        // Free already allocated entries
+        for (int i = 0; i < entry_count; i++)
+        {
+            if (entries[i])
+            {
+                libspectrum_free(entries[i]);
+            }
+        }
+        libspectrum_free(entries);
+        libspectrum_free(buffer);
+        return XFS_ERR_NOMEM;
+    }
+
+    // Free buffer now that parsing is complete
+    libspectrum_free(buffer);
+
+    *out_entries = entries;
+    *out_entry_count = (uint8_t)parsed_count;
+
+    XFS_DEBUG("https: fetch_index parsed %d entries successfully\n", parsed_count);
+    return XFS_ERR_OK;
+}
+
+
 // Mount HTTPS filesystem
 static int16_t https_mount(const struct xfs_engine_t* engine, const char* hostname, const char* path, struct xfs_engine_mount_t* out_mount)
 {
@@ -498,8 +627,31 @@ static int16_t https_mount(const struct xfs_engine_t* engine, const char* hostna
 
     XFS_DEBUG("https: mount hostname set to '%s'\n", mount_data->url);
 
+    // Temporarily set mount_data so we can use fetch functions
     out_mount->mount_data = mount_data;
-    XFS_DEBUG("https: mount success\n");
+
+    // Fetch and cache root index.txt to verify mount is valid
+    struct xfs_handle_https_dir_entry_t** root_entries = NULL;
+    uint8_t root_entry_count = 0;
+    
+    XFS_DEBUG("https: mount fetching root index.txt\n");
+    const int16_t fetch_result = https_fetch_and_parse_index(out_mount, "/", &root_entries, &root_entry_count);
+    
+    if (fetch_result != XFS_ERR_OK)
+    {
+        XFS_DEBUG("https: mount failed: root index.txt not found or error (result=%d)\n", fetch_result);
+        out_mount->mount_data = NULL;
+        libspectrum_free(mount_data);
+        return fetch_result;
+    }
+    
+    // Cache the root directory entries
+    char cache_path[HTTPS_CACHE_PATH_MAX];
+    https_normalize_dir_path("/", cache_path);
+    https_cache_store_entries(out_mount, cache_path, root_entries, root_entry_count);
+    // Ownership transferred to cache, root_entries will be freed when cache is evicted
+    
+    XFS_DEBUG("https: mount success, root index.txt cached with %d entries\n", root_entry_count);
     return XFS_ERR_OK;
 }
 
@@ -693,8 +845,6 @@ static int16_t https_lseek(const struct xfs_engine_mount_t* engine, struct xfs_h
     XFS_DEBUG("https: lseek new_pos=%zu\n", new_pos);
     return (int16_t)new_pos;
 }
-
-static int parse_index_line_to_entry(const char* line, struct xfs_handle_https_dir_entry_t* entry);
 
 // Parse index.txt buffer and populate entries array
 // Returns number of entries parsed, or -1 on error
@@ -894,129 +1044,6 @@ static int parse_index_line_to_entry(const char* line, struct xfs_handle_https_d
     entry->name[name_len] = '\0';
     
     return 0;
-}
-
-// Fetch and parse index.txt for a directory
-// Fetches all entries, allocates and returns entries array in out_entries, returns entry count
-static int16_t https_fetch_and_parse_index(const struct xfs_engine_mount_t* engine, const char* dir_path,
-                                            struct xfs_handle_https_dir_entry_t*** out_entries, uint8_t* out_entry_count)
-{
-    struct https_engine_mount_data_t* mount_data = get_mount_data(engine);
-    if (!mount_data || mount_data->url[0] == '\0')
-    {
-        XFS_DEBUG("https: fetch_index failed: not mounted\n");
-        return XFS_ERR_IO;
-    }
-
-    // Build index.txt path
-    char index_path[256];
-    if (dir_path)
-    {
-        if (dir_path[strlen(dir_path) - 1] == '/')
-        {
-            snprintf(index_path, sizeof(index_path), "%sindex.txt", dir_path);
-        }
-        else
-        {
-            snprintf(index_path, sizeof(index_path), "%s/index.txt", dir_path);
-        }
-    }
-    else
-    {
-        strcpy(index_path, "/");
-    }
-
-    // Build full URL
-    char url[512];
-    if (build_https_url(mount_data->url, index_path, url, sizeof(url)) != 0)
-    {
-        XFS_DEBUG("https: fetch_index failed: invalid URL\n");
-        return XFS_ERR_INVAL;
-    }
-
-    XFS_DEBUG("https: fetch_index fetching from '%s'\n", url);
-
-    // Allocate buffer and fetch index.txt
-    const size_t buffer_size = 2048;
-    char* buffer = (char*)libspectrum_malloc(buffer_size);
-    if (!buffer)
-    {
-        return XFS_ERR_NOMEM;
-    }
-    
-    size_t length = buffer_size;
-    if (httpc_get_buffer(&tls_sck, url, buffer, &length) != HTTPC_OK)
-    {
-        XFS_DEBUG("https: fetch_index failed: httpc_get_buffer error\n");
-        libspectrum_free(buffer);
-        return XFS_ERR_NOENT;
-    }
-    
-    XFS_DEBUG("https: fetch_index received %zu bytes\n", length);
-    
-    // First pass: count entries (max 128)
-    int entry_count = https_parse_index_txt(buffer, length, NULL, 0);
-    if (entry_count < 0)
-    {
-        XFS_DEBUG("https: fetch_index failed: parse error\n");
-        libspectrum_free(buffer);
-        return XFS_ERR_IO;
-    }
-    
-    // Limit to 128 entries
-    if (entry_count > 128)
-    {
-        entry_count = 128;
-    }
-    
-    XFS_DEBUG("https: fetch_index found %d entries\n", entry_count);
-    
-    if (entry_count == 0)
-    {
-        XFS_DEBUG("https: fetch_index empty directory\n");
-        libspectrum_free(buffer);
-        *out_entries = NULL;
-        *out_entry_count = 0;
-        return XFS_ERR_OK; // Empty directory
-    }
-    
-    // Allocate array of pointers
-    struct xfs_handle_https_dir_entry_t** entries = (struct xfs_handle_https_dir_entry_t**)libspectrum_malloc(entry_count *
-        sizeof(struct xfs_handle_https_dir_entry_t*));
-    
-    if (!entries)
-    {
-        XFS_DEBUG("https: fetch_index failed: no memory for entries array\n");
-        libspectrum_free(buffer);
-        return XFS_ERR_NOMEM;
-    }
-    
-    // Second pass: parse entries
-    const int parsed_count = https_parse_index_txt(buffer, length, entries, entry_count);
-
-    if (parsed_count < 0)
-    {
-        // Free already allocated entries
-        for (int i = 0; i < entry_count; i++)
-        {
-            if (entries[i])
-            {
-                libspectrum_free(entries[i]);
-            }
-        }
-        libspectrum_free(entries);
-        libspectrum_free(buffer);
-        return XFS_ERR_NOMEM;
-    }
-    
-    // Free buffer now that parsing is complete
-    libspectrum_free(buffer);
-    
-    *out_entries = entries;
-    *out_entry_count = (uint8_t)parsed_count;
-    
-    XFS_DEBUG("https: fetch_index parsed %d entries successfully\n", parsed_count);
-    return XFS_ERR_OK;
 }
 
 // Open directory - fetch index.txt file
