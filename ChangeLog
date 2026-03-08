@@ -8,6 +8,23 @@
 
         * Emulation core improvements:
           * Speed up reading emulated memory locations (Jindřich Makovička).
+          * More accurate emulation of AM29F010B flash ROM (Guesser).
+          * EDSK disk images: allow loading unformatted disk images (fixes
+            bug #455) (Gergely Szasz).
+          * EDSK disk images: allow merging disk sides with different bytes
+            per track (fixes bug #454) (Gergely Szasz).
+          * EDSK disk images: handle special "Stored data length" extension
+            per Simon Owen's spec, fixing load of Cabal, NARC and Robin of
+            Sherlock (fixes bug #452) (Gergely Szasz).
+          * EDSK disk images: pad disk tracks to a multiple of 256 bytes,
+            fixing Action Countdown, Discology +3, Genial, Gonzzalezz, SP5
+            and Trigger (Lightgun) (fixes bug #451) (Gergely Szasz).
+          * Fix SCAN bug in uPD765 FDC, allowing formatting on CP/M Plus and
+            Fuzix (fixes bug #453) (thanks, Phil Reynolds and Vic Chwe)
+            (Gergely Szasz).
+          * TTX2000S: improve teletext datastream code; protect against
+            desynchronised packet streams and fast-forward buffer after
+            emulation is paused (Guesser and Sergio Baldoví).
 
         * UI improvements:
           * Timex: don't abort if the Timex dock cartridge image is not
@@ -16,11 +33,31 @@
             (Gergely Szasz).
           * GTK UI: Fix loading binary data from deleted files (thanks, Crisis)
             (Sergio Baldoví).
+          * GTK UI: use PNG instead of XPM for toolbar icons, fixing display
+            with gdk-pixbuf >= 2.42.11 (fixes bug #509) (Alberto Garcia).
+          * GTK UI: fix memory leak of tape_marker_pixbuf when the tape
+            browser is closed (Alberto Garcia).
+          * GTK UI: remove use of deprecated gdk_keymap_get_default (Philip
+            Kendall).
+          * Move sound peripherals into their own "Peripherals/Sound" menu
+            (Miroslav Ďurčík and Sergio Baldoví).
+          * Win32 UI: fix handling of multiple monitors (fixes bug #491)
+            (Miroslav Ďurčík).
+          * Win32 UI: suppress unwanted window maximising on title bar
+            double-click (fixes bug #488) (Miroslav Ďurčík).
 
         * Miscellaneous improvements:
           * Add ZIP files to the bash completion script (Alberto Garcia).
           * Prevent potential segmentation fault due to overflow when emulation
-            speed is set very high (Pete Moore)
+            speed is set very high (Pete Moore).
+          * Cap tstates of timer event to further prevent segfault (fixes
+            bug #504) (Pete Moore and Philip Kendall).
+          * Remove SVGAlib UI (Sergio Baldoví).
+          * Remove MIME types for obscure and generic file formats, and rename
+            'icon' to 'generic-icon' in the MIME info file (fixes bug #494)
+            (Alberto Garcia and Sergio Baldoví).
+          * Replace obsolete autoconf macros (Sergio Baldoví).
+          * Add support for loading .S snapshot files (Miroslav Ďurčík).
 
 2021-02-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
