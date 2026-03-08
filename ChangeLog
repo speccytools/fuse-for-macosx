@@ -58,6 +58,7 @@
             (Alberto Garcia and Sergio Baldoví).
           * Replace obsolete autoconf macros (Sergio Baldoví).
           * Add support for loading .S snapshot files (Miroslav Ďurčík).
+          * Add missing include in ui/uijoystick.c (Viorel).
 
 2021-02-27  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
