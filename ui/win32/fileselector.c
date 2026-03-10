@@ -1,6 +1,6 @@
 /* fileselector.c: Win32 fileselector routines
    Copyright (c) 2008 Marek Januszewski
-   Copyright (c) 2016 Sergio Baldoví
+   Copyright (c) 2016-2021 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

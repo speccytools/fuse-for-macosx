@@ -1,5 +1,5 @@
 /* covox.h: Routines for handling the Covox
-   Copyright (c) 2011-2017 Jon Mitchell, Philip Kendall, Fredrick Meunier
+   Copyright (c) 2011-2021 Jon Mitchell, Philip Kendall, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

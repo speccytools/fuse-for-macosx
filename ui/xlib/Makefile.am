@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2004 Philip Kendall
+## Copyright (c) 2001-2016 Philip Kendall
 ## Copyright (c) 2015 Sergio Baldoví
 
 ## This program is free software; you can redistribute it and/or modify

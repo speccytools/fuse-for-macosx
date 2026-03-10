@@ -1,5 +1,5 @@
 /* gtkui.c: GTK routines for dealing with the user interface
-   Copyright (c) 2000-2015 Philip Kendall, Russell Marks, Sergio Baldoví
+   Copyright (c) 2000-2021 Philip Kendall, Russell Marks, Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

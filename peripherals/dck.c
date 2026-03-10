@@ -1,7 +1,7 @@
 /* dck.c: dock snapshot (Warajevo .DCK) handling routines
-   Copyright (c) 2003-2004 Darren Salt, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2021 Darren Salt, Fredrick Meunier, Philip Kendall
    Copyright (c) 2015 Sergio Baldoví
-   Copyright (c) 2015 Fredrick Meunier
+   Copyright (c) 2015-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

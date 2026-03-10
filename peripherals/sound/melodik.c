@@ -1,5 +1,5 @@
 /* melodik.c: Routines for handling the Melodik interface
-   Copyright (c) 2009-2016 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2009-2021 Fredrick Meunier, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

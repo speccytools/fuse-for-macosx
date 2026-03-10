@@ -1,5 +1,5 @@
 /* disk.h: Routines for handling disk images
-   Copyright (c) 2007-2015 Gergely Szasz
+   Copyright (c) 2007-2023 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

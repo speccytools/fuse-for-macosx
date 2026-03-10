@@ -1,5 +1,5 @@
 /* disassemble.c: Fuse's disassembler
-   Copyright (c) 2002-2015 Darren Salt, Philip Kendall
+   Copyright (c) 2002-2018 Darren Salt, Philip Kendall
    Copyright (c) 2016 BogDan Vatra
 
    This program is free software; you can redistribute it and/or modify

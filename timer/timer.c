@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2017 Philip Kendall, Marek Januszewski, Fredrick Meunier
+   Copyright (c) 1999-2024 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

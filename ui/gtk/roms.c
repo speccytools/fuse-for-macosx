@@ -1,5 +1,5 @@
 /* roms.c: ROM selector dialog box
-   Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2003-2012 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

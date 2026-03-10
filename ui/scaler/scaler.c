@@ -1,6 +1,6 @@
 /* scaler.c: code for selecting (etc) scalers
- * Copyright (C) 2003 Fredrick Meunier, Philip Kendall
- * Copyright (c) 2015 Sergio Baldoví
+ * Copyright (C) 2003-2021 Fredrick Meunier, Philip Kendall
+ * Copyright (c) 2015-2019 Sergio Baldoví
  * 
  * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus

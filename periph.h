@@ -1,5 +1,5 @@
 /* periph.h: code for handling peripherals
-   Copyright (c) 2004-2018 Philip Kendall, Stuart Brady, Gergely Szasz,
+   Copyright (c) 2004-2023 Philip Kendall, Stuart Brady, Gergely Szasz,
      Alistair Cree
 
    This program is free software; you can redistribute it and/or modify

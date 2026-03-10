@@ -1,5 +1,5 @@
 /* ScummVM - Scumm Interpreter
- * Copyright (C) 2002-2003 The ScummVM project, Fredrick Meunier and
+ * Copyright (C) 2002-2021 The ScummVM project, Fredrick Meunier and
  *			   Philip Kendall
  *
  * HQ2x and HQ3x scalers taken from HiEnd3D Demos (http://www.hiend3d.com)

@@ -1,6 +1,6 @@
 /* sp0256.h: SP0256 speech synthesis routines
    Copyright (c) 1998-2000 Joseph Zbiciak
-   Copyright (c) 2007-2013 Stuart Brady
+   Copyright (c) 2007-2023 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

@@ -1,7 +1,7 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2016 Philip Kendall, Darren Salt, Witold Filipczyk
-   Copyright (c) 2015 UB880D
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 1999-2017 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 2015-2018 UB880D
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

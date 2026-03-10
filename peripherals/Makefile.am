@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2018 Philip Kendall, Stuart Brady, Sergio Baldoví,
+## Copyright (c) 2018-2023 Philip Kendall, Stuart Brady, Sergio Baldoví,
 ##   Fredrick Meunier, Alistair Cree
 
 ## This program is free software; you can redistribute it and/or modify

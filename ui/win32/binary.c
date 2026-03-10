@@ -1,5 +1,5 @@
 /* binary.c: Win32 routines to load/save chunks of binary data
-   Copyright (c) 2003-2008 Philip Kendall, Marek Januszewski
+   Copyright (c) 2003-2018 Philip Kendall, Marek Januszewski
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

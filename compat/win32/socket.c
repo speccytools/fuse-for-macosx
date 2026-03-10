@@ -1,5 +1,5 @@
 /* socket.c: Socket-related compatibility routines
-   Copyright (c) 2011-2015 Sergio Baldoví, Philip Kendall
+   Copyright (c) 2011-2019 Sergio Baldoví, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

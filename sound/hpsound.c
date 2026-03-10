@@ -1,5 +1,5 @@
 /* hpsound.c: HP-UX sound I/O
-   Copyright (c) 2002-2004 Alexander Yurchenko, Russell Marks, Philip Kendall
+   Copyright (c) 2002-2007 Alexander Yurchenko, Russell Marks, Philip Kendall
 			   Matan Ziv-Av, Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 /* error.c: The error reporting widget
-   Copyright (c) 2002-2005 Philip Kendall
+   Copyright (c) 2002-2007 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

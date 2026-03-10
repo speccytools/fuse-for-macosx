@@ -1,6 +1,6 @@
 /* pokefinder.c: Win32 interface to the poke finder
    Copyright (c) 2004 Marek Januszwski
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2020 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

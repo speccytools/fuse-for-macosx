@@ -1,7 +1,7 @@
 /* stock.c: 'standard' GTK widgets etc
-   Copyright (c) 2004 Darren Salt, Philip Kendall
+   Copyright (c) 2004-2007 Darren Salt, Philip Kendall
    Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2021 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

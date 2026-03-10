@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2017 Philip Kendall, Darren Salt
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

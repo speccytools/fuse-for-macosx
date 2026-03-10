@@ -1,5 +1,5 @@
 /* input.c: generalised input events layer for Fuse
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2004-2016 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

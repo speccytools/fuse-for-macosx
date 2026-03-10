@@ -1,6 +1,6 @@
 /* rzx.c: .rzx files
    Copyright (c) 2002-2016 Philip Kendall
-   Copyright (c) 2014 Sergio Baldoví
+   Copyright (c) 2014-2018 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

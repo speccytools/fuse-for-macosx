@@ -1,5 +1,6 @@
 /* ttx2000s.c: Routines for handling the TTX2000S teletext adapter
    Copyright (c) 2018 Alistair Cree
+   Copyright (c) 2024 ZXGuesser
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

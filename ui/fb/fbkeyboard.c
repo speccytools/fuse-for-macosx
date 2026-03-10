@@ -1,5 +1,5 @@
 /* fbkeyboard.c: routines for dealing with the linux fbdev display
-   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Darren Salt
+   Copyright (c) 2000-2007 Philip Kendall, Matan Ziv-Av, Darren Salt
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

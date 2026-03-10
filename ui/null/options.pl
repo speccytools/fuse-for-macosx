@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # options.pl: generate options dialog boxes
-# Copyright (c) 2001-2015 Philip Kendall, Fredrick Meunier
+# Copyright (c) 2001-2021 Philip Kendall, Fredrick Meunier
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

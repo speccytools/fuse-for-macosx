@@ -1,5 +1,5 @@
 /* snapshot.h: snapshot handling routines
-   Copyright (c) 1999,2001-2002 Philip Kendall
+   Copyright (c) 1999,2001-2007 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

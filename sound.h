@@ -1,6 +1,6 @@
 /* sound.h: Sound support
-   Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 2000-2016 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

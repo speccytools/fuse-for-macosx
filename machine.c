@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2015 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

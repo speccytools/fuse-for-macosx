@@ -1,5 +1,5 @@
 /* widget.h: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001-2011 Matan Ziv-Av, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

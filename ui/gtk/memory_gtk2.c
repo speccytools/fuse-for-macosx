@@ -1,5 +1,5 @@
 /* memory.c: the GTK memory browser
-   Copyright (c) 2004-2005 Philip Kendall
+   Copyright (c) 2004-2018 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

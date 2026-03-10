@@ -1,5 +1,5 @@
 /* plusd.c: Routines for handling the +D interface
-   Copyright (c) 1999-2016 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 1999-2021 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt, 2014 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify

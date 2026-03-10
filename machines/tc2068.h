@@ -1,5 +1,5 @@
 /* tc2068.h: Timex TC2068 specific routines
-   Copyright (c) 2004,2015 Fredrick Meunier
+   Copyright (c) 2004,2015-2021 Fredrick Meunier
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

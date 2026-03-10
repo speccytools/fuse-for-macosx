@@ -3,7 +3,7 @@
 # keysyms.pl: generate keysyms.c from keysyms.dat
 # Copyright (c) 2000-2013 Philip Kendall, Matan Ziv-Av, Russell Marks,
 #			  Fredrick Meunier, Catalin Mihaila, Stuart Brady
-# Copyright (c) 2015 Sergio Baldoví
+# Copyright (c) 2015-2021 Sergio Baldoví
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

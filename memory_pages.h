@@ -1,5 +1,5 @@
 /* memory_pages.h: memory access routines
-   Copyright (c) 2003-2016 Philip Kendall
+   Copyright (c) 2003-2017 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

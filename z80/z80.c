@@ -1,5 +1,5 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999-2016 Philip Kendall
+   Copyright (c) 1999-2018 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

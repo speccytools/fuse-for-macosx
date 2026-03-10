@@ -1,5 +1,5 @@
 /* unittests.c: unit testing framework for Fuse
-   Copyright (c) 2008-2016 Philip Kendall
+   Copyright (c) 2008-2018 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

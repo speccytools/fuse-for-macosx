@@ -1,5 +1,5 @@
 /* divmmc.h: DivMMC interface routines
-   Copyright (c) 2005-2016 Matthew Westcott, Philip Kendall
+   Copyright (c) 2005-2017 Matthew Westcott, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

@@ -1,7 +1,7 @@
 /* compat.h: various compatibility bits
    Copyright (c) 2003-2012 Philip Kendall
    Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2016 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

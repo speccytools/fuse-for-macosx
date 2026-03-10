@@ -1,5 +1,5 @@
 /* fuller.c: Routines for handling the Fuller Box
-   Copyright (c) 2007-2016 Stuart Brady, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2007-2021 Stuart Brady, Fredrick Meunier, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

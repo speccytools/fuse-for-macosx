@@ -1,6 +1,6 @@
 /* fileselector.c: GTK fileselector routines
-   Copyright (c) 2000-2007 Philip Kendall
-   Copyright (c) 2015-2016 Sergio Baldoví
+   Copyright (c) 2000-2011 Philip Kendall
+   Copyright (c) 2015-2021 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

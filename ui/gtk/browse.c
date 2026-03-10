@@ -1,6 +1,6 @@
 /* browse.c: tape browser dialog box
-   Copyright (c) 2002-2004 Philip Kendall
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2002-2007 Philip Kendall
+   Copyright (c) 2015-2017 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

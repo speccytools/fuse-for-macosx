@@ -1,5 +1,5 @@
 /* uspeech.h: Routines for handling the Currah uSpeech interface
-   Copyright (c) 2007 Stuart Brady
+   Copyright (c) 2007-2023 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

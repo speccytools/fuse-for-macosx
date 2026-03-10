@@ -1,7 +1,7 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001-2012 Matan Ziv-Av, Philip Kendall, Russell Marks
    Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2016 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

@@ -1,5 +1,6 @@
 /* sp0256.c: SP0256 speech synthesis emulation
-   Copyright (c) 1998-2000 Jospeh Zbicaik, 2007-2015 Stuart Brady
+   Copyright (c) 1998-2000 Jospeh Zbicaik, 2007-2023 Stuart Brady
+   Copyright (c) 2023 Sergio Baldoví, Vic Chwe
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
