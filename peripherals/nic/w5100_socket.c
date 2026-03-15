@@ -617,6 +617,7 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
 
   socket->fd = new_fd;
   socket->state = W5100_SOCKET_STATE_ESTABLISHED;
+  socket->ir |= 1 << 0;
 }
 
 static void
@@ -669,6 +670,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   }
   else if( bytes_read == 0 ) {  /* TCP */
     socket->state = W5100_SOCKET_STATE_CLOSE_WAIT;
+    socket->ir |= 1 << 1;
     nic_w5100_debug( "w5100: EOF on %s socket %d; errno %d: %s\n",
                      description, socket->id, compat_socket_get_error(),
                      compat_socket_get_strerror() );

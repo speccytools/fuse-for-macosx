@@ -25,6 +25,9 @@
           * TTX2000S: improve teletext datastream code; protect against
             desynchronised packet streams and fast-forward buffer after
             emulation is paused (Guesser and Sergio Baldoví).
+          * Spectranet: raise W5100 CON and DISCON socket interrupts on state
+            transitions, fixing delayed connect/disconnect detection in BASIC
+            channels/streams (fixes bug #513) (Guesser).
 
         * UI improvements:
           * Timex: don't abort if the Timex dock cartridge image is not
