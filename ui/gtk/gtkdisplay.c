@@ -100,7 +100,7 @@ static libspectrum_dword bw_colours[16];
 /* Colour format for the back buffer in endianess-order */
 typedef enum {
   FORMAT_x8r8g8b8,    /* Cairo  (GTK3) */
-  FORMAT_x8b8g8r8     /* GdkRGB (GTK2) */
+  FORMAT_x8b8g8r8     /* GdkRGB */
 } colour_format_t;
 
 static int display_updated = 0;
