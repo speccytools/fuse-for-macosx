@@ -27,7 +27,6 @@
 
 #include <gtk/gtk.h>
 
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "ui/ui.h"
 

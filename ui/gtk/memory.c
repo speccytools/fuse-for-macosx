@@ -34,7 +34,6 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "memory_pages.h"
 #include "menu.h"

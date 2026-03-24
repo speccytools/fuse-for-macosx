@@ -28,7 +28,6 @@
 #include <gtk/gtk.h>
 
 #include "compat.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "input.h"
 #include "keyboard.h"

@@ -38,7 +38,6 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "machine.h"
 #include "memory_pages.h"

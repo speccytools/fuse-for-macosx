@@ -35,7 +35,6 @@
 
 #include "debugger/debugger.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "keyboard.h"
 #include "machine.h"

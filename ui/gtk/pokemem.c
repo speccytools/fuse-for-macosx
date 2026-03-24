@@ -30,7 +30,6 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "menu.h"
 #include "pokefinder/pokemem.h"

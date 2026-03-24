@@ -33,7 +33,6 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "menu.h"
 #include "pokefinder/pokefinder.h"

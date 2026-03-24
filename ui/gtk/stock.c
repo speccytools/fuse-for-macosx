@@ -31,7 +31,6 @@
 #include <gtk/gtk.h>
 
 #include "compat.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 
 GtkAccelGroup*
