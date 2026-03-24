@@ -93,11 +93,7 @@ create_shared_binary_dialog( struct binary_info *info, const char *title,
   label_filename = gtk_label_new( "Filename" );
 
   info->filename_widget = gtk_label_new( info->filename );
-#if GTK_CHECK_VERSION( 3, 16, 0 )
   gtk_label_set_xalign( GTK_LABEL(info->filename_widget), 0.0);
-#else
-  gtk_misc_set_alignment( GTK_MISC(info->filename_widget), 0.0, 0.5 );
-#endif
 
   button = gtk_button_new_with_label( "Browse..." );
   g_signal_connect( G_OBJECT( button ), "clicked", info->change_filename,
@@ -124,8 +120,6 @@ create_shared_binary_dialog( struct binary_info *info, const char *title,
   g_signal_connect( G_OBJECT( info->length_widget ), "activate",
                     info->activate_data, info );
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
-
   table = gtk_grid_new();
   gtk_grid_set_column_homogeneous( GTK_GRID( table ), FALSE );
   gtk_grid_set_column_spacing( GTK_GRID( table ), 6 );
@@ -142,33 +136,6 @@ create_shared_binary_dialog( struct binary_info *info, const char *title,
   gtk_grid_attach( GTK_GRID( table ), info->start_widget, 1, 1, 2, 1 );
   gtk_grid_attach( GTK_GRID( table ), label_length, 0, 2, 1, 1 );
   gtk_grid_attach( GTK_GRID( table ), info->length_widget, 1, 2, 2, 1 );
-
-#else                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
-
-  table = gtk_table_new( 3, 3, FALSE );
-  gtk_box_pack_start( GTK_BOX( content_area ), table, TRUE, TRUE, 0 );
-
-  gtk_table_attach( GTK_TABLE( table ), label_filename, 0, 1, 0, 1,
-                    GTK_FILL, GTK_FILL, 3, 3 );
-
-  gtk_table_attach( GTK_TABLE( table ), info->filename_widget, 1, 2, 0, 1,
-                    GTK_FILL, GTK_FILL, 3, 3 );
-
-  gtk_table_attach( GTK_TABLE( table ), button, 2, 3, 0, 1,
-                    GTK_FILL, GTK_FILL, 3, 3 );
-
-  gtk_table_attach( GTK_TABLE( table ), label_start, 0, 1, 1, 2, 0, 0, 3, 3 );
-
-  gtk_table_attach( GTK_TABLE( table ), info->start_widget, 1, 3, 1, 2,
-                    GTK_FILL, GTK_FILL, 3, 3 );
-
-  gtk_table_attach( GTK_TABLE( table ), label_length, 0, 1, 2, 3,
-                    GTK_FILL, GTK_FILL, 3, 3 );
-
-  gtk_table_attach( GTK_TABLE( table ), info->length_widget, 1, 3, 2, 3,
-                    GTK_FILL, GTK_FILL, 3, 3 );
-
-#endif
 
   GtkAccelGroup *accel_group;
   accel_group = gtk_accel_group_new();

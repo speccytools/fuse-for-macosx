@@ -107,20 +107,6 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
   else if( !strcmp( button->label, "_Add" ) )
     icon = gtk_image_new_from_icon_name( "list-add", GTK_ICON_SIZE_BUTTON );
 
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
-  /* Note: ok/cancel/yes/no icons are not covered by freedesktop's Icon Naming
-     Specification 0.8.90 */
-  else if( !strcmp( button->label, "_OK" ) )
-    icon = gtk_image_new_from_icon_name( GTK_STOCK_OK, GTK_ICON_SIZE_BUTTON );
-  else if( !strcmp( button->label, "_Cancel" ) )
-    icon = gtk_image_new_from_icon_name( GTK_STOCK_CANCEL,
-                                         GTK_ICON_SIZE_BUTTON );
-  else if( !strcmp( button->label, "_Yes" ) )
-    icon = gtk_image_new_from_icon_name( GTK_STOCK_YES, GTK_ICON_SIZE_BUTTON );
-  else if( !strcmp( button->label, "_No" ) )
-    icon = gtk_image_new_from_icon_name( GTK_STOCK_NO, GTK_ICON_SIZE_BUTTON );
-#endif
-
   if( icon ) gtk_button_set_image( GTK_BUTTON( btn ), icon );
 
   add_click( btn, button, accel, 0, 0, 0, 0 );

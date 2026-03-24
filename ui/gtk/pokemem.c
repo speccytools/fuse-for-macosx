@@ -166,11 +166,7 @@ create_dialog( void )
   scroll = gtk_scrolled_window_new( NULL, NULL );
 
   /* Adjust size for list */ 
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
-  gtk_widget_set_size_request( GTK_WIDGET( poke_list ), -1, 250 );
-#else
   gtk_scrolled_window_set_min_content_height( GTK_SCROLLED_WINDOW( scroll ), 250 );
-#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
   gtk_container_add( GTK_CONTAINER( scroll ), GTK_WIDGET( poke_list ) );
   gtk_box_pack_start( GTK_BOX( vbox ), GTK_WIDGET( scroll ), TRUE, TRUE, 5 );
@@ -198,10 +194,6 @@ create_and_fill_treeview( void )
   GtkTreeModel *model;
 
   poke_list = gtk_tree_view_new();
-
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
-  gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( poke_list ), TRUE );
-#endif
 
   store = gtk_list_store_new( NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING,
                               G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_BOOLEAN,

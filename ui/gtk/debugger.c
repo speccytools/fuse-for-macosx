@@ -503,17 +503,9 @@ create_register_display( GtkBox *parent, PangoFontDescription *font )
 {
   size_t i;
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
-
   register_display = gtk_grid_new();
   gtk_grid_set_row_spacing( GTK_GRID( register_display ), 4 );
   gtk_container_set_border_width( GTK_CONTAINER( register_display ), 6 );
-
-#else                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
-
-  register_display = gtk_table_new( 9, 2, FALSE );
-
-#endif
 
   gtk_box_pack_start( parent, register_display, FALSE, FALSE, 0 );
 
@@ -529,14 +521,8 @@ create_register_display( GtkBox *parent, PangoFontDescription *font )
     gtk_label_set_attributes( GTK_LABEL( registers[i] ), list );
     pango_attr_list_unref( list );
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
     gtk_grid_attach( GTK_GRID( register_display ), registers[i],
                      i%2, i/2, 1, 1 );
-#else
-    gtk_table_attach( GTK_TABLE( register_display ), registers[i],
-                      i%2, i%2+1, i/2, i/2+1, 0, 0, 2, 2 );
-#endif
-
   }
 
   return 0;
@@ -555,8 +541,6 @@ create_memory_map( GtkBox *parent )
   memory_map = gtk_frame_new( "Memory Map" );
   gtk_box_pack_start( parent, memory_map, FALSE, FALSE, 0 );
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
-
   memory_map_table = gtk_grid_new();
   gtk_grid_set_row_spacing( GTK_GRID( memory_map_table ), 4 );
   gtk_grid_set_column_spacing( GTK_GRID( memory_map_table ), 6 );
@@ -567,22 +551,6 @@ create_memory_map( GtkBox *parent )
   gtk_grid_attach( GTK_GRID( memory_map_table ), label_source, 1, 0, 1, 1 );
   gtk_grid_attach( GTK_GRID( memory_map_table ), label_writable, 2, 0, 1, 1 );
   gtk_grid_attach( GTK_GRID( memory_map_table ), label_contended, 3, 0, 1, 1 );
-
-#else                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
-
-  memory_map_table = gtk_table_new( 1 + MEMORY_PAGES_IN_64K, 4, FALSE );
-  gtk_container_add( GTK_CONTAINER( memory_map ), memory_map_table );
-
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label_address,
-                    0, 1, 0, 1, 0, 0, 2, 2 );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label_source,
-                    1, 2, 0, 1, 0, 0, 2, 2 );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label_writable,
-                    2, 3, 0, 1, 0, 0, 2, 2 );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label_contended,
-                    3, 4, 0, 1, 0, 0, 2, 2 );
-
-#endif
 
   return 0;
 }
@@ -980,14 +948,8 @@ update_memory_map( void )
 
       for( i = 0; i < 4; i++ ) {
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
         gtk_grid_attach( GTK_GRID( memory_map_table ), row_labels[i],
                          i, row + 1, 1, 1 );
-#else
-        gtk_table_attach( GTK_TABLE( memory_map_table ), row_labels[i],
-                          i, i + 1, row + 1, row + 2, 0, 0, 2, 2 );
-#endif
-
       }
 
       row++;
@@ -1306,8 +1268,6 @@ disassembly_wheel_scroll( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
     ui_debugger_disassemble( addresss );
     break;
 
-#if GTK_CHECK_VERSION( 3, 4, 0 )
-
   case GDK_SCROLL_SMOOTH:
     {
       GtkAdjustment *adjustment = user_data;
@@ -1330,8 +1290,6 @@ disassembly_wheel_scroll( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
       }
       break;
     }
-
-#endif
 
   default:
     return FALSE;
