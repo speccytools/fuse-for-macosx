@@ -348,6 +348,8 @@ if test -z "$UI"; then
 
   if test "$gtk" = yes; then
 
+    gtk3=yes
+ 
     if test "$fakeglib" = yes; then
       AC_MSG_ERROR([libspectrum is using its own internal GLib replacement
 GTK requires the real GLib library, so the GTK UI cannot be used with
