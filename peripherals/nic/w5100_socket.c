@@ -288,8 +288,8 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
 
     if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
       nic_w5100_error( UI_ERROR_ERROR,
-        "w5100: failed to connect socket %d to 0x%08x:0x%04x; errno %d: %s\n",
-        socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port),
+        "w5100: failed to connect socket %d to 0x%08lx:0x%04x; errno %d: %s\n",
+        socket->id, (long unsigned int)ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port),
         compat_socket_get_error(), compat_socket_get_strerror() );
 
       socket->ir |= 1 << 3;
