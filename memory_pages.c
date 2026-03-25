@@ -701,13 +701,10 @@ memory_to_snapshot( libspectrum_snap *snap )
 					     machine_current->ram.last_byte2 );
 
   for( i = 0; i < 64; i++ ) {
-    if( RAM[i] != NULL ) {
+    buffer = libspectrum_new( libspectrum_byte, 0x4000 );
 
-      buffer = libspectrum_new( libspectrum_byte, 0x4000 );
-
-      memcpy( buffer, RAM[i], 0x4000 );
-      libspectrum_snap_set_pages( snap, i, buffer );
-    }
+    memcpy( buffer, RAM[i], 0x4000 );
+    libspectrum_snap_set_pages( snap, i, buffer );
   }
 
   memory_rom_to_snapshot( snap );

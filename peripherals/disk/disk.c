@@ -1604,10 +1604,10 @@ extern int fuse_exiting;		/* Shall we exit now? */
 static int
 open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 {
-  int i, j, seclen, idlen, gap, idx;
+  int i, j, seclen=0, idlen, gap, idx;
   int bpt, max_bpt = 0, trlen;
   int cpc_fix;
-  unsigned char *hdrb, *tltbl;
+  unsigned char *hdrb, *tltbl=NULL;
 #ifdef CPC_DEBUG
   int cpc_fix_fix = 0;
 #endif
