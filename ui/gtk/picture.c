@@ -34,8 +34,6 @@ static int dialog_created = 0;
 static GtkWidget *dialog;
 static GdkPixbuf *pixbuf = NULL;
 
-#if GTK_CHECK_VERSION( 3, 0, 0 )
-
 static GdkPixbuf *scaled_pixbuf = NULL;
 
 static gint
@@ -81,8 +79,6 @@ picture_draw( GtkWidget *widget, cairo_t *cr, gpointer user_data GCC_UNUSED )
   return FALSE;
 }
 
-#endif                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
-
 int
 gtkui_picture( const char *filename, int border GCC_UNUSED )
 {
@@ -105,17 +101,6 @@ gtkui_picture( const char *filename, int border GCC_UNUSED )
   
     content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
-
-    GtkWidget *image = gtk_image_new();
-    gtk_image_set_from_pixbuf( GTK_IMAGE( image ), pixbuf );
-    gtk_container_add( GTK_CONTAINER( content_area ), image );
-
-    /* Stop users resizing this window */
-    gtk_window_set_resizable( GTK_WINDOW( dialog ), FALSE );
-
-#else
-
     GtkWidget *box = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
     gtk_container_add( GTK_CONTAINER( content_area ), box );
 
@@ -131,8 +116,6 @@ gtkui_picture( const char *filename, int border GCC_UNUSED )
     gtk_widget_set_size_request( GTK_WIDGET( drawing_area ),
                                  gdk_pixbuf_get_width( pixbuf ),
                                  gdk_pixbuf_get_height( pixbuf ) );
-
-#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
     gtkstock_create_close( dialog, NULL, G_CALLBACK( gtk_widget_hide ),
                            FALSE );

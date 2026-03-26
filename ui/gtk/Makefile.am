@@ -51,7 +51,6 @@ ui_gtk_files = \
                ui/gtk/confirm.c \
                ui/gtk/debugger.c \
                ui/gtk/fileselector.c \
-               ui/gtk/gtkcompat.h \
                ui/gtk/gtkdisplay.c \
                ui/gtk/gtkinternals.h \
                ui/gtk/gtkjoystick.c \
@@ -69,18 +68,8 @@ ui_gtk_files = \
                ui/gtk/rollback.c \
                ui/gtk/roms.c \
                ui/gtk/statusbar.c \
-               ui/gtk/stock.c
-
-if HAVE_GTK2
-
-ui_gtk_files += ui/gtk/gtkcompat.c \
-                ui/gtk/memory_gtk2.c
-
-else
-
-ui_gtk_files += ui/gtk/memory.c
-
-endif
+               ui/gtk/stock.c \
+               ui/gtk/memory.c
 
 ui_gtk_built = \
                ui/gtk/keysyms.c \

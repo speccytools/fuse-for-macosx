@@ -348,6 +348,8 @@ if test -z "$UI"; then
 
   if test "$gtk" = yes; then
 
+    gtk3=yes
+ 
     if test "$fakeglib" = yes; then
       AC_MSG_ERROR([libspectrum is using its own internal GLib replacement
 GTK requires the real GLib library, so the GTK UI cannot be used with
@@ -355,34 +357,9 @@ the libspectrum that was found.  Rebuild libspectrum to use the real GLib
 library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
     fi
 
-    AC_ARG_ENABLE(gtk3,
-      AS_HELP_STRING([--disable-gtk3],[prefer GTK 2 to GTK 3]),
-      if test "$enableval" = yes; then gtk3=yes; else gtk3=no; fi,
-      gtk3=auto
+    PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.20],,
+      AC_MSG_ERROR([GTK3 version >= 3.20 not found])
     )
-
-    if test "$gtk3" = yes; then
-      PKG_CHECK_MODULES(GTK, [gtk+-3.0],,
-        AC_MSG_ERROR([GTK not found])
-      )
-
-    elif test "$gtk3" = no; then
-      AM_PATH_GTK_2_0(2.18.0,,
-        AC_MSG_ERROR([GTK not found])
-      )
-
-    elif test "$gtk3" = auto; then
-      PKG_CHECK_MODULES([GTK], [gtk+-3.0], [gtk3=yes], [true])
-
-      if test "$gtk3" = auto; then
-        AM_PATH_GTK_2_0(2.18.0,
-          gtk3=no,
-          AC_MSG_WARN([GTK not found. Reverting to Xlib])
-          gtk3=no
-          gtk=no
-        )
-      fi
-    fi
 
   fi
 
@@ -410,8 +387,6 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
     CPPFLAGS="$ac_save_CPPFLAGS"
   fi
 fi
-
-AM_CONDITIONAL(HAVE_GTK2, test "$gtk3" != yes)
 
 if test "$UI" = gtk; then
   AC_PATH_XTRA

@@ -86,9 +86,7 @@ typedef struct gtkstock_button {
   gint response_id;             /* response id for dialog */
 } gtkstock_button;
 
-/* GTK1: create a simple button with the given label.
- *   "gtk-" prefixes are stripped and are used to select default accel keys.
- * GTK2: chooses between stock and normal based on "gtk-" prefix.
+/*
  * GTK3: GtkStock has been deprecated, we should not use "gtk-" prefix.
  *
  * If the target widget is a GtkDialog, then created buttons are put in its

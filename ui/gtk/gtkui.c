@@ -35,7 +35,6 @@
 
 #include "debugger/debugger.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -153,19 +152,10 @@ ui_init( int *argc, char ***argv )
   GtkAccelGroup *accel_group;
   GtkSettings *settings;
 
-#if GTK_CHECK_VERSION( 3, 10, 0 )
   /* The Wayland output is buggy, see #367 */
   gdk_set_allowed_backends( "quartz,win32,mir,x11,*" );
-#endif
 
   gtk_init(argc,argv);
-
-#if !GTK_CHECK_VERSION( 3, 0, 0 )
-  gdk_rgb_init();
-  gdk_rgb_set_install( TRUE );
-  gtk_widget_set_default_colormap( gdk_rgb_get_cmap() );
-  gtk_widget_set_default_visual( gdk_rgb_get_visual() );
-#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
   g_resources_register( gtkui_get_resource() );
 
@@ -941,8 +931,6 @@ wheel_scroll_event( GtkTreeView *list, GdkEvent *event, gpointer user_data )
   case GDK_SCROLL_DOWN:
     base += gtk_adjustment_get_page_increment( adjustment ) / 2;
     break;
-
-#if GTK_CHECK_VERSION( 3, 4, 0 )
   case GDK_SCROLL_SMOOTH:
     {
       static gdouble total_dy = 0;
@@ -962,8 +950,6 @@ wheel_scroll_event( GtkTreeView *list, GdkEvent *event, gpointer user_data )
       }
       break;
     }
-#endif
-
   default:
     return FALSE;
   }

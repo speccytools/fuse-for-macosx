@@ -28,7 +28,6 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "settings.h"
 #include "ui/ui.h"

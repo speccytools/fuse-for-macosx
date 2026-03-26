@@ -34,7 +34,6 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "memory_pages.h"
 #include "menu.h"
@@ -69,8 +68,6 @@ textview_wheel_scroll_event( GtkWidget *widget, GdkEvent *event, gpointer user_d
   case GDK_SCROLL_DOWN:
     base += gtk_adjustment_get_page_increment( adjustment ) / 2;
     break;
-
-#if GTK_CHECK_VERSION( 3, 4, 0 )
   case GDK_SCROLL_SMOOTH:
     {
       static gdouble total_dy = 0;
@@ -90,8 +87,6 @@ textview_wheel_scroll_event( GtkWidget *widget, GdkEvent *event, gpointer user_d
       }
       break;
     }
-#endif
-
   default:
     return FALSE;
   }
@@ -295,7 +290,6 @@ scroller( GtkAdjustment *adjustment, gpointer user_data )
   update_display( base );
 }
 
-#if GTK_CHECK_VERSION( 3, 6, 0 )
 static void
 goto_offset( GtkWidget *widget GCC_UNUSED, gpointer user_data GCC_UNUSED )
 {
@@ -322,7 +316,6 @@ goto_offset( GtkWidget *widget GCC_UNUSED, gpointer user_data GCC_UNUSED )
   mark_offset = offset;
   gtk_adjustment_set_value( adjustment, offset );
 }
-#endif
 
 void
 menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
@@ -346,7 +339,6 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   gtkstock_create_close( dialog, accel_group, NULL, TRUE );
 
-#if GTK_CHECK_VERSION( 3, 6, 0 )
   /* Go to offset */
   box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 8 );
   offset = gtk_search_entry_new();
@@ -366,7 +358,6 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   g_signal_connect( G_OBJECT( offset ), "activate",
                     G_CALLBACK( goto_offset ), NULL );
-#endif
 
   /* Create text buffers */
   tag_table = gtk_text_tag_table_new();
@@ -414,11 +405,9 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
   gtk_text_view_set_left_margin( GTK_TEXT_VIEW( view_data ), 1 );
   gtk_text_view_set_right_margin( GTK_TEXT_VIEW( view_data ), 1 );
 
-#if GTK_CHECK_VERSION( 3, 16, 0 )
   gtk_text_view_set_monospace( GTK_TEXT_VIEW( view_address ), TRUE );
   gtk_text_view_set_monospace( GTK_TEXT_VIEW( view_hex ), TRUE );
   gtk_text_view_set_monospace( GTK_TEXT_VIEW( view_data ), TRUE );
-#endif
 
   gtk_box_pack_start( GTK_BOX( box_address ), view_address, FALSE, FALSE, 0 );
   gtk_box_pack_start( GTK_BOX( box_hex ), view_hex, FALSE, FALSE, 0 );

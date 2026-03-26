@@ -30,7 +30,6 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "keyboard.h"
 #include "peripherals/joystick.h"

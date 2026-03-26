@@ -93,15 +93,3 @@ jobs:
       dependencies: ""
       configure_params: "--with-x"
       verify_ui: "xlib"
-
-  # GTK 2 UI (deprecated)
-  gtk2-ui:
-    name: "Fuse GTK 2 UI (MacOS) (deprecated)"
-    needs: [libspectrum]
-    uses: ./.github/workflows/build_macos_sub.yml
-    with:
-      name: GTK2 UI (deprecated)
-      dependencies: "gtk+"
-      configure_params: "--with-gtk --disable-gtk3"
-      verify_ui: "gtk"
-      verify_other: "Using GTK 3: no"
