@@ -32,8 +32,8 @@
 #include "pokefinder.h"
 #include "spectrum.h"
 
-libspectrum_byte pokefinder_possible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE ];
-libspectrum_byte pokefinder_impossible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE / 8 ];
+libspectrum_byte pokefinder_possible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE ] = { { 0 } };
+libspectrum_byte pokefinder_impossible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE / 8 ] = { { 0 } };
 size_t pokefinder_count;
 
 void
