@@ -345,7 +345,9 @@ add_filter_tape_files( GtkFileFilter *filter )
   gtk_file_filter_add_pattern( filter, "*.sta" );
   gtk_file_filter_add_pattern( filter, "*.tzx" );
   gtk_file_filter_add_pattern( filter, "*.tap" );
+#ifdef LIBSPECTRUM_SUPPORTS_WAV
   gtk_file_filter_add_pattern( filter, "*.wav" );
+#endif
 
   gtk_file_filter_add_pattern( filter, "*.CSW" );
   gtk_file_filter_add_pattern( filter, "*.LTP" );
@@ -355,5 +357,7 @@ add_filter_tape_files( GtkFileFilter *filter )
   gtk_file_filter_add_pattern( filter, "*.STA" );
   gtk_file_filter_add_pattern( filter, "*.TZX" );
   gtk_file_filter_add_pattern( filter, "*.TAP" );
+#ifdef LIBSPECTRUM_SUPPORTS_WAV
   gtk_file_filter_add_pattern( filter, "*.WAV" );
+#endif
 }

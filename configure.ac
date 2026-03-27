@@ -478,22 +478,6 @@ AC_COMPILE_IFELSE(
 CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(LIBSPEC_HAVE_BZ2)
 
-dnl Check if supplied libspectrum has support for wav files
-AC_MSG_CHECKING(whether libspectrum supports wav files)
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
-AC_COMPILE_IFELSE(
-  [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
-    [[
-      int test = LIBSPECTRUM_SUPPORTS_AUDIOFILE;
-    ]])
-  ],
-  [LIBSPEC_HAVE_AUDIOFILE=yes; AC_MSG_RESULT(yes)],
-  [LIBSPEC_HAVE_AUDIOFILE=""; AC_MSG_RESULT(no)]
-)
-CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(LIBSPEC_HAVE_AUDIOFILE)
-
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_MSG_CHECKING(whether PNG support requested)
 AC_ARG_WITH(png,
@@ -1037,7 +1021,6 @@ echo ""
 echo "Internal GLib replacement: ${fakeglib}"
 echo "zlib support: ${LIBSPEC_HAVE_ZLIB:-no}"
 echo "bzip2 support: ${LIBSPEC_HAVE_BZ2:-no}"
-echo "audiofile support: ${LIBSPEC_HAVE_AUDIOFILE:-no}"
 echo ""
 echo "********************"
 echo "*** Fuse options ***"

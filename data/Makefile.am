@@ -60,11 +60,6 @@ dist_mimeicons256_DATA = data/icons/256x256/application-x-spectrum.png
 # Generate fuse.xml according to libspectrum capabilities
 data/fuse.xml: $(srcdir)/data/fuse.xml.in
 	$(AM_V_GEN)$(MKDIR_P) data; \
-	if test -z "$(LIBSPEC_HAVE_AUDIOFILE)"; then \
-	  mime_audiofile='/LIBSPECTRUM_HAVE_AUDIOFILE_BEGIN/,/LIBSPECTRUM_HAVE_AUDIOFILE_END/d'; \
-	else \
-	  mime_audiofile='/LIBSPECTRUM_HAVE_AUDIOFILE/d'; \
-	fi; \
 	if test -z "$(LIBSPEC_HAVE_ZLIB)"; then \
 	  mime_zlib='/LIBSPECTRUM_HAVE_ZLIB_BEGIN/,/LIBSPECTRUM_HAVE_ZLIB_END/d'; \
 	else \
@@ -75,7 +70,7 @@ data/fuse.xml: $(srcdir)/data/fuse.xml.in
 	else \
 	  mime_bz2='/LIBSPECTRUM_HAVE_BZ2/d'; \
 	fi; \
-	$(SED) -e "$$mime_audiofile" -e "$$mime_zlib" -e "$$mime_bz2" < $(srcdir)/data/fuse.xml.in > $@
+	$(SED) -e "$$mime_zlib" -e "$$mime_bz2" < $(srcdir)/data/fuse.xml.in > $@
 
 # Generate fuse.desktop from fuse.xml to keep mime types list in sync
 data/fuse.desktop: $(srcdir)/data/fuse.desktop.in data/fuse.xml
