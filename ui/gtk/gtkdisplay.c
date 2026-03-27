@@ -328,8 +328,11 @@ void
 uidisplay_frame_end( void )
 {
   if( display_updated ) {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_window_process_updates( gtk_widget_get_window( gtkui_drawing_area ),
                                 FALSE );
+G_GNUC_END_IGNORE_DEPRECATIONS
+
     display_updated = 0;
   }
 

@@ -140,7 +140,6 @@ EXTRA_DIST = AUTHORS \
 	     m4/ax_create_stdint_h.m4 \
 	     m4/ax_pthread.m4 \
 	     m4/ax_string_strcasecmp.m4 \
-	     m4/gtk-2.0.m4 \
 	     m4/pkg.m4 \
 	     m4/sdl.m4 \
 	     menu_data.dat \
