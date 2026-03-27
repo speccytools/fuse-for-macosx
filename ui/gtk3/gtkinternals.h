@@ -128,7 +128,7 @@ extern GtkActionEntry gtkui_menu_data[];
 extern guint gtkui_menu_data_size;
 
 /*
- * Resources for the GTK UI (ui/gtk/resources.xml)
+ * Resources for the GTK UI (ui/gtk3/resources.xml)
  */
 
 #define FUSE_RESOURCE_PREFIX "/net/sourceforge/fuse_emulator/"

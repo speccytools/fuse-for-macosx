@@ -371,8 +371,8 @@ if test -z "$UI"; then
 
   if test "$gtk" = yes; then
 
-    gtk3=yes
- 
+    UI=gtk3
+
     if test "$fakeglib" = yes; then
       AC_MSG_ERROR([libspectrum is using its own internal GLib replacement
 GTK requires the real GLib library, so the GTK UI cannot be used with
@@ -383,12 +383,10 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
     PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.20],,
       AC_MSG_ERROR([GTK3 version >= 3.20 not found])
     )
-
   fi
 
   if test "$gtk" = yes; then
     AC_DEFINE([UI_GTK], 1, [Defined if GTK UI is in use])
-    UI=gtk;
     AC_MSG_CHECKING(whether GTK supports x11 backend)
     ac_save_CPPFLAGS="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
@@ -411,7 +409,7 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
   fi
 fi
 
-if test "$UI" = gtk; then
+if test "$UI" = gtk3; then
   AC_PATH_XTRA
 fi
 
@@ -453,7 +451,7 @@ if test -z "$UI"; then
 fi
 
 AM_CONDITIONAL(UI_FB, test "$UI" = fb)
-AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
+AM_CONDITIONAL(UI_GTK, test "$UI" = gtk3)
 AM_CONDITIONAL(UI_NULL, test "$UI" = null)
 AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
 AM_CONDITIONAL(UI_SDL2, test "$UI" = sdl2)
@@ -764,7 +762,7 @@ if test "$stick" = yes; then
         AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
       fi
       ;;
-    gtk|xlib)
+    gtk3|xlib)
       dnl These UIs could use SDL library for handling joysticks
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
@@ -1070,8 +1068,8 @@ echo "*** Fuse options ***"
 echo "********************"
 echo ""
 echo "User interface: ${UI}"
-if test "${UI}" = "gtk"; then
-   echo "Using GTK 3: ${gtk3}"
+if test "${UI}" = "gtk3"; then
+   echo "Using GTK 3: ${gtk}"
 fi
 if test "${use_sdl1}" = "yes"; then
    echo "Using SDL 1: yes"

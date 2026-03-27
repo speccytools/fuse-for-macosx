@@ -50,7 +50,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "timer/timer.h"
-#include "ui/gtk/resources.h"
+#include "ui/gtk3/resources.h"
 #include "ui/ui.h"
 #include "utils.h"
 

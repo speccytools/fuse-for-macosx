@@ -58,7 +58,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
-#include "ui/gtk/gtkinternals.h"
+#include "ui/gtk3/gtkinternals.h"
 #include "utils.h"
 
 static int
