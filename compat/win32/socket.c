@@ -168,9 +168,9 @@ compat_socket_selfpipe_alloc( void )
  
   /* Test communications in order to detect blocking firewalls */
   if( selfpipe_test( self ) == -1 ) {
-    ui_error( UI_ERROR_ERROR,
-              "Networking: failed to test internal communications" );
-    fuse_abort();
+    compat_socket_close( self->self_socket );
+    libspectrum_free( self );
+    return NULL;
   }
 
   return self;
@@ -246,4 +246,3 @@ compat_socket_networking_end( void )
 {
   WSACleanup();
 }
-

@@ -182,6 +182,17 @@ spectranet_reset( int hard_reset )
     return;
   }
 
+  if( nic_w5100_enable( w5100 ) ) {
+    ui_error( UI_ERROR_WARNING,
+              "Networking blocked (loopback/firewall?); Spectranet disabled" );
+    settings_current.spectranet = 0;
+    settings_current.spectranet_disable = 1;
+    spectranet_available = 0;
+    spectranet_paged = 0;
+    periph_activate_type( PERIPH_TYPE_SPECTRANET, 0 );
+    return;
+  }
+
   spectranet_available = 1;
   spectranet_paged = !settings_current.spectranet_disable;
 
