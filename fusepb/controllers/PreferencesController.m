@@ -29,6 +29,8 @@
 
 #import "FuseController.h"
 #import "DisplayOpenGLView.h"
+#import "AppSandboxFileAccess.h"
+#import "models/Emulator.h"
 #import "JoystickConfigurationController.h"
 #import "PreferencesController.h"
 #import "CAMachines.h"
@@ -192,7 +194,9 @@
   read_config_file( &settings_current );
 
   if( strcmp( machine_current->id, settings_current.start_machine ) ) {
+    NSArray *romURLs = [Emulator beginROMScopedAccess];
     machine_select_id( settings_current.start_machine );
+    [Emulator endROMScopedAccess:romURLs];
   }
 
   // B&W TV status may have changed
@@ -210,7 +214,11 @@
   joystick_end();
   joystick_init( NULL );
 
-  periph_posthook();
+  {
+    NSArray *romURLs = [Emulator beginROMScopedAccess];
+    periph_posthook();
+    [Emulator endROMScopedAccess:romURLs];
+  }
 
   [[DisplayOpenGLView instance] unpause];
 }
@@ -292,6 +300,8 @@
     [oFile getFileSystemRepresentation:buffer maxLength:PATH_MAX];
 
     romString = @(buffer);
+
+    [[AppSandboxFileAccess fileAccess] persistPermissionPath:oFile];
 
     switch( [sender tag] ) {
     case 0:

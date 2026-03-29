@@ -78,6 +78,102 @@ static Emulator *instance = nil;
   return instance;
 }
 
++ (NSArray *)beginROMScopedAccess
+{
+  const char *roms[] = {
+    settings_current.rom_128_0,
+    settings_current.rom_128_1,
+    settings_current.rom_16_0,
+    settings_current.rom_2048_0,
+    settings_current.rom_2068_0,
+    settings_current.rom_2068_1,
+    settings_current.rom_48_0,
+    settings_current.rom_beta128,
+    settings_current.rom_didaktik80,
+    settings_current.rom_disciple,
+    settings_current.rom_interface1,
+    settings_current.rom_multiface1,
+    settings_current.rom_multiface128,
+    settings_current.rom_multiface3,
+    settings_current.rom_opus,
+    settings_current.rom_pentagon1024_0,
+    settings_current.rom_pentagon1024_1,
+    settings_current.rom_pentagon1024_2,
+    settings_current.rom_pentagon1024_3,
+    settings_current.rom_pentagon512_0,
+    settings_current.rom_pentagon512_1,
+    settings_current.rom_pentagon512_2,
+    settings_current.rom_pentagon512_3,
+    settings_current.rom_pentagon_0,
+    settings_current.rom_pentagon_1,
+    settings_current.rom_pentagon_2,
+    settings_current.rom_plus2_0,
+    settings_current.rom_plus2_1,
+    settings_current.rom_plus2a_0,
+    settings_current.rom_plus2a_1,
+    settings_current.rom_plus2a_2,
+    settings_current.rom_plus2a_3,
+    settings_current.rom_plus3_0,
+    settings_current.rom_plus3_1,
+    settings_current.rom_plus3_2,
+    settings_current.rom_plus3_3,
+    settings_current.rom_plus3e_0,
+    settings_current.rom_plus3e_1,
+    settings_current.rom_plus3e_2,
+    settings_current.rom_plus3e_3,
+    settings_current.rom_plusd,
+    settings_current.rom_scorpion_0,
+    settings_current.rom_scorpion_1,
+    settings_current.rom_scorpion_2,
+    settings_current.rom_scorpion_3,
+    settings_current.rom_se_0,
+    settings_current.rom_se_1,
+    settings_current.rom_speccyboot,
+    settings_current.rom_ts2068_0,
+    settings_current.rom_ts2068_1,
+    settings_current.rom_ttx2000s,
+    settings_current.rom_usource,
+  };
+
+  AppSandboxFileAccess *fileAccess = [AppSandboxFileAccess fileAccess];
+  id<AppSandboxFileAccessProtocol> persist = fileAccess.bookmarkPersistanceDelegate;
+  NSMutableArray *accessedURLs = [NSMutableArray array];
+
+  for (size_t i = 0; i < sizeof(roms)/sizeof(roms[0]); i++) {
+    const char *rom = roms[i];
+    if (!rom || rom[0] != '/') continue;
+
+    NSURL *url = [[[NSURL fileURLWithPath:@(rom)]
+                   URLByStandardizingPath]
+                  URLByResolvingSymlinksInPath];
+    NSData *bookmarkData = [persist bookmarkDataForURL:url];
+    if (!bookmarkData) continue;
+
+    BOOL stale = NO;
+    NSURL *scopedURL = [NSURL URLByResolvingBookmarkData:bookmarkData
+        options:NSURLBookmarkResolutionWithSecurityScope | NSURLBookmarkResolutionWithoutUI
+        relativeToURL:nil bookmarkDataIsStale:&stale error:nil];
+    if (scopedURL && [scopedURL startAccessingSecurityScopedResource]) {
+      [accessedURLs addObject:scopedURL];
+      if (stale) {
+        NSData *newBookmark = [scopedURL
+            bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+            includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
+        if (newBookmark) [persist setBookmarkData:newBookmark forURL:url];
+      }
+    }
+  }
+
+  return accessedURLs;
+}
+
++ (void)endROMScopedAccess:(NSArray *)urls
+{
+  for (NSURL *url in urls) {
+    [url stopAccessingSecurityScopedResource];
+  }
+}
+
 -(void) connectWithPorts:(NSArray *)portArray
 {
   NSAutoreleasePool *pool;
@@ -92,9 +188,11 @@ static Emulator *instance = nil;
   proxy_view = (id)[serverConnection rootProxy];
   [proxy_view setServer:self];
 
+  NSArray *romURLs = [Emulator beginROMScopedAccess];
   if( fuse_init( ac, av ) ) {
     fprintf( stderr, "%s: error initialising -- giving up!\n", fuse_progname );
   }
+  [Emulator endROMScopedAccess:romURLs];
 
   while( !fuse_exiting ) {
     [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
@@ -300,12 +398,16 @@ static Emulator *instance = nil;
 
 -(void) reset
 {
+  NSArray *romURLs = [Emulator beginROMScopedAccess];
   machine_reset(0);
+  [Emulator endROMScopedAccess:romURLs];
 }
 
 -(void) hard_reset
 {
+  NSArray *romURLs = [Emulator beginROMScopedAccess];
   machine_reset(1);
+  [Emulator endROMScopedAccess:romURLs];
 }
 
 -(void) nmi
