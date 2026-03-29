@@ -38,7 +38,7 @@
     if (!machines) {
       size_t i;
 
-      machines = [NSMutableArray arrayWithCapacity:machine_count];
+      machines = [[NSMutableArray alloc] initWithCapacity:machine_count];
 
       for( i=0; i<machine_count; i++ ) {
         [machines addObject:

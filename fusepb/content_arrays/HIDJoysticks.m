@@ -39,7 +39,7 @@
   if (!joysticks) {
     size_t i;
 
-    joysticks = [NSMutableArray arrayWithCapacity:joysticks_supported+1];
+    joysticks = [[NSMutableArray alloc] initWithCapacity:joysticks_supported+1];
 
     [joysticks addObject:[HIDJoystick joystickWithName:@"None" andType:0]];
     if( joysticks_supported > 0 ){
