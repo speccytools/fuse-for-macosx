@@ -207,7 +207,7 @@ svga_modes, null, 0
 sdl_fullscreen_mode, string, NULL
 doublescan_mode, numeric, 1, 'D', doublescan-mode
 
-start_scaler_mode, string, "normal", 'g', graphics-filter
+start_scaler_mode, string, "2x", 'g', graphics-filter
 
 speccyboot_tap, string, "tap0",
 
