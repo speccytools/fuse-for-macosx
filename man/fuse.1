@@ -3588,6 +3588,29 @@ perhaps the only thing worth noting is that emulation is paused until
 you close the window.
 .RE
 .PP
+.I "Machine, Profiler"
+.RS
+Start or stop the built-in Z80 execution profiler. When profiling is
+started, Fuse records the cumulative number of t-states spent at each
+program counter address. When profiling is stopped, Fuse prompts for a
+filename and writes the collected data as text, one non-zero address per
+line, in the form
+.RB ` 0x1234,456 '
+where the first value is the address and the second is the cumulative
+t-state count.
+.PP
+This output can be converted with
+.BR profile2map (1)
+from the
+.B fuse-utils
+package into the opcode map-file format used by Gerton Lunter's
+.B Z80
+Spectrum emulator. Such map files can be used by external tools such as
+.B dZ80
+.RI ( "http://inkland.org.uk/dz80/" )
+to help distinguish executed code from unexecuted data.
+.RE
+.PP
 .I "Machine, NMI"
 .RS
 Sends a non-maskable interrupt to the emulated Spectrum. Due to a typo
