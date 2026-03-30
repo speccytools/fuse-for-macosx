@@ -7,5 +7,5 @@ GenericName=Spectrum Emulator
 Comment=Emulator of the 1980s ZX Spectrum home computer and its various clones
 MimeType=@MIME_TYPES@
 Exec=fuse %f
-Icon=fuse
+Icon=net.sourceforge.fuse_emulator.Fuse
 Keywords=sinclair;zx;game;retro;

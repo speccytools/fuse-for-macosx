@@ -26,7 +26,10 @@ fusemimedir = $(DESKTOP_DATADIR)/mime/packages
 fusemime_DATA = data/fuse.xml
 
 appdatadir = $(DESKTOP_DATADIR)/applications
-appdata_DATA = data/fuse.desktop
+appdata_DATA = data/net.sourceforge.fuse_emulator.Fuse.desktop
+
+metainfodir = $(DESKTOP_DATADIR)/metainfo
+metainfo_DATA = data/net.sourceforge.fuse_emulator.Fuse.metainfo.xml
 
 iconsdatadir = $(DESKTOP_DATADIR)/icons/hicolor
 icons16dir = $(iconsdatadir)/16x16/apps
@@ -36,12 +39,12 @@ icons64dir = $(iconsdatadir)/64x64/apps
 icons128dir = $(iconsdatadir)/128x128/apps
 icons256dir = $(iconsdatadir)/256x256/apps
 
-dist_icons16_DATA = data/icons/16x16/fuse.png
-dist_icons32_DATA = data/icons/32x32/fuse.png
-dist_icons48_DATA = data/icons/48x48/fuse.png
-dist_icons64_DATA = data/icons/64x64/fuse.png
-dist_icons128_DATA = data/icons/128x128/fuse.png
-dist_icons256_DATA = data/icons/256x256/fuse.png
+dist_icons16_DATA = data/icons/16x16/net.sourceforge.fuse_emulator.Fuse.png
+dist_icons32_DATA = data/icons/32x32/net.sourceforge.fuse_emulator.Fuse.png
+dist_icons48_DATA = data/icons/48x48/net.sourceforge.fuse_emulator.Fuse.png
+dist_icons64_DATA = data/icons/64x64/net.sourceforge.fuse_emulator.Fuse.png
+dist_icons128_DATA = data/icons/128x128/net.sourceforge.fuse_emulator.Fuse.png
+dist_icons256_DATA = data/icons/256x256/net.sourceforge.fuse_emulator.Fuse.png
 
 mimeicons16dir = $(iconsdatadir)/16x16/mimetypes
 mimeicons32dir = $(iconsdatadir)/32x32/mimetypes
@@ -72,11 +75,11 @@ data/fuse.xml: $(srcdir)/data/fuse.xml.in
 	fi; \
 	$(SED) -e "$$mime_zlib" -e "$$mime_bz2" < $(srcdir)/data/fuse.xml.in > $@
 
-# Generate fuse.desktop from fuse.xml to keep mime types list in sync
-data/fuse.desktop: $(srcdir)/data/fuse.desktop.in data/fuse.xml
+# Generate net.sourceforge.fuse_emulator.Fuse.desktop from fuse.xml to keep mime types list in sync
+data/net.sourceforge.fuse_emulator.Fuse.desktop: $(srcdir)/data/net.sourceforge.fuse_emulator.Fuse.desktop.in data/fuse.xml
 	$(AM_V_GEN)$(MKDIR_P) data; \
 	list=`$(SED) -e '/<mime-type/ s/.*<mime-type type="\(.*\)">.*/\1;/' -e t -e d < data/fuse.xml | tr -d '\n'` && \
-	$(SED) -e "s|@MIME_TYPES@|$$list|" < $(srcdir)/data/fuse.desktop.in > $@
+	$(SED) -e "s|@MIME_TYPES@|$$list|" < $(srcdir)/data/net.sourceforge.fuse_emulator.Fuse.desktop.in > $@
 
 update-database-cache:
 	if test -z "$(DESTDIR)"; then \
@@ -90,7 +93,7 @@ install-data-hook: update-database-cache
 
 uninstall-hook: update-database-cache
 
-validate: data/fuse.desktop
+validate: data/net.sourceforge.fuse_emulator.Fuse.desktop
 	( dfvalidate=`which desktop-file-validate`; \
 	  if test x$$dfvalidate != x && test -x $$dfvalidate; then \
             $$dfvalidate $< || ( echo "* $< INVALID *"; exit 1 ) \
@@ -108,7 +111,7 @@ dist_bashcompletion_DATA = data/shell-completion/bash/fuse
 endif
 
 EXTRA_DIST += \
-              data/fuse.desktop.in \
+              data/net.sourceforge.fuse_emulator.Fuse.desktop.in \
               data/fuse.xml.in \
               data/shell-completion/diff_options.sh \
               data/win32/fuse.manifest.in \
@@ -116,7 +119,7 @@ EXTRA_DIST += \
               data/win32/winfuse.ico
 
 CLEANFILES += \
-              data/fuse.desktop \
+              data/net.sourceforge.fuse_emulator.Fuse.desktop \
               data/fuse.xml \
               data/shell-completion/bash.txt \
               data/shell-completion/man.txt \
