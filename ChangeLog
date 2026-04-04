@@ -1,3 +1,35 @@
+2026-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.x.x released.
+
+        * UI improvements:
+          * Make 2x the default display scaler so Fuse is more usable on
+            modern screens (Fredrick Meunier).
+
+        * Debugger improvements:
+          * Remove $-prefixed hex digit syntax from the debugger to prevent
+            clashes with variables (fixes bug #407) (thanks, Gergely Szasz and
+            Sergio Baldoví).
+
+        * Deprecated features removed:
+          * Remove GTK2 support from the build and codebase (Derek Fountain).
+
+        * Miscellaneous improvements:
+          * Win32: don't abort startup if networking is blocked; instead,
+            disable Spectranet with a warning (Fredrick Meunier).
+          * Use LIBSPECTRUM_SUPPORTS_WAV to gate WAV support (Fredrick
+            Meunier).
+          * Correct libspectrum DLL version (thanks, Guesser) (Fredrick
+            Meunier).
+          * Suppress or fix various compiler warnings, including common-symbol
+            alignment warnings on macOS (Derek Fountain and Fredrick Meunier).
+          * Fix out-of-tree builds by using full paths in generated #includes
+            (Alberto Garcia).
+          * Document the profiler menu options (fixes bug #303) (Fredrick
+            Meunier).
+
+        * Various other minor bugfixes.
+
 2026-03-21  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.7.0 released.
