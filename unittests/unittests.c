@@ -24,6 +24,8 @@
 
 #include "config.h"
 
+#include <string.h>
+
 #include "libspectrum.h"
 
 #include "debugger/debugger.h"
@@ -246,6 +248,12 @@ floating_bus_merge_test( void )
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0x00 ) == 0x0a );
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xff ) == 0xaa );
 
+  /* Tests with complementary attached/floating_bus masks */
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0xf0, 0x0f ) == 0xaa );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xf0 ) == 0xaa );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x55, 0x00 ) == 0x00 );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x00, 0x55 ) == 0x00 );
+
   return 0;
 }
 
@@ -306,6 +314,35 @@ mempool_test( void )
 
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
+  /* Test mempool_strdup: verify string content and pool tracking */
+  {
+    const char *test_string = "hello fuse";
+    char *result = mempool_strdup( pool1, test_string );
+
+    TEST_ASSERT( result != NULL );
+    TEST_ASSERT( strcmp( result, test_string ) == 0 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+
+    mempool_free( pool1 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+  }
+
+  /* Test mempool_strdup with an empty string */
+  {
+    char *result = mempool_strdup( pool1, "" );
+
+    TEST_ASSERT( result != NULL );
+    TEST_ASSERT( strcmp( result, "" ) == 0 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+
+    mempool_free( pool1 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+  }
+
+  /* Test that out-of-range pool IDs return NULL */
+  TEST_ASSERT( mempool_malloc( mempool_get_pools(), 23 ) == NULL );
+  TEST_ASSERT( mempool_malloc( -2, 23 ) == NULL );
 
   return 0;
 }
