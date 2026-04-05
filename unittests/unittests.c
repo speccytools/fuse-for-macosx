@@ -52,6 +52,7 @@
 #include "peripherals/usource.h"
 #include "settings.h"
 #include "unittests.h"
+#include "utils.h"
 
 static int
 contention_test( void )
@@ -253,6 +254,29 @@ floating_bus_merge_test( void )
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xf0 ) == 0xaa );
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x55, 0x00 ) == 0x00 );
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x00, 0x55 ) == 0x00 );
+
+  return 0;
+}
+
+static int
+utils_safe_strdup_test( void )
+{
+  char *result;
+
+  /* NULL input should return NULL (safe from crash unlike plain strdup) */
+  TEST_ASSERT( utils_safe_strdup( NULL ) == NULL );
+
+  /* Regular string should be copied correctly */
+  result = utils_safe_strdup( "hello fuse" );
+  TEST_ASSERT( result != NULL );
+  TEST_ASSERT( strcmp( result, "hello fuse" ) == 0 );
+  libspectrum_free( result );
+
+  /* Empty string should produce an allocated, empty string */
+  result = utils_safe_strdup( "" );
+  TEST_ASSERT( result != NULL );
+  TEST_ASSERT( strcmp( result, "" ) == 0 );
+  libspectrum_free( result );
 
   return 0;
 }
@@ -824,6 +848,7 @@ unittests_run( void )
   r += contention_test();
   r += floating_bus_test();
   r += floating_bus_merge_test();
+  r += utils_safe_strdup_test();
   r += mempool_test();
   r += paging_test();
   r += debugger_disassemble_unittest();
