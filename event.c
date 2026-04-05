@@ -108,7 +108,7 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
   }
 
   ptr->tstates = event_time;
-  ptr->type =type;
+  ptr->type = type;
   ptr->user_data = user_data;
 
   if( event_time < event_next_event ) {
