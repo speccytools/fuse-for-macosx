@@ -327,6 +327,21 @@ update_dirty_rects( void )
     int x = 0;
     while( display_is_dirty[y] ) {
 
+#ifdef __GNUC__
+      /* Skip to the first dirty bit using a single BSF/TZCNT instruction */
+      int skip = __builtin_ctzll( (unsigned long long)display_is_dirty[y] );
+      display_is_dirty[y] >>= skip;
+      x += skip;
+
+      start = x;
+
+      /* Count the run of consecutive dirty bits using ~value */
+      int run = __builtin_ctzll( (unsigned long long)~display_is_dirty[y] );
+      display_is_dirty[y] >>= run;
+      x += run;
+
+      rectangle_add( y, start, run );
+#else
       /* Find the first dirty chunk on this row */
       while( !( display_is_dirty[y] & 0x01 ) ) {
         display_is_dirty[y] >>= 1;
@@ -342,6 +357,7 @@ update_dirty_rects( void )
       } while( display_is_dirty[y] & 0x01 );
 
       rectangle_add( y, start, x - start );
+#endif
     }
 
     /* compress the active rectangles list */
@@ -566,6 +582,12 @@ copy_critical_region_line( int y, int x, int end )
 
   while( dirty ) {
 
+#ifdef __GNUC__
+    /* Skip to the first dirty bit using a single BSF/TZCNT instruction */
+    int skip = __builtin_ctz( (unsigned int)dirty );
+    dirty >>= skip;
+    x += skip;
+#else
     /* Find the first dirty chunk on this row */
     while( !( dirty & 0x01 ) ) {
 
@@ -573,6 +595,7 @@ copy_critical_region_line( int y, int x, int end )
       x++;
 
     }
+#endif
 
     /* Walk to the end of the dirty region, writing the bytes to the
        drawing area along the way */
