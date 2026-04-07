@@ -51,6 +51,7 @@
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
 #include "settings.h"
+#include "rectangle.h"
 #include "unittests.h"
 #include "utils.h"
 
@@ -840,6 +841,100 @@ paging_test( void )
   return r;
 }
 
+static int
+rectangle_test( void )
+{
+  int saved_frame_rate = settings_current.frame_rate;
+
+  /* --- Test 1: rectangle_add creates a new active rectangle --- */
+  rectangle_reset();
+  rectangle_add( 0, 0, 10 );
+  TEST_ASSERT( rectangle_get_active_count() == 1 );
+  TEST_ASSERT( rectangle_inactive_count == 0 );
+
+  /* --- Test 2: rectangle_add extends a matching active rectangle --- */
+  rectangle_add( 1, 0, 10 );
+  TEST_ASSERT( rectangle_get_active_count() == 1 );
+
+  /* --- Test 3: rectangle_add creates a second rect when x,w differ --- */
+  rectangle_add( 1, 5, 8 );
+  TEST_ASSERT( rectangle_get_active_count() == 2 );
+
+  /* --- Test 4: rectangle_end_line keeps rects updated on this line --- */
+  /* Both rects ended at line 1 (y+h = 2 = 1+1), so both should be kept. */
+  rectangle_end_line( 1 );
+  TEST_ASSERT( rectangle_get_active_count() == 2 );
+  TEST_ASSERT( rectangle_inactive_count == 0 );
+
+  /* --- Test 5: rectangle_end_line flushes stale rects to inactive --- */
+  /* y=300 is beyond any rect; both move to inactive (frame_rate == 1). */
+  settings_current.frame_rate = 1;
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_get_active_count() == 0 );
+  TEST_ASSERT( rectangle_inactive_count == 2 );
+
+  /* --- Test 6 (frame skip): exact duplicate is discarded --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* Build inactive: {x=0, y=0, w=10, h=3} */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* Exact same rect again — should be discarded, count stays 1 */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].h == 3 );
+
+  /* --- Test 7 (frame skip): adjacent rows are merged --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=0, w=10, h=3} (rows 0-2) */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+
+  /* source: {x=0, y=3, w=10, h=1} (row 3) — touches row 2, should merge */
+  rectangle_add( 3, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].y == 0 );
+  TEST_ASSERT( rectangle_inactive[0].h == 4 );
+
+  /* --- Test 8 (frame skip): same-y different-h merge (bug fix) --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=0, w=10, h=3} */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=0, y=0, w=10, h=5} — same x,w,y but taller; must merge */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_add( 3, 0, 10 );
+  rectangle_add( 4, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].y == 0 );
+  TEST_ASSERT( rectangle_inactive[0].h == 5 );
+
+  settings_current.frame_rate = saved_frame_rate;
+  return 0;
+}
+
 int
 unittests_run( void )
 {
@@ -852,6 +947,7 @@ unittests_run( void )
   r += mempool_test();
   r += paging_test();
   r += debugger_disassemble_unittest();
+  r += rectangle_test();
 
   printf("Final return value: %d (should be 0)\n", r);
 
