@@ -931,6 +931,26 @@ rectangle_test( void )
   TEST_ASSERT( rectangle_inactive[0].y == 0 );
   TEST_ASSERT( rectangle_inactive[0].h == 5 );
 
+  /* --- Test 9 (frame skip): same-y same-h different-x merge (bug fix) --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=5, y=0, w=10, h=3} */
+  rectangle_add( 0, 5, 10 );
+  rectangle_add( 1, 5, 10 );
+  rectangle_add( 2, 5, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=5, y=0, w=15, h=3} — same x,y,h but wider; must merge */
+  rectangle_add( 0, 5, 15 );
+  rectangle_add( 1, 5, 15 );
+  rectangle_add( 2, 5, 15 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].x == 5 );
+  TEST_ASSERT( rectangle_inactive[0].w == 15 );
+
   settings_current.frame_rate = saved_frame_rate;
   return 0;
 }

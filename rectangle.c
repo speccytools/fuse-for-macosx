@@ -119,7 +119,7 @@ compare_and_merge_rectangles( struct rectangle *source )
     if( rectangle_inactive[z].y == source->y &&
           rectangle_inactive[z].h == source->h ) {
 
-      if( (rectangle_inactive[z].x < source->x && 
+      if( (rectangle_inactive[z].x <= source->x &&
           ( source->x < ( rectangle_inactive[z].x +
             rectangle_inactive[z].w + 1 ) ) ) ||
           ( source->x < rectangle_inactive[z].x && 
