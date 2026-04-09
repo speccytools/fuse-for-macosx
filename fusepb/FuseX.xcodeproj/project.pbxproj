@@ -303,11 +303,20 @@
 		FE2DAC802F32AB6C009AC45A /* vfile_ext.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC7F2F32AB6C009AC45A /* vfile_ext.c */; };
 		FE2DAC812F32AB6C009AC45A /* vfile.c in Sources */ = {isa = PBXBuildFile; fileRef = FE2DAC7D2F32AB6C009AC45A /* vfile.c */; };
 		FE3FF185294F1220009F571F /* spectranet.rom in Resources */ = {isa = PBXBuildFile; fileRef = FE3FF184294F1220009F571F /* spectranet.rom */; };
+		FE9443BC2F881C540059A578 /* engine_argv.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443B72F881C540059A578 /* engine_argv.c */; };
+		FE9443BD2F881C540059A578 /* lexer.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443B02F881C540059A578 /* lexer.c */; };
+		FE9443BE2F881C540059A578 /* engine_fs.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443B92F881C540059A578 /* engine_fs.c */; };
+		FE9443BF2F881C540059A578 /* json.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443BA2F881C540059A578 /* json.c */; };
+		FE9443C02F881C540059A578 /* ast.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443AE2F881C540059A578 /* ast.c */; };
+		FE9443C12F881C540059A578 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443B42F881C540059A578 /* parser.c */; };
+		FE9443C22F881C540059A578 /* matcher.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443B22F881C540059A578 /* matcher.c */; };
+		FE9443D12F881F210059A578 /* parson.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443D02F881F210059A578 /* parson.c */; };
+		FE9443D42F882E210059A578 /* spectranext_stdout.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443D32F882E210059A578 /* spectranext_stdout.c */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C972EEF0710008277BA /* FuseGenerator.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */; };
-		FEC02C9F2EEF65D6008277BA /* spectranext_config.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9C2EEF65D5008277BA /* spectranext_config.c */; };
+		FEC02C9F2EEF65D6008277BA /* spectranext_controller.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */; };
 		FEC02CA02EEF65D6008277BA /* spectranext.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9D2EEF65D5008277BA /* spectranext.h */; };
-		FEC02CA12EEF65D6008277BA /* spectranext_config.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9E2EEF65D6008277BA /* spectranext_config.h */; };
+		FEC02CA12EEF65D6008277BA /* spectranext_controller.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9E2EEF65D6008277BA /* spectranext_controller.h */; };
 		FED23B142EE096F10013DD32 /* tls.c in Sources */ = {isa = PBXBuildFile; fileRef = FED23B122EE096F10013DD32 /* tls.c */; };
 		FED24C472EE104C60013DD32 /* mbedtls.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FED24C382EE1002B0013DD32 /* mbedtls.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FED24C482EE104EB0013DD32 /* mbedtls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FED24C382EE1002B0013DD32 /* mbedtls.framework */; };
@@ -868,11 +877,28 @@
 		FE2DAC7E2F32AB6C009AC45A /* vfile_ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vfile_ext.h; sourceTree = "<group>"; };
 		FE2DAC7F2F32AB6C009AC45A /* vfile_ext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfile_ext.c; sourceTree = "<group>"; };
 		FE3FF184294F1220009F571F /* spectranet.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = spectranet.rom; path = ../roms/spectranet.rom; sourceTree = "<group>"; };
+		FE9443AD2F881C540059A578 /* ast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ast.h; sourceTree = "<group>"; };
+		FE9443AE2F881C540059A578 /* ast.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ast.c; sourceTree = "<group>"; };
+		FE9443AF2F881C540059A578 /* lexer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lexer.h; sourceTree = "<group>"; };
+		FE9443B02F881C540059A578 /* lexer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lexer.c; sourceTree = "<group>"; };
+		FE9443B12F881C540059A578 /* matcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matcher.h; sourceTree = "<group>"; };
+		FE9443B22F881C540059A578 /* matcher.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = matcher.c; sourceTree = "<group>"; };
+		FE9443B32F881C540059A578 /* parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
+		FE9443B42F881C540059A578 /* parser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = parser.c; sourceTree = "<group>"; };
+		FE9443B62F881C540059A578 /* engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
+		FE9443B72F881C540059A578 /* engine_argv.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = engine_argv.c; sourceTree = "<group>"; };
+		FE9443B82F881C540059A578 /* engine_fs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine_fs.h; sourceTree = "<group>"; };
+		FE9443B92F881C540059A578 /* engine_fs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = engine_fs.c; sourceTree = "<group>"; };
+		FE9443BA2F881C540059A578 /* json.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = json.c; sourceTree = "<group>"; };
+		FE9443CF2F881F210059A578 /* parson.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = parson.h; sourceTree = "<group>"; };
+		FE9443D02F881F210059A578 /* parson.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = parson.c; sourceTree = "<group>"; };
+		FE9443D22F882E210059A578 /* spectranext_stdout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext_stdout.h; sourceTree = "<group>"; };
+		FE9443D32F882E210059A578 /* spectranext_stdout.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_stdout.c; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FuseGenerator.qlgenerator; path = ../3rdparty/FuseGenerator/build/Deployment/FuseGenerator.qlgenerator; sourceTree = "<group>"; };
-		FEC02C9C2EEF65D5008277BA /* spectranext_config.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_config.c; sourceTree = "<group>"; };
+		FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_controller.c; sourceTree = "<group>"; };
 		FEC02C9D2EEF65D5008277BA /* spectranext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext.h; sourceTree = "<group>"; };
-		FEC02C9E2EEF65D6008277BA /* spectranext_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext_config.h; sourceTree = "<group>"; };
+		FEC02C9E2EEF65D6008277BA /* spectranext_controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext_controller.h; sourceTree = "<group>"; };
 		FED23B102EE096F10013DD32 /* mbedtls_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mbedtls_config.h; sourceTree = "<group>"; };
 		FED23B112EE096F10013DD32 /* tls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tls.h; sourceTree = "<group>"; };
 		FED23B122EE096F10013DD32 /* tls.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tls.c; sourceTree = "<group>"; };
@@ -1537,16 +1563,19 @@
 		B6E1F24114F7A11C00600EB0 /* nic */ = {
 			isa = PBXGroup;
 			children = (
+				FE9443BB2F881C540059A578 /* engines */,
 				B69BE53D1660E02500C5D0CE /* w5100_internals.h */,
 				B69BE53E1660E02500C5D0CE /* w5100_socket.c */,
 				B69BE53F1660E02500C5D0CE /* w5100.c */,
+				FE9443D22F882E210059A578 /* spectranext_stdout.h */,
+				FE9443D32F882E210059A578 /* spectranext_stdout.c */,
 				B69BE5401660E02500C5D0CE /* w5100.h */,
 				FED24DE52EE10B590013DD32 /* dns_processor.c */,
 				FED24DE42EE10B590013DD32 /* dns_resolver.c */,
 				FED24DE82EE10C370013DD32 /* dns_resolver.h */,
 				FEC02C9D2EEF65D5008277BA /* spectranext.h */,
-				FEC02C9E2EEF65D6008277BA /* spectranext_config.h */,
-				FEC02C9C2EEF65D5008277BA /* spectranext_config.c */,
+				FEC02C9E2EEF65D6008277BA /* spectranext_controller.h */,
+				FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */,
 			);
 			path = nic;
 			sourceTree = "<group>";
@@ -1722,6 +1751,36 @@
 				FE2DAC7A2F32A500009AC45A /* httpc.c */,
 			);
 			path = http;
+			sourceTree = "<group>";
+		};
+		FE9443B52F881C540059A578 /* jsonpath */ = {
+			isa = PBXGroup;
+			children = (
+				FE9443AD2F881C540059A578 /* ast.h */,
+				FE9443AE2F881C540059A578 /* ast.c */,
+				FE9443AF2F881C540059A578 /* lexer.h */,
+				FE9443B02F881C540059A578 /* lexer.c */,
+				FE9443B12F881C540059A578 /* matcher.h */,
+				FE9443B22F881C540059A578 /* matcher.c */,
+				FE9443B32F881C540059A578 /* parser.h */,
+				FE9443B42F881C540059A578 /* parser.c */,
+			);
+			path = jsonpath;
+			sourceTree = "<group>";
+		};
+		FE9443BB2F881C540059A578 /* engines */ = {
+			isa = PBXGroup;
+			children = (
+				FE9443B52F881C540059A578 /* jsonpath */,
+				FE9443B62F881C540059A578 /* engine.h */,
+				FE9443CF2F881F210059A578 /* parson.h */,
+				FE9443D02F881F210059A578 /* parson.c */,
+				FE9443B72F881C540059A578 /* engine_argv.c */,
+				FE9443B82F881C540059A578 /* engine_fs.h */,
+				FE9443B92F881C540059A578 /* engine_fs.c */,
+				FE9443BA2F881C540059A578 /* json.c */,
+			);
+			path = engines;
 			sourceTree = "<group>";
 		};
 		FED23B132EE096F10013DD32 /* security */ = {
@@ -1930,9 +1989,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FEC02C9F2EEF65D6008277BA /* spectranext_config.c in Sources */,
+				FEC02C9F2EEF65D6008277BA /* spectranext_controller.c in Sources */,
 				FEC02CA02EEF65D6008277BA /* spectranext.h in Sources */,
-				FEC02CA12EEF65D6008277BA /* spectranext_config.h in Sources */,
+				FEC02CA12EEF65D6008277BA /* spectranext_controller.h in Sources */,
 				B6D0E1061CFD549200202683 /* usource.c in Sources */,
 				B6DCBC96114FA67200DC9A11 /* tape_accessors.txt in Sources */,
 				B6168CEC1F0BC50D008C99E6 /* multiface.c in Sources */,
@@ -2000,6 +2059,7 @@
 				B61F467309121DF100C8096C /* periph.c in Sources */,
 				B61F467909121DF100C8096C /* breakpoint.c in Sources */,
 				B61F467A09121DF100C8096C /* scorpion.c in Sources */,
+				FE9443D42F882E210059A578 /* spectranext_stdout.c in Sources */,
 				B61F467B09121DF100C8096C /* input.c in Sources */,
 				B61F467C09121DF100C8096C /* spec_se.c in Sources */,
 				FE2DAC6C2F329E6D009AC45A /* xfs_fs.c in Sources */,
@@ -2059,6 +2119,13 @@
 				B66E04720CEDBAF400A647DC /* pentagon512.c in Sources */,
 				B6DDE53C0D67963600D6F905 /* ui.c in Sources */,
 				B665FD490DD25D8900D21C79 /* upd_fdc.c in Sources */,
+				FE9443BC2F881C540059A578 /* engine_argv.c in Sources */,
+				FE9443BD2F881C540059A578 /* lexer.c in Sources */,
+				FE9443BE2F881C540059A578 /* engine_fs.c in Sources */,
+				FE9443BF2F881C540059A578 /* json.c in Sources */,
+				FE9443C02F881C540059A578 /* ast.c in Sources */,
+				FE9443C12F881C540059A578 /* parser.c in Sources */,
+				FE9443C22F881C540059A578 /* matcher.c in Sources */,
 				B62B19E10DD31DF500D42AAF /* scalers16.c in Sources */,
 				B62B1A280DD6655800D42AAF /* fuse.c in Sources */,
 				B62B1A2A0DD667EC00D42AAF /* main.m in Sources */,
@@ -2139,6 +2206,7 @@
 				B69BE5411660E02500C5D0CE /* w5100_socket.c in Sources */,
 				D12E7FF3292596B200185E4D /* AppSandboxFileAccess.m in Sources */,
 				B69BE5421660E02500C5D0CE /* w5100.c in Sources */,
+				FE9443D12F881F210059A578 /* parson.c in Sources */,
 				B69D8D4D1D6B34490031BAFC /* zip.c in Sources */,
 				B69BE5451660E04000C5D0CE /* spectranet.c in Sources */,
 				B6B274061672AC8C00FC209B /* paths.c in Sources */,

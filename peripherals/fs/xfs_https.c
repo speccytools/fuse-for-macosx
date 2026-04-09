@@ -630,28 +630,40 @@ static int16_t https_mount(const struct xfs_engine_t* engine, const char* hostna
     // Temporarily set mount_data so we can use fetch functions
     out_mount->mount_data = mount_data;
 
-    // Fetch and cache root index.txt to verify mount is valid
-    struct xfs_handle_https_dir_entry_t** root_entries = NULL;
-    uint8_t root_entry_count = 0;
+    // Verify mount URL exists using HEAD request
+    XFS_DEBUG("https: mount verifying URL with HEAD request: %s\n", mount_data->url);
+    const int head_result = httpc_head(&tls_sck, mount_data->url);
     
-    XFS_DEBUG("https: mount fetching root index.txt\n");
-    const int16_t fetch_result = https_fetch_and_parse_index(out_mount, "/", &root_entries, &root_entry_count);
-    
-    if (fetch_result != XFS_ERR_OK)
+    // Check response code first - 3xx responses (including 304 Not Modified) are acceptable
+    if (tls_sck.response >= 300 && tls_sck.response < 400)
     {
-        XFS_DEBUG("https: mount failed: root index.txt not found or error (result=%d)\n", fetch_result);
-        out_mount->mount_data = NULL;
-        libspectrum_free(mount_data);
-        return fetch_result;
+        XFS_DEBUG("https: mount HEAD request successful (response=%d)\n", tls_sck.response);
+        return XFS_ERR_OK;
     }
     
-    // Cache the root directory entries
-    char cache_path[HTTPS_CACHE_PATH_MAX];
-    https_normalize_dir_path("/", cache_path);
-    https_cache_store_entries(out_mount, cache_path, root_entries, root_entry_count);
-    // Ownership transferred to cache, root_entries will be freed when cache is evicted
-    
-    XFS_DEBUG("https: mount success, root index.txt cached with %d entries\n", root_entry_count);
+    if (head_result != HTTPC_OK)
+    {
+        XFS_DEBUG("https: mount failed: HEAD request failed (result=%d, response=%d)\n", 
+                  head_result, tls_sck.response);
+        out_mount->mount_data = NULL;
+        libspectrum_free(mount_data);
+        // Map HTTP response codes to XFS error codes
+        if (tls_sck.response == 404)
+        {
+            return XFS_ERR_NOENT;
+        }
+        else if (tls_sck.response >= 400 && tls_sck.response < 500)
+        {
+            return XFS_ERR_INVAL;
+        }
+        else
+        {
+            return XFS_ERR_IO;
+        }
+    }
+
+    XFS_DEBUG("https: mount HEAD request successful (response=%d)\n", tls_sck.response);
+
     return XFS_ERR_OK;
 }
 

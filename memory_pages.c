@@ -44,7 +44,7 @@
 #include "peripherals/disk/opus.h"
 #include "peripherals/spectranet.h"
 #include "peripherals/fs/xfs.h"
-#include "peripherals/nic/spectranext_config.h"
+#include "peripherals/nic/spectranext_controller.h"
 #include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "settings.h"

@@ -43,6 +43,7 @@
 #include "peripherals/ula.h"
 #include "pokefinder/pokemem.h"
 #include "rzx.h"
+#include "debugger/gdbserver.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -407,6 +408,8 @@ machine_reset( int hard_reset )
 
   /* clear out old display image ready for new one */
   display_refresh_all();
+
+  gdbserver_on_machine_reset();
 
   return 0;
 }

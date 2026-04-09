@@ -16,4 +16,7 @@ void gdbserver_refresh_status();
 void gdbserver_schedule_reset(void);
 void gdbserver_schedule_autoboot(void);
 
+/** Called from machine_reset() — applies one-shot Spectranext autoboot config or turns autoboot off. */
+void gdbserver_on_machine_reset(void);
+
 #endif				/* #ifndef FUSE_DEBUGGER_GDBSERVER_H */

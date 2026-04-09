@@ -19,7 +19,7 @@
 volatile struct xfs_registers_t xfs_registers = {};
 
 // XFS debug logging control
-static bool xfs_debug_enabled = true;
+static bool xfs_debug_enabled = false;
 
 // Macro for XFS debug output (only prints if enabled)
 #define XFS_DEBUG(...) do { if (xfs_debug_enabled) printf(__VA_ARGS__); } while(0)

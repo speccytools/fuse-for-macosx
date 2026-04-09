@@ -1,15 +1,27 @@
-#ifndef _SPECTRANEXT_H_
-#define _SPECTRANEXT_H_
+#pragma once
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
-// Spectranext controller is mounted onto page 0x48
-#define SPECTRANEXT_CONTROLLER_PAGE (0x48)
+#define SPECTRANEXT_STATUS_IN_PROGRESS (0xFFu)
+#define SPECTRANEXT_STATUS_SUCCESS (0u)
+#define SPECTRANEXT_STATUS_ERROR (1u)
 
-#define SPECTRANEXT_COMMAND_SCAN_ACCESS_POINTS (1)
-#define SPECTRANEXT_COMMAND_CONNECT_ACCESS_POINT (2)
-#define SPECTRANEXT_COMMAND_DISCONNECT (3)
-#define SPECTRANEXT_COMMAND_GETHOSTBYNAME (4)
+enum spectranext_cmd_t
+{
+    SPECTRANEXT_CMD_GET_CONTROLLER_STATUS = 0,
+    SPECTRANEXT_CMD_WIFI_SCAN_ACCESS_POINTS = 1,
+    SPECTRANEXT_CMD_WIFI_GET_ACCESS_POINT = 2,
+    SPECTRANEXT_CMD_WIFI_CONNECT_ACCESS_POINT = 3,
+    SPECTRANEXT_CMD_WIFI_DISCONNECT = 4,
+    SPECTRANEXT_CMD_DNS_GETHOSTBYNAME = 5,
+    SPECTRANEXT_CMD_ENGINECALL = 6,
+};
+
+#define WIFI_CONTROLLER_STATUS_OFFLINE (0u)
+#define WIFI_CONTROLLER_STATUS_BUSY_UPDATING (1u)
+#define WIFI_CONTROLLER_STATUS_OPERATIONAL (2u)
 
 #define WIFI_SCAN_NONE (0)
 #define WIFI_SCAN_SCANNING (1)
@@ -20,11 +32,6 @@
 #define WIFI_CONNECT_CONNECTING (1)
 #define WIFI_CONNECT_CONNECT_SUCCESS (2)
 #define WIFI_CONNECT_CONNECT_IP_OBTAINED (3)
-#define WIFI_CONNECT_CONNECT_FAILURE (-1)
-
-#define WIFI_CONTROLLER_STATUS_OFFLINE (0)
-#define WIFI_CONTROLLER_STATUS_BUSY_UPDATING (1)
-#define WIFI_CONTROLLER_STATUS_OPERATIONAL (2)
 
 #define GETHOSTBYNAME_STATUS_NONE (0)
 #define GETHOSTBYNAME_STATUS_SUCCESS (1)
@@ -32,43 +39,129 @@
 #define GETHOSTBYNAME_STATUS_TIMEOUT (-2)
 #define GETHOSTBYNAME_STATUS_SYSTEM_FAILURE (-3)
 
+#define SPECTRANEXT_CONTROLLER_PAGE 0x48
+
+#define SPECTRANEXT_SCAN_AP_MAX 64
+
+#define SPECTRANEXT_CMD_REG_IDLE 0xFFu
+
 #pragma pack(push, 1)
 
-struct spectranext_controller_registers_t
+typedef struct spectranext_get_status_out_s
 {
-    // command registers - see WIFI_COMMAND_*
-    uint8_t command;
-    // scan result feedback - see WIFI_SCAN_*
-    int8_t scan_status;
-    // connect result feedback - see WIFI_CONNECT_*
-    int8_t connection_status;
-    // amount of found access points for WIFI_COMMAND_SCAN_ACCESS_POINTS
-    uint8_t scan_access_point_count;
-
-    // SSID for WIFI_COMMAND_CONNECT_ACCESS_POINT
-    char access_point_name[64];
-    // PASSWORD for WIFI_COMMAND_CONNECT_ACCESS_POINT
-    char access_point_password[64];
-
-    // controller status - see WIFI_CONTROLLER_STATUS_*
     uint8_t controller_status;
+    int8_t wifi_connection;
+    uint32_t ipv4;
+} spectranext_get_status_out_t;
 
-    // gethostbyname status result
-    int8_t gethostbyname_status;
-    // ipv4 result of a successful gethostbyname query
-    uint32_t gethostbyname_ipv4_result;
-    // input hostname to gethostbyname query
-    char gethostbyname_hostname[96];
-    // reserved
-    char reserved[22];
+_Static_assert(sizeof(spectranext_get_status_out_t) == 6u, "get_status payload size");
+_Static_assert(offsetof(spectranext_get_status_out_t, controller_status) == 0u, "");
+_Static_assert(offsetof(spectranext_get_status_out_t, wifi_connection) == 1u, "");
+_Static_assert(offsetof(spectranext_get_status_out_t, ipv4) == 2u, "");
 
-    // list of found access points
+typedef union spectranext_workspace
+{
     struct
     {
-        char name[64];
-    } access_points[32];
+        spectranext_get_status_out_t out;
+    } get_controller_status;
+
+    struct
+    {
+        union
+        {
+            struct
+            {
+                char host[64];
+            } in;
+            struct
+            {
+                uint32_t ipv4;
+            } out;
+        } io;
+    } dns;
+
+    struct
+    {
+        union
+        {
+            struct
+            {
+                char ssid[64];
+                char password[64];
+            } in;
+        } io;
+    } wifi_connect;
+
+    struct
+    {
+        union
+        {
+            struct
+            {
+                uint8_t ap_index;
+            } in;
+            struct
+            {
+                char ap_name[64];
+            } out;
+        } io;
+    } wifi_get_ap;
+
+    struct
+    {
+        union
+        {
+            struct
+            {
+                uint8_t scan_count;
+            } out;
+        } io;
+    } wifi_scan;
+
+    struct
+    {
+        struct
+        {
+            char input_file[128];
+            char output_file[128];
+            char operation[256];
+        } io;
+    } enginecall;
+
+    char page[4096 - 2];
+} spectranext_workspace_t;
+
+struct spectranext_controller_t
+{
+    uint8_t command;
+    uint8_t status;
+    spectranext_workspace_t workspace;
 };
+
+_Static_assert(sizeof(struct spectranext_controller_t) == 4096, "Controller is not of correct size");
 
 #pragma pack(pop)
 
-#endif
+typedef struct spectranext_state_t
+{
+    uint8_t controller_status;
+    int8_t connection_status;
+    uint32_t ipv4_host;
+} spectranext_state_t;
+
+extern spectranext_state_t spectranext_state;
+
+#define SNX_CTRL_DEBUG(...) ((void)0)
+
+int spectranext_enginecall_dispatch(const char *input_file, const char *output_file, const char *operation);
+
+typedef struct
+{
+    char input_file[128];
+    char output_file[128];
+    char operation[256];
+    int result;
+} spectranext_enginecall_args_t;
+
+extern spectranext_enginecall_args_t spectranext_enginecall_args;

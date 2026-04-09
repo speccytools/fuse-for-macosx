@@ -29,7 +29,7 @@
 #endif
 
 #ifndef HTTPC_LOGGING /* 0 == logging disabled, 1 == logging on */
-#define HTTPC_LOGGING (1u)
+#define HTTPC_LOGGING (0u)
 #endif
 
 #ifndef HTTPC_CONNECTION_ATTEMPTS /* default maximum number of connection attempts */

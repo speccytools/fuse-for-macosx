@@ -14,6 +14,7 @@
 #include "memory.h"
 #include "mempool.h"
 #include "periph.h"
+#include "machine.h"
 #include "peripherals/fs/xfs.h"
 #include "peripherals/spectranet.h"
 #include "settings.h"
@@ -54,6 +55,9 @@ static pthread_cond_t trapped_cond;
 static pthread_cond_t response_cond;
 static pthread_mutex_t trap_process_mutex;
 static pthread_mutex_t network_mutex;
+
+/** vSpectranext autoboot: if true at machine_reset, apply ram mount + autoboot once, then clear. */
+static bool spectranext_autoboot = false;
 
 static libspectrum_word* registers[] = {
     &AF,
@@ -657,10 +661,47 @@ int gdbserver_start( int port )
     struct sockaddr_in servaddr;
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(port);
-  
-    if ((bind(gdbserver_socket, (struct sockaddr*)&servaddr, sizeof(servaddr))) != 0)
+    
+    // Try to bind to the requested port, or find the next available port
+    int actual_port = port;
+    int max_attempts = 5; // Limit to prevent infinite loop
+    int attempts = 0;
+    
+    while (attempts < max_attempts)
     {
+        servaddr.sin_port = htons(actual_port);
+        
+        if (bind(gdbserver_socket, (struct sockaddr*)&servaddr, sizeof(servaddr)) >= 0)
+        {
+            // Successfully bound to this port
+            break;
+        }
+        
+#ifdef WIN32
+        int err = WSAGetLastError();
+        if (err != WSAEADDRINUSE)
+        {
+            // Some other error, not just port in use
+            utils_networking_end();
+            return 2;
+        }
+#else
+        if (errno != EADDRINUSE)
+        {
+            // Some other error, not just port in use
+            utils_networking_end();
+            return 2;
+        }
+#endif
+        
+        // Port is busy, try next port
+        actual_port++;
+        attempts++;
+    }
+    
+    if (attempts >= max_attempts)
+    {
+        // Couldn't find an available port
         utils_networking_end();
         return 2;
     }
@@ -677,8 +718,15 @@ int gdbserver_start( int port )
         return 4;
     }
 
-    gdbserver_port = port;
+    gdbserver_port = actual_port;
     gdbserver_debugging_enabled = 1;
+    
+    // Log if we used a different port than requested
+    if (actual_port != port)
+    {
+        printf("GDB server: Port %d was busy, using port %d instead\n", port, actual_port);
+    }
+    
     return 0;
 }
 
@@ -973,33 +1021,30 @@ static uint8_t action_reset(const void* arg, void* response)
     return 0;
 }
 
+void gdbserver_on_machine_reset(void)
+{
+#ifdef BUILD_SPECTRANET
+    if (spectranext_autoboot)
+    {
+        spectranet_config_set_string(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_MOUNT_RESOURCE, "xfs://ram/");
+        spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_AUTO_BOOT, 1);
+        spectranext_autoboot = false;
+    }
+    else
+    {
+        spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_AUTO_BOOT, 0);
+    }
+#endif
+}
+
 static uint8_t action_autoboot(const void* arg, void* response)
 {
     (void)arg;
     (void)response;
-    
-    // Configuration section/item constants
-    #define CONFIG_SECTION_AUTO_MOUNT (0x01FF)
-    #define CONFIG_ITEM_MOUNT_RESOURCE (0x00)  // String: mount resource
-    #define CONFIG_ITEM_AUTO_BOOT      (0x81)  // Byte: auto-boot flag
-    
-    // Set mount point to "xfs://ram/"
-    spectranet_config_set_string(CONFIG_SECTION_AUTO_MOUNT, 
-                                  CONFIG_ITEM_MOUNT_RESOURCE, 
-                                  "xfs://ram/");
-    
-    // Enable auto-boot
-    spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, 
-                                CONFIG_ITEM_AUTO_BOOT, 
-                                1);
-    
-    // Reset XFS filesystem
-    extern void xfs_reset(void);
+
+    spectranext_autoboot = true;
     xfs_reset();
-    
-    // Trigger reset
     machine_reset(0);
-    
     return 0;
 }
 

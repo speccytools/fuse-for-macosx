@@ -114,8 +114,9 @@ static void send_data(const uint8_t *data, size_t len)
     }
 }
 
-// Initialize packets subsystem
-void packets_init(void)
+// Reset deframer state (also restores buffer pointer/capacity — must match packets_init,
+// otherwise cap can stay 0 if bytes are fed before packets_init() or after a bad state).
+void packets_reset(void)
 {
     deframer.state = rsp_idle;
     deframer.buf   = deframer_buffer;
@@ -123,16 +124,13 @@ void packets_init(void)
     deframer.len   = 0;
     deframer.csum  = 0;
     deframer.hi    = -1;
-    incoming_raw_len = 0;
 }
 
-// Reset deframer state
-void packets_reset(void)
+// Initialize packets subsystem
+void packets_init(void)
 {
-    deframer.state = rsp_idle;
-    deframer.len   = 0;
-    deframer.csum  = 0;
-    deframer.hi    = -1;
+    packets_reset();
+    incoming_raw_len = 0;
 }
 
 // Get pointer to current packet buffer

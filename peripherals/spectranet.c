@@ -39,7 +39,8 @@
 #include "peripherals/nic/dns_resolver.h"
 #include "peripherals/fs/xfs.h"
 #include "peripherals/fs/xfs_worker.h"
-#include "peripherals/nic/spectranext_config.h"
+#include "peripherals/nic/spectranext_controller.h"
+#include "peripherals/nic/spectranext_stdout.h"
 #include "settings.h"
 #include "spectranet.h"
 #include "utils.h"
@@ -462,6 +463,7 @@ static const periph_port_t spectranet_ports[] = {
   { 0xffff, 0x013b, NULL, spectranet_page_b },
   { 0xffff, 0x023b, spectranet_cpld_version, spectranet_trap },
   { 0xffff, 0x033b, spectranet_control_read, spectranet_control_write },
+  { 0xffff, 0x043b, NULL, spectranext_stdout_write },
   { 0, 0, NULL, NULL }
 };
 
@@ -482,7 +484,7 @@ spectranet_init( void *context )
 				 &unpage_event );
 
   dns_resolver_init();
-  spectranext_config_init();
+  spectranext_controller_init();
   xfs_init();
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
@@ -547,13 +549,13 @@ spectranet_xfs_write( memory_page *page, libspectrum_word address, libspectrum_b
 libspectrum_byte
 spectranet_spectranext_config_read( memory_page *page, libspectrum_word address )
 {
-  return spectranext_config_read( page, address );
+  return spectranext_controller_read( page, address );
 }
 
 void
 spectranet_spectranext_config_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
 {
-  spectranext_config_write( page, address, b );
+  spectranext_controller_write( page, address, b );
 }
 
 void
