@@ -73,7 +73,7 @@ jobs:
         shell: bash
 
       - name: (2) Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: (3) Install Cygwin (32 bit) with libs
         uses: cygwin/cygwin-install-action@master

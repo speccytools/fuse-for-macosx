@@ -44,7 +44,7 @@ jobs:
           ls -la
 
       - name: (2) Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: (3) Install dependencies
         run: |
