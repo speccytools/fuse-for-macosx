@@ -1096,8 +1096,9 @@ display_getpixel( int x, int y )
   return paper;
 }
 
-/* Helper functions for the unit tests
-   Shouldn't be called by anything outside the unit tests */
+#ifdef DISPLAYTEST
+
+/* Helper functions for the unit tests */
 void
 display_reset_frame_count( void )
 {
@@ -1115,7 +1116,13 @@ display_set_flash_reversed( int reversed )
 void
 display_clear_maybe_dirty( void )
 {
-  memset( display_maybe_dirty, 0, ARRAY_SIZE( display_maybe_dirty ) );
+  memset( display_maybe_dirty, 0, sizeof( display_maybe_dirty ) );
+}
+
+void
+display_clear_is_dirty( void )
+{
+  memset( display_is_dirty, 0, sizeof( display_is_dirty ) );
 }
 
 void
@@ -1129,3 +1136,5 @@ display_get_is_dirty( int y )
 {
   return display_is_dirty[y];
 }
+
+#endif          /* #ifdef DISPLAYTEST */

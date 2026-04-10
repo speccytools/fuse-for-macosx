@@ -30,3 +30,4 @@ noinst_PROGRAMS += unittests/displaytest
 
 unittests_displaytest_SOURCES = unittests/displaytest.c display.c
 unittests_displaytest_LDADD = $(LIBSPEC_LIBS) $(GLIB_LIBS)
+unittests_displaytest_CPPFLAGS = $(AM_CPPFLAGS) -DDISPLAYTEST

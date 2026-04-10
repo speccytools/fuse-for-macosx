@@ -25,6 +25,8 @@
 
 #include <libspectrum.h>
 
+#include <string.h>
+
 #include "../compat.h"
 #include "../infrastructure/startup_manager.h"
 #include "../machine.h"
@@ -45,6 +47,13 @@ fuse_machine_info *machine_current;
 
 const int LINE_TIME = 224;
 const int TOP_BORDER = 24;
+
+void display_reset_frame_count( void );
+void display_set_flash_reversed( int reversed );
+void display_clear_maybe_dirty( void );
+void display_clear_is_dirty( void );
+void display_set_maybe_dirty( int y, libspectrum_qword dirty );
+libspectrum_qword display_get_is_dirty( int y );
 
 /* Various "mocks" for the UI code */
 
@@ -88,12 +97,36 @@ static int
 plot8_assert( int count, int x, int y, libspectrum_byte data,
               libspectrum_byte ink, libspectrum_byte paper )
 {
-  if( plot8_count != count ) return 1;
-  if( plot8_last_write.x != x ) return 1;
-  if( plot8_last_write.y != y ) return 1;
-  if( plot8_last_write.data != data ) return 1;
-  if( plot8_last_write.ink != ink ) return 1;
-  if( plot8_last_write.paper != paper ) return 1;
+  if( plot8_count != count ) {
+    fprintf( stderr, "plot8_count: expected %d, got %d\n",
+             count, plot8_count );
+    return 1;
+  }
+  if( plot8_last_write.x != x ) {
+    fprintf( stderr, "plot8 x: expected %d, got %d\n", x,
+             plot8_last_write.x );
+    return 1;
+  }
+  if( plot8_last_write.y != y ) {
+    fprintf( stderr, "plot8 y: expected %d, got %d\n", y,
+             plot8_last_write.y );
+    return 1;
+  }
+  if( plot8_last_write.data != data ) {
+    fprintf( stderr, "plot8 data: expected 0x%02x, got 0x%02x\n",
+             data, plot8_last_write.data );
+    return 1;
+  }
+  if( plot8_last_write.ink != ink ) {
+    fprintf( stderr, "plot8 ink: expected 0x%02x, got 0x%02x\n",
+             ink, plot8_last_write.ink );
+    return 1;
+  }
+  if( plot8_last_write.paper != paper ) {
+    fprintf( stderr, "plot8 paper: expected 0x%02x, got 0x%02x\n",
+             paper, plot8_last_write.paper );
+    return 1;
+  }
 
   return 0;
 }
@@ -140,7 +173,7 @@ static void
 test_before( void )
 {
   memset( RAM[0], 0, ARRAY_SIZE( RAM[0] ) );
-  memset( display_last_screen, 0, ARRAY_SIZE( display_last_screen ) );
+  memset( display_last_screen, 0, sizeof( display_last_screen ) );
   display_clear_maybe_dirty();
 
   plot8_fn = plot8_null;
@@ -148,6 +181,7 @@ test_before( void )
   display_write_if_dirty = display_write_if_dirty_sinclair;
 
   display_frame();
+  display_clear_is_dirty();
 
   plot8_fn = plot8_count_fn;
   plot8_count = 0;
@@ -185,8 +219,17 @@ write_called_for_new_data( void )
 
   /* Assert */
   if( plot8_assert( 1, 4, 24, 0x01, 2, 0 ) ) return 1;
-  if( display_last_screen[ 964 ] != 0x201 ) return 1;
-  if( display_get_is_dirty( 24 ) != (1L << 4) ) return 1;
+  if( display_last_screen[ 964 ] != 0x201 ) {
+    fprintf( stderr,
+             "display_last_screen[964]: expected 0x201, got 0x%x (attr=0x%02x, scld=0x%02x)\n",
+             display_last_screen[ 964 ], RAM[0][6144], scld_last_dec.byte );
+    return 1;
+  }
+  if( display_get_is_dirty( 24 ) != (1L << 4) ) {
+    fprintf( stderr, "display_get_is_dirty(24): expected 0x%lx, got 0x%llx\n",
+             1L << 4, (unsigned long long)display_get_is_dirty( 24 ) );
+    return 1;
+  }
 
   return 0;
 }
@@ -232,7 +275,7 @@ flash_inverts_colours( void )
 {
   /* Arrange */
   RAM[0][0] = 0x01;
-  RAM[0][6144] = 0x02;
+  RAM[0][6144] = 0x82;
 
   display_set_flash_reversed( 1 );
 
@@ -240,8 +283,8 @@ flash_inverts_colours( void )
   display_write_if_dirty_sinclair( 0, 0 );
 
   /* Assert */
-  if( plot8_assert( 1, 4, 24, 0x01, 2, 0 ) ) return 1;
-  if( display_last_screen[ 964 ] != 0x01000201 ) return 1;
+  if( plot8_assert( 1, 4, 24, 0x01, 0, 2 ) ) return 1;
+  if( display_last_screen[ 964 ] != 0x01008201 ) return 1;
   if( display_get_is_dirty( 24 ) != (1L << 4) ) return 1;
 
   return 0;
@@ -318,28 +361,35 @@ no_write_if_modified_area_ahead_of_critical_region( void )
 
 typedef int (*test_fn_t)( void );
 
-static test_fn_t tests[] = {
+struct test_t {
+  const char *name;
+  test_fn_t fn;
+};
+
+static const struct test_t tests[] = {
   /* display_write_if_dirty_sinclair() tests */
-  no_write_if_data_unchanged,
-  write_called_for_new_data,
-  write_reads_from_appropriate_x,
-  write_reads_from_appropriate_y,
-  flash_inverts_colours,
+  { "no_write_if_data_unchanged", no_write_if_data_unchanged },
+  { "write_called_for_new_data", write_called_for_new_data },
+  { "write_reads_from_appropriate_x", write_reads_from_appropriate_x },
+  { "write_reads_from_appropriate_y", write_reads_from_appropriate_y },
+  { "flash_inverts_colours", flash_inverts_colours },
 
   /* display_dirty_sinclair() tests */
-  no_write_if_nothing_dirty,
-  write_if_dirty,
-  no_write_if_dirty_area_ahead_of_beam,
-  no_write_if_modified_area_ahead_of_critical_region,
+  { "no_write_if_nothing_dirty", no_write_if_nothing_dirty },
+  { "write_if_dirty", write_if_dirty },
+  { "no_write_if_dirty_area_ahead_of_beam",
+    no_write_if_dirty_area_ahead_of_beam },
+  { "no_write_if_modified_area_ahead_of_critical_region",
+    no_write_if_modified_area_ahead_of_critical_region },
 
   /* End marker */
-  NULL
+  { NULL, NULL }
 };
 
 int
 main( int argc, char *argv[] )
 {
-  test_fn_t *test;
+  const struct test_t *test;
 
   if( display_init( &argc, &argv ) ) {
     fprintf( stderr, "Error from display_init()\n");
@@ -348,11 +398,11 @@ main( int argc, char *argv[] )
 
   create_fake_machine();
 
-  for( test = tests; *test; test++ ) {
+  for( test = tests; test->fn; test++ ) {
     test_before();
-    int result = (*test)();
+    int result = test->fn();
     if( result ) {
-      fprintf( stderr, "Test failed\n" );
+      fprintf( stderr, "Test failed: %s\n", test->name );
       return 1;
     }
   }
