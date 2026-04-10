@@ -51,6 +51,7 @@
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
 #include "settings.h"
+#include "bitmap.h"
 #include "rectangle.h"
 #include "unittests.h"
 #include "utils.h"
@@ -255,6 +256,73 @@ floating_bus_merge_test( void )
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xf0 ) == 0xaa );
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x55, 0x00 ) == 0x00 );
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x00, 0x55 ) == 0x00 );
+
+  return 0;
+}
+
+static int
+bitmap_ops_test( void )
+{
+  libspectrum_byte buf[2];
+
+  /* Group 1: bitmap_test returns zero on a zeroed buffer */
+  buf[0] = 0; buf[1] = 0;
+  TEST_ASSERT( bitmap_test( buf, 0 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 7 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 15 ) == 0 );
+
+  /* Group 2: bitmap_set sets only the target bit */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 0 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 1 ) == 0 );
+
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 7 );
+  TEST_ASSERT( bitmap_test( buf, 7 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 6 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) == 0 );
+
+  /* Group 3: byte-boundary crossing (bits 7->8) */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 8 );
+  TEST_ASSERT( buf[0] == 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 7 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 9 ) == 0 );
+
+  /* Group 4: bitmap_reset clears only the target bit in an all-ones buffer */
+  buf[0] = 0xff; buf[1] = 0xff;
+  bitmap_reset( buf, 0 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 1 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) != 0 );
+
+  buf[0] = 0xff; buf[1] = 0xff;
+  bitmap_reset( buf, 15 );
+  TEST_ASSERT( bitmap_test( buf, 15 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 14 ) != 0 );
+
+  /* Group 5: set-then-reset round-trips cleanly to zero */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 3 );
+  TEST_ASSERT( bitmap_test( buf, 3 ) != 0 );
+  bitmap_reset( buf, 3 );
+  TEST_ASSERT( bitmap_test( buf, 3 ) == 0 );
+
+  /* Group 6: two independent bits in the same byte do not interfere */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 0 );
+  bitmap_set( buf, 4 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 4 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 1 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 3 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 5 ) == 0 );
+  bitmap_reset( buf, 0 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 4 ) != 0 );
 
   return 0;
 }
@@ -964,6 +1032,7 @@ unittests_run( void )
   r += floating_bus_test();
   r += floating_bus_merge_test();
   r += utils_safe_strdup_test();
+  r += bitmap_ops_test();
   r += mempool_test();
   r += paging_test();
   r += debugger_disassemble_unittest();
