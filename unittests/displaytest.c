@@ -41,7 +41,7 @@ scld scld_last_dec;
 
 int memory_current_screen;
 
-libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
+libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000] = { { 0 } };
 
 fuse_machine_info *machine_current;
 

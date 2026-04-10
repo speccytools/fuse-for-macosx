@@ -88,11 +88,6 @@ z80/coretest.o: $(srcdir)/z80/coretest.c
 z80/z80_coretest.o: z80/z80_ops.c
 	$(AM_V_CC)$(COMPILE) -DCORETEST -c $(srcdir)/z80/z80_ops.c -o $@
 
-test: z80/coretest unittests/displaytest
-	z80/coretest $(srcdir)/z80/tests/tests.in > z80/tests.actual
-	cmp z80/tests.actual $(srcdir)/z80/tests/tests.expected
-	./unittests/displaytest
-
 CLEANFILES += \
               z80/opcodes_base.c \
               z80/tests.actual \

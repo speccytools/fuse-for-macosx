@@ -156,6 +156,11 @@ DISTCLEANFILES =
 
 pkgdata_DATA =
 
+test: z80/coretest unittests/displaytest
+	z80/coretest $(srcdir)/z80/tests/tests.in > z80/tests.actual
+	cmp z80/tests.actual $(srcdir)/z80/tests/tests.expected
+	./unittests/displaytest
+
 
 ## Resources for Windows executables
 if COMPAT_WIN32
