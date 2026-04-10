@@ -6,6 +6,12 @@
           * Make 2x the default display scaler so Fuse is more usable on
             modern screens (Fredrick Meunier).
 
+        * Emulation core improvements:
+          * Fix rectangle merge edge cases in dirty-region tracking with frame
+            skipping (Fredrick Meunier).
+          * Speed up display dirty-bit scanning with __builtin_ctz (Fredrick
+            Meunier).
+
         * Debugger improvements:
           * Remove $-prefixed hex digit syntax from the debugger to prevent
             clashes with variables (fixes bug #407) (thanks, Gergely Szasz and
@@ -25,8 +31,15 @@
             alignment warnings on macOS (Derek Fountain and Fredrick Meunier).
           * Fix out-of-tree builds by using full paths in generated #includes
             (Alberto Garcia).
+          * Add an AppStream metainfo file (Alberto Garcia).
           * Document the profiler menu options (fixes bug #303) (Fredrick
             Meunier).
+
+        * Testing improvements:
+          * Add unit tests for display rendering and dirty-region handling
+            (Philip Kendall and Fredrick Meunier).
+          * Expand unit test coverage for bitmap operations, mempool_strdup and
+            utils_safe_strdup edge cases (Fredrick Meunier).
 
         * Various other minor bugfixes.
 
