@@ -94,9 +94,14 @@ mempool_malloc_n( int pool, size_t nmemb, size_t size )
 char*
 mempool_strdup( int pool, const char *string )
 {
-  size_t length = strlen( string ) + 1;
+  size_t length;
+  char *ptr;
 
-  char *ptr = mempool_malloc( pool, length );
+  if( !string ) return NULL;
+
+  length = strlen( string ) + 1;
+
+  ptr = mempool_malloc( pool, length );
   if( !ptr ) return NULL;
 
   memcpy( ptr, string, length );

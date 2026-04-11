@@ -433,6 +433,10 @@ mempool_test( void )
     TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
   }
 
+  /* Test mempool_strdup with NULL returns NULL safely */
+  TEST_ASSERT( mempool_strdup( pool1, NULL ) == NULL );
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+
   /* Test that out-of-range pool IDs return NULL */
   TEST_ASSERT( mempool_malloc( mempool_get_pools(), 23 ) == NULL );
   TEST_ASSERT( mempool_malloc( -2, 23 ) == NULL );
