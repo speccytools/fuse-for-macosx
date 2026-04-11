@@ -202,5 +202,6 @@ include ui/xlib/Makefile.am
 include unittests/Makefile.am
 include z80/Makefile.am
 
-check-local: fuse
+check-local: fuse unittests/displaytest
 	$(top_builddir)/fuse --unittests
+	$(top_builddir)/unittests/displaytest
