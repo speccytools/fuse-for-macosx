@@ -226,6 +226,32 @@ fullscreen_scaler_falls_back_to_normal( void )
 }
 
 static int
+fullscreen_scaler_keeps_current_when_display_height_zero( void )
+{
+  unsigned char supported[ SCALER_NUM ] = { 0 };
+  float scales[ SCALER_NUM ];
+  int preserve;
+  scaler_type choice;
+  int i;
+
+  fill_test_scales( scales );
+  for( i = 0; i < SCALER_NUM; i++ ) supported[i] = 1;
+
+  choice = sdl2display_choose_fullscreen_scaler( SCALER_DOUBLESIZE, 2.0f,
+                                                 240, 0,
+                                                 supported, scales,
+                                                 SCALER_NUM, &preserve );
+
+  if( choice != SCALER_DOUBLESIZE || preserve ) {
+    fprintf( stderr,
+             "zero display height: expected keep current without preserve\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
 refresh_prefers_50hz_over_60hz( void )
 {
   if( sdl2display_compare_refresh( 50, 60 ) >= 0 ) {
@@ -241,6 +267,52 @@ refresh_prefers_multiple_of_50_over_60hz( void )
 {
   if( sdl2display_compare_refresh( 100, 60 ) >= 0 ) {
     fprintf( stderr, "refresh ordering: expected 100Hz before 60Hz\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+refresh_prefers_multiple_of_60_over_odd_rate( void )
+{
+  if( sdl2display_compare_refresh( 120, 75 ) >= 0 ) {
+    fprintf( stderr, "refresh ordering: expected 120Hz before 75Hz\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+refresh_treats_zero_or_negative_as_worst( void )
+{
+  if( sdl2display_compare_refresh( 50, 0 ) >= 0 ) {
+    fprintf( stderr, "refresh ordering: expected 50Hz before 0Hz\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+mode_compare_breaks_tie_by_refresh( void )
+{
+  sdl2_fullscreen_mode_info left, right;
+
+  left.width = 1920;
+  left.height = 1080;
+  left.refresh_rate = 50;
+  left.fit = 0.53f;
+
+  right.width = 1920;
+  right.height = 1080;
+  right.refresh_rate = 60;
+  right.fit = 0.53f;
+
+  if( sdl2display_compare_mode_info( &left, &right ) >= 0 ) {
+    fprintf( stderr,
+             "mode compare: expected 50Hz mode before 60Hz mode (same fit)\n" );
     return 1;
   }
 
@@ -322,12 +394,19 @@ static const struct test_t tests[] = {
     fullscreen_scaler_picks_larger_supported_scale },
   { "fullscreen_scaler_falls_back_to_normal",
     fullscreen_scaler_falls_back_to_normal },
+  { "fullscreen_scaler_keeps_current_when_display_height_zero",
+    fullscreen_scaler_keeps_current_when_display_height_zero },
   { "refresh_prefers_50hz_over_60hz", refresh_prefers_50hz_over_60hz },
   { "refresh_prefers_multiple_of_50_over_60hz",
     refresh_prefers_multiple_of_50_over_60hz },
+  { "refresh_prefers_multiple_of_60_over_odd_rate",
+    refresh_prefers_multiple_of_60_over_odd_rate },
+  { "refresh_treats_zero_or_negative_as_worst",
+    refresh_treats_zero_or_negative_as_worst },
   { "mode_fit_uses_chosen_scaler", mode_fit_uses_chosen_scaler },
   { "mode_compare_prefers_better_fit_before_size",
     mode_compare_prefers_better_fit_before_size },
+  { "mode_compare_breaks_tie_by_refresh", mode_compare_breaks_tie_by_refresh },
   { NULL, NULL }
 };
 
