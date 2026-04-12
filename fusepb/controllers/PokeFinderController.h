@@ -27,8 +27,8 @@
 
 @interface PokeFinderController : NSWindowController
 {
-  IBOutlet NSFormCell *searchFor;
-  IBOutlet NSFormCell *locations;
+  IBOutlet NSTextField *searchFor;
+  IBOutlet NSTextField *locations;
   IBOutlet NSTableView *matchList;
   NSMutableArray *tableContents;
 }
