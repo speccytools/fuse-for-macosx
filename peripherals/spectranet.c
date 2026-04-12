@@ -227,6 +227,8 @@ spectranet_memory_map( void )
 static void
 spectranet_activate( void )
 {
+  xfs_init();
+
   if( !spectranet_memory_allocated ) {
 
     int i, j;
@@ -485,7 +487,6 @@ spectranet_init( void *context )
 
   dns_resolver_init();
   spectranext_controller_init();
-  xfs_init();
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
 
