@@ -123,6 +123,15 @@
   return self;
 }
 
+- (void)dealloc
+{
+  [machineRomsController setContent:nil];
+  [machineRoms release];
+  machineRoms = nil;
+
+  [super dealloc];
+}
+
 - (void)awakeFromNib
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -134,16 +143,19 @@
 - (void)showWindow:(id)sender
 {
   [[DisplayOpenGLView instance] pause];
+
+  [machineRomsController setContent:nil];
+  [machineRoms release];
+  machineRoms = nil;
   
   /* Values in Fuse may have been updated, put them in saved settings */
   settings_write_config( &settings_current );
 
   machineRoms = settings_set_rom_array( &settings_current );
   [machineRoms retain];
+  [machineRomsController setContent:machineRoms];
 
   [super showWindow:sender];
-
-  self = [super initWithWindowNibName:@"Preferences"];
 
   [self setMassStorageType];
   [self setExternalSoundType];
@@ -156,6 +168,10 @@
 		   object:[self window]];
 
   [NSApp runModalForWindow:[self window]];
+
+  [machineRomsController setContent:nil];
+  [machineRoms release];
+  machineRoms = nil;
 }
 
 - (void)fixPhantomTypistMode
@@ -209,7 +225,6 @@
   }
 
   settings_get_rom_array( &settings_current, machineRoms );
-  [machineRoms release];
 
   joystick_end();
   joystick_init( NULL );
