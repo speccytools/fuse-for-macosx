@@ -163,6 +163,7 @@ tc2068_reset( void )
       memory_page *dock_page, *exrom_page;
       
       dock_page = &timex_dock[i * MEMORY_PAGES_IN_8K + j];
+      *dock_page = tc2068_empty_mapping[j];
       dock_page->page_num = i;
 
       exrom_page = &timex_exrom[i * MEMORY_PAGES_IN_8K + j];
