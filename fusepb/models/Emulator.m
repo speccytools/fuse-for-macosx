@@ -188,6 +188,9 @@ static Emulator *instance = nil;
   proxy_view = (id)[serverConnection rootProxy];
   [proxy_view setServer:self];
 
+  /* Load saved ROM paths before startup so the sandbox scope covers custom ROMs on relaunch. */
+  read_config_file( &settings_current );
+
   NSArray *romURLs = [Emulator beginROMScopedAccess];
   if( fuse_init( ac, av ) ) {
     fprintf( stderr, "%s: error initialising -- giving up!\n", fuse_progname );

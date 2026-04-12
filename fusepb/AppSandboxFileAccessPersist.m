@@ -35,28 +35,51 @@
 
 #import "AppSandboxFileAccessPersist.h"
 
+static NSURL *AppSandboxCanonicalFileURL( NSURL *url )
+{
+	if( !url || ![url isFileURL] ) return url;
+	return [[url URLByStandardizingPath] URLByResolvingSymlinksInPath];
+}
+
+static NSData *AppSandboxBookmarkForURLChain( NSUserDefaults *defaults, NSURL *url,
+	BOOL canonicalize )
+{
+	NSURL *subURL = canonicalize ? AppSandboxCanonicalFileURL( url ) : url;
+
+	while( [subURL path].length > 1 ) {
+		NSString *urlStr = [subURL absoluteString];
+		NSString *key = [NSString stringWithFormat:@"bd_%@", urlStr];
+		NSData *bookmark = [defaults dataForKey:key];
+		if( bookmark ) return bookmark;
+		subURL = [subURL URLByDeletingLastPathComponent];
+	}
+
+	return nil;
+}
+
 @implementation AppSandboxFileAccessPersist
 
 + (NSString *)keyForBookmarkDataForURL:(NSURL *)url {
-	NSString *urlStr = [url absoluteString];
+	NSURL *canonicalURL = AppSandboxCanonicalFileURL( url );
+	NSString *urlStr = [canonicalURL absoluteString];
 	return [NSString stringWithFormat:@"bd_%1$@", urlStr];
 }
 
 - (NSData *)bookmarkDataForURL:(NSURL *)url {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	
-	// loop through the bookmarks one path at a time down the URL
-	NSURL *subURL = url;
-	while ([subURL path].length > 1) { // give up when only '/' is left in the path
-		NSString *key = [AppSandboxFileAccessPersist keyForBookmarkDataForURL:subURL];
-		NSData *bookmark = [defaults dataForKey:key];
-		if (bookmark) { // if a bookmark is found, return it
-			return bookmark;
-		}
-		subURL = [subURL URLByDeletingLastPathComponent];
-	}
-	
-	// no bookmarks for the URL, or parent to the URL were found
+	NSData *bookmark = nil;
+	NSURL *standardizedURL = [url isFileURL] ? [url URLByStandardizingPath] : url;
+	NSURL *canonicalURL = AppSandboxCanonicalFileURL( url );
+
+	bookmark = AppSandboxBookmarkForURLChain( defaults, canonicalURL, NO );
+	if( bookmark ) return bookmark;
+
+	bookmark = AppSandboxBookmarkForURLChain( defaults, standardizedURL, NO );
+	if( bookmark ) return bookmark;
+
+	bookmark = AppSandboxBookmarkForURLChain( defaults, url, NO );
+	if( bookmark ) return bookmark;
+
 	return nil;
 }
 
