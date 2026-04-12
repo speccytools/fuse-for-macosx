@@ -51,6 +51,9 @@
 }
 +(Emulator *) instance;
 
++ (NSArray *)beginROMScopedAccess;
++ (void)endROMScopedAccess:(NSArray *)urls;
+
 -(void) connectWithPorts:(NSArray *)portArray;
 -(void) stop;
 
