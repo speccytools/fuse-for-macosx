@@ -173,8 +173,9 @@ test: z80/coretest unittests/displaytest
 ## Resources for Windows executables
 if COMPAT_WIN32
 
+fuse_LDFLAGS = -mwindows
 fuse_SOURCES += windres.rc
-fuse_LDADD += windres.o
+fuse_LDADD += -lcomctl32 -lwinmm windres.o
 fuse_DEPENDENCIES += windres.o
 
 windres.o: windres.rc data/win32/winfuse.ico data/win32/fuse.manifest $(ui_win32_res)

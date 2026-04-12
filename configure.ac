@@ -207,7 +207,6 @@ AC_MSG_RESULT($win32)
 
 if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
-                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
                   UI=win32,
                   AC_MSG_ERROR([Win32 UI not found]))

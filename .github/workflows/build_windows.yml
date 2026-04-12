@@ -82,7 +82,7 @@ jobs:
       verify_ui: "sdl"
       verify_libxml2: "no"
       verify_audio: "sdl"
-      verify_other: "Using SDL 2: no"
+      verify_other: "Using SDL 1: yes"
 
   # SDL 2 UI + Sound
   sdl2-ui-sdl2-sound:

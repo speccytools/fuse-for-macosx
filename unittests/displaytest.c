@@ -225,9 +225,10 @@ write_called_for_new_data( void )
              display_last_screen[ 964 ], RAM[0][6144], scld_last_dec.byte );
     return 1;
   }
-  if( display_get_is_dirty( 24 ) != (1L << 4) ) {
+  if( display_get_is_dirty( 24 ) != ( (libspectrum_qword)1 << 4 ) ) {
     fprintf( stderr, "display_get_is_dirty(24): expected 0x%lx, got 0x%llx\n",
-             1L << 4, (unsigned long long)display_get_is_dirty( 24 ) );
+             (unsigned long)( (libspectrum_qword)1 << 4 ),
+             (unsigned long long)display_get_is_dirty( 24 ) );
     return 1;
   }
 
@@ -247,7 +248,7 @@ write_reads_from_appropriate_x( void )
   /* Assert */
   if( plot8_assert( 1, 35, 24, 0x12, 4, 6 ) ) return 1;
   if( display_last_screen[ 995 ] != 0x3412 ) return 1;
-  if( display_get_is_dirty( 24 ) != (1L << 35) ) return 1;
+  if( display_get_is_dirty( 24 ) != ( (libspectrum_qword)1 << 35 ) ) return 1;
 
   return 0;
 }
@@ -265,7 +266,7 @@ write_reads_from_appropriate_y( void )
   /* Assert */
   if( plot8_assert( 1, 4, 32, 0x56, 8, 15 ) ) return 1;
   if( display_last_screen[ 1284 ] != 0x7856 ) return 1;
-  if( display_get_is_dirty( 32 ) != (1L << 4) ) return 1;
+  if( display_get_is_dirty( 32 ) != ( (libspectrum_qword)1 << 4 ) ) return 1;
 
   return 0;
 }
@@ -285,7 +286,7 @@ flash_inverts_colours( void )
   /* Assert */
   if( plot8_assert( 1, 4, 24, 0x01, 0, 2 ) ) return 1;
   if( display_last_screen[ 964 ] != 0x01008201 ) return 1;
-  if( display_get_is_dirty( 24 ) != (1L << 4) ) return 1;
+  if( display_get_is_dirty( 24 ) != ( (libspectrum_qword)1 << 4 ) ) return 1;
 
   return 0;
 }
@@ -385,6 +386,11 @@ static const struct test_t tests[] = {
   /* End marker */
   { NULL, NULL }
 };
+
+#ifdef main
+/* SDL headers redefine main on Windows, but this test needs a normal entry point. */
+#undef main
+#endif
 
 int
 main( int argc, char *argv[] )

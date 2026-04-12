@@ -39,6 +39,7 @@ jobs:
       dependencies: "libaudiofile-dev"
       configure_params: "--with-null-ui"
       verify_ui: "null"
+      run_check: true
 
   # GTK 3 UI
   gtk3-ui:
@@ -63,7 +64,7 @@ jobs:
       configure_params: "--with-sdl --disable-sdl2"
       verify_ui: "sdl"
       verify_audio: "sdl"
-      verify_other: "Using SDL 2: no"
+      verify_other: "Using SDL 1: yes"
 
   # SDL 2 UI + Sound
   sdl2-ui:
