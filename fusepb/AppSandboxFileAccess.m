@@ -82,6 +82,7 @@
 
 - (NSURL *)askPermissionForURL:(NSURL *)url {
 	NSParameterAssert(url);
+		url = [[url URLByStandardizingPath] URLByResolvingSymlinksInPath];
 	
 	// this url will be the url allowed, it might be a parent url of the url passed in
 	__block NSURL *allowedURL = nil;
@@ -139,7 +140,9 @@
 - (NSData *)persistPermissionURL:(NSURL *)url {
 	NSParameterAssert(url);
 	
-	// store the sandbox permissions
+	url = [[url URLByStandardizingPath] URLByResolvingSymlinksInPath];
+		
+		// store the sandbox permissions
 	NSData *bookmarkData = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope includingResourceValuesForKeys:nil relativeToURL:nil error:NULL];
 	if (bookmarkData) {
 		[self.bookmarkPersistanceDelegate setBookmarkData:bookmarkData forURL:url];

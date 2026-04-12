@@ -47,6 +47,11 @@ static int activate_debugger( void );
 static int deactivate_debugger( void );
 static void add_event( gpointer data, gpointer user_data );
 
+@interface DebuggerController ()
+- (void)mainThreadDebuggerDeactivate:(NSNumber *)interruptable;
+- (void)mainThreadDebuggerDisassemble:(NSNumber *)address;
+@end
+
 /* The top line of the current disassembly */
 static libspectrum_word disassembly_top;
 
@@ -57,9 +62,28 @@ static int debugger_active;
 
 static DebuggerController *singleton = nil;
    
-+ (DebuggerController *)singleton 
-{  
-  return singleton ? singleton : [[self alloc] init];
++ (DebuggerController *)singleton
+{
+  if( singleton ) return singleton;
+
+  if( [NSThread isMainThread] ) {
+    return [[self alloc] init];
+  }
+
+  [self performSelectorOnMainThread:@selector(ensureSingletonLoaded)
+                         withObject:nil
+                      waitUntilDone:YES];
+  return singleton;
+}
+
++ (DebuggerController *)loadedSingleton
+{
+  return singleton;
+}
+
++ (void)ensureSingletonLoaded
+{
+  if( !singleton ) [[self alloc] init];
 }
 
 - (void)habdleCloseNotification
@@ -513,6 +537,16 @@ static DebuggerController *singleton = nil;
   disassembly_top = address;
 }
 
+- (void)mainThreadDebuggerDeactivate:(NSNumber *)interruptable
+{
+  [self debugger_deactivate:[interruptable intValue]];
+}
+
+- (void)mainThreadDebuggerDisassemble:(NSNumber *)address
+{
+  [self debugger_disassemble:[address unsignedShortValue]];
+}
+
 - (IBAction)debugger_cmd_evaluate:(id)sender
 {
   debugger_command_evaluate( [[entry stringValue] UTF8String] );
@@ -625,7 +659,12 @@ ui_debugger_activate( void )
 int
 ui_debugger_deactivate( int interruptable )
 {
-  [[DebuggerController singleton] debugger_deactivate:interruptable];
+  DebuggerController *controller = [DebuggerController loadedSingleton];
+  if( !controller ) return 0;
+
+  [controller performSelectorOnMainThread:@selector(mainThreadDebuggerDeactivate:)
+                               withObject:@( interruptable )
+                            waitUntilDone:YES];
 
   return 0;
 }
@@ -634,7 +673,12 @@ ui_debugger_deactivate( int interruptable )
 int
 ui_debugger_update( void )
 {
-  [[DebuggerController singleton] debugger_update:nil];
+  DebuggerController *controller = [DebuggerController loadedSingleton];
+  if( !controller ) return 0;
+
+  [controller performSelectorOnMainThread:@selector(debugger_update:)
+                               withObject:nil
+                            waitUntilDone:YES];
 
   return 0;
 }
@@ -642,14 +686,24 @@ ui_debugger_update( void )
 void
 ui_breakpoints_updated( void )
 {
-  [[DebuggerController singleton] debugger_update_breakpoints];
+  DebuggerController *controller = [DebuggerController loadedSingleton];
+  if( !controller ) return;
+
+  [controller performSelectorOnMainThread:@selector(debugger_update_breakpoints)
+                               withObject:nil
+                            waitUntilDone:YES];
 }
 
 /* Set the disassembly to start at 'address' */
 int
 ui_debugger_disassemble( libspectrum_word address )
 {
-  [[DebuggerController singleton] debugger_disassemble:address];
+  DebuggerController *controller = [DebuggerController loadedSingleton];
+  if( !controller ) return 0;
+
+  [controller performSelectorOnMainThread:@selector(mainThreadDebuggerDisassemble:)
+                               withObject:@( address )
+                            waitUntilDone:YES];
 
   return 0;
 }

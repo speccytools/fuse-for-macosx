@@ -73,6 +73,7 @@
   IBOutlet NSTextField *z80Halted;
 }
 + (DebuggerController *)singleton;
++ (DebuggerController *)loadedSingleton;
 - (void)awakeFromNib;
 - (void)debugger_activate:(id)sender;
 - (void)debugger_deactivate:(int)interruptable; 
