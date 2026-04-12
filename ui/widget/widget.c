@@ -697,7 +697,7 @@ widget_t widget_data[] = {
   { widget_binary_draw, widget_binary_finish, widget_binary_keyhandler  },
 };
 
-#ifndef UI_SDL
+#if !defined UI_SDL && !defined UI_SDL2
 #ifndef UI_X
 /* The statusbar handling functions */
 /* TODO: make these do something useful */
@@ -713,7 +713,7 @@ ui_statusbar_update_speed( float speed )
   return 0;
 }
 #endif
-#endif                          /* #ifndef UI_SDL */
+#endif                          /* #if !defined UI_SDL && !defined UI_SDL2 */
 
 /* Tape browser update function. The dialog box is created every time it
    is displayed, so no need to do anything here */

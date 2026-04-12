@@ -222,6 +222,7 @@ jobs:
           
           # SDL dlls
           cp ${CYGWIN_LIBDIR}SDL.dll $DEST_DIR || true
+          cp ${CYGWIN_LIBDIR}SDL2.dll $DEST_DIR || true
 
           # Zlib dlls
           cp ${CYGWIN_LIBDIR}zlib1.dll $DEST_DIR || true

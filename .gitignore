@@ -98,6 +98,9 @@ tags
 /ui/xlib/keysyms.c
 /ui/xlib/xpixmaps.c
 /unittests/displaytest
+/unittests/sdl2displaytest
+/unittests/sdl2joysticktest
+/unittests/sdl2mousetest
 /ylwrap
 /z80/coretest
 /z80/coretest.exe

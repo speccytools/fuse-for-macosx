@@ -65,6 +65,8 @@ Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (P)AL-TV use TV2x effect, pal_tv2x, INPUT_KEY_p
 #ifdef UI_SDL
 Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
+#elif defined UI_SDL2
+Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 #endif
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j

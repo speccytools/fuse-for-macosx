@@ -41,9 +41,9 @@
    bootstrapping by redefining main. As we now allow SDL joystick code to be
    used in the GTK and Xlib UIs we need to also do the magic when that code is
    in use, feel free to look away for the next line */
-#if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
+#if defined UI_SDL || defined UI_SDL2 || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
 #include <SDL.h>		/* Needed on MacOS X and Windows */
-#endif /* #if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) ) */
+#endif /* #if defined UI_SDL || defined UI_SDL2 || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) ) */
 
 #ifdef GEKKO
 /* #include <fat.h>

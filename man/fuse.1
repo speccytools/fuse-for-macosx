@@ -481,7 +481,35 @@ option.
 .B \-\-full\-screen
 .RS
 Specify whether Fuse should run in full screen mode.
-This option is effective only under the SDL UI.
+This option is effective under the SDL and SDL2 UIs.
+.PP
+Under SDL2, Fuse will try to choose a suitable fixed fullscreen display mode
+automatically if no explicit fullscreen mode has been configured.
+.RE
+.PP
+.B \-\-sdl\-fullscreen\-mode
+.I mode
+.RS
+Specify the fullscreen display mode to use under the SDL and SDL2 UIs.
+.I mode
+may be one of the following:
+.RS
+.TP
+.B list
+Print the available fullscreen modes and exit.
+.TP
+.B number
+Select one of the listed fullscreen modes by its number.
+.TP
+.B WxH
+Select a fullscreen mode by width and height, for example
+.BR 1024x768 .
+.RE
+.PP
+If this option is not set, SDL2 will try to choose a fullscreen mode
+automatically. The SDL2 mode list and automatic choice prefer modes that fit
+the available scalers well, then better refresh rates (50Hz first, then
+multiples of 50Hz, then 60Hz and similar rates).
 .RE
 .PP
 .B \-g
@@ -2732,6 +2760,11 @@ menu.
 .I "Kempston mouse"
 .RS
 If this option is selected, Fuse will emulate a Kempston mouse interface.
+.PP
+With the SDL and SDL2 UIs, middle click (or middle button release) on the
+Spectrum display toggles mouse grab when the Kempston mouse is enabled.
+When grabbed, SDL2 uses relative mouse mode so motion is no longer limited by
+the host pointer reaching the edge of the screen.
 .PP
 If you're using Fuse full-screen, your mouse is automatically used as if
 attached to the Kempston interface. Otherwise, you'll need to click on the

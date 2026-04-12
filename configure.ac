@@ -273,7 +273,17 @@ if test -z "$UI"; then
   fi
 fi
 
-dnl Check if the user wants the SDL UI
+dnl Check if the user wants the SDL 2 UI
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether SDL 2 UI requested)
+  AC_ARG_WITH(sdl2,
+  [  --with-sdl2             use SDL 2 for user interface],
+  if test "$withval" = no; then sdl2_ui=no; else sdl2_ui=yes; fi,
+  sdl2_ui=no)
+  AC_MSG_RESULT($sdl2_ui)
+fi
+
+dnl Check if the user wants the SDL 1 UI
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether SDL UI requested)
   AC_ARG_WITH(sdl,
@@ -285,41 +295,55 @@ fi
 
 dnl Check if the user prefers SDL 1 over SDL 2
 AC_ARG_ENABLE(sdl2,
-  AS_HELP_STRING([--disable-sdl2],[prefer SDL 1 to SDL 2]),
+  AS_HELP_STRING([--disable-sdl2],[disable SDL 2 support]),
   if test "$enableval" = yes; then sdl2=yes; else sdl2=no; fi,
   sdl2=yes
 )
 
-dnl SDL 2 is not supported for the UI yet, so warn the user
-if test "$sdl_ui" = yes -a "$sdl2" = yes; then
-  AC_MSG_WARN([SDL 2 not supported for the UI, using SDL 1 instead])
-  sdl2=no
+if test "$sdl_ui" = yes -a "$sdl2_ui" = yes; then
+  AC_MSG_ERROR([please choose either --with-sdl or --with-sdl2, not both])
 fi
+
+dnl Look for SDL 1
+SDL1_VERSION=1.2.4
+sdl1_available=no
+AM_PATH_SDL($SDL1_VERSION, sdl1_available=yes, sdl1_available=no)
+SDL1_CFLAGS="$SDL_CFLAGS"
+SDL1_LIBS="$SDL_LIBS"
+AC_SUBST(SDL1_CFLAGS)
+AC_SUBST(SDL1_LIBS)
 
 dnl Look for SDL 2
-sdl_available=no
+sdl2_available=no
 if test "$sdl2" = yes; then
-  PKG_CHECK_MODULES([SDL], [sdl2], [sdl_available=yes], [
-                    AC_MSG_WARN([SDL 2 not found, looking for SDL 1])
-                    sdl2=no])
+  PKG_CHECK_MODULES([SDL2], [sdl2], [sdl2_available=yes], [
+                     AC_MSG_WARN([SDL 2 not found, looking for SDL 1])
+                     sdl2=no])
 fi
 
-dnl Look for SDL 1 if we don't have or want SDL 2
-SDL_VERSION=1.2.4
-if test "$sdl_available" = no; then
-  AM_PATH_SDL($SDL_VERSION, sdl_available=yes, sdl_available=no)
+dnl Enable the SDL 2 UI if all conditions are met
+if test "$sdl2_ui" = yes; then
+  if test "$sdl2_available" = yes; then
+    AC_DEFINE([UI_SDL2], 1, [Defined if the SDL 2 UI is in use])
+    AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
+    UI=sdl2
+    WIDGET=widget
+    use_sdl2=yes
+  else
+    AC_MSG_ERROR([SDL 2 support requested for the UI, but SDL 2 was not found])
+  fi
 fi
 
-dnl Enable the SDL UI if all conditions are met
+dnl Enable the SDL 1 UI if all conditions are met
 if test "$sdl_ui" = yes; then
-  if test "$sdl_available" = yes; then
+  if test "$sdl1_available" = yes; then
     AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
     UI=sdl
     WIDGET=widget
-    use_sdl=yes
+    use_sdl1=yes
   else
-    AC_MSG_ERROR([SDL version $SDL_VERSION not found])
+    AC_MSG_ERROR([SDL version $SDL1_VERSION not found])
   fi
 fi
 
@@ -433,6 +457,7 @@ AM_CONDITIONAL(UI_FB, test "$UI" = fb)
 AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
 AM_CONDITIONAL(UI_NULL, test "$UI" = null)
 AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
+AM_CONDITIONAL(UI_SDL2, test "$UI" = sdl2)
 AM_CONDITIONAL(UI_WII, test "$UI" = wii)
 AM_CONDITIONAL(UI_WIN32, test "$UI" = win32)
 AM_CONDITIONAL(UI_X, test "$UI" = xlib)
@@ -540,9 +565,20 @@ AC_CHECK_HEADER(
 )
 
 dnl SDL audio
-if test "$sdl_available" = "yes"; then
-  dnl Default to SDL audio if we're using the SDL UI
-  if test "$UI" = sdl; then
+if test "$sdl2_available" = "yes"; then
+  dnl Default to SDL2 audio if we're using the SDL2 UI
+  if test "$UI" = sdl2; then
+    audio_driver_list="sdl2 $audio_driver_list"
+  else
+    audio_driver_list="$audio_driver_list sdl2"
+  fi
+fi
+
+if test "$sdl1_available" = "yes"; then
+  dnl Default to SDL audio if we're using the SDL 1 UI
+  if test "$UI" = sdl2; then
+    :
+  elif test "$UI" = sdl; then
     audio_driver_list="sdl $audio_driver_list"
   else
     audio_driver_list="$audio_driver_list sdl"
@@ -637,9 +673,13 @@ dnl
 dnl Add the necessary options for the selected audio driver
 dnl
 case $audio_driver in
+  sdl2)
+    SOUND_LIBADD='sound/sdl2sound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+    use_sdl2=yes
+    ;;
   sdl)
     SOUND_LIBADD='sound/sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
-    use_sdl=yes
+    use_sdl1=yes
     ;;
   directsound)
     SOUND_LIBADD='sound/dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
@@ -711,7 +751,7 @@ if test "$stick" = yes; then
   dnl We prefer to use UI-specific joystick code. (Default.)
   dnl If there is none, or you override this here, we use libjsw.
   case "$UI" in
-    sdl|win32)
+    sdl|sdl2|win32)
       dnl Libraries provide their own joystick code
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
@@ -735,12 +775,12 @@ if test "$stick" = yes; then
       if test "$libjsw" = yes; then
         AC_MSG_RESULT([no, use libjsw])
       else
-        if test "$sdl_available" = yes; then
+        if test "$sdl1_available" = yes; then
           AC_MSG_RESULT(yes)
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
-          use_sdl=yes
+          use_sdl1=yes
         else
-          AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled])
+          AC_MSG_WARN([SDL version $SDL1_VERSION not found - joystick support disabled])
           stick=no
         fi
       fi
@@ -789,6 +829,9 @@ AC_SUBST(XML_LIBS)
 dnl Work out which timer routines to use
 AC_MSG_CHECKING(which timer routines to use)
 if test "$UI" = sdl; then
+  TIMER_LIBADD='timer/sdl.$(OBJEXT)'
+  AC_MSG_RESULT(SDL)
+elif test "$UI" = sdl2; then
   TIMER_LIBADD='timer/sdl.$(OBJEXT)'
   AC_MSG_RESULT(SDL)
 else
@@ -923,8 +966,9 @@ AM_CONDITIONAL(COMPAT_UNIX, test "$COMPAT_OSNAME" = 'unix')
 AM_CONDITIONAL(COMPAT_WII, test "$COMPAT_OSNAME" = 'wii')
 AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
 
-dnl This tells the Makefile to use SDL_CFLAGS and SDL_LIBS during the build
-AM_CONDITIONAL(USE_SDL, test "$use_sdl" = "yes")
+dnl These tell the Makefile to use SDL 1 and SDL 2 flags during the build
+AM_CONDITIONAL(USE_SDL1, test "$use_sdl1" = "yes")
+AM_CONDITIONAL(USE_SDL2, test "$use_sdl2" = "yes")
 
 dnl Decide whether to install desktop and mime files
 AC_ARG_ENABLE(desktop-integration,
@@ -1030,8 +1074,11 @@ echo "User interface: ${UI}"
 if test "${UI}" = "gtk"; then
    echo "Using GTK 3: ${gtk3}"
 fi
-if test "${use_sdl}" = "yes"; then
-   echo "Using SDL 2: ${sdl2}"
+if test "${use_sdl1}" = "yes"; then
+   echo "Using SDL 1: yes"
+fi
+if test "${use_sdl2}" = "yes"; then
+   echo "Using SDL 2: yes"
 fi
 if test x"${gpm}" != "x"; then
    echo "libgpm support: ${gpm}"

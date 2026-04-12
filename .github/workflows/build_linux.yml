@@ -65,18 +65,18 @@ jobs:
       verify_audio: "sdl"
       verify_other: "Using SDL 2: no"
 
-  # SDL 2 UI + Sound (not supported for UI yet)
+  # SDL 2 UI + Sound
   sdl2-ui:
-    name: "Fuse SDL 2 UI + sound (Linux) (not supported yet)"
+    name: "Fuse SDL 2 UI + sound (Linux)"
     needs: [libspectrum]
     uses: ./.github/workflows/build_linux_sub.yml
     with:
-      name: SDL2 UI (not supported yet)
-      dependencies: "libaudiofile-dev libsdl2-dev libsdl1.2-dev"
-      configure_params: "--with-sdl"
-      verify_ui: "sdl"
-      verify_audio: "sdl"
-      verify_other: "SDL 2 not supported for the UI, using SDL 1 instead"
+      name: SDL2 UI
+      dependencies: "libaudiofile-dev libsdl2-dev"
+      configure_params: "--with-sdl2"
+      verify_ui: "sdl2"
+      verify_audio: "sdl2"
+      verify_other: "Using SDL 2: yes"
 
 ##########################################
 ### DEPRECATED Linux UI configurations ###

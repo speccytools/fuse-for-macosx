@@ -27,7 +27,28 @@ noinst_HEADERS += unittests/unittests.h
 ## The display code tester
 
 noinst_PROGRAMS += unittests/displaytest
+noinst_PROGRAMS += unittests/sdl2displaytest
+noinst_PROGRAMS += unittests/sdl2joysticktest
+noinst_PROGRAMS += unittests/sdl2mousetest
 
 unittests_displaytest_SOURCES = unittests/displaytest.c display.c
 unittests_displaytest_LDADD = $(LIBSPECTRUM_LIBS) $(GLIB_LIBS)
 unittests_displaytest_CPPFLAGS = $(AM_CPPFLAGS) -DDISPLAYTEST
+
+unittests_sdl2displaytest_SOURCES = \
+        unittests/sdl2displaytest.c \
+        ui/sdl2/sdl2_display_internal.c
+unittests_sdl2displaytest_LDADD = $(LIBSPECTRUM_LIBS)
+unittests_sdl2displaytest_CPPFLAGS = $(AM_CPPFLAGS)
+
+unittests_sdl2joysticktest_SOURCES = \
+        unittests/sdl2joysticktest.c \
+        ui/sdl2/sdl2_joystick_internal.c
+unittests_sdl2joysticktest_LDADD = $(LIBSPECTRUM_LIBS)
+unittests_sdl2joysticktest_CPPFLAGS = $(AM_CPPFLAGS)
+
+unittests_sdl2mousetest_SOURCES = \
+        unittests/sdl2mousetest.c \
+        ui/sdl2/sdl2_mouse_internal.c
+unittests_sdl2mousetest_LDADD = $(LIBSPECTRUM_LIBS)
+unittests_sdl2mousetest_CPPFLAGS = $(AM_CPPFLAGS)

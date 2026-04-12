@@ -65,8 +65,12 @@ fuse_LDADD = \
              $(X_LIBS) \
              $(XML_LIBS)
 
-if USE_SDL
-fuse_LDADD += $(SDL_LIBS)
+if USE_SDL1
+fuse_LDADD += $(SDL1_LIBS)
+endif
+
+if USE_SDL2
+fuse_LDADD += $(SDL2_LIBS)
 endif
 
 fuse_DEPENDENCIES =
@@ -92,8 +96,12 @@ AM_CPPFLAGS = \
               -DFUSEDATADIR="\"${pkgdatadir}\"" \
               $(PNG_CFLAGS)
 
-if USE_SDL
-AM_CPPFLAGS += $(SDL_CFLAGS)
+if USE_SDL1
+AM_CPPFLAGS += $(SDL1_CFLAGS)
+endif
+
+if USE_SDL2
+AM_CPPFLAGS += $(SDL2_CFLAGS)
 endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(PTHREAD_CFLAGS)
@@ -195,6 +203,7 @@ include ui/gtk/Makefile.am
 include ui/null/Makefile.am
 include ui/scaler/Makefile.am
 include ui/sdl/Makefile.am
+include ui/sdl2/Makefile.am
 include ui/widget/Makefile.am
 include ui/wii/Makefile.am
 include ui/win32/Makefile.am
@@ -202,6 +211,9 @@ include ui/xlib/Makefile.am
 include unittests/Makefile.am
 include z80/Makefile.am
 
-check-local: fuse unittests/displaytest
+check-local: fuse unittests/displaytest unittests/sdl2displaytest unittests/sdl2joysticktest unittests/sdl2mousetest
 	$(top_builddir)/fuse --unittests
 	$(top_builddir)/unittests/displaytest
+	$(top_builddir)/unittests/sdl2displaytest
+	$(top_builddir)/unittests/sdl2joysticktest
+	$(top_builddir)/unittests/sdl2mousetest
