@@ -29,10 +29,10 @@
 
 @interface PreferencesController : NSWindowController
 {
-  IBOutlet NSFormCell *rom0Filename;
-  IBOutlet NSFormCell *rom1Filename;
-  IBOutlet NSFormCell *rom2Filename;
-  IBOutlet NSFormCell *rom3Filename;
+  IBOutlet NSTextField *rom0Filename;
+  IBOutlet NSTextField *rom1Filename;
+  IBOutlet NSTextField *rom2Filename;
+  IBOutlet NSTextField *rom3Filename;
   IBOutlet NSArrayController *machineRomsController;
   IBOutlet NSMatrix *massStorageType;
   IBOutlet NSMatrix *externalSoundType;

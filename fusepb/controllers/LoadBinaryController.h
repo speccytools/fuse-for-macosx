@@ -27,9 +27,9 @@
 
 @interface LoadBinaryController : NSWindowController
 {
-  IBOutlet NSFormCell *file;
-  IBOutlet NSFormCell *start;
-  IBOutlet NSFormCell *length;
+  IBOutlet NSTextField *file;
+  IBOutlet NSTextField *start;
+  IBOutlet NSTextField *length;
   IBOutlet NSButton *apply;
 }
 

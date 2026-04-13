@@ -28,9 +28,9 @@
 @interface SaveBinaryController : NSWindowController
 {
     IBOutlet NSButton *apply;
-    IBOutlet NSFormCell *file;
-    IBOutlet NSFormCell *length;
-    IBOutlet NSFormCell *start;
+    IBOutlet NSTextField *file;
+    IBOutlet NSTextField *length;
+    IBOutlet NSTextField *start;
 }
 
 - (IBAction)apply:(id)sender;

@@ -972,33 +972,32 @@
                                     <binding destination="270" name="value" keyPath="values.zxataspwriteprotect" id="a1q-3d-peT"/>
                                 </connections>
                             </button>
-                            <form verticalHuggingPriority="750" fixedFrame="YES" mode="track" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pgI-Qm-62i">
-                                <rect key="frame" x="20" y="97" width="243" height="22"/>
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-mdrlen">
+                                <rect key="frame" x="20" y="97" width="125" height="22"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                <size key="cellSize" width="243" height="22"/>
-                                <size key="intercellSpacing" width="1" height="8"/>
-                                <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="kS6-1D-SfM">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="MDR cartridge len:" id="lbl-mdrlen-cell">
                                     <font key="font" metaFont="system"/>
-                                    <font key="titleFont" metaFont="system"/>
-                                </formCell>
-                                <cells>
-                                    <column>
-                                        <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="justified" title="MDR cartridge len:" id="H7r-3H-Vna">
-                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="cMb-uh-8m6" customClass="NumberFormatter">
-                                                <nil key="negativeInfinitySymbol"/>
-                                                <nil key="positiveInfinitySymbol"/>
-                                                <real key="minimum" value="1"/>
-                                            </numberFormatter>
-                                            <font key="font" metaFont="system"/>
-                                            <font key="titleFont" metaFont="system"/>
-                                            <connections>
-                                                <binding destination="270" name="value" keyPath="values.mdrlen" id="7U6-X7-kbF"/>
-                                            </connections>
-                                        </formCell>
-                                    </column>
-                                </cells>
-                            </form>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fld-mdrlen">
+                                <rect key="frame" x="149" y="97" width="114" height="22"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" alignment="left" id="fld-mdrlen-cell">
+                                    <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="cMb-uh-8m6" customClass="NumberFormatter">
+                                        <nil key="negativeInfinitySymbol"/>
+                                        <nil key="positiveInfinitySymbol"/>
+                                        <real key="minimum" value="1"/>
+                                    </numberFormatter>
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.mdrlen" id="7U6-X7-kbF"/>
+                                </connections>
+                            </textField>
                         </subviews>
                     </view>
                 </box>
@@ -1477,69 +1476,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>
-                <button tag="2" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1598">
-                    <rect key="frame" x="311" y="395" width="77" height="28"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="2" inset="2" id="1611">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                </button>
-                <form verticalHuggingPriority="750" fixedFrame="YES" mode="track" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1599">
-                    <rect key="frame" x="-4" y="374" width="312" height="100"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <size key="cellSize" width="312" height="19"/>
-                    <size key="intercellSpacing" width="1" height="8"/>
-                    <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1606">
-                        <font key="font" metaFont="smallSystem"/>
-                        <font key="titleFont" metaFont="smallSystem"/>
-                    </formCell>
-                    <cells>
-                        <column>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="ROM 0:" id="1609">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                            </formCell>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="1" title="ROM 1:" id="1608">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                            </formCell>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="2" title="ROM 2:" id="1610">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                            </formCell>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="3" title="ROM 3:" id="1607">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                            </formCell>
-                        </column>
-                    </cells>
-                </form>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1600">
-                    <rect key="frame" x="311" y="449" width="77" height="28"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="1605">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                </button>
-                <button tag="3" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1601">
-                    <rect key="frame" x="311" y="368" width="77" height="28"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="3" inset="2" id="1604">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                </button>
-                <button tag="1" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1602">
-                    <rect key="frame" x="311" y="422" width="77" height="28"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="1" inset="2" id="1603">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                </button>
                 <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1587">
                     <rect key="frame" x="20" y="19" width="137" height="322"/>
                     <autoresizingMask key="autoresizingMask"/>
@@ -1593,85 +1529,126 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>
-                <form verticalHuggingPriority="750" fixedFrame="YES" mode="track" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1589">
-                    <rect key="frame" x="165" y="240" width="487" height="100"/>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-rom0">
+                    <rect key="frame" x="165" y="321" width="42" height="19"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <size key="cellSize" width="487" height="19"/>
-                    <size key="intercellSpacing" width="1" height="8"/>
-                    <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1625">
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="ROM 0:" id="lbl-rom0-cell">
                         <font key="font" metaFont="smallSystem"/>
-                        <font key="titleFont" metaFont="smallSystem"/>
-                    </formCell>
-                    <cells>
-                        <column>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="ROM 0:" id="1628">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                                <connections>
-                                    <binding destination="533" name="value" keyPath="selection.rom0" id="1644">
-                                        <dictionary key="options">
-                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="533" name="enabled" keyPath="selection.rom0" id="1652">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSIsNotNil</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </formCell>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="1" title="ROM 1:" id="1627">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                                <connections>
-                                    <binding destination="533" name="value" keyPath="selection.rom1" id="1646">
-                                        <dictionary key="options">
-                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="533" name="enabled" keyPath="selection.rom1" id="1655">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSIsNotNil</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </formCell>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="2" title="ROM 2:" id="1629">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                                <connections>
-                                    <binding destination="533" name="value" keyPath="selection.rom2" id="1648">
-                                        <dictionary key="options">
-                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="533" name="enabled" keyPath="selection.rom2" id="1657">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSIsNotNil</string>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </formCell>
-                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="3" title="ROM 3:" id="1626">
-                                <font key="font" metaFont="smallSystem"/>
-                                <font key="titleFont" metaFont="smallSystem"/>
-                                <connections>
-                                    <binding destination="533" name="enabled" keyPath="selection.rom2" id="1659">
-                                        <dictionary key="options">
-                                            <string key="NSValueTransformerName">NSIsNotNil</string>
-                                        </dictionary>
-                                    </binding>
-                                    <binding destination="533" name="value" keyPath="selection.rom3" id="1650">
-                                        <dictionary key="options">
-                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
-                                        </dictionary>
-                                    </binding>
-                                </connections>
-                            </formCell>
-                        </column>
-                    </cells>
-                </form>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1628">
+                    <rect key="frame" x="211" y="321" width="441" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" id="1628-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="533" name="value" keyPath="selection.rom0" id="1644">
+                            <dictionary key="options">
+                                <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                            </dictionary>
+                        </binding>
+                        <binding destination="533" name="enabled" keyPath="selection.rom0" id="1652">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-rom1">
+                    <rect key="frame" x="165" y="294" width="42" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="ROM 1:" id="lbl-rom1-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1627">
+                    <rect key="frame" x="211" y="294" width="441" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" id="1627-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="533" name="value" keyPath="selection.rom1" id="1646">
+                            <dictionary key="options">
+                                <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                            </dictionary>
+                        </binding>
+                        <binding destination="533" name="enabled" keyPath="selection.rom1" id="1655">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-rom2">
+                    <rect key="frame" x="165" y="267" width="42" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="ROM 2:" id="lbl-rom2-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1629">
+                    <rect key="frame" x="211" y="267" width="441" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" id="1629-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="533" name="value" keyPath="selection.rom2" id="1648">
+                            <dictionary key="options">
+                                <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                            </dictionary>
+                        </binding>
+                        <binding destination="533" name="enabled" keyPath="selection.rom2" id="1657">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-rom3">
+                    <rect key="frame" x="165" y="240" width="42" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="ROM 3:" id="lbl-rom3-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1626">
+                    <rect key="frame" x="211" y="240" width="441" height="19"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" id="1626-cell">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="533" name="enabled" keyPath="selection.rom2" id="1659">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                        <binding destination="533" name="value" keyPath="selection.rom3" id="1650">
+                            <dictionary key="options">
+                                <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </textField>
                 <button tag="2" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1583">
                     <rect key="frame" x="729" y="263" width="57" height="28"/>
                     <autoresizingMask key="autoresizingMask"/>
