@@ -2,13 +2,16 @@
 
         * Fuse 1.x.x released.
 
+        * New features:
+          * Add SDL 2 compatibility (thanks, Gergely Szasz, Vitaly Greck,
+            Marc Serdeliuc, Sergio Baldoví and Alberto Garcia)
+            (Fredrick Meunier)
+
         * UI improvements:
           * Make 2x the default display scaler so Fuse is more usable on
             modern screens (Fredrick Meunier).
 
         * Emulation core improvements:
-          * Fix rectangle merge edge cases in dirty-region tracking with frame
-            skipping (Fredrick Meunier).
           * Speed up display dirty-bit scanning with __builtin_ctz (Fredrick
             Meunier).
 
