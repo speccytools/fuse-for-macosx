@@ -96,6 +96,7 @@ static int trap_write_msb;
 
 /* Whether the Spectranet's "suppress NMI" flipflop is set */
 static int nmi_flipflop = 0;
+static libspectrum_byte spectranet_control_register = 0;
 
 static int spectranet_source;
 
@@ -186,7 +187,8 @@ spectranet_hard_reset( void )
   trap_write_msb = 0;
 
   nmi_flipflop = 0;
-}  
+  spectranet_control_register = 0;
+}
 
 static void
 spectranet_reset( int hard_reset )
@@ -444,6 +446,9 @@ spectranet_control_read( libspectrum_word port, libspectrum_byte *attached )
     machine_current->ram.last_byte & 0x08 )
     b |= 0x10;
 
+  /* Spectranext detection expects bit 7 to read back inverted. */
+  b |= ( spectranet_control_register ^ 0x80 ) & 0x80;
+
   *attached = 0xff; /* TODO: check this */
 
   return b;
@@ -452,6 +457,8 @@ spectranet_control_read( libspectrum_word port, libspectrum_byte *attached )
 static void
 spectranet_control_write( libspectrum_word port, libspectrum_byte data )
 {
+  spectranet_control_register = data & 0x80;
+
   if( data & 0x01 )
     spectranet_page( 1 );
   else if( spectranet_paged_via_io )
