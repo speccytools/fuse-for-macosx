@@ -42,6 +42,7 @@ jobs:
       configure_params: "--with-null-ui --with-audio-driver=null"
       verify_ui: "null"
       verify_audio: "null"
+      run_check: true
 
   # GTK 3 UI
   gtk3-ui:
