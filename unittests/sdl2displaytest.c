@@ -320,6 +320,108 @@ mode_compare_breaks_tie_by_refresh( void )
 }
 
 static int
+mode_compare_breaks_tie_by_height( void )
+{
+  sdl2_fullscreen_mode_info left, right;
+
+  /* fit and refresh equal; taller display should win */
+  left.width = 1920;
+  left.height = 1080;
+  left.refresh_rate = 50;
+  left.fit = 0.53f;
+
+  right.width = 1920;
+  right.height = 720;
+  right.refresh_rate = 50;
+  right.fit = 0.53f;
+
+  if( sdl2display_compare_mode_info( &left, &right ) >= 0 ) {
+    fprintf( stderr,
+             "mode compare: expected taller mode before shorter (same fit & refresh)\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+mode_compare_breaks_tie_by_width( void )
+{
+  sdl2_fullscreen_mode_info left, right;
+
+  /* fit, refresh, and height equal; wider display should win */
+  left.width = 1920;
+  left.height = 1080;
+  left.refresh_rate = 50;
+  left.fit = 0.53f;
+
+  right.width = 1280;
+  right.height = 1080;
+  right.refresh_rate = 50;
+  right.fit = 0.53f;
+
+  if( sdl2display_compare_mode_info( &left, &right ) >= 0 ) {
+    fprintf( stderr,
+             "mode compare: expected wider mode before narrower (same fit, refresh & height)\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+mode_compare_equal_modes_returns_zero( void )
+{
+  sdl2_fullscreen_mode_info mode;
+
+  mode.width = 1920;
+  mode.height = 1080;
+  mode.refresh_rate = 50;
+  mode.fit = 0.53f;
+
+  if( sdl2display_compare_mode_info( &mode, &mode ) != 0 ) {
+    fprintf( stderr, "mode compare: expected 0 for identical modes\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+mode_fit_returns_zero_when_image_doesnt_fit( void )
+{
+  unsigned char supported[ SCALER_NUM ] = { 0 };
+  float scales[ SCALER_NUM ];
+  float fit;
+
+  fill_test_scales( scales );
+  supported[ SCALER_DOUBLESIZE ] = 1;
+
+  /* 320*2=640 > 600: image does not fit horizontally */
+  fit = sdl2display_mode_fit( SCALER_DOUBLESIZE, 320, 240,
+                              600, 480, supported, scales, SCALER_NUM );
+
+  if( fit != 0.0f ) {
+    fprintf( stderr,
+             "mode fit: expected 0.0 when image exceeds display dimensions\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+refresh_equal_rates_compare_as_zero( void )
+{
+  if( sdl2display_compare_refresh( 50, 50 ) != 0 ) {
+    fprintf( stderr, "refresh compare: expected 0 for equal rates\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
 mode_fit_uses_chosen_scaler( void )
 {
   unsigned char supported[ SCALER_NUM ] = { 0 };
@@ -407,6 +509,14 @@ static const struct test_t tests[] = {
   { "mode_compare_prefers_better_fit_before_size",
     mode_compare_prefers_better_fit_before_size },
   { "mode_compare_breaks_tie_by_refresh", mode_compare_breaks_tie_by_refresh },
+  { "mode_compare_breaks_tie_by_height", mode_compare_breaks_tie_by_height },
+  { "mode_compare_breaks_tie_by_width", mode_compare_breaks_tie_by_width },
+  { "mode_compare_equal_modes_returns_zero",
+    mode_compare_equal_modes_returns_zero },
+  { "mode_fit_returns_zero_when_image_doesnt_fit",
+    mode_fit_returns_zero_when_image_doesnt_fit },
+  { "refresh_equal_rates_compare_as_zero",
+    refresh_equal_rates_compare_as_zero },
   { NULL, NULL }
 };
 
