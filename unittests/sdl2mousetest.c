@@ -66,6 +66,21 @@ runtime_grab_hides_cursor( void )
 }
 
 static int
+startup_fullscreen_no_window_does_not_grab( void )
+{
+  sdl2_mouse_grab_plan plan;
+
+  /* startup=1, full_screen=1, have_window=0: first guard (startup && !full_screen)
+     is false, but second guard (!have_window) fires → no grab */
+  sdl2mouse_get_grab_plan( 1, 1, 0, &plan );
+
+  if( plan.should_grab || plan.enable_relative_mode ||
+      plan.enable_window_grab || !plan.show_cursor ) return 1;
+
+  return 0;
+}
+
+static int
 release_with_window_releases_grab( void )
 {
   sdl2_mouse_grab_plan plan;
@@ -102,6 +117,8 @@ static const struct test_t tests[] = {
   { "startup_fullscreen_grabs", startup_fullscreen_grabs },
   { "runtime_grab_requires_window", runtime_grab_requires_window },
   { "runtime_grab_hides_cursor", runtime_grab_hides_cursor },
+  { "startup_fullscreen_no_window_does_not_grab",
+    startup_fullscreen_no_window_does_not_grab },
   { "release_with_window_releases_grab", release_with_window_releases_grab },
   { "release_without_window_skips_window_grab_call",
     release_without_window_skips_window_grab_call },

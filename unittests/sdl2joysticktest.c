@@ -96,6 +96,51 @@ axis_neutral_releases_both_directions( void )
 }
 
 static int
+axis_at_positive_threshold_is_neutral( void )
+{
+  input_event_t event1, event2;
+
+  /* value == 16384: not strictly > 16384, so neutral */
+  sdl2joystick_axis_events( 0, 16384, INPUT_JOYSTICK_LEFT,
+                            INPUT_JOYSTICK_RIGHT, &event1, &event2 );
+
+  if( event1.type != INPUT_EVENT_JOYSTICK_RELEASE ) return 1;
+  if( event2.type != INPUT_EVENT_JOYSTICK_RELEASE ) return 1;
+
+  return 0;
+}
+
+static int
+axis_at_negative_threshold_is_neutral( void )
+{
+  input_event_t event1, event2;
+
+  /* value == -16384: not strictly < -16384, so neutral */
+  sdl2joystick_axis_events( 0, -16384, INPUT_JOYSTICK_UP,
+                            INPUT_JOYSTICK_DOWN, &event1, &event2 );
+
+  if( event1.type != INPUT_EVENT_JOYSTICK_RELEASE ) return 1;
+  if( event2.type != INPUT_EVENT_JOYSTICK_RELEASE ) return 1;
+
+  return 0;
+}
+
+static int
+axis_just_above_threshold_presses_positive( void )
+{
+  input_event_t event1, event2;
+
+  /* value == 16385: just over threshold, should press positive */
+  sdl2joystick_axis_events( 0, 16385, INPUT_JOYSTICK_LEFT,
+                            INPUT_JOYSTICK_RIGHT, &event1, &event2 );
+
+  if( event1.type != INPUT_EVENT_JOYSTICK_RELEASE ) return 1;
+  if( event2.type != INPUT_EVENT_JOYSTICK_PRESS ) return 1;
+
+  return 0;
+}
+
+static int
 hat_event_sets_press_and_release( void )
 {
   input_event_t event;
@@ -129,6 +174,12 @@ static const struct test_t tests[] = {
     axis_negative_presses_negative_direction },
   { "axis_neutral_releases_both_directions",
     axis_neutral_releases_both_directions },
+  { "axis_at_positive_threshold_is_neutral",
+    axis_at_positive_threshold_is_neutral },
+  { "axis_at_negative_threshold_is_neutral",
+    axis_at_negative_threshold_is_neutral },
+  { "axis_just_above_threshold_presses_positive",
+    axis_just_above_threshold_presses_positive },
   { "hat_event_sets_press_and_release", hat_event_sets_press_and_release },
   { NULL, NULL }
 };
