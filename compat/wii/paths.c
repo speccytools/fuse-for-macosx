@@ -47,6 +47,12 @@ compat_get_config_path( void )
   return "sd:/apps/fuse";
 }
 
+const char*
+compat_get_fallback_config_path( void )
+{
+  return NULL;
+}
+
 int
 compat_is_absolute_path( const char *path )
 {

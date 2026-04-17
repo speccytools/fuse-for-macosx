@@ -46,6 +46,12 @@ compat_get_config_path( void )
   return "PROGDIR:settings";
 }
 
+const char*
+compat_get_fallback_config_path( void )
+{
+  return NULL;
+}
+
 int
 compat_is_absolute_path( const char *path )
 {
