@@ -186,7 +186,6 @@ static Emulator *instance = nil;
                       sendPort:[portArray objectAtIndex:1]];
   [serverConnection setRootObject:self];
   proxy_view = (id)[serverConnection rootProxy];
-  [proxy_view setServer:self];
 
   /* Load saved ROM paths before startup so the sandbox scope covers custom ROMs on relaunch. */
   read_config_file( &settings_current );
@@ -196,6 +195,8 @@ static Emulator *instance = nil;
     fprintf( stderr, "%s: error initialising -- giving up!\n", fuse_progname );
   }
   [Emulator endROMScopedAccess:romURLs];
+
+  [proxy_view setServer:self];
 
   while( !fuse_exiting ) {
     [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
