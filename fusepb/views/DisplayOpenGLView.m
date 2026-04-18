@@ -646,7 +646,12 @@ static DisplayOpenGLView *instance = nil;
   GLuint i;
 
   [[self openGLContext] makeCurrentContext];
-  [self performSelectorOnMainThread:@selector(update) withObject:[self openGLContext] waitUntilDone:YES];
+  /* -update must only run on the main thread. When called from the
+     emulation thread (e.g. machine change during openFile:), skip it;
+     the drawable geometry is already valid from the last reshape. */
+  if ([NSThread isMainThread]) {
+    [self update];
+  }
   
   glGenTextures( MAX_SCREEN_BUFFERS, screenTexId );
 
