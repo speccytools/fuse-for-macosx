@@ -154,6 +154,18 @@ plot16_null( int x, int y, libspectrum_word data, libspectrum_byte ink,
   /* Do nothing */
 }
 
+/* putpixel tracking (used by the Pentagon 16-colour display path) */
+
+typedef void (*putpixel_fn_t)( int x, int y, int colour );
+
+static putpixel_fn_t putpixel_fn;
+
+static void
+putpixel_null( int x, int y, int colour )
+{
+  /* Do nothing */
+}
+
 static int plot16_count;
 
 struct plot16_record_t {
@@ -215,6 +227,14 @@ plot16_assert( int count, int x, int y, libspectrum_word data,
   return 0;
 }
 
+static int putpixel_count;
+
+static void
+putpixel_count_fn( int x, int y, int colour )
+{
+  putpixel_count++;
+}
+
 static int write_if_dirty_count;
 static int write_if_dirty_last_x;
 static int write_if_dirty_last_y;
@@ -251,6 +271,9 @@ test_before( void )
   memset( RAM[0], 0, ARRAY_SIZE( RAM[0] ) );
   memset( display_last_screen, 0, sizeof( display_last_screen ) );
   display_clear_maybe_dirty();
+
+  putpixel_fn = putpixel_null;
+  putpixel_count = 0;
 
   plot8_fn = plot8_null;
   display_reset_frame_count();
@@ -610,6 +633,103 @@ struct test_t {
   test_fn_t fn;
 };
 
+/* Setup for Pentagon 16-colour display tests */
+
+static void
+pentagon_test_before( void )
+{
+  memset( RAM[4], 0, sizeof( RAM[4] ) );
+  memset( RAM[5], 0, sizeof( RAM[5] ) );
+  memset( RAM[6], 0, sizeof( RAM[6] ) );
+  memset( RAM[7], 0, sizeof( RAM[7] ) );
+  memset( display_last_screen, 0, sizeof( display_last_screen ) );
+  display_clear_is_dirty();
+
+  putpixel_fn = putpixel_count_fn;
+  putpixel_count = 0;
+
+  memory_current_screen = 5;
+}
+
+/* display_write_if_dirty_pentagon_16_col() tests */
+
+static int
+pentagon_no_write_if_data_unchanged( void )
+{
+  pentagon_test_before();
+
+  /* All RAM pages and display_last_screen are zero — cache is current,
+     so no pixels should be emitted. */
+  display_write_if_dirty_pentagon_16_col( 0, 0 );
+
+  if( putpixel_count ) {
+    fprintf( stderr, "putpixel_count: expected 0, got %d\n", putpixel_count );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+pentagon_write_called_for_new_data( void )
+{
+  pentagon_test_before();
+
+  /* Set data2 (page 5 base offset) to a nonzero value. */
+  RAM[5][0] = 0x01;
+
+  display_write_if_dirty_pentagon_16_col( 0, 0 );
+
+  /* 8 pixels must be emitted. */
+  if( putpixel_count != 8 ) {
+    fprintf( stderr, "putpixel_count: expected 8, got %d\n", putpixel_count );
+    return 1;
+  }
+
+  /* last_chunk_detail = (data4<<24)|(data3<<16)|(data2<<8)|data1 = 0x100 */
+  if( display_last_screen[ 964 ] != 0x100 ) {
+    fprintf( stderr,
+             "display_last_screen[964]: expected 0x100, got 0x%x\n",
+             display_last_screen[ 964 ] );
+    return 1;
+  }
+
+  if( display_get_is_dirty( 24 ) != ( (libspectrum_qword)1 << 4 ) ) {
+    fprintf( stderr,
+             "display_is_dirty[24]: expected bit 4 set\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+pentagon_page7_reads_correct_pages( void )
+{
+  pentagon_test_before();
+  memory_current_screen = 7;
+
+  /* Set data2 from page 7 base offset — verifies page 7/6 selection. */
+  RAM[7][0] = 0x11;
+
+  display_write_if_dirty_pentagon_16_col( 0, 0 );
+
+  if( putpixel_count != 8 ) {
+    fprintf( stderr, "putpixel_count: expected 8, got %d\n", putpixel_count );
+    return 1;
+  }
+
+  /* last_chunk_detail = 0|(0<<16)|(0x11<<8)|0 = 0x1100 */
+  if( display_last_screen[ 964 ] != 0x1100 ) {
+    fprintf( stderr,
+             "display_last_screen[964]: expected 0x1100, got 0x%x\n",
+             display_last_screen[ 964 ] );
+    return 1;
+  }
+
+  return 0;
+}
+
 static const struct test_t tests[] = {
   /* display_write_if_dirty_sinclair() tests */
   { "no_write_if_data_unchanged", no_write_if_data_unchanged },
@@ -641,6 +761,14 @@ static const struct test_t tests[] = {
     timex_mode_change_causes_redraw },
   { "timex_hires_plot16_called_with_correct_data",
     timex_hires_plot16_called_with_correct_data },
+
+  /* display_write_if_dirty_pentagon_16_col() tests */
+  { "pentagon_no_write_if_data_unchanged",
+    pentagon_no_write_if_data_unchanged },
+  { "pentagon_write_called_for_new_data",
+    pentagon_write_called_for_new_data },
+  { "pentagon_page7_reads_correct_pages",
+    pentagon_page7_reads_correct_pages },
 
   /* End marker */
   { NULL, NULL }
@@ -685,7 +813,7 @@ ui_init( int *argc, char ***argv )
 
 void uidisplay_area( int x, int y, int w, int h ) {}
 void uidisplay_frame_end( void ) {}
-void uidisplay_putpixel( int x, int y, int colour ) {}
+void uidisplay_putpixel( int x, int y, int colour ) { putpixel_fn( x, y, colour ); }
 
 void
 uidisplay_plot16( int x, int y, libspectrum_word data, libspectrum_byte ink,
