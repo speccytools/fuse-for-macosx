@@ -38,7 +38,7 @@
   if (!joysticks) {
     size_t i;
 
-    joysticks = [NSMutableArray arrayWithCapacity:JOYSTICK_TYPE_COUNT];
+    joysticks = [[NSMutableArray alloc] initWithCapacity:JOYSTICK_TYPE_COUNT];
 
     for( i=0; i<JOYSTICK_TYPE_COUNT; i++ ) {
       [joysticks addObject:
