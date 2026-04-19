@@ -69,10 +69,12 @@ libgcrypt:
 		$(XCODEBUILD_SIGN_ARGS)
 
 FuseGenerator:
-	@echo "Building FuseGenerator Framework..."
+	@echo "Building Quick Look extensions..."
 	cd 3rdparty/FuseGenerator && \
 	xcodebuild -project FuseGenerator.xcodeproj \
-		-target "FuseGenerator" \
+		-target "FuseQLThumbnail" \
+		-target "FuseQLPreview" \
+		-parallelizeTargets \
 		-configuration Deployment \
 		SYMROOT=build \
 		BUILD_DIR=build \

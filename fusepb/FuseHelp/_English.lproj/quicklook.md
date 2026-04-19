@@ -1,10 +1,10 @@
 ---
-title: Quick Look Generator
-description: This section describes Fuses support of the Quick Look feature of macOSX 10.5 and newer.
+title: Quick Look
+description: This section describes FuseX's support for Quick Look thumbnails and previews on macOS 12 and newer.
 order: 250
 ---
 
-On macOSX 10.5 and newer, the Fuse Quick Look generator allows viewing
+On macOS 12 and newer, FuseX's Quick Look extensions allow viewing
 thumbnails and previews of ZX Spectrum emulation related files. The supported
 types are:
 
