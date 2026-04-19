@@ -1,21 +1,26 @@
-.PHONY: 3rdparty audiofile libgcrypt FuseGenerator FuseImporter mbedtls clean-3rdparty list-teams fusex archive dist dmg clean
+.PHONY: 3rdparty audiofile libgcrypt FuseGenerator FuseImporter mbedtls clean-3rdparty list-teams fusex archive dist dmg release release-clean release-notarize release-export clean
 
 # Signing parameters (can be overridden from command line)
-# Example: make 3rdparty DEVELOPMENT_TEAM="ABC123DEFG" CODE_SIGN_IDENTITY="Apple Development"
+# By default, use the signing settings already stored in the Xcode projects.
+# Example override: make 3rdparty DEVELOPMENT_TEAM="ABC123DEFG" CODE_SIGN_IDENTITY="Apple Development"
 DEVELOPMENT_TEAM ?=
 CODE_SIGN_IDENTITY ?=
-CODE_SIGN_STYLE ?= Automatic
+CODE_SIGN_STYLE ?=
 PROVISIONING_PROFILE_SPECIFIER ?=
 
 # Archive path (can be overridden from command line)
 # Example: make archive ARCHIVE_PATH=./build/FuseX.xcarchive
 ARCHIVE_PATH ?= ./build/FuseX.xcarchive
 
-# Automatically set CODE_SIGN_STYLE=Manual if Developer ID identity is specified
+# Release paths and notarization profile
+DIST_APP_PATH ?= dist/FuseX.app
+ARCHIVE_APP_PATH = $(ARCHIVE_PATH)/Products/Applications/FuseX.app
+RELEASE_ZIP_PATH ?= ./build/FuseX-notarize.zip
+NOTARYTOOL_PROFILE ?=
+
+# Automatically set CODE_SIGN_STYLE=Manual if a code signing identity is specified
 ifneq ($(CODE_SIGN_IDENTITY),)
-ifeq ($(findstring Developer ID,$(CODE_SIGN_IDENTITY)),Developer ID)
 	CODE_SIGN_STYLE := Manual
-endif
 endif
 
 # Build common xcodebuild arguments for signing
@@ -126,6 +131,13 @@ fusex: 3rdparty fusepb
 		CONFIGURATION_BUILD_DIR=build/Deployment \
 		$(XCODEBUILD_SIGN_ARGS)
 
+release-clean:
+	@echo "Cleaning FuseX build folder..."
+	@rm -rf fusepb/build
+	@rm -rf build
+	@echo "Removing existing app bundle from dist/..."
+	@rm -rf "$(DIST_APP_PATH)"
+
 archive: 3rdparty fusepb
 	@echo "Archiving FuseX app..."
 	@mkdir -p build
@@ -138,8 +150,34 @@ archive: 3rdparty fusepb
 		SYMROOT=build \
 		BUILD_DIR=build \
 		CONFIGURATION_BUILD_DIR=build/Deployment \
-		$(XCODEBUILD_SIGN_ARGS)
+			$(XCODEBUILD_SIGN_ARGS)
 	@echo "Archive created at: $(ARCHIVE_PATH)"
+
+release-notarize: archive
+	@echo "Submitting archived app for notarization..."
+	@if [ -z "$(NOTARYTOOL_PROFILE)" ]; then \
+		echo "Error: NOTARYTOOL_PROFILE is required for make release"; \
+		echo "Create one with: xcrun notarytool store-credentials <profile> --apple-id ... --team-id ... --password ..."; \
+		exit 1; \
+	fi
+	@if [ ! -d "$(ARCHIVE_APP_PATH)" ]; then \
+		echo "Error: archived app not found at $(ARCHIVE_APP_PATH)"; \
+		exit 1; \
+	fi
+	@mkdir -p build
+	@rm -f "$(RELEASE_ZIP_PATH)"
+	@ditto -c -k --keepParent "$(ARCHIVE_APP_PATH)" "$(RELEASE_ZIP_PATH)"
+	@xcrun notarytool submit "$(RELEASE_ZIP_PATH)" --keychain-profile "$(NOTARYTOOL_PROFILE)" --wait
+	@xcrun stapler staple "$(ARCHIVE_APP_PATH)"
+
+release-export: release-notarize
+	@echo "Exporting notarized app to dist/..."
+	@mkdir -p dist
+	@rm -rf "$(DIST_APP_PATH)"
+	@ditto "$(ARCHIVE_APP_PATH)" "$(DIST_APP_PATH)"
+
+release: release-clean release-export
+	@$(MAKE) dmg
 
 dist:
 	@echo "Checking for dist/FuseX.app..."

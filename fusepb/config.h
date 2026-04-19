@@ -52,8 +52,8 @@
 /* Defined if we've got glib */
 /* #undef HAVE_LIB_GLIB */
 
-/* Defined if we've got libxml2 */
-/* #undef HAVE_LIB_XML2 */
+/* Defined if we've got libxml2 (system libxml2 for Spectranext xpath engine) */
+#define HAVE_LIB_XML2 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1

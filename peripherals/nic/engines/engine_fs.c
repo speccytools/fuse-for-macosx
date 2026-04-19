@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#define ENGINE_FS_READ_BUF_SIZE (256u * 1024u)
 static uint8_t engine_fs_read_buf[ENGINE_FS_READ_BUF_SIZE];
 
 int engine_fs_parse_mount_spec(const char *spec, int *mount_index_out, const char **path_out)

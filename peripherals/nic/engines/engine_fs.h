@@ -3,6 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/** Max read size for engine input files (see engine_fs_read_entire). */
+#define ENGINE_FS_READ_BUF_SIZE (256u * 1024u)
+
 struct xfs_handle_t;
 struct xfs_engine_mount_t;
 

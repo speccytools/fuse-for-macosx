@@ -40,8 +40,10 @@ int spectranext_enginecall_dispatch(const char *input_file, const char *output_f
     if (argc < 1)
         return -6;
 
-    if (strcmp(argv[0], "json") == 0)
+    if (strcmp(argv[0], "jsonpath") == 0 || strcmp(argv[0], "json") == 0)
         return engine_json_call(input_file, output_file, argc, argv);
+    if (strcmp(argv[0], "xpath") == 0)
+        return engine_xpath_call(input_file, output_file, argc, argv);
     return -1;
 }
 

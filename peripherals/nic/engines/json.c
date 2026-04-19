@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "engine_fs.h"
+#include "engine_utf8.h"
 #include "jsonpath/matcher.h"
 
 #include "../../fs/xfs.h"
@@ -28,6 +29,7 @@ static int scalar_value_to_string(const JSON_Value *v, char *buf, size_t buf_sz)
     {
         case JSONString:
             snprintf(buf, buf_sz, "%s", json_value_get_string(v));
+            engine_utf8_fold(buf, buf_sz);
             return 0;
         case JSONNumber: {
             const double d = json_value_get_number(v);
@@ -39,17 +41,21 @@ static int scalar_value_to_string(const JSON_Value *v, char *buf, size_t buf_sz)
                 if ((double)iv == d)
                 {
                     snprintf(buf, buf_sz, "%" PRId64, (int64_t)iv);
+                    engine_utf8_fold(buf, buf_sz);
                     return 0;
                 }
             }
             snprintf(buf, buf_sz, "%.17g", d);
+            engine_utf8_fold(buf, buf_sz);
             return 0;
         }
         case JSONBoolean:
             snprintf(buf, buf_sz, "%s", json_value_get_boolean(v) ? "true" : "false");
+            engine_utf8_fold(buf, buf_sz);
             return 0;
         case JSONNull:
             snprintf(buf, buf_sz, "null");
+            engine_utf8_fold(buf, buf_sz);
             return 0;
         default:
             return -1;

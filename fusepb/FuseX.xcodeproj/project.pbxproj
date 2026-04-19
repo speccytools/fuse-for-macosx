@@ -312,6 +312,8 @@
 		FE9443C22F881C540059A578 /* matcher.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443B22F881C540059A578 /* matcher.c */; };
 		FE9443D12F881F210059A578 /* parson.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443D02F881F210059A578 /* parson.c */; };
 		FE9443D42F882E210059A578 /* spectranext_stdout.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443D32F882E210059A578 /* spectranext_stdout.c */; };
+		FE9443E82F881C540059A578 /* engine_utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443E62F881C540059A578 /* engine_utf8.c */; };
+		FE9443E92F881C540059A578 /* xpath.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443E72F881C540059A578 /* xpath.c */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C972EEF0710008277BA /* FuseGenerator.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */; };
 		FEC02C9F2EEF65D6008277BA /* spectranext_controller.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */; };
@@ -894,6 +896,9 @@
 		FE9443D02F881F210059A578 /* parson.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = parson.c; sourceTree = "<group>"; };
 		FE9443D22F882E210059A578 /* spectranext_stdout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext_stdout.h; sourceTree = "<group>"; };
 		FE9443D32F882E210059A578 /* spectranext_stdout.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_stdout.c; sourceTree = "<group>"; };
+		FE9443E52F881C540059A578 /* engine_utf8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine_utf8.h; sourceTree = "<group>"; };
+		FE9443E62F881C540059A578 /* engine_utf8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = engine_utf8.c; sourceTree = "<group>"; };
+		FE9443E72F881C540059A578 /* xpath.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xpath.c; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C962EEF0710008277BA /* FuseGenerator.qlgenerator */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FuseGenerator.qlgenerator; path = ../3rdparty/FuseGenerator/build/Deployment/FuseGenerator.qlgenerator; sourceTree = "<group>"; };
 		FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_controller.c; sourceTree = "<group>"; };
@@ -1779,6 +1784,9 @@
 				FE9443B82F881C540059A578 /* engine_fs.h */,
 				FE9443B92F881C540059A578 /* engine_fs.c */,
 				FE9443BA2F881C540059A578 /* json.c */,
+				FE9443E52F881C540059A578 /* engine_utf8.h */,
+				FE9443E62F881C540059A578 /* engine_utf8.c */,
+				FE9443E72F881C540059A578 /* xpath.c */,
 			);
 			path = engines;
 			sourceTree = "<group>";
@@ -2123,6 +2131,8 @@
 				FE9443BD2F881C540059A578 /* lexer.c in Sources */,
 				FE9443BE2F881C540059A578 /* engine_fs.c in Sources */,
 				FE9443BF2F881C540059A578 /* json.c in Sources */,
+				FE9443E82F881C540059A578 /* engine_utf8.c in Sources */,
+				FE9443E92F881C540059A578 /* xpath.c in Sources */,
 				FE9443C02F881C540059A578 /* ast.c in Sources */,
 				FE9443C12F881C540059A578 /* parser.c in Sources */,
 				FE9443C22F881C540059A578 /* matcher.c in Sources */,
@@ -2252,7 +2262,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
@@ -2281,6 +2291,7 @@
 					..,
 					"$(PROJECT_DIR)",
 					/usr/local/include,
+					"$(SDKROOT)/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "Info-FuseX.plist";
 				INSTALL_PATH = /Applications;
@@ -2292,6 +2303,7 @@
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-lz",
+					"-lxml2",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
 				PRODUCT_NAME = FuseX;
@@ -2316,7 +2328,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
@@ -2344,6 +2356,7 @@
 					..,
 					"$(PROJECT_DIR)",
 					/usr/local/include,
+					"$(SDKROOT)/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "Info-FuseX.plist";
 				INSTALL_PATH = /Applications;
@@ -2355,6 +2368,7 @@
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-lz",
+					"-lxml2",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
 				PRODUCT_NAME = FuseX;
@@ -2378,7 +2392,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
@@ -2406,6 +2420,7 @@
 					..,
 					"$(PROJECT_DIR)",
 					/usr/local/include,
+					"$(SDKROOT)/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "Info-FuseX.plist";
 				INSTALL_PATH = /Applications;
@@ -2417,6 +2432,7 @@
 				OTHER_LDFLAGS = (
 					"-lbz2",
 					"-lz",
+					"-lxml2",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = FuseXPreferences;
 				PRODUCT_NAME = FuseX;

@@ -8,3 +8,4 @@ typedef int (*enginecall_t)(const char *input_file, const char *output_file, int
 int engine_argv_parse(char *buf, char *argv[], int max_argv);
 
 int engine_json_call(const char *input_file, const char *output_file, int argc, char *argv[]);
+int engine_xpath_call(const char *input_file, const char *output_file, int argc, char *argv[]);
