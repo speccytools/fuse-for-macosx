@@ -97,8 +97,10 @@ print hashline( __LINE__ ), << 'CODE';
 /* The name of our configuration file */
 #ifdef WIN32
 #define CONFIG_FILE_NAME "fuse.cfg"
+#define FALLBACK_CONFIG_FILE_NAME CONFIG_FILE_NAME
 #else				/* #ifdef WIN32 */
-#define CONFIG_FILE_NAME ".fuserc"
+#define CONFIG_FILE_NAME "fuserc"
+#define FALLBACK_CONFIG_FILE_NAME ".fuserc"
 #endif				/* #ifdef WIN32 */
 
 /* The current settings of options, etc */
@@ -175,7 +177,11 @@ read_config_file( settings_info *settings )
 
   /* See if the file exists; if doesn't, it's not a problem */
   if( !compat_file_exists( path ) ) {
-      return 0;
+    /* Look for the config file in the fallback location, if there is one */
+    const char *fallbackdir = compat_get_fallback_config_path();
+    if( !fallbackdir ) return 0;
+    snprintf( path, PATH_MAX, "%s/%s", fallbackdir, FALLBACK_CONFIG_FILE_NAME );
+    if( !compat_file_exists( path ) ) return 0;
   }
 
   doc = xmlReadFile( path, NULL, 0 );
@@ -327,7 +333,6 @@ static int
 read_config_file( settings_info *settings )
 {
   const char *cfgdir; char path[ PATH_MAX ];
-  struct stat stat_info;
   int error;
 
   utils_file file;
@@ -337,14 +342,12 @@ read_config_file( settings_info *settings )
   snprintf( path, PATH_MAX, "%s/%s", cfgdir, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
-  if( stat( path, &stat_info ) ) {
-    if( errno == ENOENT ) {
-      return 0;
-    } else {
-      ui_error( UI_ERROR_ERROR, "couldn't stat '%s': %s", path,
-		strerror( errno ) );
-      return 1;
-    }
+  if( !compat_file_exists( path ) ) {
+    /* Look for the config file in the fallback location, if there is one */
+    const char *fallbackdir = compat_get_fallback_config_path();
+    if( !fallbackdir ) return 0;
+    snprintf( path, PATH_MAX, "%s/%s", fallbackdir, FALLBACK_CONFIG_FILE_NAME );
+    if( !compat_file_exists( path ) ) return 0;
   }
 
   error = utils_read_file( path, &file );

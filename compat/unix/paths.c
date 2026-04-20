@@ -26,12 +26,15 @@
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif				/* #ifdef HAVE_LIBGEN_H */
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "compat.h"
 #include "fuse.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 void get_relative_directory( char *buffer, size_t bufsize );
 
@@ -46,11 +49,51 @@ compat_get_temp_path( void )
 }
 
 const char*
-compat_get_config_path( void )
+compat_get_fallback_config_path( void )
 {
   const char *dir;
   dir = getenv( "HOME" ); if( dir ) return dir;
   return ".";
+}
+
+const char*
+compat_get_config_path( void )
+{
+  static char *config_path = NULL;
+  char path[ PATH_MAX ];
+  const char *xdg_dir;
+
+  if( config_path ) return config_path;
+
+  /* First get $XDG_CONFIG_HOME, falling back to $HOME/.config */
+  xdg_dir = getenv( "XDG_CONFIG_HOME" );
+  if( xdg_dir && xdg_dir[0] ) {
+    strncpy( path, xdg_dir, PATH_MAX - 1 );
+    path[ PATH_MAX - 1 ] = '\0';
+  } else {
+    const char *home = getenv( "HOME" );
+    /* If $HOME is not set return immediately */
+    if( !home ) return ".";
+    snprintf( path, PATH_MAX, "%s/.config", home );
+  }
+
+  /* Create that directory if it doesn't exist */
+  if( mkdir( path, 0700 ) && errno != EEXIST )
+    goto mkdir_err;
+
+  /* Our config is stored inside $XDG_CONFIG_HOME/fuse-emulator */
+  strncat( path, "/fuse-emulator", PATH_MAX - strlen( path ) - 1 );
+  if( mkdir( path, 0700 ) && errno != EEXIST )
+    goto mkdir_err;
+
+  config_path = utils_safe_strdup( path );
+
+  return config_path;
+
+mkdir_err:
+  ui_error( UI_ERROR_ERROR, "couldn't create directory '%s': %s",
+            path, strerror( errno ) );
+  return NULL;
 }
 
 int
