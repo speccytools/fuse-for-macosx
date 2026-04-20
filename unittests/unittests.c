@@ -1023,6 +1023,61 @@ rectangle_test( void )
   TEST_ASSERT( rectangle_inactive[0].x == 5 );
   TEST_ASSERT( rectangle_inactive[0].w == 15 );
 
+  /* --- Test 10 (frame skip): y-merge where source is above inactive --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=3, w=10, h=2} (rows 3-4) */
+  rectangle_add( 3, 0, 10 );
+  rectangle_add( 4, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=0, y=2, w=10, h=1} (row 2) — touches row 3 from above */
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].y == 2 );
+  TEST_ASSERT( rectangle_inactive[0].h == 3 );
+
+  /* --- Test 11 (frame skip): x-merge where source is to the left of inactive --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=5, y=0, w=10, h=3} (columns 5-14) */
+  rectangle_add( 0, 5, 10 );
+  rectangle_add( 1, 5, 10 );
+  rectangle_add( 2, 5, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=0, y=0, w=6, h=3} (columns 0-5) — touches column 5 from left */
+  rectangle_add( 0, 0, 6 );
+  rectangle_add( 1, 0, 6 );
+  rectangle_add( 2, 0, 6 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].x == 0 );
+  TEST_ASSERT( rectangle_inactive[0].w == 15 );
+
+  /* --- Test 12 (frame skip): non-overlapping rects stay as separate entries --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=0, w=5, h=3} */
+  rectangle_add( 0, 0, 5 );
+  rectangle_add( 1, 0, 5 );
+  rectangle_add( 2, 0, 5 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=20, y=10, w=5, h=3} — no overlap in either dimension */
+  rectangle_add( 10, 20, 5 );
+  rectangle_add( 11, 20, 5 );
+  rectangle_add( 12, 20, 5 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 2 );
+
   settings_current.frame_rate = saved_frame_rate;
   return 0;
 }
