@@ -139,6 +139,81 @@ uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
   plot8_fn( x, y, data, ink, paper );
 }
 
+/* Tracking infrastructure for uidisplay_plot16 */
+
+typedef void (*plot16_fn_t)( int x, int y, libspectrum_word data,
+                             libspectrum_byte ink, libspectrum_byte paper );
+
+static plot16_fn_t plot16_fn;
+
+static void
+plot16_null( int x, int y, libspectrum_word data, libspectrum_byte ink,
+             libspectrum_byte paper )
+{
+  /* Do nothing */
+}
+
+static int plot16_count;
+
+struct plot16_record_t {
+  int x;
+  int y;
+  libspectrum_word data;
+  libspectrum_byte ink;
+  libspectrum_byte paper;
+};
+
+static struct plot16_record_t plot16_last_write;
+
+static void
+plot16_count_fn( int x, int y, libspectrum_word data, libspectrum_byte ink,
+                 libspectrum_byte paper )
+{
+  plot16_count++;
+  plot16_last_write.x = x;
+  plot16_last_write.y = y;
+  plot16_last_write.data = data;
+  plot16_last_write.ink = ink;
+  plot16_last_write.paper = paper;
+}
+
+static int
+plot16_assert( int count, int x, int y, libspectrum_word data,
+               libspectrum_byte ink, libspectrum_byte paper )
+{
+  if( plot16_count != count ) {
+    fprintf( stderr, "plot16_count: expected %d, got %d\n",
+             count, plot16_count );
+    return 1;
+  }
+  if( plot16_last_write.x != x ) {
+    fprintf( stderr, "plot16 x: expected %d, got %d\n", x,
+             plot16_last_write.x );
+    return 1;
+  }
+  if( plot16_last_write.y != y ) {
+    fprintf( stderr, "plot16 y: expected %d, got %d\n", y,
+             plot16_last_write.y );
+    return 1;
+  }
+  if( plot16_last_write.data != data ) {
+    fprintf( stderr, "plot16 data: expected 0x%04x, got 0x%04x\n",
+             data, plot16_last_write.data );
+    return 1;
+  }
+  if( plot16_last_write.ink != ink ) {
+    fprintf( stderr, "plot16 ink: expected 0x%02x, got 0x%02x\n",
+             ink, plot16_last_write.ink );
+    return 1;
+  }
+  if( plot16_last_write.paper != paper ) {
+    fprintf( stderr, "plot16 paper: expected 0x%02x, got 0x%02x\n",
+             paper, plot16_last_write.paper );
+    return 1;
+  }
+  return 0;
+}
+
 static int write_if_dirty_count;
 static int write_if_dirty_last_x;
 static int write_if_dirty_last_y;
@@ -184,7 +259,34 @@ test_before( void )
   display_clear_is_dirty();
 
   plot8_fn = plot8_count_fn;
+  plot16_fn = plot16_null;
   plot8_count = 0;
+
+  write_if_dirty_count = 0;
+  write_if_dirty_last_x = -1;
+  write_if_dirty_last_y = -1;
+}
+
+static void
+timex_test_before( libspectrum_byte scld_byte )
+{
+  memset( RAM[0], 0, ARRAY_SIZE( RAM[0] ) );
+  memset( display_last_screen, 0, sizeof( display_last_screen ) );
+  display_clear_maybe_dirty();
+
+  scld_last_dec.byte = scld_byte;
+  plot8_fn = plot8_null;
+  plot16_fn = plot16_null;
+  display_reset_frame_count();
+  display_write_if_dirty = display_write_if_dirty_timex;
+
+  display_frame();
+  display_clear_is_dirty();
+
+  plot8_fn = plot8_count_fn;
+  plot16_fn = plot16_count_fn;
+  plot8_count = 0;
+  plot16_count = 0;
 
   write_if_dirty_count = 0;
   write_if_dirty_last_x = -1;
@@ -360,6 +462,87 @@ no_write_if_modified_area_ahead_of_critical_region( void )
   return 0;
 }
 
+/* display_write_if_dirty_timex() tests */
+
+static int
+timex_lores_no_redraw_if_unchanged( void )
+{
+  /* Arrange: STANDARD mode, all-zero RAM (matches zeroed display_last_screen) */
+  timex_test_before( STANDARD );
+
+  /* Act */
+  display_write_if_dirty_timex( 0, 0 );
+
+  /* Assert: cache hit — no redraw */
+  if( plot8_count ) return 1;
+
+  return 0;
+}
+
+static int
+timex_lores_write_called_for_new_data( void )
+{
+  /* Arrange: STANDARD mode, non-zero pixel and attribute data */
+  timex_test_before( STANDARD );
+  RAM[0][0] = 0x01;
+  RAM[0][6144] = 0x02; /* ink=2, paper=0 */
+
+  /* Act */
+  display_write_if_dirty_timex( 0, 0 );
+
+  /* Assert: plot8 called; cache updated with (mode_data=0x00, attr=0x02, data=0x01) */
+  if( plot8_assert( 1, 4, 24, 0x01, 2, 0 ) ) return 1;
+  if( display_last_screen[ 964 ] != 0x00000201 ) {
+    fprintf( stderr,
+             "display_last_screen[964]: expected 0x201, got 0x%x\n",
+             display_last_screen[ 964 ] );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+timex_mode_change_causes_redraw( void )
+{
+  /* Arrange: draw once in STANDARD mode to prime the cache */
+  timex_test_before( STANDARD );
+  RAM[0][0] = 0x01;
+  RAM[0][6144] = 0x02;
+  display_write_if_dirty_timex( 0, 0 );
+  plot8_count = 0;
+
+  /* Act: change mode_data via SCLD byte (pixel/attr bytes unchanged) */
+  scld_last_dec.byte = 0x40; /* intdisable set; scrnmode still STANDARD */
+  display_write_if_dirty_timex( 0, 0 );
+
+  /* Assert: mode_data differs → cache miss → redraw required */
+  if( plot8_count != 1 ) {
+    fprintf( stderr, "timex_mode_change: expected plot8_count=1, got %d\n",
+             plot8_count );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+timex_hires_plot16_called_with_correct_data( void )
+{
+  /* Arrange: HIRES mode; pixel from first screen, pixel from second screen */
+  timex_test_before( HIRES );
+  RAM[0][0] = 0xAA;
+  RAM[0][ALTDFILE_OFFSET] = 0x55;
+
+  /* Act */
+  display_write_if_dirty_timex( 0, 0 );
+
+  /* Assert: uidisplay_plot16 called with hires_data = (0xAA<<8)|0x55 */
+  if( plot16_assert( 1, 4, 24, 0xAA55, 0, 0 ) ) return 1;
+
+  return 0;
+}
+
 typedef int (*test_fn_t)( void );
 
 struct test_t {
@@ -382,6 +565,16 @@ static const struct test_t tests[] = {
     no_write_if_dirty_area_ahead_of_beam },
   { "no_write_if_modified_area_ahead_of_critical_region",
     no_write_if_modified_area_ahead_of_critical_region },
+
+  /* display_write_if_dirty_timex() tests */
+  { "timex_lores_no_redraw_if_unchanged",
+    timex_lores_no_redraw_if_unchanged },
+  { "timex_lores_write_called_for_new_data",
+    timex_lores_write_called_for_new_data },
+  { "timex_mode_change_causes_redraw",
+    timex_mode_change_causes_redraw },
+  { "timex_hires_plot16_called_with_correct_data",
+    timex_hires_plot16_called_with_correct_data },
 
   /* End marker */
   { NULL, NULL }
@@ -429,9 +622,10 @@ void uidisplay_frame_end( void ) {}
 void uidisplay_putpixel( int x, int y, int colour ) {}
 
 void
-uidisplay_plot16( int x, int y, libspectrum_byte data, libspectrum_byte ink,
+uidisplay_plot16( int x, int y, libspectrum_word data, libspectrum_byte ink,
                   libspectrum_byte paper )
 {
+  plot16_fn( x, y, data, ink, paper );
 }
 
 /* Dummy movie code */
