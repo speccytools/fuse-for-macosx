@@ -250,7 +250,6 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
   *accel_group = NULL;
   *menu_bar = NULL;
   GError *error = NULL;
-  char ui_file[ PATH_MAX ];
 
   ui_manager_menu = gtk_ui_manager_new();
 
@@ -262,14 +261,8 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
   g_object_unref( menu_action_group );
 
   /* Load the UI */
-  if( utils_find_file_path( "menu_data.ui", ui_file, UTILS_AUXILIARY_GTK ) ) {
-    fprintf( stderr, "%s: Error getting path for menu_data.ui\n",
-                     fuse_progname );
-    return TRUE;
-  }
-
-  guint ui_menu_id = gtk_ui_manager_add_ui_from_file( ui_manager_menu, ui_file,
-                                                      &error );
+  guint ui_menu_id =
+      gtk_ui_manager_add_ui_from_resource( ui_manager_menu, GTK_MENU_DATA, &error );
   if( error ) {
     g_error_free( error );
     return TRUE;

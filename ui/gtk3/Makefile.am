@@ -26,11 +26,10 @@ fuse_SOURCES += $(ui_gtk_files)
 
 BUILT_SOURCES += $(ui_gtk_built)
 
-pkgdata_DATA += ui/gtk3/menu_data.ui
-
 endif
 
 gtkui_resource_files = \
+              ui/gtk3/menu_data.ui \
               ui/gtk3/icons/disk_active.png \
               ui/gtk3/icons/disk_inactive.png \
               ui/gtk3/icons/mdr_active.png \
@@ -107,7 +106,7 @@ ui/gtk3/options_internals.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/gt
 	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/gtk3/options-header.pl - > $@.tmp && mv $@.tmp $@
 
 ui/gtk3/resources.c: ui/gtk3/resources.xml $(gtkui_resource_files)
-	$(AM_V_GEN)glib-compile-resources --sourcedir=$(srcdir) --target=$@ --internal --generate-source --c-name=gtkui $<
+	$(AM_V_GEN)glib-compile-resources --sourcedir=$(srcdir) --sourcedir=$(builddir) --target=$@ --internal --generate-source --c-name=gtkui $<
 
 ui/gtk3/resources.h: ui/gtk3/resources.xml $(gtkui_resource_files)
-	$(AM_V_GEN)glib-compile-resources --sourcedir=$(srcdir) --target=$@ --internal --generate-header --c-name=gtkui $<
+	$(AM_V_GEN)glib-compile-resources --sourcedir=$(srcdir) --sourcedir=$(builddir) --target=$@ --internal --generate-header --c-name=gtkui $<

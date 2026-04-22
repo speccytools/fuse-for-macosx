@@ -12,5 +12,6 @@
     <file alias="tape_active.png">ui/gtk3/icons/tape_active.png</file>
     <file alias="tape_inactive.png">ui/gtk3/icons/tape_inactive.png</file>
     <file alias="tape_marker.png">ui/gtk3/icons/tape_marker.png</file>
+    <file alias="menu_data.ui" compressed="true">ui/gtk3/menu_data.ui</file>
   </gresource>
 </gresources>

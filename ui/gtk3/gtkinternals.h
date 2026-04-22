@@ -143,6 +143,7 @@ extern guint gtkui_menu_data_size;
 #define ICON_TAPE_ACTIVE     FUSE_RESOURCE_PREFIX "tape_active.png"
 #define ICON_TAPE_INACTIVE   FUSE_RESOURCE_PREFIX "tape_inactive.png"
 #define ICON_TAPE_MARKER     FUSE_RESOURCE_PREFIX "tape_marker.png"
+#define GTK_MENU_DATA        FUSE_RESOURCE_PREFIX "menu_data.ui"
 
 /*
  * Statusbar routines (statusbar.c)
