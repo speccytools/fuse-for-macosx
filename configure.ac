@@ -410,6 +410,8 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
 fi
 
 if test "$UI" = gtk3; then
+  # GTK3 is in maintenance mode so we can silence the deprecation warnings
+  CPPFLAGS="$CPPFLAGS -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS"
   AC_PATH_XTRA
 fi
 

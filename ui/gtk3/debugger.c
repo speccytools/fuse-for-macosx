@@ -306,9 +306,7 @@ get_pane_menu_item( debugger_pane pane )
   }
 
   gchar *full_path = g_strdup_printf( "/DebuggerMenu%s", path );
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   menu_item = gtk_ui_manager_get_widget( ui_manager_debugger, full_path );
-G_GNUC_END_IGNORE_DEPRECATIONS
   g_free( full_path );
 
   if( !menu_item ) {
@@ -418,7 +416,6 @@ create_menu_bar( GtkBox *parent, GtkAccelGroup **accel_group )
   guint ui_menu_id;
 
   /* FIXME: we should unref this at some point */
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   ui_manager_debugger = gtk_ui_manager_new();
 
   /* Load actions */
@@ -429,29 +426,22 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
                                        ARRAY_SIZE( menu_toggles ), NULL );
   gtk_ui_manager_insert_action_group( ui_manager_debugger, menu_action_group,
                                       0 );
-G_GNUC_END_IGNORE_DEPRECATIONS
-
   g_object_unref( menu_action_group );
 
   /* Load the menu */
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   ui_menu_id = gtk_ui_manager_add_ui_from_string( ui_manager_debugger,
                                                   debugger_menu,
                                                   sizeof( debugger_menu ),
                                                   &error );
-G_GNUC_END_IGNORE_DEPRECATIONS
-
-if( error ) {
+  if( error ) {
     g_error_free( error );
     return 1;
   }
   else if( !ui_menu_id ) return 1;
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   *accel_group = gtk_ui_manager_get_accel_group( ui_manager_debugger );
 
   menu_bar = gtk_ui_manager_get_widget( ui_manager_debugger, "/DebuggerMenu" );
-G_GNUC_END_IGNORE_DEPRECATIONS
 
   gtk_box_pack_start( parent, menu_bar, FALSE, FALSE, 0 );
   
@@ -465,13 +455,11 @@ toggle_display( GtkToggleAction* action, debugger_pane pane_id )
 
   pane = get_pane( pane_id ); if( !pane ) return;
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   if( gtk_toggle_action_get_active( action ) ) {
     gtk_widget_show_all( pane );
   } else {
     gtk_widget_hide( pane );
   }
-G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void

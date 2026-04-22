@@ -252,7 +252,6 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
   GError *error = NULL;
   char ui_file[ PATH_MAX ];
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   ui_manager_menu = gtk_ui_manager_new();
 
   /* Load actions */
@@ -260,9 +259,7 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   gtk_action_group_add_actions( menu_action_group, menu_data, menu_data_size,
                                 NULL );
   gtk_ui_manager_insert_action_group( ui_manager_menu, menu_action_group, 0 );
-G_GNUC_END_IGNORE_DEPRECATIONS
-
-g_object_unref( menu_action_group );
+  g_object_unref( menu_action_group );
 
   /* Load the UI */
   if( utils_find_file_path( "menu_data.ui", ui_file, UTILS_AUXILIARY_GTK ) ) {
@@ -271,24 +268,18 @@ g_object_unref( menu_action_group );
     return TRUE;
   }
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   guint ui_menu_id = gtk_ui_manager_add_ui_from_file( ui_manager_menu, ui_file,
                                                       &error );
-G_GNUC_END_IGNORE_DEPRECATIONS
-
-if( error ) {
+  if( error ) {
     g_error_free( error );
     return TRUE;
   }
   else if( !ui_menu_id ) return TRUE;
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   *accel_group = gtk_ui_manager_get_accel_group( ui_manager_menu );
 
   *menu_bar = gtk_ui_manager_get_widget( ui_manager_menu, "/MainMenu" );
-G_GNUC_END_IGNORE_DEPRECATIONS
-
-g_signal_connect( G_OBJECT( *menu_bar ), "deactivate",
+  g_signal_connect( G_OBJECT( *menu_bar ), "deactivate",
 		    G_CALLBACK( gtkui_menu_deactivate ), NULL );
 
   /* Start various menus in the 'off' state */
@@ -707,10 +698,7 @@ ui_menu_item_set_active( const char *path, int active )
   /* Translate UI-indepentment path to GTK UI path */
   gchar *full_path = g_strdup_printf ("/MainMenu%s", path );
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   menu_item = gtk_ui_manager_get_widget( ui_manager_menu, full_path );
-G_GNUC_END_IGNORE_DEPRECATIONS
-
   g_free( full_path );
 
   if( !menu_item ) {
