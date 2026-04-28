@@ -79,13 +79,12 @@ jobs:
   ########################################
 
   libspectrum-windows:
-    # Reuse libspectrum's build wokflow and artefact (all libs enabled, fake glib)
+    # Build libspectrum from the canonical SourceForge repository.
     name: "Libspectrum lib"
-    uses: arki55/fuse-libspectrum/.github/workflows/build_windows_sub.yml@master
+    uses: ./.github/workflows/build_libspectrum_windows_sub.yml
     with:
-      branch: ${{ inputs.libspectrum_branch }}
       key: fuse-app
-      # repo name is taken from var.LIBSPECTRUM_REPO
+      libspectrum_ref: ${{ inputs.libspectrum_branch }}
 
   ########################################
   ### Make Testing builds for Windows  ###
@@ -167,7 +166,7 @@ jobs:
           cat "$readme_file"
 
       - name: (3) Download all generated files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
 
       - name: (4) Create release with zip files
         uses: ncipollo/release-action@v1

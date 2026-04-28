@@ -6,13 +6,12 @@ on: [pull_request]
 
 jobs:
   libspectrum:
-    # Reuse libspectrum's build wokflow and artefact (all libs enabled, fake glib)
+    # Build libspectrum from the canonical SourceForge repository.
     name: "Libspectrum lib (Windows)"
-    uses: arki55/fuse-libspectrum/.github/workflows/build_windows_sub.yml@arki55/github-workflows
+    uses: ./.github/workflows/build_libspectrum_windows_sub.yml
     with:
-      branch: arki55/github-workflows
       key: fuse-app
-      # repo name is taken from var.LIBSPECTRUM_REPO
+      libspectrum_ref: master
 
 ########################################
 ### SUPPORTED Windows configurations ###

@@ -6,15 +6,14 @@ on: [pull_request]
 
 jobs:
   libspectrum:
-    # Reuse libspectrum's build wokflow and artefact (all libs enabled, real glib)
+    # Build libspectrum from the canonical SourceForge repository.
     name: "Libspectrum lib (MacOS)"
-    uses: arki55/fuse-libspectrum/.github/workflows/build_macos_sub.yml@arki55/github-workflows
+    uses: ./.github/workflows/build_libspectrum_macos_sub.yml
     with:
-      branch: arki55/github-workflows
       key: fuse-app
-      # repo name is taken from var.LIBSPECTRUM_REPO
+      libspectrum_ref: master
 
-  # Default build without any configure params (xlib)
+  # Default build via SDL, which is easier to satisfy on current runners.
   default-ui:
     name: "Fuse Default UI (MacOS)"
     needs: [libspectrum]
@@ -81,18 +80,3 @@ jobs:
       verify_ui: "sdl2"
       verify_audio: "sdl2"
       verify_other: "Using SDL 2: yes"
-
-##########################################
-### DEPRECATED MacOS UI configurations ###
-##########################################
-
-  # XLIB UI (deprecated)
-  xlib-ui:
-    name: "Fuse X-lib UI (MacOS) (deprecated)"
-    needs: [libspectrum]
-    uses: ./.github/workflows/build_macos_sub.yml
-    with:
-      name: X-lib UI (deprecated)
-      dependencies: ""
-      configure_params: "--with-x"
-      verify_ui: "xlib"

@@ -16,6 +16,10 @@ on:
         type: string
         required: false
         default: ""
+      libspectrum_key:
+        type: string
+        required: false
+        default: "fuse-app"
       verify_ui:
         type: string
         required: true
@@ -48,12 +52,12 @@ jobs:
           sudo apt-get install -y ${{ inputs.dependencies }}
 
       - name: (2) Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: (3) Download libspectrum artefact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
         with:
-          name: libspectrum-installed-linux-fuse-app
+          name: libspectrum-installed-linux-${{ inputs.libspectrum_key }}
           path: libspectrum
 
       - name: (4) Install libspectrum from artefact

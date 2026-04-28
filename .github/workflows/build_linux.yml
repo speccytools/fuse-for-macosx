@@ -6,13 +6,21 @@ on: [pull_request]
 
 jobs:
   libspectrum:
-    # Reuse libspectrum's build wokflow and artefact (all libs enabled, real glib)
+    # Build libspectrum from the canonical SourceForge repository.
     name: "Libspectrum lib (Linux)"
-    uses: arki55/fuse-libspectrum/.github/workflows/build_linux_sub.yml@arki55/github-workflows
+    uses: ./.github/workflows/build_libspectrum_linux_sub.yml
     with:
-      branch: arki55/github-workflows
       key: fuse-app
-      # repo name is taken from var.LIBSPECTRUM_REPO
+      libspectrum_ref: master
+      use_fake_glib: true
+
+  libspectrum-gtk:
+    name: "Libspectrum lib for GTK (Linux)"
+    uses: ./.github/workflows/build_libspectrum_linux_sub.yml
+    with:
+      key: fuse-app-gtk
+      libspectrum_ref: master
+      use_fake_glib: false
 
   # Default build without any configure params (xlib)
   default-ui:
@@ -21,7 +29,7 @@ jobs:
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: Default
-      dependencies: "libaudiofile-dev"
+      dependencies: "libaudiofile-dev libgcrypt-dev xorg-dev"
       configure_params: ""
       verify_ui: "xlib"
 
@@ -36,7 +44,7 @@ jobs:
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: "NULL UI"
-      dependencies: "libaudiofile-dev"
+      dependencies: "libaudiofile-dev libgcrypt-dev libpng-dev"
       configure_params: "--with-null-ui"
       verify_ui: "null"
       run_check: true
@@ -44,12 +52,13 @@ jobs:
   # GTK 3 UI
   gtk3-ui:
     name: "Fuse GTK 3 UI (Linux)"
-    needs: [libspectrum]
+    needs: [libspectrum-gtk]
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: GTK3 UI
-      dependencies: "libaudiofile-dev gtk3.0 libgtk-3-dev"
+      dependencies: "libaudiofile-dev libgcrypt-dev gtk3.0 libgtk-3-dev"
       configure_params: "--with-gtk"
+      libspectrum_key: fuse-app-gtk
       verify_ui: "gtk"
       verify_other: "Using GTK 3: yes"
 
@@ -60,7 +69,7 @@ jobs:
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: SDL1 UI
-      dependencies: "libaudiofile-dev libsdl1.2-dev"
+      dependencies: "libaudiofile-dev libgcrypt-dev libsdl1.2-dev libpng-dev"
       configure_params: "--with-sdl --disable-sdl2"
       verify_ui: "sdl"
       verify_audio: "sdl"
@@ -73,7 +82,7 @@ jobs:
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: SDL2 UI
-      dependencies: "libaudiofile-dev libsdl2-dev"
+      dependencies: "libaudiofile-dev libgcrypt-dev libsdl2-dev libpng-dev"
       configure_params: "--with-sdl2"
       verify_ui: "sdl2"
       verify_audio: "sdl2"
@@ -90,7 +99,7 @@ jobs:
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: "FB UI (deprecated)"
-      dependencies: "libaudiofile-dev libgpm-dev"
+      dependencies: "libaudiofile-dev libgpm-dev libgcrypt-dev libpng-dev"
       configure_params: "--with-fb"
       verify_ui: "fb"
 
@@ -101,6 +110,6 @@ jobs:
     uses: ./.github/workflows/build_linux_sub.yml
     with:
       name: X-lib UI (deprecated)
-      dependencies: "libaudiofile-dev"
+      dependencies: "libaudiofile-dev libgcrypt-dev xorg-dev"
       configure_params: "--with-x"
       verify_ui: "xlib"
