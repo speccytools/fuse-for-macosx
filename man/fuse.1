@@ -3447,15 +3447,15 @@ and
 .I "Options, Save"
 .RS
 This will cause Fuse's current options to be written to
-.I .fuserc
-in your home directory (Unix-like systems), or
-.I fuse.cfg
-in your %USERPROFILE% folder (Windows), from which they will be
+a configuration file in your home directory, from which they will be
 picked up again when Fuse is restarted. The best way to update
 this file is by using this option, but it's a simple XML file if
 .I libxml2
 was available when Fuse was compiled (otherwise, plain text), and
 shouldn't be too hard to edit by hand if you really want to.
+See the
+.B "FILES"
+section for more details about location of this file.
 .RE
 .PP
 .I Pause
@@ -5792,7 +5792,28 @@ error messages.
 .\"------------------------------------------------------------------
 .\"
 .SH FILES
-.I "~/.fuserc"
+.I "$XDG_CONFIG_HOME/fuse-emulator/fuserc"
+.RS
+On Unix systems this is the per-user configuration file of Fuse.
+Writing configuration always goes to the XDG location.
+.RE
+.PP
+.I "~/.config/fuse-emulator/fuserc"
+.RS
+If $XDG_CONFIG_HOME is unset, this is the location of the configuration
+file.
+.RE
+.PP
+.I "$HOME/.fuserc"
+.RS
+If neither of previous files exist, reading falls back to this file
+as it was the default location until Fuse 1.7.0.
+.RE
+.PP
+.I "%USERPROFILE%\\\\fuse.cfg"
+.RS
+On Windows system this is the per-user configuration file of Fuse.
+.RE
 .\"
 .\"------------------------------------------------------------------
 .\"
