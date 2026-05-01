@@ -605,7 +605,7 @@ disassemble_ddfd_cb( libspectrum_word address, char offset,
     }
   } else if( b < 0x80 ) {
     ix_iy_offset( buffer2, 40, use_hl, offset );
-    snprintf( buffer, buflen, "BIT %d,%s", ( b >> 3 ) & 0x07, buffer2 );
+    snprintf( buffer, buflen, "%s %d,%s", bit_op( b ), bit_op_bit( b ), buffer2 );
     *length = 1;
   } else {
     if( ( b & 0x07 ) == 0x06 ) {
