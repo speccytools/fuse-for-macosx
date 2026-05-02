@@ -38,6 +38,7 @@
 #import "HIDJoysticks.h"
 
 #import "ScalerNameToIdTransformer.h"
+#import "ScalerSupportsScanlines.h"
 #import "MachineScalerIsEnabled.h"
 #import "MachineNameToIdTransformer.h"
 #import "VolumeSliderToPrefTransformer.h"
@@ -62,6 +63,7 @@
 +(void) initialize
 {
   ScalerNameToIdTransformer *sNToITransformer;
+  ScalerSupportsScanlines *scalerSupportsScanlines;
   MachineScalerIsEnabled *machineScalerIsEnabled;
   MachineNameToIdTransformer *mToITransformer;
   VolumeSliderToPrefTransformer *vsToPTransformer;
@@ -70,6 +72,11 @@
 
   [NSValueTransformer setValueTransformer:sNToITransformer
                                   forName:@"ScalerNameToIdTransformer"];
+
+  scalerSupportsScanlines = [[[ScalerSupportsScanlines alloc] init] autorelease];
+
+  [NSValueTransformer setValueTransformer:scalerSupportsScanlines
+                                  forName:@"ScalerSupportsScanlines"];
 
   machineScalerIsEnabled = [MachineScalerIsEnabled
                                 machineScalerIsEnabledWithInt:1];

@@ -1901,6 +1901,11 @@
                     </buttonCell>
                     <connections>
                         <binding destination="270" name="value" keyPath="values.paltv2x" id="1743"/>
+                        <binding destination="270" name="enabled" keyPath="values.graphicsfilter" id="1790">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">ScalerSupportsScanlines</string>
+                            </dictionary>
+                        </binding>
                     </connections>
                 </button>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
