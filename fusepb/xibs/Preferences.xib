@@ -2023,9 +2023,16 @@
                                     </binding>
                                 </connections>
                             </buttonCell>
-                            <buttonCell type="radio" title="HQ 4x" imagePosition="left" alignment="left" tag="24" inset="2" id="tRv-o9-mGu">
+                            <buttonCell type="radio" title="TV 4x" imagePosition="left" alignment="left" tag="13" inset="2" id="1721">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1791">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
                             </buttonCell>
                         </column>
                         <column>
@@ -2066,6 +2073,17 @@
                                     </binding>
                                 </connections>
                             </buttonCell>
+                            <buttonCell type="radio" title="PAL TV 4x" imagePosition="left" alignment="left" tag="21" inset="2" id="74h-R3-Dsl">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1792">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
                             <buttonCell type="radio" title="HQ 2x" imagePosition="left" alignment="left" tag="22" inset="2" id="1729">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2088,6 +2106,17 @@
                                     </binding>
                                 </connections>
                             </buttonCell>
+                            <buttonCell type="radio" title="HQ 4x" imagePosition="left" alignment="left" tag="24" inset="2" id="tRv-o9-mGu">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1793">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
                             <buttonCell type="radio" title="Dot Matrix" imagePosition="left" alignment="left" tag="15" inset="2" id="1725">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2098,14 +2127,6 @@
                                         </dictionary>
                                     </binding>
                                 </connections>
-                            </buttonCell>
-                            <buttonCell type="radio" title="TV 4x" imagePosition="left" alignment="left" tag="13" inset="2" id="1721">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <buttonCell type="radio" title="PAL TV 4x" imagePosition="left" alignment="left" tag="21" inset="2" id="74h-R3-Dsl">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
                             </buttonCell>
                         </column>
                     </cells>
