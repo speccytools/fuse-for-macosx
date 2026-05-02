@@ -854,10 +854,27 @@ libspectrum_byte test13_data[] = { 0xfd, 0xdd, 0xfd, 0xdd, 0xfd, 0xdd, 0xfd,
 libspectrum_byte test14_data[] = { 0x7e };
 libspectrum_byte test15_data[] = { 0xdd, 0x7e, 0x55 };
 
+/* CB prefix BIT/RES/SET tests */
+libspectrum_byte test16_data[] = { 0xcb, 0x47 };  /* BIT 0,A */
+libspectrum_byte test17_data[] = { 0xcb, 0x87 };  /* RES 0,A */
+libspectrum_byte test18_data[] = { 0xcb, 0xcf };  /* SET 1,A */
+
+/* DD CB prefix: BIT/RES/SET on (IX+d) */
+libspectrum_byte test19_data[] = { 0xdd, 0xcb, 0x55, 0x46 };  /* BIT 0,(IX+55) */
+libspectrum_byte test20_data[] = { 0xdd, 0xcb, 0x55, 0x86 };  /* RES 0,(IX+55) */
+libspectrum_byte test21_data[] = { 0xdd, 0xcb, 0x55, 0xc6 };  /* SET 0,(IX+55) */
+
+/* FD CB prefix: BIT on (IY+d) */
+libspectrum_byte test22_data[] = { 0xfd, 0xcb, 0x55, 0x46 };  /* BIT 0,(IY+55) */
+
+/* DD CB undocumented: LD reg,RES/SET n,(IX+d) — regression for bug #515 fix */
+libspectrum_byte test23_data[] = { 0xdd, 0xcb, 0x55, 0x87 };  /* LD A,RES 0,(IX+55) */
+libspectrum_byte test24_data[] = { 0xdd, 0xcb, 0x55, 0xcf };  /* LD A,SET 1,(IX+55) */
+
 static int
 run_test( libspectrum_byte *data, size_t data_length, const char *expected )
 {
-  char disassembly[16];
+  char disassembly[40];
   size_t length;
 
   memcpy( memory_map_read[8].page, data, data_length );
@@ -895,6 +912,23 @@ debugger_disassemble_unittest( void )
 
   r += run_test( test14_data, sizeof( test14_data ), "LD A,(HL)" );
   r += run_test( test15_data, sizeof( test15_data ), "LD A,(IX+55)" );
+
+  /* CB prefix BIT/RES/SET */
+  r += run_test( test16_data, sizeof( test16_data ), "BIT 0,A" );
+  r += run_test( test17_data, sizeof( test17_data ), "RES 0,A" );
+  r += run_test( test18_data, sizeof( test18_data ), "SET 1,A" );
+
+  /* DD CB prefix BIT/RES/SET on (IX+d) */
+  r += run_test( test19_data, sizeof( test19_data ), "BIT 0,(IX+55)" );
+  r += run_test( test20_data, sizeof( test20_data ), "RES 0,(IX+55)" );
+  r += run_test( test21_data, sizeof( test21_data ), "SET 0,(IX+55)" );
+
+  /* FD CB prefix BIT on (IY+d) */
+  r += run_test( test22_data, sizeof( test22_data ), "BIT 0,(IY+55)" );
+
+  /* DD CB undocumented LD reg,RES/SET n,(IX+d) — regression for bug #515 */
+  r += run_test( test23_data, sizeof( test23_data ), "LD A,RES 0,(IX+55)" );
+  r += run_test( test24_data, sizeof( test24_data ), "LD A,SET 1,(IX+55)" );
 
   return r;
 }
