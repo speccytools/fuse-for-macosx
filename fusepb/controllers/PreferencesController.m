@@ -218,8 +218,25 @@
   // B&W TV status may have changed
   display_refresh_all();
 
-  if( ( ( current_scaler != scaler_get_type(settings_current.start_scaler_mode) )
-          && !scaler_select_id(settings_current.start_scaler_mode) ) ||
+  scaler_type prev_scaler = current_scaler;
+
+  /* Skip silently for unknown ids (e.g. defaults written by an older build
+     with a now-removed scaler) rather than show ui_error from
+     scaler_select_id every time Preferences closes. */
+  int new_scaler = scaler_get_type( settings_current.start_scaler_mode );
+  if( new_scaler >= 0 ) {
+    /* scaler_select_scaler is a no-op when the requested scaler is already
+       current; if it isn't supported on the current machine it returns
+       non-zero and current_scaler is left unchanged. When the scaler does
+       change, the hotswap inside picks up the new bilinear setting via
+       createTexture, so no separate hotswap call is needed for that path. */
+    scaler_select_scaler( new_scaler );
+  }
+
+  /* For bilinear-only changes, the hotswap inside scaler_select_scaler
+     didn't fire; trigger one explicitly so createTexture picks up the new
+     filter. */
+  if( current_scaler == prev_scaler &&
       old_bilinear != settings_current.bilinear_filter ) {
     uidisplay_hotswap_gfx_mode();
   }

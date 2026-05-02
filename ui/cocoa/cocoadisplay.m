@@ -229,6 +229,46 @@ cocoadisplay_allocate_colours( int numColours, uint16_t *colour_values,
   }
 }
 
+/* Resize the emulator window to match the unscaled framebuffer (set by
+   uidisplay_init from per-machine dimensions) times the current scaler
+   factor. Mirrors gtkdisplay_load_gfx_mode's gtk_window_resize call.
+
+   Callers may be on a worker thread (fuse_init runs on the emulator thread
+   spawned by -[Emulator connectWithPorts:]) or the main thread
+   (Preferences close). NSWindow geometry must be touched on the main
+   thread, so dispatch unconditionally to it; the size is captured by the
+   block to avoid reading shared state on the wrong thread. */
+static void
+cocoadisplay_resize_window( void )
+{
+  /* Skip during the very first uidisplay_init so the xib's window size is
+     preserved at launch. Subsequent inits (machine change) and every
+     hotswap will resize. */
+  if( !display_ui_initialised || settings_current.full_screen ) return;
+
+  float factor = scaler_get_scaling_factor( current_scaler );
+  NSSize size = NSMakeSize( image_width * factor, image_height * factor );
+
+  dispatch_async( dispatch_get_main_queue(), ^{
+    /* Re-check after the hop in case the user entered fullscreen between
+       enqueue and execute. */
+    if( settings_current.full_screen ) return;
+
+    /* Preserve the window's perceived centre; setContentSize: would anchor
+       the top-left and drift the centre across repeated scaler changes. */
+    NSWindow *win = [[DisplayOpenGLView instance] window];
+    NSRect old = [win frame];
+    NSRect frame = [win frameRectForContentRect:
+                            NSMakeRect( 0, 0, size.width, size.height )];
+    frame.origin.x = NSMidX( old ) - frame.size.width / 2.0;
+    frame.origin.y = NSMidY( old ) - frame.size.height / 2.0;
+    /* A 4x scaler from a corner-positioned window can otherwise push the
+       title bar off-screen and make the window hard to recover. */
+    frame = [win constrainFrameRect:frame toScreen:[win screen]];
+    [win setFrame:frame display:YES animate:YES];
+  });
+}
+
 int
 uidisplay_init( int width, int height )
 {
@@ -247,6 +287,8 @@ uidisplay_init( int width, int height )
   cocoadisplay_load_gfx_mode();
   [buffered_screen_lock unlock];
 
+  cocoadisplay_resize_window();
+
   /* We can now output error messages to our output device */
   display_ui_initialised = 1;
 
@@ -261,6 +303,27 @@ uidisplay_hotswap_gfx_mode( void )
   /* obtain lock for buffered screen */
   [buffered_screen_lock lock];
 
+  /* Preserve last rendered pixel data so we can repopulate the new surfaces
+     after reallocation, avoiding a black frame during a scaler-only swap.
+     (A swap that follows a machine change still flashes black for one frame
+     because uidisplay_init has just zeroed unscaled_screen.pixels and no
+     emulator frame has run yet.)
+     pixels is NULL on the very first hotswap (before uidisplay_init has run
+     load_gfx_mode) and after uidisplay_end, so the NULL check covers
+     "no valid frame yet". */
+  uint16_t *saved_pixels = NULL;
+  size_t saved_pixels_size = 0;
+  if( unscaled_screen.pixels ) {
+    size_t bytes = (size_t)unscaled_screen.full_width *
+                   unscaled_screen.full_height *
+                   sizeof(uint16_t);
+    saved_pixels = malloc( bytes );
+    if( saved_pixels ) {
+      memcpy( saved_pixels, unscaled_screen.pixels, bytes );
+      saved_pixels_size = bytes;
+    }
+  }
+
   /* Free the old surfaces */
   free_screen( &unscaled_screen );
   free_screen( &scaled_screen );
@@ -269,10 +332,52 @@ uidisplay_hotswap_gfx_mode( void )
   /* Setup the new GFX mode */
   cocoadisplay_load_gfx_mode();
 
+  /* Repopulate the new surfaces under the lock so the display link sees a
+     valid frame the moment the lock is released. Inlines the equivalent of
+     uidisplay_area + uidisplay_frame_end without re-acquiring the lock
+     (NSLock is non-recursive). Skip the restore if the new surface size
+     differs from the saved buffer to avoid a buffer overrun. */
+  if( saved_pixels && unscaled_screen.pixels &&
+      saved_pixels_size == (size_t)unscaled_screen.full_width *
+                           unscaled_screen.full_height *
+                           sizeof(uint16_t) ) {
+    int i;
+    PIG_rect r = { 0, 0, image_width, image_height };
+
+    memcpy( unscaled_screen.pixels, saved_pixels, saved_pixels_size );
+
+    if( current_scaler == SCALER_NORMAL ) {
+      pig_dirty_add( unscaled_screen.dirty, &r );
+    } else {
+      r.w = display_current_size * image_width;
+      r.h = display_current_size * image_height;
+      pig_dirty_add( scaled_screen.dirty, &r );
+      scaler_proc16( unscaled_screen.pixels +
+                       unscaled_screen.image_yoffset * unscaled_screen.pitch +
+                       sizeof(uint16_t) * unscaled_screen.image_xoffset,
+                     unscaled_screen.pitch,
+                     scaled_screen.pixels +
+                       scaled_screen.image_yoffset * scaled_screen.pitch +
+                       sizeof(uint16_t) * scaled_screen.image_xoffset,
+                     scaled_screen.pitch, image_width, image_height );
+    }
+
+    for( i = 0; i < screen->dirty->count; ++i )
+      copy_area( &buffered_screen, screen, screen->dirty->rects + i );
+    pig_dirty_merge( buffered_screen.dirty, screen->dirty );
+
+    unscaled_screen.dirty->count = 0;
+    if( current_scaler != SCALER_NORMAL ) scaled_screen.dirty->count = 0;
+  }
+
   [buffered_screen_lock unlock];
 
+  free( saved_pixels );
+
+  cocoadisplay_resize_window();
+
   fuse_emulation_unpause();
-  
+
   return 0;
 }
 
