@@ -1137,4 +1137,10 @@ display_get_is_dirty( int y )
   return display_is_dirty[y];
 }
 
+libspectrum_dword
+display_get_maybe_dirty( int y )
+{
+  return display_maybe_dirty[y];
+}
+
 #endif          /* #ifdef DISPLAYTEST */

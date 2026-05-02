@@ -54,6 +54,7 @@ void display_clear_maybe_dirty( void );
 void display_clear_is_dirty( void );
 void display_set_maybe_dirty( int y, libspectrum_qword dirty );
 libspectrum_qword display_get_is_dirty( int y );
+libspectrum_dword display_get_maybe_dirty( int y );
 
 /* Various "mocks" for the UI code */
 
@@ -462,6 +463,65 @@ no_write_if_modified_area_ahead_of_critical_region( void )
   return 0;
 }
 
+/* display_dirty_flashing_sinclair() tests */
+
+static int
+flash_dirty_no_flash_attrs( void )
+{
+  int y;
+
+  /* Arrange: all attribute bytes have flash bit clear (RAM zeroed by test_before) */
+
+  /* Act */
+  display_dirty_flashing_sinclair();
+
+  /* Assert: no maybe_dirty bits should be set */
+  for( y = 0; y < DISPLAY_HEIGHT; y++ )
+    if( display_get_maybe_dirty( y ) ) return 1;
+
+  return 0;
+}
+
+static int
+flash_dirty_with_flash_attr_row0_col0( void )
+{
+  int i;
+
+  /* Arrange: set flash bit in attribute for row 0, col 0 (offset 0x1800) */
+  RAM[0][0x1800] = 0x80;
+
+  /* Act */
+  display_dirty_flashing_sinclair();
+
+  /* Assert: all 8 pixel rows for that attribute cell must be dirty at col 0 */
+  for( i = 0; i < 8; i++ )
+    if( !( display_get_maybe_dirty( i ) & 0x01 ) ) return 1;
+
+  /* Row 8 onwards must be clean */
+  for( i = 8; i < DISPLAY_HEIGHT; i++ )
+    if( display_get_maybe_dirty( i ) ) return 1;
+
+  return 0;
+}
+
+static int
+flash_dirty_non_flash_attr( void )
+{
+  int y;
+
+  /* Arrange: non-flash attr at row 0, col 0 (bit 7 clear) */
+  RAM[0][0x1800] = 0x47;
+
+  /* Act */
+  display_dirty_flashing_sinclair();
+
+  /* Assert: no maybe_dirty bits should be set */
+  for( y = 0; y < DISPLAY_HEIGHT; y++ )
+    if( display_get_maybe_dirty( y ) ) return 1;
+
+  return 0;
+}
+
 /* display_write_if_dirty_timex() tests */
 
 static int
@@ -565,6 +625,12 @@ static const struct test_t tests[] = {
     no_write_if_dirty_area_ahead_of_beam },
   { "no_write_if_modified_area_ahead_of_critical_region",
     no_write_if_modified_area_ahead_of_critical_region },
+
+  /* display_dirty_flashing_sinclair() tests */
+  { "flash_dirty_no_flash_attrs", flash_dirty_no_flash_attrs },
+  { "flash_dirty_with_flash_attr_row0_col0",
+    flash_dirty_with_flash_attr_row0_col0 },
+  { "flash_dirty_non_flash_attr", flash_dirty_non_flash_attr },
 
   /* display_write_if_dirty_timex() tests */
   { "timex_lores_no_redraw_if_unchanged",
