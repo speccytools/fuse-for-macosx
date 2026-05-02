@@ -36,6 +36,12 @@
 {
   int isPaused;
   NSTimer* timer;
+  /* Set once in connectWithPorts: on the emulator thread, cleared at
+     teardown. Read from arbitrary callers (typically main) in pause /
+     unpause to decide whether to dispatch the timer-fiddling work
+     cross-thread. volatile so the publish from the emulator thread is
+     observed without relying on incidental barriers in fuse_init. */
+  NSThread* volatile emulatorThread;
   CFAbsoluteTime time;
   float timerInterval;
 

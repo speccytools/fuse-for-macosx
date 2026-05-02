@@ -161,6 +161,11 @@
 
 - (void)showWindow:(id)sender
 {
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
+
   [[DisplayOpenGLView instance] pause];
 
   [machineRomsController setContent:nil];
@@ -176,6 +181,11 @@
 
   [super showWindow:sender];
 
+  /* Pin to the main emulator window. The Joystick sub-dialog adds
+     itself as a child of Preferences when opened, producing a
+     main → Preferences → Joystick chain. */
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
+
   [self setMassStorageType];
   [self setExternalSoundType];
   
@@ -185,12 +195,6 @@
 		 selector:@selector(handleWillClose:)
 			 name:@"NSWindowWillCloseNotification"
 		   object:[self window]];
-
-  [NSApp runModalForWindow:[self window]];
-
-  [machineRomsController setContent:nil];
-  [machineRoms release];
-  machineRoms = nil;
 }
 
 - (void)fixPhantomTypistMode
@@ -219,8 +223,6 @@
 
 - (void)handleWillClose:(NSNotification *)note
 {
-  [NSApp stopModal];
-
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 
   int old_bilinear = settings_current.bilinear_filter;
@@ -273,6 +275,12 @@
     periph_posthook();
     [Emulator endROMScopedAccess:romURLs];
   }
+
+  [machineRomsController setContent:nil];
+  [machineRoms release];
+  machineRoms = nil;
+
+  [[self window] unpinFromParent];
 
   [[DisplayOpenGLView instance] unpause];
 }

@@ -94,14 +94,19 @@
 
 - (void)handleWillClose:(NSNotification *)note
 {
-  [NSApp stopModal];
+  [[NSNotificationCenter defaultCenter]
+    removeObserver:self
+              name:@"NSWindowWillCloseNotification"
+            object:[self window]];
 
   [tableContents removeAllObjects];
   [tableContents release];
-  
+
   tableContents = nil;
-  
+
   [matchList reloadData];
+
+  [[self window] unpinFromParent];
 
   [[DisplayOpenGLView instance] unpause];
 }
@@ -109,6 +114,11 @@
 - (void)showWindow:(id)sender
 {
   NSNotificationCenter *nc;
+
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
 
   nc = [NSNotificationCenter defaultCenter];
   [nc addObserver:self
@@ -120,9 +130,9 @@
 
   [super showWindow:sender];
 
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
+
   [self update_pokefinder];
-  
-  [NSApp runModalForWindow:[self window]];
 }
 
 - (IBAction)search:(id)sender

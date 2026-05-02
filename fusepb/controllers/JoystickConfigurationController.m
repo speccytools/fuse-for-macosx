@@ -154,7 +154,7 @@ static const unsigned int key_menu_count = sizeof( key_menu ) / sizeof( key_menu
 
 - (IBAction)cancel:(id)sender
 {
-  [NSApp stopModal];
+  [[self window] unpinFromParent];
   [[self window] close];
 }
 
@@ -165,7 +165,16 @@ static const unsigned int key_menu_count = sizeof( key_menu ) / sizeof( key_menu
 
   joyNum = [sender tag];
 
+  /* Capture the parent before [super showWindow:] takes key status away. */
+  NSWindow *parent = [NSApp keyWindow];
+
   [super showWindow:sender];
+
+  /* Pin to the parent (Preferences) so this sub-dialog cannot be hidden
+     behind it. Preferences is itself a child of the main emulator window,
+     making this a grandchild — addChildWindow: is the only mechanism that
+     enforces z-order for two windows at the same level. */
+  [[self window] pinAsChildOf:parent];
 
   [joyXAxis removeAllItems];
   [joyYAxis removeAllItems];
@@ -375,8 +384,6 @@ static const unsigned int key_menu_count = sizeof( key_menu ) / sizeof( key_menu
   default:
     assert(0);
   }
-
-  [NSApp runModalForWindow:[self window]];
 }
 
 @end

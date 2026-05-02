@@ -248,3 +248,18 @@
 -(void) doReshape;
 
 @end
+
+/* Helper category used by every utility controller in §Affected Windows
+   (spec 004) to pin its panel to a parent window and reverse that
+   relationship at teardown. Centralizing the reconciliation removes
+   the previously-duplicated 7-line block in seven controllers. */
+@interface NSWindow (FuseChildPinning)
+/* Make `self` a child window of `parent` with NSWindowAbove ordering.
+   If `self` is already a child of `parent`, this is a no-op. If `self`
+   has a different parent, it is detached first. Passing `nil` or
+   `self` for `parent` is a no-op. */
+- (void)pinAsChildOf:(NSWindow *)parent;
+/* Remove `self` from whatever parent it currently has. No-op if there
+   is no parent. */
+- (void)unpinFromParent;
+@end

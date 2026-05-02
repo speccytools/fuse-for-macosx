@@ -164,9 +164,6 @@
 - savePanelAccessoryView;
 @property (getter=saveFileType,readonly) NSPopUpButton* saveFileType;
 
-- (void)releaseCmdKeys:(NSString *)character withCode:(int)keyCode;
-- (void)releaseKey:(int)keyCode;
-
 - (void)ui_menu_activate_media_cartridge:(NSNumber*)active;
 - (void)ui_menu_activate_media_cartridge_dock:(NSNumber*)active;
 - (void)ui_menu_activate_media_cartridge_dock_eject:(NSNumber*)active;

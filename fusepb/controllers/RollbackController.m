@@ -88,23 +88,46 @@ add_point_details( gpointer data, void *user_data );
 
 - (IBAction)cancel:(id)sender
 {
-    [NSApp stopModal];
-    [[self window] close];
+  /* All dismissal paths (OK, Cancel, red X) funnel through
+     handleWillClose: via NSWindowWillCloseNotification, so this just
+     closes the window and lets the observer do the teardown. */
+  [[self window] close];
+}
 
-    [[DisplayOpenGLView instance] unpause];
+- (void)handleWillClose:(NSNotification *)note
+{
+  [[NSNotificationCenter defaultCenter]
+    removeObserver:self
+              name:@"NSWindowWillCloseNotification"
+            object:[self window]];
+
+  [[self window] unpinFromParent];
+
+  [[DisplayOpenGLView instance] unpause];
 }
 
 - (void)showWindow:(id)sender
 {
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
+
   [[DisplayOpenGLView instance] pause];
-  
+
+  [[NSNotificationCenter defaultCenter]
+    addObserver:self
+       selector:@selector(handleWillClose:)
+           name:@"NSWindowWillCloseNotification"
+         object:[self window]];
+
   [super showWindow:sender];
+
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
 
   [self update];
 
   [okButton setEnabled:NO];
-
-  [NSApp runModalForWindow:[self window]];
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)table

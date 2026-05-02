@@ -220,6 +220,32 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Edit" id="1196">
+                    <menu key="submenu" title="Edit" id="1197">
+                        <items>
+                            <menuItem title="Cut" keyEquivalent="x" id="1198">
+                                <connections>
+                                    <action selector="cut:" target="-1" id="1199"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Copy" keyEquivalent="c" id="1200">
+                                <connections>
+                                    <action selector="copy:" target="-1" id="1201"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Paste" keyEquivalent="v" id="1202">
+                                <connections>
+                                    <action selector="paste:" target="-1" id="1203"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Select All" keyEquivalent="a" id="1204">
+                                <connections>
+                                    <action selector="selectAll:" target="-1" id="1205"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="View" id="887">
                     <menu key="submenu" title="View" id="888">
                         <items>

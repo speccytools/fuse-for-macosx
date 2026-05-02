@@ -80,25 +80,30 @@
 
 - (IBAction)cancel:(id)sender
 {
-  [NSApp stopModal];
+  [[self window] unpinFromParent];
   [[self window] close];
-  
+
   [[DisplayOpenGLView instance] unpause];
 }
 
 - (void)showWindow:(id)sender
 {
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
+
   [[DisplayOpenGLView instance] pause];
-  
+
   [super showWindow:sender];
+
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
 
   [file setStringValue:@""];
   [start setStringValue:@""];
   [length setStringValue:@""];
   
   [apply setEnabled:NO];
-
-  [NSApp runModalForWindow:[self window]];
 }
 
 - (IBAction)chooseFile:(id)sender

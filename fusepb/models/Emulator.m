@@ -181,6 +181,8 @@ static Emulator *instance = nil;
 
   pool = [[NSAutoreleasePool alloc] init];
 
+  emulatorThread = [[NSThread currentThread] retain];
+
   serverConnection = [NSConnection
                       connectionWithReceivePort:[portArray objectAtIndex:0]
                       sendPort:[portArray objectAtIndex:1]];
@@ -206,6 +208,9 @@ static Emulator *instance = nil;
   [serverConnection invalidate];
 
   fuse_end();
+
+  [emulatorThread release];
+  emulatorThread = nil;
 
   instance = nil;
   [pool release];
@@ -386,18 +391,36 @@ static Emulator *instance = nil;
 
   if( isPaused++ ) return;
 
-  if( timer != nil ) {
+  if( emulatorThread == nil || [NSThread currentThread] == emulatorThread ) {
     [self stopEmulationTimer];
+  } else {
+    [self performSelector:@selector(stopEmulationTimer)
+                 onThread:emulatorThread
+               withObject:nil
+            waitUntilDone:NO];
   }
 }
 
 -(void) unpause
 {
+  /* Underflow guard: isPaused and fuse_emulation_paused must track the
+     same number of holds. A missing teardown hook should surface as a
+     stuck pause rather than walking both counters into negative
+     territory. */
+  if( isPaused <= 0 ) return;
+
   fuse_emulation_unpause();
 
   if( --isPaused ) return;
 
-  [self startEmulationTimer];
+  if( emulatorThread == nil || [NSThread currentThread] == emulatorThread ) {
+    [self startEmulationTimer];
+  } else {
+    [self performSelector:@selector(startEmulationTimer)
+                 onThread:emulatorThread
+               withObject:nil
+            waitUntilDone:NO];
+  }
 }
 
 -(void) reset
@@ -774,9 +797,13 @@ static Emulator *instance = nil;
 -(void) startEmulationTimer
 {
   if( timer == nil ) {
-    timer = [[NSTimer scheduledTimerWithTimeInterval: timerInterval
-                      target:self selector:@selector(updateEmulation:)
-                      userInfo:self repeats:true] retain];
+    timer = [NSTimer timerWithTimeInterval:timerInterval
+                                   target:self
+                                 selector:@selector(updateEmulation:)
+                                 userInfo:self
+                                  repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    [timer retain];
   }
 }
 

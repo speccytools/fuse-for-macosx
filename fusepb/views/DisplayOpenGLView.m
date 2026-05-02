@@ -177,7 +177,6 @@ static DisplayOpenGLView *instance = nil;
   [view_lock lock];
   statusbar_updated = YES;
   [view_lock unlock];
-  [[FuseController singleton] releaseCmdKeys:@"f" withCode:QZ_f];
 }
 
 -(IBAction) zoom:(id)sender
@@ -188,33 +187,27 @@ static DisplayOpenGLView *instance = nil;
   case 1: /* 320x240 */
     size.width = 320;
     size.height = 240;
-    [[FuseController singleton] releaseCmdKeys:@"1" withCode:QZ_1];
     break;
   case 2: /* 640x480 */
     size.width = 640;
     size.height = 480;
-    [[FuseController singleton] releaseCmdKeys:@"2" withCode:QZ_2];
     break;
   case 3: /* 960x720 */
     size.width = 960;
     size.height = 720;
-    [[FuseController singleton] releaseCmdKeys:@"3" withCode:QZ_3];
     break;
   case 4: /* 1280x960 */
     size.width = 1280;
     size.height = 960;
-    [[FuseController singleton] releaseCmdKeys:@"4" withCode:QZ_4];
     break;
   case 5: /* 1600x1200 */
     size.width = 1600;
     size.height = 1200;
-    [[FuseController singleton] releaseCmdKeys:@"5" withCode:QZ_5];
     break;
   case 0:
   default: /* Actual size */
     size.width = screenTex[0].image_width;
     size.height = screenTex[0].image_height;
-    [[FuseController singleton] releaseCmdKeys:@"0" withCode:QZ_0];
   }
 
   [[self window] setContentSize:size];
@@ -1467,11 +1460,6 @@ static DisplayOpenGLView *instance = nil;
   }
 }
 
--(void) windowDidDeminiaturize:(NSNotification *)inNotification
-{
-  [[FuseController singleton] releaseCmdKeys:@"m" withCode:QZ_m];
-}
-
 -(void) displayLinkStop
 {
   if( displayLinkRunning == YES ) {
@@ -1491,6 +1479,29 @@ static DisplayOpenGLView *instance = nil;
       NSLog( @"error starting displayLink:%d", error );
     }
     displayLinkRunning = YES;
+  }
+}
+
+@end
+
+@implementation NSWindow (FuseChildPinning)
+
+- (void)pinAsChildOf:(NSWindow *)parent
+{
+  if( !parent || parent == self ) return;
+  NSWindow *currentParent = [self parentWindow];
+  if( currentParent == parent ) return;
+  if( currentParent ) {
+    [currentParent removeChildWindow:self];
+  }
+  [parent addChildWindow:self ordered:NSWindowAbove];
+}
+
+- (void)unpinFromParent
+{
+  NSWindow *parent = [self parentWindow];
+  if( parent ) {
+    [parent removeChildWindow:self];
   }
 }
 
