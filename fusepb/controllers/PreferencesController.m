@@ -99,6 +99,12 @@
 
   [NSValueTransformer setValueTransformer:vsToPTransformer
                                   forName:@"VolumeSliderToPrefTransformer"];
+
+  /* Force the saved bilinear flag off so the disabled Bilinear checkbox
+     shows as unchecked rather than checked-but-greyed for users upgrading
+     from a build where they had enabled it. Drop this when the TODO in
+     DisplayOpenGLView.m re-enables the setting. */
+  [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"bilinear"];
 }
 
 - (void)windowDidLoad 
@@ -145,6 +151,12 @@
   NSToolbarItem *item = [[toolbar items] objectAtIndex:[defaults integerForKey:@"preferencestab"]];
   [toolbar setSelectedItemIdentifier:[item itemIdentifier]];
   [self selectPrefPanel:item];
+
+  /* The xib's static enabled="NO" attribute is silently dropped by ibtool
+     for buttons with a value binding (the compiled nib has NSEnabled=true),
+     so disable it here instead. Drop this when the TODO in
+     DisplayOpenGLView.m re-enables bilinear filtering. */
+  [bilinearCheckbox setEnabled:NO];
 }
 
 - (void)showWindow:(id)sender

@@ -22,6 +22,7 @@
                 <outlet property="rom1Filename" destination="1627" id="1783"/>
                 <outlet property="rom2Filename" destination="1629" id="1784"/>
                 <outlet property="rom3Filename" destination="1626" id="1785"/>
+                <outlet property="bilinearCheckbox" destination="1717" id="1789"/>
                 <outlet property="romPrefsView" destination="1582" id="1778"/>
                 <outlet property="rzxPrefsView" destination="1488" id="1779"/>
                 <outlet property="soundPrefsView" destination="1408" id="1780"/>
