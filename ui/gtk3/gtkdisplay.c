@@ -379,7 +379,21 @@ uidisplay_area( int x, int y, int w, int h )
 
 static void gtkdisplay_area(int x, int y, int width, int height)
 {
+  int max_width, max_height;
+
   display_updated = 1;
+
+  if( width <= 0 || height <= 0 ) return;
+
+  max_width = surface ? cairo_image_surface_get_width( surface ) : width;
+  max_height = surface ? cairo_image_surface_get_height( surface ) : height;
+
+  /* Expand the invalidated area slightly to avoid thin seams on scaled GTK
+     redraws where Cairo clips right on a dirty-rect edge. */
+  if( x > 0 ) { x--; width++; }
+  if( y > 0 ) { y--; height++; }
+  if( x + width < max_width ) width++;
+  if( y + height < max_height ) height++;
 
   gtk_widget_queue_draw_area( gtkui_drawing_area, x, y, width, height );
 }
