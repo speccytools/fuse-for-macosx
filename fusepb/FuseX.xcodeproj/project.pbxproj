@@ -317,6 +317,7 @@
 		FE9443D42F882E210059A578 /* spectranext_stdout.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443D32F882E210059A578 /* spectranext_stdout.c */; };
 		FE9443E82F881C540059A578 /* engine_utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443E62F881C540059A578 /* engine_utf8.c */; };
 		FE9443E92F881C540059A578 /* xpath.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443E72F881C540059A578 /* xpath.c */; };
+		FE981C372FA55F84005FE59F /* gdbserver_remote_commands.c in Sources */ = {isa = PBXBuildFile; fileRef = FE981C362FA55F84005FE59F /* gdbserver_remote_commands.c */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C9F2EEF65D6008277BA /* spectranext_controller.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */; };
 		FEC02CA02EEF65D6008277BA /* spectranext.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9D2EEF65D5008277BA /* spectranext.h */; };
@@ -907,6 +908,8 @@
 		FE9443E52F881C540059A578 /* engine_utf8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = engine_utf8.h; sourceTree = "<group>"; };
 		FE9443E62F881C540059A578 /* engine_utf8.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = engine_utf8.c; sourceTree = "<group>"; };
 		FE9443E72F881C540059A578 /* xpath.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xpath.c; sourceTree = "<group>"; };
+		FE981C352FA55F84005FE59F /* gdbserver_remote_commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gdbserver_remote_commands.h; sourceTree = "<group>"; };
+		FE981C362FA55F84005FE59F /* gdbserver_remote_commands.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gdbserver_remote_commands.c; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_controller.c; sourceTree = "<group>"; };
 		FEC02C9D2EEF65D5008277BA /* spectranext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext.h; sourceTree = "<group>"; };
@@ -1286,6 +1289,8 @@
 				D15E8F8C259F5C0B0006FC79 /* arch.h */,
 				D15E8F8D259F5C0B0006FC79 /* gdbserver_utils.c */,
 				D15E8F8E259F5C0B0006FC79 /* gdbserver_utils.h */,
+				FE981C362FA55F84005FE59F /* gdbserver_remote_commands.c */,
+				FE981C352FA55F84005FE59F /* gdbserver_remote_commands.h */,
 				D15E8F91259F5C0B0006FC79 /* gdbserver.c */,
 				D15E8F92259F5C0C0006FC79 /* gdbserver.h */,
 				D15E8F8F259F5C0B0006FC79 /* packets.c */,
@@ -2212,6 +2217,7 @@
 				B6E1F1A114F652E300600EB0 /* pokemem.c in Sources */,
 				B6E1F1A514F653CE00600EB0 /* machines_periph.c in Sources */,
 				B6E1F1AB14F653FB00600EB0 /* speccyboot.c in Sources */,
+				FE981C372FA55F84005FE59F /* gdbserver_remote_commands.c in Sources */,
 				B6E1F1AD14F653FB00600EB0 /* specdrum.c in Sources */,
 				B6E1F1B114F6555400600EB0 /* disciple.c in Sources */,
 				B61700F7163EAFC600142336 /* PokeMemoryController.m in Sources */,

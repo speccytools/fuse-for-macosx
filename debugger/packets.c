@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include "packets.h"
+#include "gdbserver.h"
 
 #include "libspectrum.h"
 
@@ -63,7 +64,9 @@ static void send_ack(void)
     if (gdbserver_client_socket >= 0)
     {
         const char ack = '+';
+        gdbserver_lock_network_write();
         send(gdbserver_client_socket, &ack, 1, 0);
+        gdbserver_unlock_network_write();
     }
 }
 
@@ -73,7 +76,9 @@ static void send_nak(void)
     if (gdbserver_client_socket >= 0)
     {
         const char nak = '-';
+        gdbserver_lock_network_write();
         send(gdbserver_client_socket, &nak, 1, 0);
+        gdbserver_unlock_network_write();
     }
 }
 
@@ -82,6 +87,8 @@ static void send_data(const uint8_t *data, size_t len)
 {
     if (gdbserver_client_socket < 0) return;
     
+    gdbserver_lock_network_write();
+
     size_t write_index = 0;
     while (write_index < len)
     {
@@ -103,15 +110,19 @@ static void send_data(const uint8_t *data, size_t len)
             }
 #endif
             printf("Write error: send() failed\n");
+            gdbserver_unlock_network_write();
             return;
         }
         if (nwritten == 0)
         {
             // Socket closed
+            gdbserver_unlock_network_write();
             return;
         }
         write_index += nwritten;
     }
+
+    gdbserver_unlock_network_write();
 }
 
 // Reset deframer state (also restores buffer pointer/capacity — must match packets_init,

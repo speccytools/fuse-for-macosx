@@ -3,6 +3,7 @@
 
 #include "debugger.h"
 #include "gdbserver.h"
+#include "gdbserver_remote_commands.h"
 #include "packets.h"
 #include "arch.h"
 #include "gdbserver_utils.h"
@@ -36,14 +37,12 @@
 #include <sys/types.h>
 #include <semaphore.h>
 
-typedef uint8_t (*trapped_action_t)(const void* data, void* response);
-
 static int gdbserver_socket;
 int gdbserver_client_socket = -1;  // Made non-static so packets.c can access it
 uint8_t tmpbuf[0x20000];  // Made non-static so vfile_ext.c can access it
 static volatile char gdbserver_trapped = 0;
-static volatile char gdbserver_do_not_report_trap = 0;
 static int gdbserver_port = 0;
+static int gdbserver_last_trap_reason = DEBUG_TRAP_REASON_SIGNAL_RECEIVED;
 
 static pthread_t network_thread_id;
 static trapped_action_t scheduled_action = NULL;
@@ -54,7 +53,9 @@ static uint8_t scheduled_action_response_delivered = 0;
 static pthread_cond_t trapped_cond;
 static pthread_cond_t response_cond;
 static pthread_mutex_t trap_process_mutex;
-static pthread_mutex_t network_mutex;
+static pthread_mutex_t network_read_mutex;
+static pthread_mutex_t network_write_mutex;
+static int gdbserver_reset_event = -1;
 
 /** vSpectranext autoboot: if true at machine_reset, apply ram mount + autoboot once, then clear. */
 static bool spectranext_autoboot = false;
@@ -77,7 +78,38 @@ static libspectrum_word* registers[] = {
 };
 
 static uint8_t gdbserver_detrap();
-static uint8_t gdbserver_execute_on_main_thread(trapped_action_t call, const void* data, void* response);
+static void gdbserver_send_stop_reply(int trap_reason);
+
+void gdbserver_lock_network_write(void)
+{
+    pthread_mutex_lock(&network_write_mutex);
+}
+
+void gdbserver_unlock_network_write(void)
+{
+    pthread_mutex_unlock(&network_write_mutex);
+}
+
+static void gdbserver_send_stop_reply(int trap_reason)
+{
+    char tbuf[64];
+    int signal;
+
+    switch (trap_reason)
+    {
+        case DEBUG_TRAP_REASON_BREAKPOINT:
+            signal = 5;  /* SIGTRAP */
+            break;
+        case DEBUG_TRAP_REASON_SIGNAL_RECEIVED:
+        case DEBUG_TRAP_REASON_OTHER:
+        default:
+            signal = 2;  /* SIGINT */
+            break;
+    }
+
+    sprintf(tbuf, "T%02xthread:p%02x.%02x;", signal, 1, 1);
+    packet_send_message((const uint8_t*)tbuf, strlen(tbuf));
+}
 
 static uint8_t action_get_registers(const void* arg, void* response);
 static uint8_t action_set_registers(const void* arg, void* response);
@@ -88,7 +120,6 @@ static uint8_t action_set_register(const void* arg, void* response);
 static uint8_t action_set_breakpoint(const void* arg, void* response);
 static uint8_t action_remove_breakpoint(const void* arg, void* response);
 static uint8_t action_step_instruction(const void* arg, void* response);
-static uint8_t action_reset(const void* arg, void* response);
 static uint8_t action_autoboot(const void* arg, void* response);
 
 struct action_mem_args_t {
@@ -113,6 +144,75 @@ struct action_breakpoint_args_t {
     size_t maddr, mlen;
 };
 
+void gdbserver_send_remote_console_output(const char *text)
+{
+    size_t len = strlen(text);
+
+    if (gdbserver_client_socket == -1 || !gdbserver_debugging_enabled)
+        return;
+
+    if (1 + len * 2 >= sizeof(tmpbuf))
+        len = (sizeof(tmpbuf) - 1) / 2;
+
+    tmpbuf[0] = 'O';
+    mem2hex((const uint8_t *)text, (char *)&tmpbuf[1], (int)len);
+    packet_send_message(tmpbuf, 1 + len * 2);
+}
+
+static int decode_remote_command(const char *hex_command, char *command, size_t command_size)
+{
+    size_t hex_len = strlen(hex_command);
+
+    if ((hex_len & 1) != 0)
+        return 0;
+
+    if (hex_len / 2 >= command_size)
+        return 0;
+
+    hex2mem(hex_command, (uint8_t *)command, (int)(hex_len / 2));
+    command[hex_len / 2] = '\0';
+    return 1;
+}
+
+static void process_remote_command(const char *hex_command)
+{
+    const struct remote_command_entry_t *entry;
+    char command[256];
+
+    if (!decode_remote_command(hex_command, command, sizeof(command))) {
+        packet_send_message((const uint8_t *)"E01", 3);
+        return;
+    }
+
+    for (entry = remote_commands; entry->name; entry++) {
+        if (!strcmp(command, entry->name)) {
+            if (entry->handler())
+                packet_send_message((const uint8_t *)"E01", 3);
+            else
+                packet_send_message((const uint8_t *)"OK", 2);
+            return;
+        }
+    }
+
+    packet_send_message((const uint8_t *)"E04", 3);
+}
+
+static void gdbserver_reset_event_fn(libspectrum_dword event_time, int type,
+                                     void *user_data)
+{
+    (void)event_time;
+    (void)type;
+    (void)user_data;
+
+    machine_reset(0);
+}
+
+uint8_t gdbserver_reset_via_remote_command(void)
+{
+    gdbserver_schedule_reset();
+    return 0;
+}
+
 static void process_xfer(const char *name, char *args)
 {
   const char *mode = args;
@@ -131,6 +231,11 @@ static void process_query(char *payload)
 {
     const char *name;
     char *args;
+
+    if (payload == strstr(payload, "Rcmd,")) {
+        process_remote_command(payload + 5);
+        return;
+    }
 
     args = strchr(payload, ':');
     if (args)
@@ -464,13 +569,11 @@ uint8_t process_packet()
         {
             if (gdbserver_trapped)
             {
-                char tbuf[64];
-                sprintf(tbuf, "T%02xthread:p%02x.%02x;", 5, 1, 1);
-                packet_send_message((const uint8_t*)tbuf, strlen(tbuf));
+                gdbserver_send_stop_reply(gdbserver_last_trap_reason);
             }
             else
             {
-                packet_send_message((const uint8_t*)"OK", 2);
+                debugger_mode = DEBUGGER_MODE_HALTED;
             }
             break;
         }
@@ -486,18 +589,18 @@ uint8_t process_packet()
 
 static int process_network(int socket)
 {
-    pthread_mutex_lock(&network_mutex);
+    pthread_mutex_lock(&network_read_mutex);
     
     // Read raw bytes from socket
     int bytes_read = packets_read_socket(socket);
     if (bytes_read < 0)
     {
-        pthread_mutex_unlock(&network_mutex);
+        pthread_mutex_unlock(&network_read_mutex);
         return -1;  // Error or EOF
     }
     if (bytes_read == 0)
     {
-        pthread_mutex_unlock(&network_mutex);
+        pthread_mutex_unlock(&network_read_mutex);
         return 0;  // No data available
     }
     
@@ -519,7 +622,7 @@ static int process_network(int socket)
             
             // Clear consumed bytes
             packets_clear_incoming_raw();
-            pthread_mutex_unlock(&network_mutex);
+            pthread_mutex_unlock(&network_read_mutex);
             return 0;
         }
         else if (result == PACKETS_FEED_INTERRUPT)
@@ -535,7 +638,7 @@ static int process_network(int socket)
     
     // All bytes consumed but no complete packet yet
     packets_clear_incoming_raw();
-    pthread_mutex_unlock(&network_mutex);
+    pthread_mutex_unlock(&network_read_mutex);
   
     return 0;
 }
@@ -549,11 +652,11 @@ static void* network_thread(void* arg)
             timeout.tv_sec = 0;
             timeout.tv_usec = 500000;
 
-            pthread_mutex_lock(&network_mutex);
+            pthread_mutex_lock(&network_read_mutex);
             
             if (gdbserver_socket < 0)
             {
-                pthread_mutex_unlock(&network_mutex);
+                pthread_mutex_unlock(&network_read_mutex);
                 break;
             }
             
@@ -563,10 +666,10 @@ static void* network_thread(void* arg)
 
             if (select(gdbserver_socket + 1, &set, NULL, NULL, &timeout) <= 0)
             {
-                pthread_mutex_unlock(&network_mutex);
+                pthread_mutex_unlock(&network_read_mutex);
                 continue;
             }
-            pthread_mutex_unlock(&network_mutex);
+            pthread_mutex_unlock(&network_read_mutex);
         }
 
         socklen_t socklen;
@@ -592,17 +695,6 @@ static void* network_thread(void* arg)
         // Reset packets subsystem for new connection
         packets_reset();
         packets_clear_incoming_raw();
-        gdbserver_do_not_report_trap = 1;
-        debugger_mode = DEBUGGER_MODE_HALTED;
-
-        // property wait for it to trap
-        pthread_mutex_lock(&trap_process_mutex);
-        while (!gdbserver_trapped)
-        {
-            pthread_cond_wait(&trapped_cond, &trap_process_mutex);
-        }
-        pthread_mutex_unlock(&trap_process_mutex);
-
     
         int ret;
         while ((ret = process_network(gdbserver_client_socket)) == 0) ;
@@ -624,10 +716,13 @@ void gdbserver_init()
     pthread_cond_init(&trapped_cond, NULL);
     pthread_cond_init(&response_cond, NULL);
     pthread_mutex_init(&trap_process_mutex, NULL);
-    pthread_mutex_init(&network_mutex, NULL);
+    pthread_mutex_init(&network_read_mutex, NULL);
+    pthread_mutex_init(&network_write_mutex, NULL);
     
     // Initialize packets subsystem
     packets_init();
+    gdbserver_reset_event =
+      event_register(gdbserver_reset_event_fn, "GDB server reset");
     
     gdbserver_refresh_status();
 }
@@ -737,14 +832,14 @@ void gdbserver_stop()
         return;
     }
 
-    pthread_mutex_lock(&network_mutex);
+    pthread_mutex_lock(&network_read_mutex);
     if (gdbserver_socket != -1)
     {
         compat_socket_close(gdbserver_socket);
         gdbserver_socket = -1;
     }
     
-    pthread_mutex_unlock(&network_mutex);
+    pthread_mutex_unlock(&network_read_mutex);
 
     gdbserver_debugging_enabled = 0;
     pthread_join(network_thread_id, NULL);
@@ -753,7 +848,8 @@ void gdbserver_stop()
 
 void gdbserver_schedule_reset(void)
 {
-    gdbserver_execute_on_main_thread(action_reset, NULL, NULL);
+    if (gdbserver_reset_event >= 0)
+        event_add(tstates + 1, gdbserver_reset_event);
 }
 
 void gdbserver_schedule_autoboot(void)
@@ -821,7 +917,7 @@ static uint8_t gdbserver_detrap()
 // schedule a simple job (call) on the main thread, while it's trapped
 // data and response are supposed to be located on the stack of the caller (network) thread,
 // as it's going to be stopped until the response is there
-static uint8_t gdbserver_execute_on_main_thread(trapped_action_t call, const void* data, void* response)
+uint8_t gdbserver_execute_on_main_thread(trapped_action_t call, const void* data, void* response)
 {
     pthread_mutex_lock(&trap_process_mutex);
 
@@ -1013,14 +1109,6 @@ static uint8_t action_remove_breakpoint(const void* arg, void* response)
     return 0;
 }
 
-static uint8_t action_reset(const void* arg, void* response)
-{
-    (void)arg;
-    (void)response;
-    machine_reset(0);
-    return 0;
-}
-
 void gdbserver_on_machine_reset(void)
 {
 #ifdef BUILD_SPECTRANET
@@ -1080,31 +1168,11 @@ int gdbserver_activate()
 
 int gdbserver_activate_with_reason(int trap_reason)
 {
-    // printf("Execution stopped: trapped.\n");
-
-    if (gdbserver_do_not_report_trap == 0)
-    {
-        // notify the gdb client that we have trapped
-        char tbuf[64];
-        int signal;
-        switch (trap_reason)
-        {
-            case DEBUG_TRAP_REASON_BREAKPOINT:
-                signal = 5;  // SIGTRAP
-                break;
-            case DEBUG_TRAP_REASON_SIGNAL_RECEIVED:
-            case DEBUG_TRAP_REASON_OTHER:
-            default:
-                signal = 2;  // SIGINT
-                break;
-        }
-        sprintf(tbuf, "T%02xthread:p%02x.%02x;", signal, 1, 1);
-        packet_send_message((const uint8_t*)tbuf, strlen(tbuf));
-    }
+    if (gdbserver_client_socket != -1 && gdbserver_debugging_enabled)
+        gdbserver_send_stop_reply(trap_reason);
 
     pthread_mutex_lock(&trap_process_mutex);
-  
-    gdbserver_do_not_report_trap = 0;
+    gdbserver_last_trap_reason = trap_reason;
     gdbserver_trapped = 1;
     pthread_cond_signal(&trapped_cond);
   
