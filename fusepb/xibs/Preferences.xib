@@ -22,6 +22,7 @@
                 <outlet property="rom1Filename" destination="1627" id="1783"/>
                 <outlet property="rom2Filename" destination="1629" id="1784"/>
                 <outlet property="rom3Filename" destination="1626" id="1785"/>
+                <outlet property="bilinearCheckbox" destination="1717" id="1789"/>
                 <outlet property="romPrefsView" destination="1582" id="1778"/>
                 <outlet property="rzxPrefsView" destination="1488" id="1779"/>
                 <outlet property="soundPrefsView" destination="1408" id="1780"/>
@@ -1901,6 +1902,11 @@
                     </buttonCell>
                     <connections>
                         <binding destination="270" name="value" keyPath="values.paltv2x" id="1743"/>
+                        <binding destination="270" name="enabled" keyPath="values.graphicsfilter" id="1790">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">ScalerSupportsScanlines</string>
+                            </dictionary>
+                        </binding>
                     </connections>
                 </button>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
@@ -2018,9 +2024,16 @@
                                     </binding>
                                 </connections>
                             </buttonCell>
-                            <buttonCell type="radio" title="HQ 4x" imagePosition="left" alignment="left" tag="24" inset="2" id="tRv-o9-mGu">
+                            <buttonCell type="radio" title="TV 4x" imagePosition="left" alignment="left" tag="13" inset="2" id="1721">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1791">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
                             </buttonCell>
                         </column>
                         <column>
@@ -2061,6 +2074,17 @@
                                     </binding>
                                 </connections>
                             </buttonCell>
+                            <buttonCell type="radio" title="PAL TV 4x" imagePosition="left" alignment="left" tag="21" inset="2" id="74h-R3-Dsl">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1792">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
                             <buttonCell type="radio" title="HQ 2x" imagePosition="left" alignment="left" tag="22" inset="2" id="1729">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2083,6 +2107,17 @@
                                     </binding>
                                 </connections>
                             </buttonCell>
+                            <buttonCell type="radio" title="HQ 4x" imagePosition="left" alignment="left" tag="24" inset="2" id="tRv-o9-mGu">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1793">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
                             <buttonCell type="radio" title="Dot Matrix" imagePosition="left" alignment="left" tag="15" inset="2" id="1725">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -2093,14 +2128,6 @@
                                         </dictionary>
                                     </binding>
                                 </connections>
-                            </buttonCell>
-                            <buttonCell type="radio" title="TV 4x" imagePosition="left" alignment="left" tag="13" inset="2" id="1721">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <buttonCell type="radio" title="PAL TV 4x" imagePosition="left" alignment="left" tag="21" inset="2" id="74h-R3-Dsl">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="system"/>
                             </buttonCell>
                         </column>
                     </cells>

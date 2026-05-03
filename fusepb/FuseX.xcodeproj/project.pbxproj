@@ -119,6 +119,7 @@
 		B61F468B09121DF100C8096C /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = B650F73F07E7CD3F00E4F3AF /* PreferencesController.m */; };
 		B61F468C09121DF100C8096C /* ScalerNameToIdTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3C1507ED1C9D0045339F /* ScalerNameToIdTransformer.m */; };
 		B61F468D09121DF100C8096C /* MachineScalerIsEnabled.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3C5007ED34530045339F /* MachineScalerIsEnabled.m */; };
+		B61F46A009121DF100C8096C /* ScalerSupportsScanlines.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */; };
 		B61F468E09121DF100C8096C /* MachineNameToIdTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3CC407EE0A130045339F /* MachineNameToIdTransformer.m */; };
 		B61F468F09121DF100C8096C /* CAMachines.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CC83000800E408006EFFB9 /* CAMachines.m */; };
 		B61F469009121DF100C8096C /* Joysticks.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C740DA0810BB0500AB170C /* Joysticks.m */; };
@@ -562,6 +563,8 @@
 		B67DC2180B63835100FA31B6 /* cocoastatusbar.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = cocoastatusbar.m; sourceTree = "<group>"; };
 		B67F3C1407ED1C9D0045339F /* ScalerNameToIdTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ScalerNameToIdTransformer.h; path = transformers/ScalerNameToIdTransformer.h; sourceTree = SOURCE_ROOT; };
 		B67F3C1507ED1C9D0045339F /* ScalerNameToIdTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ScalerNameToIdTransformer.m; path = transformers/ScalerNameToIdTransformer.m; sourceTree = SOURCE_ROOT; };
+		B67F3D0007ED1C9D0045339F /* ScalerSupportsScanlines.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ScalerSupportsScanlines.h; path = transformers/ScalerSupportsScanlines.h; sourceTree = SOURCE_ROOT; };
+		B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ScalerSupportsScanlines.m; path = transformers/ScalerSupportsScanlines.m; sourceTree = SOURCE_ROOT; };
 		B67F3C4F07ED34530045339F /* MachineScalerIsEnabled.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MachineScalerIsEnabled.h; path = transformers/MachineScalerIsEnabled.h; sourceTree = SOURCE_ROOT; };
 		B67F3C5007ED34530045339F /* MachineScalerIsEnabled.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MachineScalerIsEnabled.m; path = transformers/MachineScalerIsEnabled.m; sourceTree = SOURCE_ROOT; };
 		B67F3CC307EE0A130045339F /* MachineNameToIdTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MachineNameToIdTransformer.h; path = transformers/MachineNameToIdTransformer.h; sourceTree = SOURCE_ROOT; };
@@ -1260,6 +1263,8 @@
 				B67F3C5007ED34530045339F /* MachineScalerIsEnabled.m */,
 				B67F3C1407ED1C9D0045339F /* ScalerNameToIdTransformer.h */,
 				B67F3C1507ED1C9D0045339F /* ScalerNameToIdTransformer.m */,
+				B67F3D0007ED1C9D0045339F /* ScalerSupportsScanlines.h */,
+				B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */,
 				B66D6C9608115FC200FAE6F3 /* VolumeSliderToPrefTransformer.h */,
 				B66D6C9708115FC200FAE6F3 /* VolumeSliderToPrefTransformer.m */,
 			);
@@ -2093,6 +2098,7 @@
 				B61F468B09121DF100C8096C /* PreferencesController.m in Sources */,
 				B61F468C09121DF100C8096C /* ScalerNameToIdTransformer.m in Sources */,
 				B61F468D09121DF100C8096C /* MachineScalerIsEnabled.m in Sources */,
+				B61F46A009121DF100C8096C /* ScalerSupportsScanlines.m in Sources */,
 				B61F468E09121DF100C8096C /* MachineNameToIdTransformer.m in Sources */,
 				B61F468F09121DF100C8096C /* CAMachines.m in Sources */,
 				B61F469009121DF100C8096C /* Joysticks.m in Sources */,

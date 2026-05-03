@@ -688,7 +688,12 @@ static DisplayOpenGLView *instance = nil;
                      GL_STORAGE_CACHED_APPLE );
     glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
 #endif
-    GLint filter = settings_current.bilinear_filter ? GL_LINEAR : GL_NEAREST;
+    /* TODO: honour settings_current.bilinear_filter again and re-enable the
+       Bilinear checkbox in PreferencesController -awakeFromNib once
+       bilinear filtering is fully working. Hard-coded to nearest-neighbour
+       for now so the broken path is not reached for users with the setting
+       saved on. */
+    GLint filter = GL_NEAREST;
     glTexParameteri( GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, filter );
     glTexParameteri( GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, filter );
     glTexParameteri( GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );

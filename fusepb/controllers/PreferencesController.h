@@ -48,6 +48,7 @@
   IBOutlet NSView *machinePrefsView;
   IBOutlet NSView *filterPrefsView;
   IBOutlet NSView *debuggerPrefsView;
+  IBOutlet NSButton *bilinearCheckbox;
 
   JoystickConfigurationController *joystickConfigurationController;
 
