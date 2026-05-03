@@ -120,7 +120,6 @@ static uint8_t action_set_register(const void* arg, void* response);
 static uint8_t action_set_breakpoint(const void* arg, void* response);
 static uint8_t action_remove_breakpoint(const void* arg, void* response);
 static uint8_t action_step_instruction(const void* arg, void* response);
-static uint8_t action_autoboot(const void* arg, void* response);
 
 struct action_mem_args_t {
     size_t maddr, mlen;
@@ -854,7 +853,8 @@ void gdbserver_schedule_reset(void)
 
 void gdbserver_schedule_autoboot(void)
 {
-    gdbserver_execute_on_main_thread(action_autoboot, NULL, NULL);
+    spectranext_autoboot = true;
+    event_add(tstates + 1, gdbserver_reset_event);
 }
 
 void gdbserver_refresh_status()
@@ -1123,17 +1123,6 @@ void gdbserver_on_machine_reset(void)
         spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_AUTO_BOOT, 0);
     }
 #endif
-}
-
-static uint8_t action_autoboot(const void* arg, void* response)
-{
-    (void)arg;
-    (void)response;
-
-    spectranext_autoboot = true;
-    xfs_reset();
-    machine_reset(0);
-    return 0;
 }
 
 static uint8_t action_step_instruction(const void* arg, void* response)
