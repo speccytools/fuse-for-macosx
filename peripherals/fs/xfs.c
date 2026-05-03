@@ -702,6 +702,38 @@ void xfs_handle_lseek(struct xfs_registers_t* registers)
     }
 }
 
+void xfs_handle_umount(struct xfs_registers_t* registers)
+{
+    const int mount_point = registers->mount_point;
+
+    if (mount_point < 0 || mount_point >= 4)
+    {
+        XFS_DEBUG("xfs: umount failed: invalid mount_point=%d\n", mount_point);
+        registers->result = XFS_ERR_INVAL;
+        registers->status = XFS_STATUS_ERROR;
+        return;
+    }
+
+    if (xfs_mounted_engines[mount_point].engine == NULL)
+    {
+        XFS_DEBUG("xfs: umount mount_point=%d (already idle)\n", mount_point);
+        registers->result = 0;
+        registers->status = XFS_STATUS_COMPLETE;
+        return;
+    }
+
+    struct xfs_engine_t* const eng = xfs_mounted_engines[mount_point].engine;
+    if (eng->unmount)
+        eng->unmount(eng, &xfs_mounted_engines[mount_point]);
+
+    xfs_mounted_engines[mount_point].engine = NULL;
+
+    XFS_DEBUG("xfs: umount success mount_point=%d\n", mount_point);
+    registers->result = 0;
+    registers->status = XFS_STATUS_COMPLETE;
+}
+
+
 /**
  * Handle XFS command dispatch
  * This function processes a command from the registers and dispatches to the appropriate handler
@@ -797,6 +829,11 @@ void xfs_handle_command(struct xfs_registers_t* registers)
             case XFS_CMD_LSEEK:
             {
                 xfs_handle_lseek(registers);
+                break;
+            }
+            case XFS_CMD_UNMOUNT:
+            {
+                xfs_handle_umount(registers);
                 break;
             }
             default:

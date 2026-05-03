@@ -65,6 +65,7 @@ enum xfs_whence_flags {
 #define XFS_CMD_GETCWD (14)
 #define XFS_CMD_RENAME (15)
 #define XFS_CMD_LSEEK (16)
+#define XFS_CMD_UNMOUNT (17)
 
 #define XFS_STATUS_IDLE (0)
 #define XFS_STATUS_BUSY (1)
@@ -303,6 +304,7 @@ extern bool xfs_debug_is_enabled(void);
 extern void xfs_handle_command(struct xfs_registers_t* registers);
 extern void xfs_free(void);
 extern void xfs_handle_mount(struct xfs_registers_t* registers);
+extern void xfs_handle_umount(struct xfs_registers_t* registers);
 
 // Mounted engines array (shared between task and emulator)
 extern struct xfs_engine_mount_t xfs_mounted_engines[4];
