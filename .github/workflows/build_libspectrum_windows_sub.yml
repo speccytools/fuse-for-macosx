@@ -223,7 +223,7 @@ jobs:
           -C /usr/local/i686-w64-mingw32/ .
 
       - name: (15) Upload generated tar file
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v8
         with:
           name: libspectrum-installed-windows-${{ inputs.key }}
           path: |

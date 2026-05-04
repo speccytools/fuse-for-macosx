@@ -139,7 +139,7 @@ jobs:
           -C /usr/local/ -T.tar_files
 
       - name: (12) Upload generated tar file
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v8
         with:
           name: libspectrum-installed-linux-${{ inputs.key }}
           path: |

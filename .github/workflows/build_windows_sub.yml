@@ -495,7 +495,7 @@ jobs:
 
       - name: (11) Upload generated artifact(s)
         if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v8
         with: 
           name: ${{ steps.rename-files.outputs.FUSE_DISTR_BASE }}
           if-no-files-found: error
