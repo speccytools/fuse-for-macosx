@@ -545,6 +545,130 @@ flash_dirty_non_flash_attr( void )
   return 0;
 }
 
+/* display_dirty_flashing_timex() tests */
+
+static void
+timex_flash_test_before( libspectrum_byte scld_byte )
+{
+  test_before();
+  scld_last_dec.byte = scld_byte;
+}
+
+static int
+timex_flash_hires_skips_flashing( void )
+{
+  int y;
+
+  /* Arrange: hires mode; set flash bits in both screen areas */
+  timex_flash_test_before( HIRES );
+  RAM[0][ALTDFILE_OFFSET] = 0x80;
+  RAM[0][0x3800] = 0x80;
+
+  /* Act */
+  display_dirty_flashing_timex();
+
+  /* Assert: hires path is a no-op — no maybe_dirty bits should be set */
+  for( y = 0; y < DISPLAY_HEIGHT; y++ )
+    if( display_get_maybe_dirty( y ) ) return 1;
+
+  return 0;
+}
+
+static int
+timex_flash_b1_no_attrs_clean( void )
+{
+  int y;
+
+  /* Arrange: b1 mode, no flash bytes in alternate pixel area (RAM zeroed) */
+  timex_flash_test_before( 0x02 ); /* b1=1, hires=0, altdfile=0 */
+
+  /* Act */
+  display_dirty_flashing_timex();
+
+  /* Assert: no maybe_dirty bits set */
+  for( y = 0; y < DISPLAY_HEIGHT; y++ )
+    if( display_get_maybe_dirty( y ) ) return 1;
+
+  return 0;
+}
+
+static int
+timex_flash_b1_marks_dirty( void )
+{
+  /* Arrange: b1 mode; set flash bit at first byte of second screen pixel area */
+  timex_flash_test_before( 0x02 ); /* b1=1, hires=0, altdfile=0 */
+  RAM[0][ALTDFILE_OFFSET] = 0x80;  /* offset 0x2000, maps to pixel row 0, col 0 */
+
+  /* Act */
+  display_dirty_flashing_timex();
+
+  /* Assert: pixel row 0, col 0 must be marked dirty */
+  if( !( display_get_maybe_dirty( 0 ) & 0x01 ) ) {
+    fprintf( stderr,
+             "timex_flash_b1_marks_dirty: expected maybe_dirty[0] bit 0 set\n" );
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+timex_flash_altdfile_marks_dirty( void )
+{
+  int i;
+
+  /* Arrange: altdfile mode; flash attr at row 0, col 0 of second screen */
+  timex_flash_test_before( ALTDFILE ); /* altdfile=1, b1=0, hires=0 */
+  RAM[0][0x3800] = 0x80;              /* second screen attr area, row 0 col 0 */
+
+  /* Act */
+  display_dirty_flashing_timex();
+
+  /* Assert: all 8 pixel rows for that attribute cell dirty at col 0 */
+  for( i = 0; i < 8; i++ ) {
+    if( !( display_get_maybe_dirty( i ) & 0x01 ) ) {
+      fprintf( stderr,
+               "timex_flash_altdfile_marks_dirty: expected maybe_dirty[%d] bit 0 set\n",
+               i );
+      return 1;
+    }
+  }
+
+  /* Rows 8 onwards must be clean */
+  for( i = 8; i < DISPLAY_HEIGHT; i++ )
+    if( display_get_maybe_dirty( i ) ) return 1;
+
+  return 0;
+}
+
+static int
+timex_flash_standard_delegates_to_sinclair( void )
+{
+  int i;
+
+  /* Arrange: standard Timex mode (scld=0); flash attr at row 0, col 0 */
+  timex_flash_test_before( STANDARD );
+  RAM[0][0x1800] = 0x80;
+
+  /* Act: standard path delegates to display_dirty_flashing_sinclair() */
+  display_dirty_flashing_timex();
+
+  /* Assert: same result as sinclair flash test — 8 rows dirty at col 0 */
+  for( i = 0; i < 8; i++ ) {
+    if( !( display_get_maybe_dirty( i ) & 0x01 ) ) {
+      fprintf( stderr,
+               "timex_flash_standard_delegates: expected maybe_dirty[%d] bit 0 set\n",
+               i );
+      return 1;
+    }
+  }
+
+  for( i = 8; i < DISPLAY_HEIGHT; i++ )
+    if( display_get_maybe_dirty( i ) ) return 1;
+
+  return 0;
+}
+
 /* display_write_if_dirty_timex() tests */
 
 static int
@@ -751,6 +875,18 @@ static const struct test_t tests[] = {
   { "flash_dirty_with_flash_attr_row0_col0",
     flash_dirty_with_flash_attr_row0_col0 },
   { "flash_dirty_non_flash_attr", flash_dirty_non_flash_attr },
+
+  /* display_dirty_flashing_timex() tests */
+  { "timex_flash_hires_skips_flashing",
+    timex_flash_hires_skips_flashing },
+  { "timex_flash_b1_no_attrs_clean",
+    timex_flash_b1_no_attrs_clean },
+  { "timex_flash_b1_marks_dirty",
+    timex_flash_b1_marks_dirty },
+  { "timex_flash_altdfile_marks_dirty",
+    timex_flash_altdfile_marks_dirty },
+  { "timex_flash_standard_delegates_to_sinclair",
+    timex_flash_standard_delegates_to_sinclair },
 
   /* display_write_if_dirty_timex() tests */
   { "timex_lores_no_redraw_if_unchanged",
