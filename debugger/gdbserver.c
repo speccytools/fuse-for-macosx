@@ -42,6 +42,7 @@ int gdbserver_client_socket = -1;  // Made non-static so packets.c can access it
 uint8_t tmpbuf[0x20000];  // Made non-static so vfile_ext.c can access it
 static volatile char gdbserver_trapped = 0;
 static int gdbserver_port = 0;
+static int gdbserver_requested_port = 0;
 static int gdbserver_last_trap_reason = DEBUG_TRAP_REASON_SIGNAL_RECEIVED;
 
 static pthread_t network_thread_id;
@@ -813,6 +814,7 @@ int gdbserver_start( int port )
     }
 
     gdbserver_port = actual_port;
+    gdbserver_requested_port = port;
     gdbserver_debugging_enabled = 1;
     
     // Log if we used a different port than requested
@@ -841,6 +843,8 @@ void gdbserver_stop()
     pthread_mutex_unlock(&network_read_mutex);
 
     gdbserver_debugging_enabled = 0;
+    gdbserver_port = 0;
+    gdbserver_requested_port = 0;
     pthread_join(network_thread_id, NULL);
     utils_networking_end();
 }
@@ -885,7 +889,8 @@ void gdbserver_refresh_status()
     }
     else
     {
-        if (gdbserver_debugging_enabled && (gdbserver_port != settings_current.gdbserver_port))
+        if (gdbserver_debugging_enabled &&
+            (gdbserver_requested_port != settings_current.gdbserver_port))
         {
             // we need to restart
             gdbserver_stop();
