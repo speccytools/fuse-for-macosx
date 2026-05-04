@@ -864,12 +864,29 @@ libspectrum_byte test19_data[] = { 0xdd, 0xcb, 0x55, 0x46 };  /* BIT 0,(IX+55) *
 libspectrum_byte test20_data[] = { 0xdd, 0xcb, 0x55, 0x86 };  /* RES 0,(IX+55) */
 libspectrum_byte test21_data[] = { 0xdd, 0xcb, 0x55, 0xc6 };  /* SET 0,(IX+55) */
 
-/* FD CB prefix: BIT on (IY+d) */
+/* FD CB prefix: BIT/RES/SET on (IY+d) */
 libspectrum_byte test22_data[] = { 0xfd, 0xcb, 0x55, 0x46 };  /* BIT 0,(IY+55) */
+libspectrum_byte test25_data[] = { 0xfd, 0xcb, 0x55, 0x86 };  /* RES 0,(IY+55) */
+libspectrum_byte test26_data[] = { 0xfd, 0xcb, 0x55, 0xc6 };  /* SET 0,(IY+55) */
 
 /* DD CB undocumented: LD reg,RES/SET n,(IX+d) — regression for bug #515 fix */
 libspectrum_byte test23_data[] = { 0xdd, 0xcb, 0x55, 0x87 };  /* LD A,RES 0,(IX+55) */
 libspectrum_byte test24_data[] = { 0xdd, 0xcb, 0x55, 0xcf };  /* LD A,SET 1,(IX+55) */
+
+/* FD CB undocumented: LD reg,RES/SET n,(IY+d) */
+libspectrum_byte test27_data[] = { 0xfd, 0xcb, 0x55, 0x87 };  /* LD A,RES 0,(IY+55) */
+libspectrum_byte test28_data[] = { 0xfd, 0xcb, 0x55, 0xcf };  /* LD A,SET 1,(IY+55) */
+
+/* Negative (IX+d)/(IY+d) offset (offset >= 0x80) */
+libspectrum_byte test29_data[] = { 0xdd, 0xcb, 0xff, 0x46 };  /* BIT 0,(IX-01) */
+libspectrum_byte test30_data[] = { 0xfd, 0xcb, 0xff, 0x46 };  /* BIT 0,(IY-01) */
+libspectrum_byte test31_data[] = { 0xdd, 0x7e, 0xff };         /* LD A,(IX-01) */
+
+/* Relative jump instructions */
+libspectrum_byte test32_data[] = { 0x18, 0x00 };  /* JR 0 offset -> target 0x4002 */
+libspectrum_byte test33_data[] = { 0x18, 0xfe };  /* JR -2 offset -> target 0x4000 */
+libspectrum_byte test34_data[] = { 0x10, 0xfe };  /* DJNZ -2 offset -> target 0x4000 */
+libspectrum_byte test35_data[] = { 0x20, 0x04 };  /* JR NZ,+4 -> target 0x4006 */
 
 static int
 run_test( libspectrum_byte *data, size_t data_length, const char *expected )
@@ -923,12 +940,29 @@ debugger_disassemble_unittest( void )
   r += run_test( test20_data, sizeof( test20_data ), "RES 0,(IX+55)" );
   r += run_test( test21_data, sizeof( test21_data ), "SET 0,(IX+55)" );
 
-  /* FD CB prefix BIT on (IY+d) */
+  /* FD CB prefix BIT/RES/SET on (IY+d) */
   r += run_test( test22_data, sizeof( test22_data ), "BIT 0,(IY+55)" );
+  r += run_test( test25_data, sizeof( test25_data ), "RES 0,(IY+55)" );
+  r += run_test( test26_data, sizeof( test26_data ), "SET 0,(IY+55)" );
 
   /* DD CB undocumented LD reg,RES/SET n,(IX+d) — regression for bug #515 */
   r += run_test( test23_data, sizeof( test23_data ), "LD A,RES 0,(IX+55)" );
   r += run_test( test24_data, sizeof( test24_data ), "LD A,SET 1,(IX+55)" );
+
+  /* FD CB undocumented LD reg,RES/SET n,(IY+d) */
+  r += run_test( test27_data, sizeof( test27_data ), "LD A,RES 0,(IY+55)" );
+  r += run_test( test28_data, sizeof( test28_data ), "LD A,SET 1,(IY+55)" );
+
+  /* Negative (IX+d)/(IY+d) offsets */
+  r += run_test( test29_data, sizeof( test29_data ), "BIT 0,(IX-01)" );
+  r += run_test( test30_data, sizeof( test30_data ), "BIT 0,(IY-01)" );
+  r += run_test( test31_data, sizeof( test31_data ), "LD A,(IX-01)" );
+
+  /* Relative jump instructions */
+  r += run_test( test32_data, sizeof( test32_data ), "JR 4002" );
+  r += run_test( test33_data, sizeof( test33_data ), "JR 4000" );
+  r += run_test( test34_data, sizeof( test34_data ), "DJNZ 4000" );
+  r += run_test( test35_data, sizeof( test35_data ), "JR NZ,4006" );
 
   return r;
 }
