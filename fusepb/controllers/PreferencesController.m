@@ -224,6 +224,8 @@
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 
   int old_bilinear = settings_current.bilinear_filter;
+  int old_joy1_number = settings_current.joy1_number;
+  int old_joy2_number = settings_current.joy2_number;
 
   /* Values in shared defaults have been updated, pass them onto Fuse */
   read_config_file( &settings_current );
@@ -262,8 +264,12 @@
 
   settings_get_rom_array( &settings_current, machineRoms );
 
-  joystick_end();
-  joystick_init( NULL );
+  int joystick_changed = old_joy1_number != settings_current.joy1_number ||
+                         old_joy2_number != settings_current.joy2_number;
+  if( joystick_changed ) {
+    joystick_end();
+    joystick_init( NULL );
+  }
 
   {
     NSArray *romURLs = [Emulator beginROMScopedAccess];
