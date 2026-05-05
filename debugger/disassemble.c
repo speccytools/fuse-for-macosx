@@ -898,8 +898,16 @@ run_test( libspectrum_byte *data, size_t data_length, const char *expected )
   
   debugger_disassemble( disassembly, sizeof( disassembly ), &length, 0x4000 );
 
-  if( strcmp( disassembly, expected ) ) return 1;
-  if( length != data_length ) return 1;
+  if( strcmp( disassembly, expected ) ) {
+    printf( "disassemble test: expected '%s', got '%s'\n", expected,
+            disassembly );
+    return 1;
+  }
+  if( length != data_length ) {
+    printf( "disassemble test: '%s': expected length %zu, got %zu\n", expected,
+            data_length, length );
+    return 1;
+  }
 
   return 0;
 }
