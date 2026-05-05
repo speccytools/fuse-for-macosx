@@ -888,6 +888,40 @@ libspectrum_byte test33_data[] = { 0x18, 0xfe };  /* JR -2 offset -> target 0x40
 libspectrum_byte test34_data[] = { 0x10, 0xfe };  /* DJNZ -2 offset -> target 0x4000 */
 libspectrum_byte test35_data[] = { 0x20, 0x04 };  /* JR NZ,+4 -> target 0x4006 */
 
+/* ED prefix: IN reg,(C) and OUT (C),reg */
+libspectrum_byte test36_data[] = { 0xed, 0x40 };  /* IN B,(C) */
+libspectrum_byte test37_data[] = { 0xed, 0x70 };  /* IN F,(C) — special case */
+libspectrum_byte test38_data[] = { 0xed, 0x41 };  /* OUT (C),B */
+libspectrum_byte test39_data[] = { 0xed, 0x71 };  /* OUT (C),0 — special case */
+
+/* ED prefix: SBC HL,rr and ADC HL,rr */
+libspectrum_byte test40_data[] = { 0xed, 0x42 };  /* SBC HL,BC */
+libspectrum_byte test41_data[] = { 0xed, 0x4a };  /* ADC HL,BC */
+
+/* ED prefix: LD (nn),rr and LD rr,(nn) */
+libspectrum_byte test42_data[] = { 0xed, 0x43, 0x56, 0x34 };  /* LD (3456),BC */
+libspectrum_byte test43_data[] = { 0xed, 0x4b, 0x56, 0x34 };  /* LD BC,(3456) */
+
+/* ED prefix: NEG, RETN, RETI */
+libspectrum_byte test44_data[] = { 0xed, 0x44 };  /* NEG */
+libspectrum_byte test45_data[] = { 0xed, 0x45 };  /* RETN */
+libspectrum_byte test46_data[] = { 0xed, 0x4d };  /* RETI */
+
+/* ED prefix: IM 0, IM 1, IM 2 */
+libspectrum_byte test47_data[] = { 0xed, 0x46 };  /* IM 0 */
+libspectrum_byte test48_data[] = { 0xed, 0x56 };  /* IM 1 */
+libspectrum_byte test49_data[] = { 0xed, 0x5e };  /* IM 2 */
+
+/* ED prefix: LD I,A and LD A,I */
+libspectrum_byte test50_data[] = { 0xed, 0x47 };  /* LD I,A */
+libspectrum_byte test51_data[] = { 0xed, 0x57 };  /* LD A,I */
+
+/* ED prefix: block instructions */
+libspectrum_byte test52_data[] = { 0xed, 0xa0 };  /* LDI */
+libspectrum_byte test53_data[] = { 0xed, 0xb0 };  /* LDIR */
+libspectrum_byte test54_data[] = { 0xed, 0xa8 };  /* LDD */
+libspectrum_byte test55_data[] = { 0xed, 0xb8 };  /* LDDR */
+
 static int
 run_test( libspectrum_byte *data, size_t data_length, const char *expected )
 {
@@ -971,6 +1005,40 @@ debugger_disassemble_unittest( void )
   r += run_test( test33_data, sizeof( test33_data ), "JR 4000" );
   r += run_test( test34_data, sizeof( test34_data ), "DJNZ 4000" );
   r += run_test( test35_data, sizeof( test35_data ), "JR NZ,4006" );
+
+  /* ED prefix: IN reg,(C) and OUT (C),reg */
+  r += run_test( test36_data, sizeof( test36_data ), "IN B,(C)" );
+  r += run_test( test37_data, sizeof( test37_data ), "IN F,(C)" );
+  r += run_test( test38_data, sizeof( test38_data ), "OUT (C),B" );
+  r += run_test( test39_data, sizeof( test39_data ), "OUT (C),0" );
+
+  /* ED prefix: SBC HL,rr and ADC HL,rr */
+  r += run_test( test40_data, sizeof( test40_data ), "SBC HL,BC" );
+  r += run_test( test41_data, sizeof( test41_data ), "ADC HL,BC" );
+
+  /* ED prefix: LD (nn),rr and LD rr,(nn) */
+  r += run_test( test42_data, sizeof( test42_data ), "LD (3456),BC" );
+  r += run_test( test43_data, sizeof( test43_data ), "LD BC,(3456)" );
+
+  /* ED prefix: NEG, RETN, RETI */
+  r += run_test( test44_data, sizeof( test44_data ), "NEG" );
+  r += run_test( test45_data, sizeof( test45_data ), "RETN" );
+  r += run_test( test46_data, sizeof( test46_data ), "RETI" );
+
+  /* ED prefix: IM 0, IM 1, IM 2 */
+  r += run_test( test47_data, sizeof( test47_data ), "IM 0" );
+  r += run_test( test48_data, sizeof( test48_data ), "IM 1" );
+  r += run_test( test49_data, sizeof( test49_data ), "IM 2" );
+
+  /* ED prefix: LD I,A and LD A,I */
+  r += run_test( test50_data, sizeof( test50_data ), "LD I,A" );
+  r += run_test( test51_data, sizeof( test51_data ), "LD A,I" );
+
+  /* ED prefix: block instructions */
+  r += run_test( test52_data, sizeof( test52_data ), "LDI" );
+  r += run_test( test53_data, sizeof( test53_data ), "LDIR" );
+  r += run_test( test54_data, sizeof( test54_data ), "LDD" );
+  r += run_test( test55_data, sizeof( test55_data ), "LDDR" );
 
   return r;
 }
