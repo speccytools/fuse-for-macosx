@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include "fuse.h"
+#include "utils.h"
 #include "ui/ui.h"
 #include "w5100.h"
 #include "w5100_internals.h"
@@ -101,9 +102,9 @@ w5100_io_thread( void *arg )
 
     FD_SET( selfpipe_socket, &readfds );
 
-    for( i = 0; i < 4; i++ )
-      nic_w5100_socket_add_to_sets( &self->socket[i], &readfds, &writefds,
-        &max_fd );
+      for( i = 0; i < 4; i++ )
+        nic_w5100_socket_add_to_sets( self, &self->socket[i], &readfds, &writefds,
+          &max_fd );
 
     /* Note that if a socket is closed between when we added it to the sets
        above and when we call select() below, it will cause the select to fail
@@ -124,7 +125,7 @@ w5100_io_thread( void *arg )
       }
 
       for( i = 0; i < 4; i++ )
-        nic_w5100_socket_process_io( &self->socket[i], readfds, writefds );
+        nic_w5100_socket_process_io( self, &self->socket[i], readfds, writefds );
     }
     else if( compat_socket_get_error() == compat_socket_EBADF ) {
       /* Do nothing - just loop again */
@@ -143,6 +144,8 @@ static int
 w5100_start_io_thread( nic_w5100_t *self )
 {
   int error;
+
+  utils_networking_init();
 
   if( self->io_thread_running ) return 0;
 

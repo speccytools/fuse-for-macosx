@@ -37,8 +37,15 @@ while(<>) {
 
     chomp;
 
-    my( $name, $type, $default, $short, $commandline, $configfile ) =
-	split /\s*,\s*/;
+    my( $name, $type, $default, $funcn, $short, $commandline, $configfile ) =
+	split /\s*,\s*/, $_, 7;
+
+    if( defined $funcn && $funcn =~ /^'.'$/ &&
+        defined $short && !defined $commandline ) {
+        $commandline = $short;
+        $short = $funcn;
+        $funcn = '';
+    }
 
     if( not defined $commandline ) {
 	$commandline = $name;
