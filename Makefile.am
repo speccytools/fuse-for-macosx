@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2015 Philip Kendall
+## Copyright (c) 1999-2017 Philip Kendall
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -65,8 +65,12 @@ fuse_LDADD = \
              $(X_LIBS) \
              $(XML_LIBS)
 
-if USE_SDL
-fuse_LDADD += $(SDL_LIBS)
+if USE_SDL1
+fuse_LDADD += $(SDL1_LIBS)
+endif
+
+if USE_SDL2
+fuse_LDADD += $(SDL2_LIBS)
 endif
 
 fuse_DEPENDENCIES =
@@ -92,8 +96,12 @@ AM_CPPFLAGS = \
               -DFUSEDATADIR="\"${pkgdatadir}\"" \
               $(PNG_CFLAGS)
 
-if USE_SDL
-AM_CPPFLAGS += $(SDL_CFLAGS)
+if USE_SDL1
+AM_CPPFLAGS += $(SDL1_CFLAGS)
+endif
+
+if USE_SDL2
+AM_CPPFLAGS += $(SDL2_CFLAGS)
 endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(PTHREAD_CFLAGS)
@@ -140,7 +148,6 @@ EXTRA_DIST = AUTHORS \
 	     m4/ax_create_stdint_h.m4 \
 	     m4/ax_pthread.m4 \
 	     m4/ax_string_strcasecmp.m4 \
-	     m4/gtk-2.0.m4 \
 	     m4/pkg.m4 \
 	     m4/sdl.m4 \
 	     menu_data.dat \
@@ -157,12 +164,18 @@ DISTCLEANFILES =
 
 pkgdata_DATA =
 
+test: z80/coretest unittests/displaytest
+	z80/coretest $(srcdir)/z80/tests/tests.in > z80/tests.actual
+	cmp z80/tests.actual $(srcdir)/z80/tests/tests.expected
+	./unittests/displaytest
+
 
 ## Resources for Windows executables
 if COMPAT_WIN32
 
+fuse_LDFLAGS = -mwindows
 fuse_SOURCES += windres.rc
-fuse_LDADD += windres.o
+fuse_LDADD += -lcomctl32 -lwinmm windres.o
 fuse_DEPENDENCIES += windres.o
 
 windres.o: windres.rc data/win32/winfuse.ico data/win32/fuse.manifest $(ui_win32_res)
@@ -187,13 +200,21 @@ include sound/Makefile.am
 include timer/Makefile.am
 include ui/Makefile.am
 include ui/fb/Makefile.am
-include ui/gtk/Makefile.am
+include ui/gtk3/Makefile.am
 include ui/null/Makefile.am
 include ui/scaler/Makefile.am
 include ui/sdl/Makefile.am
+include ui/sdl2/Makefile.am
 include ui/widget/Makefile.am
 include ui/wii/Makefile.am
 include ui/win32/Makefile.am
 include ui/xlib/Makefile.am
 include unittests/Makefile.am
 include z80/Makefile.am
+
+check-local: fuse unittests/displaytest unittests/sdl2displaytest unittests/sdl2joysticktest unittests/sdl2mousetest
+	$(top_builddir)/fuse --unittests
+	$(top_builddir)/unittests/displaytest
+	$(top_builddir)/unittests/sdl2displaytest
+	$(top_builddir)/unittests/sdl2joysticktest
+	$(top_builddir)/unittests/sdl2mousetest

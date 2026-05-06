@@ -1,5 +1,5 @@
 /* ts2068.c: Timex TS2068 specific routines
-   Copyright (c) 1999-2015 Philip Kendall, Fredrick Meunier, Witold Filipczyk,
+   Copyright (c) 1999-2021 Philip Kendall, Fredrick Meunier, Witold Filipczyk,
                            Darren Salt
 
    This program is free software; you can redistribute it and/or modify

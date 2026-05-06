@@ -1,5 +1,5 @@
 /* z80_debugger_variables.c: routines to expose Z80 registers to the debugger
-   Copyright (c) 2016 Philip Kendall
+   Copyright (c) 2016-2018 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

@@ -116,9 +116,6 @@ w|wr|wri|writ|write { return WRITE; }
 
 ":"		{ return ':'; }
 
-$[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
-		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
-		  return NUMBER; }
 0x[[:xdigit:]]+	{ yylval.integer = strtol( yytext+2, NULL, 16 );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 	          return NUMBER; }

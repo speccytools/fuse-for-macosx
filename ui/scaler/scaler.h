@@ -1,5 +1,5 @@
 /* ScummVM - Scumm Interpreter
- * Copyright (C) 2002-2003 The ScummVM project, Fredrick Meunier and
+ * Copyright (C) 2002-2021 The ScummVM project, Fredrick Meunier and
  *			   Philip Kendall
  *
  * HQ2x and HQ3x scalers taken from HiEnd3D Demos (http://www.hiend3d.com)
@@ -91,6 +91,7 @@ typedef int (*scaler_available_fn)( scaler_type scaler );
 int scaler_select_id( const char *scaler_mode );
 int scaler_get_type( const char *scaler_mode );
 void scaler_register_clear( void );
+int scaler_activate_scaler( scaler_type scaler );
 int scaler_select_scaler( scaler_type scaler );
 void scaler_register( scaler_type scaler );
 int scaler_is_supported( scaler_type scaler );

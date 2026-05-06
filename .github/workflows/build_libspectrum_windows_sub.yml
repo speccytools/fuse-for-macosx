@@ -1,0 +1,234 @@
+name: Libspectrum for Windows
+run-name: Build and test Libspectrum for Windows / ${{ github.actor }} /
+
+on:
+  workflow_call:
+    inputs:
+      key:
+        type: string
+        required: true
+      libspectrum_ref:
+        type: string
+        required: false
+        default: master
+      use_zlib:
+        type: boolean
+        required: false
+        default: true
+      use_bzip2:
+        type: boolean
+        required: false
+        default: true
+      use_libgcrypt:
+        type: boolean
+        required: false
+        default: true
+      use_libaudiofile:
+        type: boolean
+        required: false
+        default: true
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+    env:
+      CYGWIN_NOWINPATH: 1
+      CPPFLAGS: "-I/usr/local/i686-w64-mingw32/include"
+      LDFLAGS: "-L/usr/local/i686-w64-mingw32/lib"
+      PKG_CONFIG_LIBDIR: "/usr/local/i686-w64-mingw32/lib/pkgconfig:/usr/i686-w64-mingw32/sys-root/mingw/lib/pkgconfig"
+      CYGWIN_LIBDIR: "/usr/i686-w64-mingw32/sys-root/mingw/bin/"
+      LIBSPECTRUM_DIR: libspectrum
+      LIBSPECTRUM_GIT_URL: https://git.code.sf.net/p/fuse-emulator/libspectrum
+
+    steps:
+      - name: (1) Prepare environment
+        run: |
+          cd ${GITHUB_WORKSPACE}
+
+          echo "Adjust autocrlf in git.."
+          git config --global core.autocrlf input
+
+          echo "Libspectrum URL: $LIBSPECTRUM_GIT_URL"
+          echo "Libspectrum ref: ${{ inputs.libspectrum_ref }}"
+
+          echo "Use lib zlib: ${{ inputs.use_zlib && 'yes' || 'no' }}"
+          echo "Use lib bzip2: ${{ inputs.use_bzip2 && 'yes' || 'no' }}"
+          echo "Use lib libgcrypt: ${{ inputs.use_libgcrypt && 'yes' || 'no' }}"
+          echo "Use lib libaudiofile: ${{ inputs.use_libaudiofile && 'yes' || 'no' }}"
+
+      - name: (2) Clone libspectrum source
+        run: |
+          cd ${GITHUB_WORKSPACE}
+
+          git init "$LIBSPECTRUM_DIR"
+          git -C "$LIBSPECTRUM_DIR" remote add origin "$LIBSPECTRUM_GIT_URL"
+          git -C "$LIBSPECTRUM_DIR" fetch --depth 1 origin "${{ inputs.libspectrum_ref }}"
+          git -C "$LIBSPECTRUM_DIR" checkout FETCH_HEAD
+
+      - name: (2b) Resolve Cygwin package cache path
+        id: cygwin-cache-path
+        run: |
+          if (Test-Path -LiteralPath 'D:\') {
+            $workVol = 'D:'
+          } else {
+            $workVol = 'C:'
+          }
+
+          echo "work-vol=$workVol" >> $env:GITHUB_OUTPUT
+          echo "package-cache=$workVol\cygwin-packages" >> $env:GITHUB_OUTPUT
+        shell: powershell
+
+      - name: (3) Restore Cygwin packages
+        id: cygwin-cache-load
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ${{ steps.cygwin-cache-path.outputs.package-cache }}
+          key: cygwin-packages-libspectrum-1
+
+      - name: (4) Install Cygwin (32 bit) with libs
+        uses: cygwin/cygwin-install-action@711d29f3da23c9f4a1798e369a6f01198c13b11a # v6
+        with:
+          work-vol: ${{ steps.cygwin-cache-path.outputs.work-vol }}
+          platform: x86
+          packages: |
+            audiofile \
+            autoconf \
+            automake \
+            bison \
+            flex \
+            gcc-core \
+            gcc-g++ \
+            gettext-devel \
+            libtool \
+            libaudiofile-devel \
+            make \
+            mingw64-i686-audiofile \
+            mingw64-i686-bzip2 \
+            mingw64-i686-gcc-core \
+            mingw64-i686-gcc-g++ \
+            mingw64-i686-libgcrypt \
+            mingw64-i686-libgpg-error \
+            mingw64-i686-libpng \
+            mingw64-i686-win-iconv \
+            mingw64-i686-winpthread \
+            mingw64-i686-zlib \
+            pkg-config
+
+      - name: (5) Save Cygwin packages
+        if: steps.cygwin-cache-load.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            ${{ steps.cygwin-cache-path.outputs.package-cache }}
+          key: cygwin-packages-libspectrum-1
+
+      - name: (6) Autogen.sh
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Running autogen.sh .."
+          ./autogen.sh
+
+      - name: (7) Configure for Windows (fake glib)
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Running configure .."
+          ./configure \
+          --build=i686-pc-cygwin \
+          --host=i686-w64-mingw32 \
+          --prefix=/usr/local/i686-w64-mingw32 \
+          --disable-static \
+          --with-fake-glib \
+          ${{ inputs.use_zlib == false && '--without-zlib' || '' }} \
+          ${{ inputs.use_bzip2 == false && '--without-bzip2' || '' }} \
+          ${{ inputs.use_libgcrypt == false && '--without-libgcrypt' || '' }} \
+          ${{ inputs.use_libaudiofile == false && '--without-libaudiofile' || '' }} \
+          | tee ./configure.out
+
+      - name: (8) Verify output from configure
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          .github/scripts/in_config.sh "libspectrum is ready to be compiled"
+          .github/scripts/in_config.sh "zlib support: ${{ inputs.use_zlib && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "bzip2 support: ${{ inputs.use_bzip2 && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "libgcrypt support: ${{ inputs.use_libgcrypt && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "libaudiofile support: ${{ inputs.use_libaudiofile && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "Internal GLib replacement: yes"
+
+      - name: (9) Make
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Running make .."
+          make
+
+      - name: (10) Install
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Running make install-strip .."
+          make install-strip
+
+      - name: (11) Copy dependency dlls
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Copying mandatory dependency dlls.."
+          cp -f ${CYGWIN_LIBDIR}libgcc_s_sjlj-1.dll .
+          cp -f ${CYGWIN_LIBDIR}libwinpthread-1.dll .
+          cp -f ${CYGWIN_LIBDIR}libgpg-error-0.dll .
+          cp -f ${CYGWIN_LIBDIR}libstdc++-6.dll .
+
+          echo "Copying optional dependency dlls.."
+          ${{ inputs.use_zlib         && 'cp -f ${CYGWIN_LIBDIR}zlib1.dll .'          || ''}}
+          ${{ inputs.use_bzip2        && 'cp -f ${CYGWIN_LIBDIR}libbz2-1.dll .'       || ''}}
+          ${{ inputs.use_libgcrypt    && 'cp -f ${CYGWIN_LIBDIR}libgcrypt-20.dll .'   || ''}}
+          ${{ inputs.use_libaudiofile && 'cp -f ${CYGWIN_LIBDIR}libaudiofile-1.dll .' || ''}}
+          ${{ inputs.use_libaudiofile && 'cp -f ${CYGWIN_LIBDIR}libFLAC-8.dll .'      || ''}}
+          ${{ inputs.use_libaudiofile && 'cp -f ${CYGWIN_LIBDIR}libOGG-0.dll .'       || ''}}
+
+          echo "Copying own dll.."
+          cp -f .libs/libspectrum-*.dll .
+
+      - name: (12) Run tests
+        id: run-tests
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Building and running tests .."
+          make check
+
+      - name: (13) Verbose check tests (on failure)
+        if: failure() && steps.run-tests.outcome != 'success'
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          echo "Listing all tests individually .."
+          test/test.exe
+
+      - name: (14) Pack installed library files
+        run: |
+          cd ${GITHUB_WORKSPACE}/${LIBSPECTRUM_DIR}
+
+          tar -cvf \
+          libspectrum-installed-windows.tar \
+          -C /usr/local/i686-w64-mingw32/ .
+
+      - name: (15) Upload generated tar file
+        uses: actions/upload-artifact@v8
+        with:
+          name: libspectrum-installed-windows-${{ inputs.key }}
+          path: |
+            ${{ env.LIBSPECTRUM_DIR }}/libspectrum-installed-windows.tar
+
+      - name: (16) Finish
+        run: |
+          echo "Finishing with status ${{ job.status }}."

@@ -1,5 +1,5 @@
 /* error.c: The error reporting widget
-   Copyright (c) 2002-2005 Philip Kendall
+   Copyright (c) 2002-2007 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ split_message( const char *message, char ***lines, size_t *count,
 {
   const char *ptr = message;
   int position;
+  int next_line = 0;
 
   line_length *= 8;
 
@@ -103,8 +104,14 @@ split_message( const char *message, char ***lines, size_t *count,
 
   while( *ptr ) {
 
+    /* Detect new lines */
+    while( *ptr && ( *ptr ) == '\n' ) {
+      ptr++;
+      next_line=1;
+    }
     /* Skip any whitespace */
     while( *ptr && isspace( *ptr ) ) ptr++;
+    /* End of message? */
     if( *ptr == '\0' ) break;
     message = ptr;
 
@@ -118,10 +125,11 @@ split_message( const char *message, char ***lines, size_t *count,
       message++;
 
     /* Check we've got room for the word, plus some prefixing space */
-    if( position + widget_substringwidth( message, ptr - message ) + 4
- 	>= line_length ) {
+    if( (position + widget_substringwidth( message, ptr - message ) + 4
+	>= line_length) || (next_line==1) ) {
 
       char **new_lines; size_t i;
+      next_line=0;
 
       /* If we've filled the screen, stop */
       if( *count == 18 ) return 0;

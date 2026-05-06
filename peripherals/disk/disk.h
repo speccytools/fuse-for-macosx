@@ -1,5 +1,5 @@
 /* disk.h: Routines for handling disk images
-   Copyright (c) 2007-2015 Gergely Szasz
+   Copyright (c) 2007-2023 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ typedef struct disk_t {
   libspectrum_byte *data;	/* disk data */
 /* private part */
   int tlen;			/* length of a track with clock and other marks (bpt + 3/8bpt) */
+  int c_bpt;			/* current track bpt value it can be other than allocated bpt */
   libspectrum_byte *track;	/* current track data bytes */
   libspectrum_byte *clocks;	/* clock marks bits */
   libspectrum_byte *fm;		/* FM/MFM marks bits */
@@ -111,7 +112,7 @@ TRACK_LEN TYPE TRACK......DATA CLOCK..MARKS MF..MARKS WEAK..MARKS
                ^               ^            ^         ^
                |__ track       |__ clocks   |__ mf    |__ weak
   so, track[-1] = TYPE
-  TLEN = track[-3] + tarck 256 * track[-2]
+  TLEN = track[-3] + 256 * track[-2]
   TYPE is Track type as in UDI spec (0x00, 0x01, 0x02, 0x80, 0x81, 0x82) after update_tracks_mode() !!!
 */
 
@@ -119,9 +120,10 @@ TRACK_LEN TYPE TRACK......DATA CLOCK..MARKS MF..MARKS WEAK..MARKS
 
 #define DISK_SET_TRACK_IDX( d, idx ) \
    d->track = d->data + 3 + ( idx ) * d->tlen; \
-   d->clocks = d->track  + d->bpt; \
-   d->fm     = d->clocks + DISK_CLEN( d->bpt ); \
-   d->weak   = d->fm     + DISK_CLEN( d->bpt )
+   d->c_bpt = d->track[-3] + 256 * d->track[-2]; \
+   d->clocks = d->track  + d->c_bpt; \
+   d->fm     = d->clocks + DISK_CLEN( d->c_bpt ); \
+   d->weak   = d->fm     + DISK_CLEN( d->c_bpt )
 
 #define DISK_SET_TRACK( d, head, cyl ) \
    DISK_SET_TRACK_IDX( (d), (d)->sides * cyl + head )
@@ -132,6 +134,7 @@ typedef struct disk_position_context_t {
   libspectrum_byte *fm;      /* FM/MFM marks bits */
   libspectrum_byte *weak;    /* weak marks bits/weak data */
   int i;                     /* index for track and clocks */
+  int c_bpt;
 } disk_position_context_t;
 
 const char *disk_strerror( int error );

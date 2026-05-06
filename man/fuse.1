@@ -3,6 +3,7 @@
 .\" fuse.1: Fuse man page
 .\" Copyright (c) 2001-2018 Russell Marks, Philip Kendall, Darren Salt,
 .\"                         Fredrick Meunier, Stuart Brady
+.\" Copyright (c) 2021-2026 Sergio Baldoví
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "27th February, 2021" "Version 1.6.0" "Emulators"
+.TH fuse 1 "10th March, 2026" "Version 1.7.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -212,7 +213,7 @@ option.
 .B \-\-covox
 .RS
 Emulate a Covox sound interface for Pentagon/Scorpion. Same as the
-General Peripherals Options dialog's
+Sound Peripherals Options dialog's
 .I "Covox"
 option.
 .RE
@@ -472,7 +473,7 @@ are `320' (which corresponds to a 320\(mu240\(mu256 mode), the default and
 .PP
 .B \-\-fuller
 .RS
-Emulate a Fuller Box interface. Same as the General Peripherals Options dialog's
+Emulate a Fuller Box interface. Same as the Sound Peripherals Options dialog's
 .I "Fuller Box"
 option.
 .RE
@@ -480,7 +481,35 @@ option.
 .B \-\-full\-screen
 .RS
 Specify whether Fuse should run in full screen mode.
-This option is effective only under the SDL UI.
+This option is effective under the SDL and SDL2 UIs.
+.PP
+Under SDL2, Fuse will try to choose a suitable fixed fullscreen display mode
+automatically if no explicit fullscreen mode has been configured.
+.RE
+.PP
+.B \-\-sdl\-fullscreen\-mode
+.I mode
+.RS
+Specify the fullscreen display mode to use under the SDL and SDL2 UIs.
+.I mode
+may be one of the following:
+.RS
+.TP
+.B list
+Print the available fullscreen modes and exit.
+.TP
+.B number
+Select one of the listed fullscreen modes by its number.
+.TP
+.B WxH
+Select a fullscreen mode by width and height, for example
+.BR 1024x768 .
+.RE
+.PP
+If this option is not set, SDL2 will try to choose a fullscreen mode
+automatically. The SDL2 mode list and automatic choice prefer modes that fit
+the available scalers well, then better refresh rates (50Hz first, then
+multiples of 50Hz, then 60Hz and similar rates).
 .RE
 .PP
 .B \-g
@@ -838,7 +867,7 @@ and
 .B \-\-melodik
 .RS
 Emulate a Melodik AY\ interface for 16/48k\ Spectrums. Same as the
-General Peripherals Options dialog's
+Sound Peripherals Options dialog's
 .I "Melodik"
 option.
 .RE
@@ -1268,6 +1297,9 @@ are not.
 .B \-\-rom\-opus
 .I file
 .br
+.B \-\-rom\-sp0256
+.I file
+.br
 .B \-\-rom\-speccyboot
 .I file
 .br
@@ -1275,6 +1307,9 @@ are not.
 .I file
 .br
 .B \-\-rom\-usource
+.I file
+.br
+.B \-\-rom\-uspeech
 .I file
 .RS
 Specify the file to be used for ROM(s) used for each peripheral. The
@@ -1299,10 +1334,14 @@ the Opus Discovery ROM
 .RI ( opus.rom ),
 the SpeccyBoot ROM
 .RI ( speccyboot\-1.4.rom ),
+the SP0256 ROM
+.RI ( sp0256-al2.rom ),
 the TTX2000S ROM
 .RI ( ttx2000s.rom ),
 and the \(mcSource ROM
-.RI ( usource.rom ).
+.RI ( usource.rom ),
+the \(mcSpeech ROM
+.RI ( uspeech.rom ).
 .PP
 The names in brackets denote the defaults. Note that not all these ROMs
 are supplied with Fuse \(em you must supply your own copies of those which
@@ -1775,7 +1814,7 @@ Specify the TAP device to use for SpeccyBoot emulation.
 .PP
 .B \-\-specdrum
 .RS
-Emulate a SpecDrum interface. Same as the General Peripherals Options dialog's
+Emulate a SpecDrum interface. Same as the Sound Peripherals Options dialog's
 .I "SpecDrum"
 option. See the World of Spectrum Infoseek web page at
 .I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
@@ -1919,6 +1958,13 @@ Emulate a \(mcSource interface. Same as the General Peripherals Options dialog's
 option.
 .RE
 .PP
+.B \-\-uspeech
+.RS
+Emulate a \(mcSpeech interface. Same as the Sound Peripherals Options dialog's
+.I "\(mcSpeech"
+option.
+.RE
+.PP
 .B \-V
 .br
 .B \-\-version
@@ -1959,6 +2005,15 @@ option.
 Sets the relative volume of the SpecDrum from a range of 0\(en100%.
 Same as the Sound Options dialog's
 .I "SpecDrum volume"
+option.
+.RE
+.PP
+.B \-\-volume\-uspeech
+.I volume
+.RS
+Sets the relative volume of the \(mcSpeech from a range of 0\(en100%.
+Same as the Sound Options dialog's
+.I "uSpeech volume"
 option.
 .RE
 .PP
@@ -2669,6 +2724,11 @@ Sets the relative volume of the Covox from a range of 0\(en100%.
 .RS
 Sets the relative volume of the SpecDrum from a range of 0\(en100%.
 .RE
+.PP
+.I "uSpeech volume"
+.RS
+Sets the relative volume of the \(mcSpeech from a range of 0\(en100%.
+.RE
 .RE
 .PP
 .I "Options, Peripherals, General..."
@@ -2701,6 +2761,11 @@ menu.
 .RS
 If this option is selected, Fuse will emulate a Kempston mouse interface.
 .PP
+With the SDL and SDL2 UIs, middle click (or middle button release) on the
+Spectrum display toggles mouse grab when the Kempston mouse is enabled.
+When grabbed, SDL2 uses relative mouse mode so motion is no longer limited by
+the host pointer reaching the edge of the screen.
+.PP
 If you're using Fuse full-screen, your mouse is automatically used as if
 attached to the Kempston interface. Otherwise, you'll need to click on the
 Spectrum display in order to tell Fuse to grab the pointer (and make it
@@ -2719,21 +2784,6 @@ connected mouse may be used.
 .RS
 If this option is enabled, the left and right mouse buttons will be swapped
 when emulating a Kempston mouse.
-.RE
-.PP
-.I "Fuller Box"
-.RS
-If this option is selected, Fuse will emulate a Fuller Box AY sound and
-joystick interface. This emulation is only available for the 16k, 48k and
-TC2048 machines.
-.RE
-.PP
-.I "Melodik"
-.RS
-If this option is selected, Fuse will emulate a Melodik AY sound interface.
-These interfaces and many similar ones were produced to make the 48K\ Spectrum
-compatible with the same AY music as the 128K\ Spectrum. This emulation is only
-available for the 16k, 48k and TC2048 machines.
 .RE
 .PP
 .I "Interface\ 1"
@@ -2804,15 +2854,6 @@ web page at
 for more details.
 .RE
 .PP
-.I "SpecDrum interface"
-.RS
-If this option is selected, Fuse will emulate a Cheetah SpecDrum sound
-interface.  See the World of Spectrum Infoseek web page at
-.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
-for manuals, software and more. This emulation is only available for
-the 48k, 128k and TC2048 machines.
-.RE
-.PP
 .I "Spectranet"
 .RS
 If this option is selected, Fuse will emulate the Spectranet interface,
@@ -2844,6 +2885,20 @@ See the World of Spectrum Infoseek web page at
 .I http://www.worldofspectrum.org/infoseekid.cgi?id=1000080
 for the manual.
 .RE
+.RE
+.PP
+.I "Options, Peripherals, Sound..."
+.RS
+Display the Sound Peripherals Options dialog, letting you configure the
+sound interface peripherals which Fuse will consider to be attached to
+the emulated machine. (With the widget UI, the keys shown in brackets
+toggle the options,
+.I Enter
+confirms any changes, and
+.I Esc
+aborts). Note that any changed settings only apply to the
+currently-running Fuse. Also note that any changes that enable and disable
+peripherals may result in a hard reset of the emulated machine.
 .PP
 .I "Covox interface"
 .RS
@@ -2851,6 +2906,38 @@ If this option is selected, Fuse will emulate a Covox digital sound
 interface. This emulation is only available for the Pentagon, Pentagon 512k,
 Pentagon 1024k and Scorpion machines. The Pentagon variants use port 0xfb and
 the Scorpion version uses port 0xdd.
+.RE
+.PP
+.I "Fuller Box"
+.RS
+If this option is selected, Fuse will emulate a Fuller Box AY sound and
+joystick interface. This emulation is only available for the 16k, 48k and
+TC2048 machines.
+.RE
+.PP
+.I "Melodik"
+.RS
+If this option is selected, Fuse will emulate a Melodik AY sound interface.
+These interfaces and many similar ones were produced to make the 48K\ Spectrum
+compatible with the same AY music as the 128K\ Spectrum. This emulation is only
+available for the 16k, 48k and TC2048 machines.
+.RE
+.PP
+.I "SpecDrum interface"
+.RS
+If this option is selected, Fuse will emulate a Cheetah SpecDrum sound
+interface.  See the World of Spectrum Infoseek web page at
+.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
+for manuals, software and more. This emulation is only available for
+the 48k, 128k and TC2048 machines.
+.RE
+.PP
+.I "\(mcSpeech"
+.RS
+If this option is selected, Fuse will emulate a Currah \(mcSpeech interface.
+See the World of Spectrum Infoseek web page at
+.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000081
+for the manual, software and more.
 .RE
 .RE
 .PP
@@ -3360,15 +3447,15 @@ and
 .I "Options, Save"
 .RS
 This will cause Fuse's current options to be written to
-.I .fuserc
-in your home directory (Unix-like systems), or
-.I fuse.cfg
-in your %USERPROFILE% folder (Windows), from which they will be
+a configuration file in your home directory, from which they will be
 picked up again when Fuse is restarted. The best way to update
 this file is by using this option, but it's a simple XML file if
 .I libxml2
 was available when Fuse was compiled (otherwise, plain text), and
 shouldn't be too hard to edit by hand if you really want to.
+See the
+.B "FILES"
+section for more details about location of this file.
 .RE
 .PP
 .I Pause
@@ -3532,6 +3619,29 @@ section for more information.
 Start the memory browser. It should be fairly obvious what this does;
 perhaps the only thing worth noting is that emulation is paused until
 you close the window.
+.RE
+.PP
+.I "Machine, Profiler"
+.RS
+Start or stop the built-in Z80 execution profiler. When profiling is
+started, Fuse records the cumulative number of t-states spent at each
+program counter address. When profiling is stopped, Fuse prompts for a
+filename and writes the collected data as text, one non-zero address per
+line, in the form
+.RB ` 0x1234,456 '
+where the first value is the address and the second is the cumulative
+t-state count.
+.PP
+This output can be converted with
+.BR profile2map (1)
+from the
+.B fuse-utils
+package into the opcode map-file format used by Gerton Lunter's
+.B Z80
+Spectrum emulator. Such map files can be used by external tools such as
+.B dZ80
+.RI ( "http://inkland.org.uk/dz80/" )
+to help distinguish executed code from unexecuted data.
 .RE
 .PP
 .I "Machine, NMI"
@@ -4719,10 +4829,8 @@ entry box, which are similar in nature (but definitely not identical
 to or as powerful as) to those in
 .IR gdb (1).
 In general, the debugger is case-insensitive, and numbers will be
-interpreted as decimal, unless prefixed by either
+interpreted as decimal, unless prefixed by
 .RI ` 0x '
-or
-.RI ` $ '
 when they will be interpreted as hex. Each command can be abbreviated
 to the portion not in curly braces.
 .PP
@@ -4875,6 +4983,13 @@ tape:play
 tape:stop
 .RS
 The emulated tape starts or stops playing.
+.RE
+.br
+uspeech:page
+.br
+uspeech:unpage
+.RS
+The \(mcSpeech interface is paged into or out of memory.
 .RE
 .br
 zxatasp:page
@@ -5102,6 +5217,7 @@ Other available sources are:
 .RI ` "Timex Dock" "',"
 .RI ` "Timex EXROM" "',"
 .RI ` uSource "',"
+.RI ` uSpeech "',"
 .RI ` ZXATASP '
 and
 .RI ` ZXCF "'."
@@ -5333,6 +5449,19 @@ option additionally controls whether the machine boots directly into the TR-DOS
 system. See the
 .B "DISK FILE FORMATS"
 section for more details on supported disk file formats.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH CURRAH \(mcSPEECH
+.PP
+Currah \(mcSpeech interface is an allophone speech synthesiser.
+This interface use a SP0256-AL2 chip that has an internal ROM with
+commands to make english allophones. Fuse needs this ROM named as
+sp0256-al2.rom in your ROMs directory and its CRC-32 is b504ac15.
+.PP
+An alternative authorised ROM is distributed by Joe Zbiciak with
+CRC-32 df8de0b0. In this case, bit ordering in data bytes is reversed
+and need to be adjusted.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -5663,7 +5792,28 @@ error messages.
 .\"------------------------------------------------------------------
 .\"
 .SH FILES
-.I "~/.fuserc"
+.I "$XDG_CONFIG_HOME/fuse-emulator/fuserc"
+.RS
+On Unix systems this is the per-user configuration file of Fuse.
+Writing configuration always goes to the XDG location.
+.RE
+.PP
+.I "~/.config/fuse-emulator/fuserc"
+.RS
+If $XDG_CONFIG_HOME is unset, this is the location of the configuration
+file.
+.RE
+.PP
+.I "$HOME/.fuserc"
+.RS
+If neither of previous files exist, reading falls back to this file
+as it was the default location until Fuse 1.7.0.
+.RE
+.PP
+.I "%USERPROFILE%\\\\fuse.cfg"
+.RS
+On Windows system this is the per-user configuration file of Fuse.
+.RE
 .\"
 .\"------------------------------------------------------------------
 .\"

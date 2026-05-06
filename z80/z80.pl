@@ -1139,7 +1139,7 @@ sub opcode_shift (@) {
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 ); PC++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode3) {
-#include "z80_ddfdcb.c"
+#include "z80/z80_ddfdcb.c"
 	}
 #else			/* #ifdef HAVE_ENOUGH_MEMORY */
 	z80_ddfdcbxx(opcode3);
@@ -1163,13 +1163,13 @@ shift
 #define REGISTER  $register
 #define REGISTERL ${register}L
 #define REGISTERH ${register}H
-#include "z80_ddfd.c"
+#include "z80/z80_ddfd.c"
 #undef REGISTERH
 #undef REGISTERL
 #undef REGISTER
 shift
         } elsif( $opcode eq 'CB' or $opcode eq 'ED' ) {
-	    print "#include \"z80_$lc_opcode.c\"\n";
+	    print "#include \"z80/z80_$lc_opcode.c\"\n";
         }
 
         print << "shift"

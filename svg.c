@@ -1,6 +1,6 @@
 /* svg.c: Routines to capture ROM graphics statements to Scalable Vector
           Graphics files
-   Copyright (c) 2014 Stefano Bodrato
+   Copyright (c) 2014-2015 Stefano Bodrato
    Portions taken from svgwrite.c, (c) J.J. Green 2005
 
    This program is free software; you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 /* beta.h: Routines for handling the Beta disk interface
-   Copyright (c) 2003-2016 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2021 Fredrick Meunier, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

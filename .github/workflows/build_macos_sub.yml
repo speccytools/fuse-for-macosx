@@ -1,0 +1,131 @@
+# Reusable workflow for all MacOS builds
+name: Fuse App For MacOS
+run-name: Build Fuse App for MacOS / ${{ github.actor }} /
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        type: string
+        required: true
+      dependencies:
+        type: string
+        required: false
+        default: ""
+      configure_params:
+        type: string
+        required: false
+        default: ""
+      verify_ui:
+        type: string
+        required: true
+      verify_audio:
+        type: string
+        required: false
+        default: "coreaudio"
+      verify_other:
+        type: string
+        required: false
+        default: ""
+      run_check:
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  build:
+    name: Build App
+    runs-on: macos-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: (1) Prepare environment
+        run: |
+          echo -n "Current directory: "
+          pwd
+          ls -la
+
+      - name: (2) Check out repository code
+        uses: actions/checkout@v6
+
+      - name: (3) Install dependencies
+        run: |
+          echo "Inspect if brew installed .."
+          brew doctor || true
+          
+          echo "Upgrade bash (fix |& ) .."
+          brew install bash
+          which -a bash
+          bash --version
+          sudo sh -c 'echo /usr/local/bin/bash >> /etc/shells'
+          
+          echo "Installing dependencies .."
+          brew install \
+            automake \
+            bzip2 \
+            libgcrypt \
+            glib \
+            libxml2 \
+            ${{ inputs.dependencies }}
+
+          echo "Configuring Homebrew search paths .."
+          echo "CPPFLAGS=-I$(brew --prefix)/include -I$(brew --prefix libgcrypt)/include -I$(brew --prefix libxml2)/include/libxml2" >> "$GITHUB_ENV"
+          echo "LDFLAGS=-L$(brew --prefix)/lib -L$(brew --prefix libgcrypt)/lib -L$(brew --prefix libxml2)/lib" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix libgcrypt)/lib/pkgconfig:$(brew --prefix libxml2)/lib/pkgconfig" >> "$GITHUB_ENV"
+
+          autoreconf -i
+
+      - name: (4) Download libspectrum artefact
+        uses: actions/download-artifact@v8
+        with:
+          name: libspectrum-installed-macos-fuse-app
+          path: libspectrum
+
+      - name: (5) Install libspectrum from artefact
+        run: |
+          # Extract (-x) files into /usr/local
+          sudo tar --directory / -xvf libspectrum/libspectrum-installed-macos.tar
+          echo "Done"
+
+      - name: (6) Autogen.sh
+        run: ./autogen.sh
+
+      - name: (7) Configure for MacOS
+        run: |
+          ./configure ${{ inputs.configure_params }} \
+          |& tee ./configure.out
+
+      - name: (8) Verify output from configure
+        # Most of the tested strings are common for all MacOS builds
+        # Only the strings related to UI selection differ
+        run: |          
+          .github/scripts/in_config.sh "Fuse options"
+          .github/scripts/in_config.sh "zlib support: yes"
+          .github/scripts/in_config.sh "libxml2 support: yes"
+          .github/scripts/in_config.sh "libpng support: yes"
+          .github/scripts/in_config.sh "Spectranet support: yes"
+          .github/scripts/in_config.sh "SpeccyBoot support: no"
+          .github/scripts/in_config.sh "TTX2000 S support: yes"
+          .github/scripts/in_config.sh "Desktop integration: no"
+          
+          .github/scripts/in_config.sh "User interface: ${{ inputs.verify_ui }}"
+          .github/scripts/in_config.sh "Selected audio driver: ${{ inputs.verify_audio }}"
+      - if: ${{ inputs.verify_other }}
+        run: |
+          .github/scripts/in_config.sh "${{ inputs.verify_other }}"
+
+      - name: (9) Make
+        run: make
+
+      - name: (10) Install
+        run: sudo make install
+
+      - name: (11) Run unit tests
+        if: ${{ inputs.run_check }}
+        run: make check
+
+      - name: (12) Finish
+        run: |
+          echo "🍏 Finishing with status ${{ job.status }}."

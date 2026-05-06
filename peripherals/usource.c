@@ -1,6 +1,6 @@
 /* usource.c: Routines for handling the Currah uSource interface
    Copyright (c) 2007-2016 Stuart Brady, Philip Kendall
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

@@ -1,5 +1,5 @@
 /* upd_fdc.c: NEC floppy disk controller emulation
-   Copyright (c) 2007-2015 Gergely Szasz
+   Copyright (c) 2007-2023 Gergely Szasz
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,34 @@
 #include "upd_fdc.h"
 
 #define MAX_SIZE_CODE 8
+
+#ifdef DEBUG_UPD
+const char *debug_cmd_str[] = {
+  "INVALID",
+  "--",
+  "READ_DIAG",
+  "SPECIFY",
+  "SENSE_DRIVE",
+  "WRITE_DATA",
+  "READ_DATA",
+  "RECALIBRATE",
+  "SENSE_INTERRUPT",
+  "WRITE_DATA_DEL",
+  "READ_ID",
+  "--",
+  "READ_DATA_DEL",
+  "WRITE_ID",
+  "--",
+  "SEEK",
+  "VERSION",
+  "SCAN_EQ",
+  "--","--","--","--","--","--","--",
+  "SCAN_LE",
+  "--","--","--",
+  "SCAN_HE",
+  "--","--"
+};
+#endif
 
 /* static const int UPD_FDC_MAIN_DRV_0_SEEK = 0x01; */
 /* static const int UPD_FDC_MAIN_DRV_1_SEEK = 0x02; */
@@ -514,12 +542,12 @@ start_read_id( upd_fdc *f )
     f->read_id = 1;
   }
   if( f->rev ) {
-    i = f->current_drive->disk.i >= f->current_drive->disk.bpt ?
+    i = f->current_drive->disk.i >= f->current_drive->disk.c_bpt ?
     	0 : f->current_drive->disk.i;			/* start position */
     if( read_id( f ) != 2 )
       f->rev = 0;
-    i = f->current_drive->disk.bpt ? 
-      ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.bpt : 200;
+    i = f->current_drive->disk.c_bpt ? 
+      ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.c_bpt : 200;
     if( i > 0 ) {
       event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			 machine_current->timings.processor_speed / 1000,
@@ -552,12 +580,12 @@ start_read_diag( upd_fdc *f )
     f->read_id = 1;
   }
   if( f->rev ) {
-    i = f->current_drive->disk.i >= f->current_drive->disk.bpt ?
+    i = f->current_drive->disk.i >= f->current_drive->disk.c_bpt ?
     	0 : f->current_drive->disk.i;			/* start position */
     if( read_id( f ) != 2 )
       f->rev = 0;
-    i = f->current_drive->disk.bpt ? 
-      ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.bpt : 200;
+    i = f->current_drive->disk.c_bpt ? 
+      ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.c_bpt : 200;
     if( i > 0 ) {
       event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			 machine_current->timings.processor_speed / 1000,
@@ -620,14 +648,14 @@ multi_track_next:
       f->read_id = 1;
     }
     while( f->rev ) {
-      i = f->current_drive->disk.i >= f->current_drive->disk.bpt ?
+      i = f->current_drive->disk.i >= f->current_drive->disk.c_bpt ?
     	  0 : f->current_drive->disk.i;			/* start position */
       if( seek_id( f ) == 0 )
         f->rev = 0;
       else
         f->id_mark = UPD_FDC_AM_NONE;
-      i = f->current_drive->disk.bpt ? 
-          ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.bpt : 200;
+      i = f->current_drive->disk.c_bpt ? 
+          ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.c_bpt : 200;
       if( i > 0 ) {
         event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			     machine_current->timings.processor_speed / 1000,
@@ -688,6 +716,8 @@ abort_read_data:
   f->main_status |= UPD_FDC_MAIN_DATAREQ;
   if( f->cmd->id != UPD_CMD_SCAN )
     f->main_status |= UPD_FDC_MAIN_DATA_READ;
+  else
+    f->main_status |= UPD_FDC_MAIN_DATA_WRITE;
   f->data_offset = 0;
   event_remove_type( timeout_event );
   event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000  */
@@ -713,14 +743,14 @@ multi_track_next:
       f->read_id = 1;
     }
     while( f->rev ) {
-      i = f->current_drive->disk.i >= f->current_drive->disk.bpt ?
+      i = f->current_drive->disk.i >= f->current_drive->disk.c_bpt ?
     	  0 : f->current_drive->disk.i;			/* start position */
       if( seek_id( f ) == 0 )
         f->rev = 0;
       else
         f->id_mark = UPD_FDC_AM_NONE;
-      i = f->current_drive->disk.bpt ? 
-          ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.bpt : 200;
+      i = f->current_drive->disk.c_bpt ? 
+          ( f->current_drive->disk.i - i ) * 200 / f->current_drive->disk.c_bpt : 200;
       if( i > 0 ) {
         event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			     machine_current->timings.processor_speed / 1000,
@@ -871,7 +901,7 @@ upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
   }
   
   if( f->read_id ) {
-    if( f->cmd->id == UPD_CMD_READ_DATA ) {
+    if( f->cmd->id == UPD_CMD_READ_DATA || f->cmd->id == UPD_CMD_SCAN ) {
       start_read_data( f );
     } else if( f->cmd->id == UPD_CMD_READ_ID ) {
       start_read_id( f );
@@ -899,9 +929,53 @@ upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
   return;
 }
 
+#ifdef DEBUG_UPD
+#define CHECK_BIT_STR( n ) ( n ) ? "\e[42;30m" : "\e[100;37m"
+#define CHECK_BIT_RED( n ) ( n ) ? "\e[42;30m" : "\e[41;37m"
+#define CHECK_4BIT_STR( b ) ( b ) & CHECK_BIT_STR( 0x20 ), \
+                            ( b ) & CHECK_BIT_STR( 0x10 ), \
+                            ( b ) & CHECK_BIT_STR( 0x08 ), \
+                            ( b ) & CHECK_BIT_STR( 0x04 )
+
+#define CHECK_6BIT_STR( b ) ( b ) & CHECK_BIT_STR( 0x80 ), \
+                            ( b ) & CHECK_BIT_STR( 0x40 ), \
+                            ( b ) & CHECK_BIT_STR( 0x20 ), \
+                            ( b ) & CHECK_BIT_STR( 0x10 ), \
+                            ( b ) & CHECK_BIT_STR( 0x08 ), \
+                            ( b ) & CHECK_BIT_STR( 0x04 )
+
+#define CHECK_8BIT_STR( b ) ( b ) & CHECK_BIT_STR( 0x80 ), \
+                            ( b ) & CHECK_BIT_STR( 0x40 ), \
+                            ( b ) & CHECK_BIT_STR( 0x20 ), \
+                            ( b ) & CHECK_BIT_STR( 0x10 ), \
+                            ( b ) & CHECK_BIT_STR( 0x08 ), \
+                            ( b ) & CHECK_BIT_STR( 0x04 ), \
+                            ( b ) & CHECK_BIT_STR( 0x02 ), \
+                            ( b ) & CHECK_BIT_STR( 0x01 )
+#endif /* #ifdef DEBUG_UPD */
+
 libspectrum_byte
 upd_fdc_read_status( upd_fdc *f )
 {
+#ifdef DEBUG_UPD
+  /* RQM DIO EXM  CB D3B D2B D1B D0B */
+  if( f ) {
+    static int last_status = -1;
+    static size_t num = 0;
+    if( last_status == f->main_status ) {
+      num++;
+    } else {
+      if( num )
+        fprintf( stderr, "Main ST (0x%02x): %sRQM\e[0m %sDIO\e[0m %sEXM\e[0m %s CB\e[0m %sD3B\e[0m %sD2B\e[0m %sD1B\e[0m %sD0B\e[0m x%zu\n", last_status,
+                 CHECK_8BIT_STR( last_status ), num );
+      fprintf( stderr, "Main ST (0x%02x): %sRQM\e[0m %sDIO\e[0m %sEXM\e[0m %s CB\e[0m %sD3B\e[0m %sD2B\e[0m %sD1B\e[0m %sD0B\e[0m\n", f->main_status,
+               CHECK_8BIT_STR( f->main_status ) );
+      last_status = f->main_status;
+      num = 0;
+    }
+  }
+#endif /* #ifdef DEBUG_UPD */
+
   return f->main_status;
 }
 
@@ -909,6 +983,10 @@ libspectrum_byte
 upd_fdc_read_data( upd_fdc *f )
 {
   libspectrum_byte r;
+#ifdef DEBUG_UPD
+  int state = f->state;
+  const char *t_str[] = { " NT", " AT", " IC", "RAT" };
+#endif /* #ifdef DEBUG_UPD */
 
   fdd_t *d = f->current_drive;
 
@@ -998,8 +1076,39 @@ upd_fdc_read_data( upd_fdc *f )
     if( f->intrq < UPD_INTRQ_READY )
       f->intrq = UPD_INTRQ_NONE;
   }
+
+#ifdef DEBUG_UPD
+  if( state == UPD_FDC_STATE_RES ) { /* result */
+    if( f->cmd->id == UPD_CMD_SENSE_DRIVE ) {  /* sense drive -> ST3 */
+      fprintf( stderr, "--- %s RESULT\nSTATUS3 (0x%02x): %sFLT\e[0m %s WP\e[0m %sRDY\e[0m %s T0\e[0m %s TS\e[0m %s HD\e[0m US: %d\n", debug_cmd_str[f->command_register & 0x1f], r,
+               CHECK_6BIT_STR( r ), r & 0x03 );
+    } else if( f->cmd->id == UPD_CMD_SENSE_INT && f->cycle == 0 ) { /* ST0 PCN */
+      fprintf( stderr, "--- %s RESULT\nSTATUS0 (0x%02x): TRM:%s%s\e[0m %s SE\e[0m %s EC\e[0m %s NR\e[0m %s HD\e[0m US: %d   PCN:% 3d\n", debug_cmd_str[f->command_register & 0x1f], f->sense_int_res[0],
+               CHECK_BIT_RED( !( f->sense_int_res[0] & 0xc0 ) ), t_str[f->sense_int_res[0] >> 6],
+               CHECK_4BIT_STR( r ), f->sense_int_res[0] & 0x03, f->sense_int_res[1] );
+    } else if( f->cmd->res_length == 7 && f->cycle == 0 ) {
+      fprintf( stderr, "--- %s RESULT\nSTATUS0 (0x%02x): TRM:%s%s\e[0m %s SE\e[0m %s EC\e[0m %s NR\e[0m %s HD\e[0m US: %d\n", debug_cmd_str[f->command_register & 0x1f], f->status_register[0],
+               CHECK_BIT_RED( !( f->status_register[0] & 0xc0 ) ), t_str[f->status_register[0] >> 6],
+               CHECK_4BIT_STR( r ), f->sense_int_res[0] & 0x03 );
+      fprintf( stderr, "STATUS1 (0x%02x): %sEOC\e[0m %s---\e[0m %sIDE\e[0m %s OR\e[0m %s---\e[0m %s ND\e[0m %s NW\e[0m %s MA\e[0m\n", f->status_register[1],
+               CHECK_8BIT_STR( f->status_register[1] ) );
+      fprintf( stderr, "STATUS2 (0x%02x): %s---\e[0m %s CM\e[0m %sDDE\e[0m %s WC\e[0m %s SH\e[0m %s SN\e[0m %s BC\e[0m %s MD\e[0m\n", f->status_register[2],
+               CHECK_8BIT_STR( f->status_register[2] ) );
+      fprintf( stderr, "C H R N (....): CYL: %2d HEAD: %d REC:%3d LEN: %d\n", f->data_register[1],
+               f->data_register[2], f->data_register[3], f->data_register[4] );
+    }
+  }
+#endif /* #ifdef DEBUG_UPD */
+
   return r;
 }
+
+#ifdef DEBUG_UPD
+#define FDR( n ) f->data_register[n]
+#define CHECK_CMD_STR( b )  ( b ) & CHECK_BIT_STR( 0x80 ), \
+                            ( b ) & CHECK_BIT_STR( 0x40 ), \
+                            ( b ) & CHECK_BIT_STR( 0x20 )
+#endif /* #ifdef DEBUG_UPD */
 
 void
 upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
@@ -1007,13 +1116,21 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
   int i, terminated = 0;
   unsigned int u;
   fdd_t *d;
+#ifdef DEBUG_UPD
+  static int cmd = 0;
+
+  f->dbg_data_wr = 0;
+  if( f->cycle == 0 ) {
+    cmd = data;
+  }
+#endif /* #ifdef DEBUG_UPD */
 
   if( !( f->main_status & UPD_FDC_MAIN_DATAREQ ) || 
       ( f->main_status & UPD_FDC_MAIN_DATA_READ ) )
     return;
 
   if( f->main_status & UPD_FDC_MAIN_BUSY && 
-      f->state == UPD_FDC_STATE_EXE ) {	/* execution phase WRITE/FORMAT */
+      f->state == UPD_FDC_STATE_EXE ) {        /* execution phase WRITE/FORMAT/SCAN */
     d = f->current_drive;
     if( f->cmd->id == UPD_CMD_WRITE_ID ) {	/* FORMAT */
 		/* at the index hole... */
@@ -1120,7 +1237,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
     } else {						/* SCAN */
       f->data_offset++;
       fdd_read_data( d ); crc_add( f, d );
-      if( f->data_offset == 0 && d->data == data )	/* `scan hit' */
+      if( f->data_offset == 1 && d->data == data )     /* `scan hit' */
         f->status_register[2] |= UPD_FDC_ST2_SCAN_HIT;
 
       if( d->data != data )				/* `scan _not_ hit' */
@@ -1131,7 +1248,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
           ( f->scan == UPD_SCAN_HI && d->data < data ) ) {
         f->status_register[2] |= UPD_FDC_ST2_SCAN_NOT_SAT;
       }
-    
+
       if( f->data_offset == f->sector_length ) {	/* read the CRC */
 	fdd_read_data( d ); crc_add( f, d );
 	fdd_read_data( d ); crc_add( f, d );
@@ -1188,6 +1305,10 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
     if( f->non_dma ) {				/* btw: only NON-DMA mode emulated */
       f->main_status |= UPD_FDC_MAIN_EXECUTION;
     }
+
+#ifdef DEBUG_UPD
+    f->dbg_data_wr = 1;
+#endif
 
     /* select current drive and head if needed */    
     if( f->cmd->id != UPD_CMD_SENSE_INT &&
@@ -1366,6 +1487,9 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 							     UPD_SCAN_LO;
 
       f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
+      f->first_rw = 1;         /* always read at least one sector */
+      if( f->data_register[4] == 0 && f->data_register[7] < 128 )
+        f->rlen = f->data_register[7];
       head_load( f );
       return;
     }
@@ -1380,4 +1504,34 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
   } else {
     f->cycle++;
   }
+
+#ifdef DEBUG_UPD
+  if( f->dbg_data_wr ) {       /* we already read all neccessery byte */
+    if( f->cmd->cmd_length == 0 ) {    /* 0 */
+      fprintf( stderr, "\n--- %s (0x%02x) START\n", debug_cmd_str[f->command_register & 0x1f], cmd );
+    } else if( f->cmd->cmd_length == 1 ) { /* HD, US */
+      fprintf( stderr, "\n--- %s (0x%02x) START\n  HD: %d US: %d\n", debug_cmd_str[f->command_register & 0x1f], cmd, ( data & 0x04 ) >> 2, data & 0x03 );
+    } else if( f->cmd->id == UPD_CMD_SPECIFY ) { /*  */
+      fprintf( stderr, "\n--- %s (0x%02x) START\n  SRT: %d HUT: %dms HLT: %dms NDMA: %d\n", debug_cmd_str[f->command_register & 0x1f], cmd,
+               FDR( 0 ) >> 4, FDR( 0 ) & 0x0f,
+               data >> 1, data & 1);
+    } else if( f->cmd->id == UPD_CMD_SEEK ) { /*  */
+      fprintf( stderr, "\n--- %s (0x%02x) START\n  HD: %d US: %d NCN: %d\n", debug_cmd_str[f->command_register & 0x1f], cmd,
+               ( FDR( 0 ) & 0x04 ) >> 2, FDR( 0 ) & 0x03, data );
+    } else if( f->cmd->cmd_length == 6 ) { /* HD, US */
+      fprintf( stderr, "\n--- %s (0x%02x) START\n  %sMT\e[0m %sMF\e[0m %sSK\e[0m HD: %d US: %d - N: %d SC: %d GPL: %d FILL: 0x%02x\n", debug_cmd_str[f->command_register & 0x1f], cmd,
+               CHECK_CMD_STR( f->command_register & 0x40 ), ( FDR( 0 ) & 0x04 ) >> 2, FDR( 0 ) & 0x03,
+               FDR( 1 ), FDR( 2 ), FDR( 3 ), data );
+    } else if( f->cmd->cmd_length == 8 ) {
+      fprintf( stderr, "\n--- %s (0x%02x) START (%d)\n"
+                       "                %sMT\e[0m %sMF\e[0m %sSK\e[0m HD: %d US: %d\n"
+                       "                CYL: %2d HEAD: %d REC:%3d LEN: %d\n"
+                       "                EOT: %2d GPL: %2d DTL:%3d\n", debug_cmd_str[f->command_register & 0x1f], cmd, f->cycle,
+               CHECK_CMD_STR( f->command_register ), ( FDR( 0 ) & 0x04 ) >> 2, FDR( 0 ) & 0x03,
+               FDR( 1 ), FDR( 2 ), FDR( 3 ), FDR( 4 ), FDR( 5 ), FDR(6), data );
+    }
+  }
+#undef FDR
+#endif /* #ifdef DEBUG_UPD */
+
 }

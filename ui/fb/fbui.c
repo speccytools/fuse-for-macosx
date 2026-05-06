@@ -1,5 +1,5 @@
 /* fbui.c: Routines for dealing with the linux fbdev user interface
-   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Witold Filipczyk
+   Copyright (c) 2000-2007 Philip Kendall, Matan Ziv-Av, Witold Filipczyk
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

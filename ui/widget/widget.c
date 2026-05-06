@@ -1,7 +1,7 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001-2012 Matan Ziv-Av, Philip Kendall, Russell Marks
    Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2016 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -689,6 +689,7 @@ widget_t widget_data[] = {
   { widget_memory_draw,   NULL,			 widget_memory_keyhandler   },
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
   { widget_peripherals_general_draw, widget_options_finish, widget_peripherals_general_keyhandler },
+  { widget_peripherals_sound_draw, widget_options_finish, widget_peripherals_sound_keyhandler },
   { widget_peripherals_disk_draw, widget_options_finish, widget_peripherals_disk_keyhandler },
   { widget_query_draw,    widget_query_finish,	 widget_query_keyhandler    },
   { widget_query_save_draw,widget_query_finish,	 widget_query_save_keyhandler },
@@ -696,7 +697,7 @@ widget_t widget_data[] = {
   { widget_binary_draw, widget_binary_finish, widget_binary_keyhandler  },
 };
 
-#ifndef UI_SDL
+#if !defined UI_SDL && !defined UI_SDL2
 #ifndef UI_X
 /* The statusbar handling functions */
 /* TODO: make these do something useful */
@@ -712,7 +713,7 @@ ui_statusbar_update_speed( float speed )
   return 0;
 }
 #endif
-#endif                          /* #ifndef UI_SDL */
+#endif                          /* #if !defined UI_SDL && !defined UI_SDL2 */
 
 /* Tape browser update function. The dialog box is created every time it
    is displayed, so no need to do anything here */

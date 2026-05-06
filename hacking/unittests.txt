@@ -1,0 +1,23 @@
+Running Fuse's unit tests
+=========================
+
+Fuse's unit tests are built into the main `fuse' binary rather than
+being exposed as separate Automake `TESTS' executables.
+
+The normal developer entry point is:
+
+  make check
+
+This builds `fuse' and runs the embedded unit test framework via
+`./fuse --unittests'. Contributors should run it before submitting
+changes.
+
+If you want to run the test framework directly, use:
+
+  ./fuse --unittests
+
+The `--unittests' option runs the embedded test framework, prints any
+failures to stdout, and exits with status 0 on success or a non-zero
+status on failure.
+
+For manual peripheral smoke tests, see `hacking/peripheral_tests.txt'.

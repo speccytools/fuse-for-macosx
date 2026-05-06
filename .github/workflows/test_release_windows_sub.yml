@@ -1,0 +1,45 @@
+# Reusable workflow for creating test release (Windows builds)
+name: Test version of Fuse App (Windows)
+run-name: Build & Deploy Test version of Fuse App For Windows / ${{ github.actor }} /
+
+on:
+  workflow_call:
+    inputs:
+      # Description of this test build
+      reason:
+        type: string
+        required: true
+      # Build parameters (forwarded)
+      key:
+        type: string
+        required: true
+      dependencies:
+        type: string
+        required: false
+      configure_params:
+        type: string
+        required: true
+      verify_ui:
+        type: string
+        required: true
+      verify_audio:
+        type: string
+        required: true
+      verify_other:
+        type: string
+        required: false
+
+jobs:
+
+  # Build Fuse App
+  build:
+    name: "Build Fuse"
+    uses: ./.github/workflows/build_windows_sub.yml
+    with:
+      key: "${{ inputs.key }}"
+      dependencies: "${{ inputs.dependencies }}"
+      configure_params: "${{ inputs.configure_params }} --with-test-build='Reason: ${{ inputs.reason }}\\nTriggered by: ${{ github.actor }}\\nBranch: ${{ github.ref_name }}\\nDate: #NOW#'"
+      fuse_version: "TEST-BUILD"
+      verify_ui: "${{ inputs.verify_ui }}"
+      verify_audio: "${{ inputs.verify_audio }}"
+      upload_artifacts: true

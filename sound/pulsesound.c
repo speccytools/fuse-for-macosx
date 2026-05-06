@@ -1,5 +1,5 @@
 /* pulsesound.c: pulseaudio (Linux) sound I/O
-   Copyright (c) 2010-2019 Grzegorz Jablonski, Sergio Baldoví
+   Copyright (c) 2010-2021 Grzegorz Jablonski, Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

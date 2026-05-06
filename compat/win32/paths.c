@@ -56,6 +56,12 @@ compat_get_config_path( void )
   return ".";
 }
 
+const char*
+compat_get_fallback_config_path( void )
+{
+  return NULL;
+}
+
 int
 compat_is_absolute_path( const char *path )
 {
@@ -74,7 +80,6 @@ compat_get_next_path( path_context *ctx )
   case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
   case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
   case UTILS_AUXILIARY_WIDGET: path_segment = "ui/widget"; break;
-  case UTILS_AUXILIARY_GTK: path_segment = "ui/gtk"; break;
   default:
     ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", ctx->type );
     return 0;

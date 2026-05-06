@@ -1,5 +1,5 @@
 /* unittests.c: unit testing framework for Fuse
-   Copyright (c) 2008-2016 Philip Kendall
+   Copyright (c) 2008-2018 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,8 @@
 
 #include "config.h"
 
+#include <string.h>
+
 #include "libspectrum.h"
 
 #include "debugger/debugger.h"
@@ -43,12 +45,16 @@
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
 #include "peripherals/multiface.h"
+#include "peripherals/sound/uspeech.h"
 #include "peripherals/speccyboot.h"
 #include "peripherals/ttx2000s.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
 #include "settings.h"
+#include "bitmap.h"
+#include "rectangle.h"
 #include "unittests.h"
+#include "utils.h"
 
 static int
 contention_test( void )
@@ -245,6 +251,102 @@ floating_bus_merge_test( void )
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0x00 ) == 0x0a );
   TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xff ) == 0xaa );
 
+  /* Tests with complementary attached/floating_bus masks */
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0xf0, 0x0f ) == 0xaa );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xf0 ) == 0xaa );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x55, 0x00 ) == 0x00 );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x00, 0x55 ) == 0x00 );
+
+  return 0;
+}
+
+static int
+bitmap_ops_test( void )
+{
+  libspectrum_byte buf[2];
+
+  /* Group 1: bitmap_test returns zero on a zeroed buffer */
+  buf[0] = 0; buf[1] = 0;
+  TEST_ASSERT( bitmap_test( buf, 0 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 7 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 15 ) == 0 );
+
+  /* Group 2: bitmap_set sets only the target bit */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 0 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 1 ) == 0 );
+
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 7 );
+  TEST_ASSERT( bitmap_test( buf, 7 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 6 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) == 0 );
+
+  /* Group 3: byte-boundary crossing (bits 7->8) */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 8 );
+  TEST_ASSERT( buf[0] == 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 7 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 9 ) == 0 );
+
+  /* Group 4: bitmap_reset clears only the target bit in an all-ones buffer */
+  buf[0] = 0xff; buf[1] = 0xff;
+  bitmap_reset( buf, 0 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 1 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 8 ) != 0 );
+
+  buf[0] = 0xff; buf[1] = 0xff;
+  bitmap_reset( buf, 15 );
+  TEST_ASSERT( bitmap_test( buf, 15 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 14 ) != 0 );
+
+  /* Group 5: set-then-reset round-trips cleanly to zero */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 3 );
+  TEST_ASSERT( bitmap_test( buf, 3 ) != 0 );
+  bitmap_reset( buf, 3 );
+  TEST_ASSERT( bitmap_test( buf, 3 ) == 0 );
+
+  /* Group 6: two independent bits in the same byte do not interfere */
+  buf[0] = 0; buf[1] = 0;
+  bitmap_set( buf, 0 );
+  bitmap_set( buf, 4 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 4 ) != 0 );
+  TEST_ASSERT( bitmap_test( buf, 1 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 3 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 5 ) == 0 );
+  bitmap_reset( buf, 0 );
+  TEST_ASSERT( bitmap_test( buf, 0 ) == 0 );
+  TEST_ASSERT( bitmap_test( buf, 4 ) != 0 );
+
+  return 0;
+}
+
+static int
+utils_safe_strdup_test( void )
+{
+  char *result;
+
+  /* NULL input should return NULL (safe from crash unlike plain strdup) */
+  TEST_ASSERT( utils_safe_strdup( NULL ) == NULL );
+
+  /* Regular string should be copied correctly */
+  result = utils_safe_strdup( "hello fuse" );
+  TEST_ASSERT( result != NULL );
+  TEST_ASSERT( strcmp( result, "hello fuse" ) == 0 );
+  libspectrum_free( result );
+
+  /* Empty string should produce an allocated, empty string */
+  result = utils_safe_strdup( "" );
+  TEST_ASSERT( result != NULL );
+  TEST_ASSERT( strcmp( result, "" ) == 0 );
+  libspectrum_free( result );
+
   return 0;
 }
 
@@ -305,6 +407,39 @@ mempool_test( void )
 
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
+  /* Test mempool_strdup: verify string content and pool tracking */
+  {
+    const char *test_string = "hello fuse";
+    char *result = mempool_strdup( pool1, test_string );
+
+    TEST_ASSERT( result != NULL );
+    TEST_ASSERT( strcmp( result, test_string ) == 0 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+
+    mempool_free( pool1 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+  }
+
+  /* Test mempool_strdup with an empty string */
+  {
+    char *result = mempool_strdup( pool1, "" );
+
+    TEST_ASSERT( result != NULL );
+    TEST_ASSERT( strcmp( result, "" ) == 0 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+
+    mempool_free( pool1 );
+    TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+  }
+
+  /* Test mempool_strdup with NULL returns NULL safely */
+  TEST_ASSERT( mempool_strdup( pool1, NULL ) == NULL );
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+
+  /* Test that out-of-range pool IDs return NULL */
+  TEST_ASSERT( mempool_malloc( mempool_get_pools(), 23 ) == NULL );
+  TEST_ASSERT( mempool_malloc( -2, 23 ) == NULL );
 
   return 0;
 }
@@ -761,6 +896,7 @@ paging_test( void )
     r += speccyboot_unittest();
     r += ttx2000s_unittest();
     r += usource_unittest();
+    r += uspeech_unittest();
 
     r += beta_unittest();
     r += didaktik80_unittest();
@@ -777,6 +913,175 @@ paging_test( void )
   return r;
 }
 
+static int
+rectangle_test( void )
+{
+  int saved_frame_rate = settings_current.frame_rate;
+
+  /* --- Test 1: rectangle_add creates a new active rectangle --- */
+  rectangle_reset();
+  rectangle_add( 0, 0, 10 );
+  TEST_ASSERT( rectangle_get_active_count() == 1 );
+  TEST_ASSERT( rectangle_inactive_count == 0 );
+
+  /* --- Test 2: rectangle_add extends a matching active rectangle --- */
+  rectangle_add( 1, 0, 10 );
+  TEST_ASSERT( rectangle_get_active_count() == 1 );
+
+  /* --- Test 3: rectangle_add creates a second rect when x,w differ --- */
+  rectangle_add( 1, 5, 8 );
+  TEST_ASSERT( rectangle_get_active_count() == 2 );
+
+  /* --- Test 4: rectangle_end_line keeps rects updated on this line --- */
+  /* Both rects ended at line 1 (y+h = 2 = 1+1), so both should be kept. */
+  rectangle_end_line( 1 );
+  TEST_ASSERT( rectangle_get_active_count() == 2 );
+  TEST_ASSERT( rectangle_inactive_count == 0 );
+
+  /* --- Test 5: rectangle_end_line flushes stale rects to inactive --- */
+  /* y=300 is beyond any rect; both move to inactive (frame_rate == 1). */
+  settings_current.frame_rate = 1;
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_get_active_count() == 0 );
+  TEST_ASSERT( rectangle_inactive_count == 2 );
+
+  /* --- Test 6 (frame skip): exact duplicate is discarded --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* Build inactive: {x=0, y=0, w=10, h=3} */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* Exact same rect again — should be discarded, count stays 1 */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].h == 3 );
+
+  /* --- Test 7 (frame skip): adjacent rows are merged --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=0, w=10, h=3} (rows 0-2) */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+
+  /* source: {x=0, y=3, w=10, h=1} (row 3) — touches row 2, should merge */
+  rectangle_add( 3, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].y == 0 );
+  TEST_ASSERT( rectangle_inactive[0].h == 4 );
+
+  /* --- Test 8 (frame skip): same-y different-h merge (bug fix) --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=0, w=10, h=3} */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=0, y=0, w=10, h=5} — same x,w,y but taller; must merge */
+  rectangle_add( 0, 0, 10 );
+  rectangle_add( 1, 0, 10 );
+  rectangle_add( 2, 0, 10 );
+  rectangle_add( 3, 0, 10 );
+  rectangle_add( 4, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].y == 0 );
+  TEST_ASSERT( rectangle_inactive[0].h == 5 );
+
+  /* --- Test 9 (frame skip): same-y same-h different-x merge (bug fix) --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=5, y=0, w=10, h=3} */
+  rectangle_add( 0, 5, 10 );
+  rectangle_add( 1, 5, 10 );
+  rectangle_add( 2, 5, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=5, y=0, w=15, h=3} — same x,y,h but wider; must merge */
+  rectangle_add( 0, 5, 15 );
+  rectangle_add( 1, 5, 15 );
+  rectangle_add( 2, 5, 15 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].x == 5 );
+  TEST_ASSERT( rectangle_inactive[0].w == 15 );
+
+  /* --- Test 10 (frame skip): y-merge where source is above inactive --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=3, w=10, h=2} (rows 3-4) */
+  rectangle_add( 3, 0, 10 );
+  rectangle_add( 4, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=0, y=2, w=10, h=1} (row 2) — touches row 3 from above */
+  rectangle_add( 2, 0, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].y == 2 );
+  TEST_ASSERT( rectangle_inactive[0].h == 3 );
+
+  /* --- Test 11 (frame skip): x-merge where source is to the left of inactive --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=5, y=0, w=10, h=3} (columns 5-14) */
+  rectangle_add( 0, 5, 10 );
+  rectangle_add( 1, 5, 10 );
+  rectangle_add( 2, 5, 10 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=0, y=0, w=6, h=3} (columns 0-5) — touches column 5 from left */
+  rectangle_add( 0, 0, 6 );
+  rectangle_add( 1, 0, 6 );
+  rectangle_add( 2, 0, 6 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+  TEST_ASSERT( rectangle_inactive[0].x == 0 );
+  TEST_ASSERT( rectangle_inactive[0].w == 15 );
+
+  /* --- Test 12 (frame skip): non-overlapping rects stay as separate entries --- */
+  rectangle_reset();
+  settings_current.frame_rate = 2;
+
+  /* inactive: {x=0, y=0, w=5, h=3} */
+  rectangle_add( 0, 0, 5 );
+  rectangle_add( 1, 0, 5 );
+  rectangle_add( 2, 0, 5 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 1 );
+
+  /* source: {x=20, y=10, w=5, h=3} — no overlap in either dimension */
+  rectangle_add( 10, 20, 5 );
+  rectangle_add( 11, 20, 5 );
+  rectangle_add( 12, 20, 5 );
+  rectangle_end_line( 300 );
+  TEST_ASSERT( rectangle_inactive_count == 2 );
+
+  settings_current.frame_rate = saved_frame_rate;
+  return 0;
+}
+
 int
 unittests_run( void )
 {
@@ -785,9 +1090,12 @@ unittests_run( void )
   r += contention_test();
   r += floating_bus_test();
   r += floating_bus_merge_test();
+  r += utils_safe_strdup_test();
+  r += bitmap_ops_test();
   r += mempool_test();
   r += paging_test();
   r += debugger_disassemble_unittest();
+  r += rectangle_test();
 
   printf("Final return value: %d (should be 0)\n", r);
 

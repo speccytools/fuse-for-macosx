@@ -1,5 +1,5 @@
 /* display.c: Routines for printing the Spectrum screen
-   Copyright (c) 1999-2015 Philip Kendall, Thomas Harte, Witold Filipczyk
+   Copyright (c) 1999-2016 Philip Kendall, Thomas Harte, Witold Filipczyk
                            and Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
@@ -100,7 +100,7 @@ static libspectrum_qword display_all_dirty;
 static int display_redraw_all;
 
 /* The last point at which we updated the screen display */
-int critical_region_x = 0, critical_region_y = 0;
+static int critical_region_x = 0, critical_region_y = 0;
 
 /* The border colour changes which have occurred in this frame */
 struct border_change_t {
@@ -328,6 +328,21 @@ update_dirty_rects( void )
     int x = 0;
     while( display_is_dirty[y] ) {
 
+#ifdef __GNUC__
+      /* Skip to the first dirty bit using a single BSF/TZCNT instruction */
+      int skip = __builtin_ctzll( (unsigned long long)display_is_dirty[y] );
+      display_is_dirty[y] >>= skip;
+      x += skip;
+
+      start = x;
+
+      /* Count the run of consecutive dirty bits using ~value */
+      int run = __builtin_ctzll( (unsigned long long)~display_is_dirty[y] );
+      display_is_dirty[y] >>= run;
+      x += run;
+
+      rectangle_add( y, start, run );
+#else
       /* Find the first dirty chunk on this row */
       while( !( display_is_dirty[y] & 0x01 ) ) {
         display_is_dirty[y] >>= 1;
@@ -343,6 +358,7 @@ update_dirty_rects( void )
       } while( display_is_dirty[y] & 0x01 );
 
       rectangle_add( y, start, x - start );
+#endif
     }
 
     /* compress the active rectangles list */
@@ -567,6 +583,12 @@ copy_critical_region_line( int y, int x, int end )
 
   while( dirty ) {
 
+#ifdef __GNUC__
+    /* Skip to the first dirty bit using a single BSF/TZCNT instruction */
+    int skip = __builtin_ctz( (unsigned int)dirty );
+    dirty >>= skip;
+    x += skip;
+#else
     /* Find the first dirty chunk on this row */
     while( !( dirty & 0x01 ) ) {
 
@@ -574,6 +596,7 @@ copy_critical_region_line( int y, int x, int end )
       x++;
 
     }
+#endif
 
     /* Walk to the end of the dirty region, writing the bytes to the
        drawing area along the way */
@@ -1081,3 +1104,52 @@ display_getpixel( int x, int y )
 
   return paper;
 }
+
+#ifdef DISPLAYTEST
+
+/* Helper functions for the unit tests */
+void
+display_reset_frame_count( void )
+{
+  /* We set the frame count to 31 so the next call to display_frame()
+     pushes us back to zero and resets display_flash_reversed */
+  display_frame_count = 31;
+}
+
+void
+display_set_flash_reversed( int reversed )
+{
+  display_flash_reversed = reversed;
+}
+
+void
+display_clear_maybe_dirty( void )
+{
+  memset( display_maybe_dirty, 0, sizeof( display_maybe_dirty ) );
+}
+
+void
+display_clear_is_dirty( void )
+{
+  memset( display_is_dirty, 0, sizeof( display_is_dirty ) );
+}
+
+void
+display_set_maybe_dirty( int y, libspectrum_qword dirty )
+{
+  display_maybe_dirty[y] = dirty;
+}
+
+libspectrum_qword
+display_get_is_dirty( int y )
+{
+  return display_is_dirty[y];
+}
+
+libspectrum_dword
+display_get_maybe_dirty( int y )
+{
+  return display_maybe_dirty[y];
+}
+
+#endif          /* #ifdef DISPLAYTEST */

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2003-2013 Philip Kendall
+## Copyright (c) 2003-2016 Philip Kendall
 ## Copyright (c) 2015 Sergio Baldoví
 
 ## This program is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ endif
 ## Wii routines
 if COMPAT_WII
 fuse_SOURCES += \
-                compat/wii/dir.c \
+                compat/unix/dir.c \
                 compat/unix/file.c \
                 compat/wii/osname.c \
                 compat/wii/paths.c \

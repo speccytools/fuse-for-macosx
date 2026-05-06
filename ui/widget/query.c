@@ -1,5 +1,5 @@
 /* query.c: The query widgets
-   Copyright (c) 2004-2008 Darren Salt, Fredrick Meunier
+   Copyright (c) 2004-2021 Darren Salt, Fredrick Meunier
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

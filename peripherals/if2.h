@@ -1,5 +1,5 @@
 /* if2.h: Interface 2 cartridge handling routines
-   Copyright (c) 2004-2016 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2004-2021 Fredrick Meunier, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

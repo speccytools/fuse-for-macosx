@@ -1,0 +1,150 @@
+name: Libspectrum for Linux
+run-name: Build and test Libspectrum for Linux / ${{ github.actor }} /
+
+on:
+  workflow_call:
+    inputs:
+      key:
+        type: string
+        required: true
+      libspectrum_ref:
+        type: string
+        required: false
+        default: master
+      use_zlib:
+        type: boolean
+        required: false
+        default: true
+      use_bzip2:
+        type: boolean
+        required: false
+        default: true
+      use_libgcrypt:
+        type: boolean
+        required: false
+        default: true
+      use_libaudiofile:
+        type: boolean
+        required: false
+        default: true
+      use_fake_glib:
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    env:
+      LIBSPECTRUM_DIR: libspectrum
+      LIBSPECTRUM_GIT_URL: https://git.code.sf.net/p/fuse-emulator/libspectrum
+
+    steps:
+      - name: (1) Prepare environment
+        run: |
+          echo -n "Current directory: "
+          pwd
+          ls -la
+
+          echo "Libspectrum URL: $LIBSPECTRUM_GIT_URL"
+          echo "Libspectrum ref: ${{ inputs.libspectrum_ref }}"
+
+          echo "Use lib zlib: ${{ inputs.use_zlib && 'yes' || 'no' }}"
+          echo "Use lib bzip2: ${{ inputs.use_bzip2 && 'yes' || 'no' }}"
+          echo "Use lib libgcrypt: ${{ inputs.use_libgcrypt && 'yes' || 'no' }}"
+          echo "Use lib libaudiofile: ${{ inputs.use_libaudiofile && 'yes' || 'no' }}"
+          echo "Use fake glib: ${{ inputs.use_fake_glib && 'yes' || 'no' }}"
+
+      - name: (2) Clone libspectrum source
+        run: |
+          git init "$LIBSPECTRUM_DIR"
+          git -C "$LIBSPECTRUM_DIR" remote add origin "$LIBSPECTRUM_GIT_URL"
+          git -C "$LIBSPECTRUM_DIR" fetch --depth 1 origin "${{ inputs.libspectrum_ref }}"
+          git -C "$LIBSPECTRUM_DIR" checkout FETCH_HEAD
+
+      - name: (3) Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install --no-install-recommends \
+            libaudiofile-dev \
+            libbz2-dev \
+            libgcrypt-dev \
+            libglib2.0-dev
+
+      - name: (4) Autogen.sh
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          echo "Running autogen.sh .."
+          ./autogen.sh
+
+      - name: (5) Configure for Linux
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          echo "Running configure .."
+          ./configure \
+          ${{ inputs.use_zlib == false && '--without-zlib' || '' }} \
+          ${{ inputs.use_bzip2 == false && '--without-bzip2' || '' }} \
+          ${{ inputs.use_libgcrypt == false && '--without-libgcrypt' || '' }} \
+          ${{ inputs.use_libaudiofile == false && '--without-libaudiofile' || '' }} \
+          ${{ inputs.use_fake_glib == true && '--with-fake-glib' || '' }} \
+          | tee ./configure.out
+
+      - name: (6) Verify output from configure
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          .github/scripts/in_config.sh "libspectrum is ready to be compiled"
+          .github/scripts/in_config.sh "zlib support: ${{ inputs.use_zlib && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "bzip2 support: ${{ inputs.use_bzip2 && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "libgcrypt support: ${{ inputs.use_libgcrypt && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "libaudiofile support: ${{ inputs.use_libaudiofile && 'yes' || 'no' }}"
+          .github/scripts/in_config.sh "Internal GLib replacement: ${{ inputs.use_fake_glib && 'yes' || 'no' }}"
+
+      - name: (7) Make
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          echo "Running make .."
+          make
+
+      - name: (8) Install
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          echo "Running make install .."
+          sudo make install
+
+      - name: (9) Run tests
+        id: run-tests
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          echo "Building and running tests .."
+          make check
+
+      - name: (10) Verbose check tests (on failure)
+        if: failure() && steps.run-tests.outcome != 'success'
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          echo "Listing all tests individually .."
+          test/test
+
+      - name: (11) Pack installed library files
+        working-directory: ${{ env.LIBSPECTRUM_DIR }}
+        run: |
+          find /usr/local | grep libspectrum > .tar_files
+          sudo tar -cvf \
+          libspectrum-installed-linux.tar \
+          -C /usr/local/ -T.tar_files
+
+      - name: (12) Upload generated tar file
+        uses: actions/upload-artifact@v8
+        with:
+          name: libspectrum-installed-linux-${{ inputs.key }}
+          path: |
+            ${{ env.LIBSPECTRUM_DIR }}/libspectrum-installed-linux.tar
+
+      - name: (13) Finish
+        run: |
+          echo "Finishing with status ${{ job.status }}."

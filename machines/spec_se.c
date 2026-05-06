@@ -1,5 +1,5 @@
 /* spec_se.c: ZX Spectrum SE specific routines
-   Copyright (c) 1999-2015 Fredrick Meunier, Philip Kendall, Darren Salt
+   Copyright (c) 1999-2021 Fredrick Meunier, Philip Kendall, Darren Salt
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

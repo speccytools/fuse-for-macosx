@@ -1,5 +1,5 @@
 /* sunsound.c: OpenBSD sound I/O
-   Copyright (c) 2002-2004 Alexander Yurchenko, Russell Marks, Philip Kendall
+   Copyright (c) 2002-2007 Alexander Yurchenko, Russell Marks, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

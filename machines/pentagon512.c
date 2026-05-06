@@ -4,7 +4,7 @@
                   exchange snapshots with emulators that do not support this
                   model but do support the older style Pentagon (SPIN,
                   Spectaculator, xzx-pro etc. etc.)..
-   Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2021 Philip Kendall and Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
