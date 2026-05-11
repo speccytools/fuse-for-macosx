@@ -58,8 +58,15 @@ static pthread_mutex_t network_read_mutex;
 static pthread_mutex_t network_write_mutex;
 static int gdbserver_reset_event = -1;
 
+enum spectranext_autoboot
+{
+  autoboot_nothing = 0,
+  autoboot_force_set_once = 1,
+  autoboot_force_reset_once
+};
+
 /** vSpectranext autoboot: if true at machine_reset, apply ram mount + autoboot once, then clear. */
-static bool spectranext_autoboot = false;
+static enum spectranext_autoboot spectranext_autoboot = autoboot_nothing;
 
 static libspectrum_word* registers[] = {
     &AF,
@@ -857,7 +864,7 @@ void gdbserver_schedule_reset(void)
 
 void gdbserver_schedule_autoboot(void)
 {
-    spectranext_autoboot = true;
+    spectranext_autoboot = autoboot_force_set_once;
     event_add(tstates + 1, gdbserver_reset_event);
 }
 
@@ -1117,15 +1124,25 @@ static uint8_t action_remove_breakpoint(const void* arg, void* response)
 void gdbserver_on_machine_reset(void)
 {
 #ifdef BUILD_SPECTRANET
-    if (spectranext_autoboot)
+    switch (spectranext_autoboot)
     {
+      case autoboot_force_set_once:
+      {
         spectranet_config_set_string(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_MOUNT_RESOURCE, "xfs://ram/");
         spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_AUTO_BOOT, 1);
-        spectranext_autoboot = false;
-    }
-    else
-    {
+        spectranext_autoboot = autoboot_force_reset_once;
+        break;
+      }
+      case autoboot_force_reset_once:
+      {
         spectranet_config_set_byte(CONFIG_SECTION_AUTO_MOUNT, CONFIG_ITEM_AUTO_BOOT, 0);
+        spectranext_autoboot = autoboot_nothing;
+        break;
+      }
+      default:
+      {
+        break;
+      }
     }
 #endif
 }
