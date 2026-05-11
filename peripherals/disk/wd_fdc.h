@@ -1,5 +1,5 @@
 /* wd_fdc.h: Western Digital floppy disk controller emulation
-   Copyright (c) 2003-2015 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 2003-2021 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify

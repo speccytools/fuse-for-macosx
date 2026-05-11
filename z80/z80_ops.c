@@ -1,7 +1,7 @@
 /* z80_ops.c: Process the next opcode
-   Copyright (c) 1999-2005 Philip Kendall, Witold Filipczyk
-   Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 1999-2018 Philip Kendall, Witold Filipczyk
+   Copyright (c) 2015-2023 Stuart Brady
+   Copyright (c) 2015-2017 Gergely Szasz
    Copyright (c) 2015 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@
 #include "peripherals/ide/divmmc.h"
 #include "peripherals/if1.h"
 #include "peripherals/multiface.h"
+#include "peripherals/sound/uspeech.h"
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "peripherals/usource.h"
@@ -223,6 +224,14 @@ z80_do_opcodes( void )
 
     if( PC == 0x2bae ) {
       usource_toggle();
+    }
+
+    END_CHECK
+
+    CHECK( uspeech, uspeech_available )
+
+    if( PC == 0x0038 ) {
+      uspeech_toggle();
     }
 
     END_CHECK

@@ -144,6 +144,7 @@ struct nic_w5100_t {
   nic_w5100_socket_t socket[4];
 
   pthread_t thread;         /* Thread for doing I/O */
+  int io_thread_running;    /* True if the I/O thread was started */
   sig_atomic_t stop_io_thread; /* Flag to stop I/O thread */
   compat_socket_selfpipe_t *selfpipe; /* Device for waking I/O thread */
 };

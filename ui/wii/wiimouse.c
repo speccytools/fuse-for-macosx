@@ -32,8 +32,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#define GEKKO
-
 #include <wiiuse/wpad.h>
 
 #include "fuse.h"

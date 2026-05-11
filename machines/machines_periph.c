@@ -1,7 +1,7 @@
 /* machines_periph.c: various machine-specific peripherals
-   Copyright (c) 2011-2016 Philip Kendall
-   Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2011-2017 Philip Kendall
+   Copyright (c) 2015-2023 Stuart Brady
+   Copyright (c) 2015-2017 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -219,6 +219,7 @@ machines_periph_48( void )
   periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_DIDAKTIK80, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_DISCIPLE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_USPEECH, PERIPH_PRESENT_OPTIONAL );
 }
 
 /* The set of peripherals available on the 128K and similar machines */

@@ -1,5 +1,5 @@
 /* wd_fdc.c: Western Digital floppy disk controller emulation
-   Copyright (c) 2002-2016 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 2002-2021 Stuart Brady, Fredrick Meunier, Philip Kendall,
                            Dmitry Sanarin, Gergely Szasz
    Copyright (c) 2016 Sergio Baldoví
 
@@ -404,14 +404,14 @@ wd_fdc_seek_verify_read_id( wd_fdc *f )
   event_remove_type( fdc_event );
   if( f->id_mark == WD_FDC_AM_NONE ) {
     while( f->rev ) {
-      i = d->disk.i >= d->disk.bpt ? 0 : d->disk.i;	/* start position */
+      i = d->disk.i >= d->disk.c_bpt ? 0 : d->disk.i;	/* start position */
       if( !read_id( f ) ) {
 	if( f->id_track != f->track_register ) {
 	  f->status_register |= WD_FDC_SR_RNF;
 	}
       } else
         f->id_mark = WD_FDC_AM_NONE;
-      i = d->disk.bpt ? ( d->disk.i - i ) * 200 / d->disk.bpt : 200;
+      i = d->disk.c_bpt ? ( d->disk.i - i ) * 200 / d->disk.c_bpt : 200;
       if( i > 0 ) {
         event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			   machine_current->timings.processor_speed / 1000,
@@ -561,7 +561,7 @@ wd_fdc_type_ii_seek( wd_fdc *f )
   if( f->id_mark == WD_FDC_AM_NONE ) {
     f->read_id = 1;
     while( f->rev ) {
-      i = d->disk.i >= d->disk.bpt ? 0 : d->disk.i;	/* start position */
+      i = d->disk.i >= d->disk.c_bpt ? 0 : d->disk.i;	/* start position */
       if( !read_id( f ) ) {
         if( ( f->data_check_head != -1 && f->data_check_head != !!( f->id_head ) ) ||
 	    ( f->id_track != f->track_register || f->id_sector != f->sector_register ) ) {
@@ -570,8 +570,8 @@ wd_fdc_type_ii_seek( wd_fdc *f )
       } else {
         f->id_mark = WD_FDC_AM_NONE;
       }
-      i = d->disk.bpt ?
-	( d->disk.i - i ) * 200 / d->disk.bpt : 200;
+      i = d->disk.c_bpt ?
+	( d->disk.i - i ) * 200 / d->disk.c_bpt : 200;
       if( i > 0 ) {
         event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			     machine_current->timings.processor_speed / 1000,
@@ -723,10 +723,10 @@ wd_fdc_type_iii( wd_fdc *f )
     }
     if( f->id_mark == WD_FDC_AM_NONE ) {
       while( f->rev ) {
-        i = d->disk.i >= d->disk.bpt ? 0 : d->disk.i;	/* start position */
+        i = d->disk.i >= d->disk.c_bpt ? 0 : d->disk.i;	/* start position */
         read_id( f );
-        i = d->disk.bpt ?
-	    ( d->disk.i - i ) * 200 / d->disk.bpt : 200;
+        i = d->disk.c_bpt ?
+	    ( d->disk.i - i ) * 200 / d->disk.c_bpt : 200;
 	if( i > 0 ) {
           event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			       machine_current->timings.processor_speed / 1000,

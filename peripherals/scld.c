@@ -1,5 +1,5 @@
 /* scld.c: Routines for handling the Timex SCLD
-   Copyright (c) 2002-2016 Fredrick Meunier, Philip Kendall, Witold Filipczyk
+   Copyright (c) 2002-2021 Fredrick Meunier, Philip Kendall, Witold Filipczyk
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

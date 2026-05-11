@@ -1,5 +1,5 @@
 /* variable.c: Debugger variables
-   Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2008-2012 Philip Kendall
    Copyright (c) 2015 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 /* socket.c: Socket-related compatibility routines
-   Copyright (c) 2011-2015 Philip Kendall
+   Copyright (c) 2011-2019 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 
 #include "compat.h"
 #include "fuse.h"
@@ -60,6 +61,15 @@ compat_socket_blocking_mode( compat_socket_t fd, int blocking )
     return -1;
   flags = blocking ? ( flags | O_NONBLOCK ) : ( flags & ~O_NONBLOCK );
   return ( fcntl( fd, F_SETFL, flags ) != 0 );
+}
+
+int
+compat_socket_get_fionread( compat_socket_t fd, u_long *bytes)
+{
+  int b;
+  int err = ioctl( fd, FIONREAD, &b );
+  *bytes = b;
+  return ( err );
 }
 
 int

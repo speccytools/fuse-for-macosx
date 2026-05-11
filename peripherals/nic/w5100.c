@@ -140,23 +140,15 @@ w5100_io_thread( void *arg )
   return NULL;
 }
 
-nic_w5100_t*
-nic_w5100_alloc( void )
+static int
+w5100_start_io_thread( nic_w5100_t *self )
 {
   int error;
-  int i;
-  nic_w5100_t *self;
 
-  utils_networking_init();
-
-  self = libspectrum_new( nic_w5100_t, 1 );
+  if( self->io_thread_running ) return 0;
 
   self->selfpipe = compat_socket_selfpipe_alloc();
-
-  for( i = 0; i < 4; i++ )
-    nic_w5100_socket_init( &self->socket[i], i );
-
-  nic_w5100_reset( self );
+  if( !self->selfpipe ) return 1;
 
   self->stop_io_thread = 0;
 
@@ -165,6 +157,30 @@ nic_w5100_alloc( void )
     ui_error( UI_ERROR_ERROR, "w5100: error %d creating thread", error );
     fuse_abort();
   }
+
+  self->io_thread_running = 1;
+
+  return 0;
+}
+
+nic_w5100_t*
+nic_w5100_alloc( void )
+{
+  int i;
+  nic_w5100_t *self;
+
+  utils_networking_init();
+
+  self = libspectrum_new( nic_w5100_t, 1 );
+
+  self->selfpipe = NULL;
+  self->io_thread_running = 0;
+  self->stop_io_thread = 0;
+
+  for( i = 0; i < 4; i++ )
+    nic_w5100_socket_init( &self->socket[i], i );
+
+  nic_w5100_reset( self );
 
   return self;
 }
@@ -175,15 +191,17 @@ nic_w5100_free( nic_w5100_t *self )
   int i;
 
   if( self ) {
-    self->stop_io_thread = 1;
-    compat_socket_selfpipe_wake( self->selfpipe );
+    if( self->io_thread_running ) {
+      self->stop_io_thread = 1;
+      compat_socket_selfpipe_wake( self->selfpipe );
 
-    pthread_join( self->thread, NULL );
+      pthread_join( self->thread, NULL );
+    }
 
     for( i = 0; i < 4; i++ )
       nic_w5100_socket_end( &self->socket[i] );
 
-    compat_socket_selfpipe_free( self->selfpipe );
+    if( self->selfpipe ) compat_socket_selfpipe_free( self->selfpipe );
 
     compat_socket_networking_end();
 
@@ -191,10 +209,20 @@ nic_w5100_free( nic_w5100_t *self )
   }
 }
 
+int
+nic_w5100_enable( nic_w5100_t *self )
+{
+  if( !self ) return 1;
+
+  return w5100_start_io_thread( self );
+}
+
 libspectrum_byte
 nic_w5100_read( nic_w5100_t *self, libspectrum_word reg )
 {
   libspectrum_byte b;
+
+  if( !self->io_thread_running && reg >= 0x400 ) return 0xff;
 
   if( reg < 0x030 ) {
     switch( reg ) {
@@ -292,6 +320,8 @@ w5100_write__msr( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b )
 void
 nic_w5100_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b )
 {
+  if( !self->io_thread_running && reg >= 0x400 ) return;
+
   if( reg < 0x030 ) {
     switch( reg ) {
       case W5100_MR:

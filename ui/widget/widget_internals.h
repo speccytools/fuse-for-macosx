@@ -1,5 +1,5 @@
 /* widget_internals.h: Functions internal to the widget code
-   Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001-2011 Matan Ziv-Av, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

@@ -1,3 +1,52 @@
+# options.dat: Data file for options dialog boxes
+# Copyright (c) 2001-2023 Philip Kendall, Marek Januszewski, Stuart Brady
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Author contact information:
+#
+# E-mail: philip-fuse@shadowmagic.org.uk
+#
+# File is preprocessed by cpp-perl.pl to apply some .h like conditions (see Makefile.am),
+#   and then parsed by script Dialog.pm (Perl package Fuse::Dialog).
+#
+# Format of this file is as follows:
+#   - Description of this file, comments. Section will be ignored.
+#   - Blocks of option dialog boxes' data.
+#
+# Structure of each block:
+#   - 1x line - keyword for dialog box
+#   - 1x line - English description for dialog box
+#   - 1-N lines with options - one line per 1 option
+#   - 1-2 lines with callbacks
+#   - Empty line (end of one block)
+#
+# Structure of option line:
+#   Type, English translation, setting ID, shortcut key ID [ , Data 1 ] [ , Data 2 ]
+#     Wrapping some letter in description into () will underline it as hint for key shortcut.
+#     Setting ID must be defined in file settings.dat (there it defines also type and default value).
+#
+# Possible types:
+#   - Entry (input text) - uses data 1: max. length, data 2: label text (only in GTK).
+#   - Checkbox
+#   - Combo - uses data 1: Dropdown values separated with "|" . "*" specifies default value.
+#
+# Callbacks:
+#   - Postcheck, callback function - Called function should return if to reset machine (see needs_hard_reset).
+#   - Posthook, callback function - Will be called after settings are saved.
+#
 general
 General Options
 Entry, (E)mulation speed, emulation_speed, INPUT_KEY_e, 5, %
@@ -15,6 +64,8 @@ Checkbox, Raw Sinclair(N)ET, raw_s_net, INPUT_KEY_n
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (P)AL-TV use TV2x effect, pal_tv2x, INPUT_KEY_p
 #ifdef UI_SDL
+Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
+#elif defined UI_SDL2
 Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 #endif
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
@@ -39,8 +90,6 @@ General Peripheral Options
 Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
 Checkbox, Kempston (m)ouse, kempston_mouse, INPUT_KEY_m
 Checkbox, (S)wap mouse buttons, mouse_swap_buttons, INPUT_KEY_s
-Checkbox, (F)uller Box, fuller, INPUT_KEY_f
-Checkbox, M(e)lodik, melodik, INPUT_KEY_e
 Checkbox, (I)nterface 1, interface1, INPUT_KEY_i
 Checkbox, In(t)erface 2, interface2, INPUT_KEY_t
 Checkbox, Mu(l)tiface One, multiface1, INPUT_KEY_l
@@ -52,7 +101,6 @@ Checkbox, (Z)X Printer, zxprinter, INPUT_KEY_z
 #ifdef BUILD_SPECCYBOOT
 Checkbox, Speccy(B)oot interface, speccyboot, INPUT_KEY_b
 #endif
-Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
 #ifdef BUILD_SPECTRANET
 Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n
 Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
@@ -61,7 +109,16 @@ Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
 Checkbox, TT(X)2000S, ttx2000s, INPUT_KEY_x
 #endif
 Checkbox, uSo(u)rce, usource, INPUT_KEY_u
+Postcheck, periph_postcheck
+Posthook, periph_posthook
+
+peripherals_sound
+Sound Peripheral Options
+Checkbox, (F)uller Box, fuller, INPUT_KEY_f
+Checkbox, M(e)lodik, melodik, INPUT_KEY_e
+Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
 Checkbox, C(o)vox interface, covox, INPUT_KEY_o
+Checkbox, (u)Speech, uspeech, INPUT_KEY_u
 Postcheck, periph_postcheck
 Posthook, periph_posthook
 
@@ -106,6 +163,7 @@ Entry, A(Y) volume, volume_ay, INPUT_KEY_y, 3, %
 Entry, B(e)eper volume, volume_beeper, INPUT_KEY_e, 3, %
 Entry, Spec(D)rum volume, volume_specdrum, INPUT_KEY_d, 3, %
 Entry, (C)ovox volume, volume_covox, INPUT_KEY_c, 3, %
+Entry, (u)Speech volume, volume_uspeech, INPUT_KEY_u, 3, %
 
 diskoptions
 Drives Setup

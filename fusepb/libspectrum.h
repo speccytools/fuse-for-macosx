@@ -1,5 +1,5 @@
 /* libspectrum.h: the library for dealing with ZX Spectrum emulator files
-   Copyright (c) 2001-2018 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2023 Philip Kendall, Darren Salt, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -272,6 +272,7 @@ typedef enum libspectrum_error {
   LIBSPECTRUM_ERROR_SIGNATURE,
   LIBSPECTRUM_ERROR_SLT,	/* .slt data found at end of a .z80 file */
   LIBSPECTRUM_ERROR_INVALID,	/* Invalid parameter supplied */
+  LIBSPECTRUM_ERROR_MISSING_ZLIB, /* Missing or not used zlib.h */
 
   LIBSPECTRUM_ERROR_LOGIC = -1,
 
@@ -452,6 +453,9 @@ typedef enum libspectrum_id_t {
   /* Below here, present only in 1.4.0 and later */
 
   LIBSPECTRUM_ID_SCREEN_MLT,		/* .mlt screen file */
+
+  /* Below here, present only in FUTURE version */
+  LIBSPECTRUM_ID_SNAPSHOT_DSNAP,		/* .S snapshot (D40/D80) */
 
 } libspectrum_id_t;
 
@@ -689,35 +693,35 @@ LIBSPECTRUM_API libspectrum_error
 libspectrum_creator_set_program( libspectrum_creator *creator,
 				 const char *program );
 LIBSPECTRUM_API const char *
-libspectrum_creator_program( libspectrum_creator *creator );
+libspectrum_creator_program( const libspectrum_creator *creator );
 
 LIBSPECTRUM_API libspectrum_error
 libspectrum_creator_set_major( libspectrum_creator *creator,
 			       libspectrum_word major );
 LIBSPECTRUM_API libspectrum_word
-libspectrum_creator_major( libspectrum_creator *creator );
+libspectrum_creator_major( const libspectrum_creator *creator );
 
 LIBSPECTRUM_API libspectrum_error
 libspectrum_creator_set_minor( libspectrum_creator *creator,
 			       libspectrum_word minor );
 LIBSPECTRUM_API libspectrum_word
-libspectrum_creator_minor( libspectrum_creator *creator );
+libspectrum_creator_minor( const libspectrum_creator *creator );
 
 LIBSPECTRUM_API libspectrum_error
 libspectrum_creator_set_competition_code( libspectrum_creator *creator,
 					  libspectrum_dword competition_code );
 LIBSPECTRUM_API libspectrum_dword
-libspectrum_creator_competition_code( libspectrum_creator *creator );
+libspectrum_creator_competition_code( const libspectrum_creator *creator );
 
 LIBSPECTRUM_API libspectrum_error
 libspectrum_creator_set_custom( libspectrum_creator *creator,
 				libspectrum_byte *data, size_t length );
 
 LIBSPECTRUM_API libspectrum_byte *
-libspectrum_creator_custom( libspectrum_creator *creator );
+libspectrum_creator_custom( const libspectrum_creator *creator );
 
 LIBSPECTRUM_API size_t
-libspectrum_creator_custom_length( libspectrum_creator *creator );
+libspectrum_creator_custom_length( const libspectrum_creator *creator );
 
 /*
  * Snap handling routines
@@ -1084,6 +1088,10 @@ WIN32_DLL libspectrum_byte * libspectrum_snap_usource_rom( libspectrum_snap *sna
 WIN32_DLL void libspectrum_snap_set_usource_rom( libspectrum_snap *snap, int idx, libspectrum_byte* usource_rom );
 WIN32_DLL size_t libspectrum_snap_usource_rom_length( libspectrum_snap *snap, int idx );
 WIN32_DLL void libspectrum_snap_set_usource_rom_length( libspectrum_snap *snap, int idx, size_t usource_rom_length );
+WIN32_DLL int libspectrum_snap_uspeech_active( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_uspeech_active( libspectrum_snap *snap, int uspeech_active );
+WIN32_DLL int libspectrum_snap_uspeech_paged( libspectrum_snap *snap );
+WIN32_DLL void libspectrum_snap_set_uspeech_paged( libspectrum_snap *snap, int uspeech_paged );
 WIN32_DLL int libspectrum_snap_disciple_active( libspectrum_snap *snap );
 WIN32_DLL void libspectrum_snap_set_disciple_active( libspectrum_snap *snap, int disciple_active );
 WIN32_DLL int libspectrum_snap_disciple_paged( libspectrum_snap *snap );

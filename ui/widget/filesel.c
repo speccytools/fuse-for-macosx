@@ -1,7 +1,7 @@
 /* filesel.c: File selection dialog box
    Copyright (c) 2001-2015 Matan Ziv-Av, Philip Kendall, Russell Marks,
 			   Marek Januszewski
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2017 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

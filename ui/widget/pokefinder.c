@@ -1,5 +1,5 @@
 /* pokefinder.c: The poke finder widget
-   Copyright (c) 2004 Darren Salt
+   Copyright (c) 2004-2005 Darren Salt
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

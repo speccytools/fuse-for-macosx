@@ -1,6 +1,6 @@
 /* multiface.c: Multiface One/128/3 handling routines
-   Copyright (c) 2005,2007 Gergely Szasz
-   Copyright (c) 2017 Fredrick Meunier
+   Copyright (c) 2005,2007-2017 Gergely Szasz
+   Copyright (c) 2017-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

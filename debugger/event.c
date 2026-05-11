@@ -1,6 +1,6 @@
 /* event.c: Debugger events
-   Copyright (c) 2008 Philip Kendall
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2008-2016 Philip Kendall
+   Copyright (c) 2015-2016 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

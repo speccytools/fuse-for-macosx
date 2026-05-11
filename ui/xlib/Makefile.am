@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2004 Philip Kendall
+## Copyright (c) 2001-2016 Philip Kendall
 ## Copyright (c) 2015 Sergio Baldoví
 
 ## This program is free software; you can redistribute it and/or modify
@@ -50,12 +50,13 @@ ui_xlib_built = \
 
 EXTRA_DIST += \
               ui/xlib/xpixmaps.c \
+              ui/xlib/xpixmaps.c.in \
               ui/xlib/xstatusbar.pl
 
 ui/xlib/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
 	@$(MKDIR_P) ui/xlib
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl x $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
 
-ui/xlib/xpixmaps.c: ui/xlib/xstatusbar.pl $(srcdir)/ui/gtk/pixmaps.c
+ui/xlib/xpixmaps.c: ui/xlib/xstatusbar.pl $(srcdir)/ui/xlib/xpixmaps.c.in
 	@$(MKDIR_P) ui/xlib
-	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/ui/xlib/xstatusbar.pl $(srcdir)/ui/gtk/pixmaps.c > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/ui/xlib/xstatusbar.pl $(srcdir)/ui/xlib/xpixmaps.c.in > $@.tmp && mv $@.tmp $@

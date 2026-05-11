@@ -1,10 +1,10 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2012 Philip Kendall
+   Copyright (c) 1999-2018 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015 Gergely Szasz
-   Copyright (c) 2015 Fredrick Meunier
+   Copyright (c) 2015-2021 Fredrick Meunier
    Copyright (c) 2016 BogDan Vatra
-   Copyright (c) 2016 Sergio Baldoví
+   Copyright (c) 2016-2017 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

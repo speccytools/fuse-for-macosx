@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2015 Philip Kendall, Darren Salt, Gergely Szasz
+   Copyright (c) 1999-2017 Philip Kendall, Darren Salt, Gergely Szasz
    Copyright (c) 2016 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify

@@ -1,6 +1,6 @@
 /* menu.c: general menu widget
-   Copyright (c) 2001-2015 Philip Kendall
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2001-2016 Philip Kendall
+   Copyright (c) 2015-2018 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -481,6 +481,12 @@ void
 menu_options_peripherals_general( int action )
 {
   widget_do_peripherals_general();
+}
+
+void
+menu_options_peripherals_sound( int action )
+{
+  widget_do_peripherals_sound();
 }
 
 void

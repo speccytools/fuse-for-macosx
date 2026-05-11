@@ -2,7 +2,7 @@
    Copyright (c) 2015-2016 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

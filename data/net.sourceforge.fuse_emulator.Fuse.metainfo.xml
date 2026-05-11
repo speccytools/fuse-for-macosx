@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2018 The Fuse development team -->
+<component type="desktop">
+  <id>net.sourceforge.fuse_emulator.Fuse</id>
+  <provides>
+    <id>net.sf.fuse_emulator.desktop</id>
+  </provides>
+  <replaces>
+    <id>net.sf.fuse_emulator.desktop</id>
+  </replaces>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>Fuse</name>
+  <summary>Sinclair ZX Spectrum Emulator</summary>
+  <categories>
+    <category>Game</category>
+    <category>Emulator</category>
+  </categories>
+  <releases>
+    <release date="2026-03-24" version="1.7.0">
+      <description>
+        <ul>
+          <li>Added Currah μSpeech emulation</li>
+          <li>More accurate AM29F010B flash ROM handling</li>
+          <li>Improved EDSK disk image handling</li>
+          <li>Fixed the uPD765 FDC SCAN bug, allowing formatting on CP/M Plus and Fuzix</li>
+          <li>Improved TTX2000S teletext handling</li>
+          <li>Improved Spectranet socket interrupt behaviour</li>
+          <li>Added support for loading .S snapshot files</li>
+          <li>Better emulation accuracy and performance</li>
+          <li>Several UI fixes and improvements</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2021-03-01" version="1.6.0">
+      <description>
+        <ul>
+          <li>Added TTX2000S emulation</li>
+          <li>New 4X scalers</li>
+          <li>Several UI fixes and improvements</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2018-12-11" version="1.5.7">
+      <description>
+        <ul>
+          <li>Improved Kempston mouse handling</li>
+          <li>Several UI fixes and improvements</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2018-08-08" version="1.5.6">
+      <description>
+        <ul>
+          <li>Z80 flags register is now correct after SCF and CCF</li>
+          <li>Accelerate Alkatraz, Search and Dinaload loaders</li>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2018-07-01" version="1.5.5">
+      <description>
+        <ul>
+          <li>Improve sound accuracy on Unix 64 bits systems</li>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+    </release>
+    <release date="2018-06-06" version="1.5.4">
+      <description>
+        <ul>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+  <description>
+    <p>
+      Fuse is an emulator of the Sinclair ZX Spectrum home
+      computer. It supports all of the original models and some
+      clones, with quite faithful emulation of the display and
+      sound.
+    </p>
+    <p>
+      Fuse can load most formats of snapshots, tapes and floppy disks
+      and it can emulate many peripherals such as joysticks, printers,
+      storage devices and network interfaces, among others.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Fuse running the 128 BASIC editor</caption>
+      <image>
+        https://fuse-emulator.sourceforge.net/screens/AppStream/fuse1.png
+      </image>
+    </screenshot>
+    <screenshot>
+      <caption>Fuse loading The Lords of Midnight</caption>
+      <image>
+        https://fuse-emulator.sourceforge.net/screens/AppStream/fuse2.png
+      </image>
+    </screenshot>
+    <screenshot>
+      <caption>Fuse running Head Over Heels</caption>
+      <image>
+        https://fuse-emulator.sourceforge.net/screens/AppStream/fuse3.png
+      </image>
+    </screenshot>
+    <screenshot>
+      <caption>The Fuse debugger window</caption>
+      <image>
+        https://fuse-emulator.sourceforge.net/screens/AppStream/fuse4.png
+      </image>
+    </screenshot>
+  </screenshots>
+  <developer id="net.sourceforge.fuse-emulator"><name>The Fuse development team</name></developer>
+  <update_contact>fuse-emulator-devel_AT_lists.sourceforge.net</update_contact>
+  <url type="homepage">https://fuse-emulator.sourceforge.net/</url>
+  <url type="bugtracker">https://sourceforge.net/p/fuse-emulator/bugs/</url>
+  <content_rating type="oars-1.1"/>
+  <launchable type="desktop-id">net.sourceforge.fuse_emulator.Fuse.desktop</launchable>
+</component>

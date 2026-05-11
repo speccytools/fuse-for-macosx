@@ -1,5 +1,5 @@
 /* zxcf.c: ZXCF interface routines
-   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall
+   Copyright (c) 2003-2017 Garry Lancaster, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 		 

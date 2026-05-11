@@ -1,5 +1,5 @@
 /* profile.c: Z80 profiler
-   Copyright (c) 2005-2016 Philip Kendall
+   Copyright (c) 2005-2018 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

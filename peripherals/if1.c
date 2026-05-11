@@ -1,5 +1,5 @@
 /* if1.c: Interface 1 handling routines
-   Copyright (c) 2004-2016 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2019 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

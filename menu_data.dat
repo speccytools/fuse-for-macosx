@@ -81,6 +81,7 @@ Options/_Sound..., Item
 
 Options/_Peripherals, Branch
 Options/Peripherals/_General..., Item
+Options/Peripherals/_Sound..., Item
 Options/Peripherals/_Disk..., Item
 
 Options/_RZX..., Item
@@ -122,13 +123,15 @@ Options/Select ROMs/Peripheral ROMs/Mu_ltiface One..., Item,, menu_options_selec
 Options/Select ROMs/Peripheral ROMs/Multiface _128..., Item,, menu_options_selectroms_peripheral_select,, 7
 Options/Select ROMs/Peripheral ROMs/Multiface _3..., Item,, menu_options_selectroms_peripheral_select,, 8
 Options/Select ROMs/Peripheral ROMs/_Opus Discovery..., Item,, menu_options_selectroms_peripheral_select,, 9
-Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_peripheral_select,, 10
-Options/Select ROMs/Peripheral ROMs/TT_X2000S..., Item,, menu_options_selectroms_peripheral_select,, 11
-Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 12
+Options/Select ROMs/Peripheral ROMs/_SP0256..., Item,,menu_options_selectroms_peripheral_select,, 10
+Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_peripheral_select,, 11
+Options/Select ROMs/Peripheral ROMs/TT_X2000S..., Item,, menu_options_selectroms_peripheral_select,, 12
+Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 13
+Options/Select ROMs/Peripheral ROMs/uS_peech..., Item,, menu_options_selectroms_peripheral_select,, 14
 
 Options/_Filter..., Item,,, menu_filter_detail
 
-#ifdef UI_SDL
+#if defined UI_SDL || defined UI_SDL2
 Options/F_ull screen, Item, F11
 #endif
 

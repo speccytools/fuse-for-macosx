@@ -1,5 +1,5 @@
 /* utils.h: some useful helper functions
-   Copyright (c) 1999-2012 Philip Kendall
+   Copyright (c) 1999-2018 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

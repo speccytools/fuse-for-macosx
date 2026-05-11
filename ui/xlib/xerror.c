@@ -1,5 +1,5 @@
 /* xerror.c: handle X errors
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2007 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

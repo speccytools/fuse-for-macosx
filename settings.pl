@@ -587,9 +587,11 @@ settings_get_rom_setting( settings_info *settings, size_t which,
     case  6: return &( settings->rom_multiface128 );
     case  7: return &( settings->rom_multiface3 );
     case  8: return &( settings->rom_opus );
-    case  9: return &( settings->rom_speccyboot );
-    case 10: return &( settings->rom_ttx2000s );
-    case 11: return &( settings->rom_usource );
+    case  9: return &( settings->rom_sp0256 );
+    case 10: return &( settings->rom_speccyboot );
+    case 11: return &( settings->rom_ttx2000s );
+    case 12: return &( settings->rom_usource );
+    case 13: return &( settings->rom_uspeech );
     default: return NULL;
     }
   }

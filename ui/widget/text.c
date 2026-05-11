@@ -1,5 +1,5 @@
 /* text.c: simple text entry widget
-   Copyright (c) 2002-2005 Philip Kendall
+   Copyright (c) 2002-2007 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

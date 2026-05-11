@@ -38,6 +38,7 @@
 
 #include "input.h"
 #include "uijoystick.h"
+#include "peripherals/joystick.h"
 
 #if defined USE_JOYSTICK && defined HAVE_JSW_H
 

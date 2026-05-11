@@ -1,5 +1,5 @@
 /* win32keyboard.c: routines for dealing with the Win32 keyboard
-   Copyright (c) 2003 Marek Januszewski, Philip Kendall
+   Copyright (c) 2003-2008 Marek Januszewski, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

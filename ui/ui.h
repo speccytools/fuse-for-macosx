@@ -1,5 +1,5 @@
 /* ui.h: General UI event handling routines
-   Copyright (c) 2000-2015 Philip Kendall
+   Copyright (c) 2000-2017 Philip Kendall
    Copyright (c) 2016 BogDan Vatra
 
    This program is free software; you can redistribute it and/or modify

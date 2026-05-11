@@ -1,6 +1,6 @@
 # fuse: bash completion for fuse-emulator
 
-# Copyright (c) 2015 Sergio Baldoví
+# Copyright (c) 2015-2023 Sergio Baldoví
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ _fuse()
         --sdl-fullscreen-mode|--snet|--sound-device|-d| \
         --sound-freq|-f|--speccyboot-tap|--speed| \
         --teletext-addr-[1-4]|--teletext-port-[1-4]|--volume-ay| \
-        --volume-beeper|--volume-covox|--volume-specdrum)
+        --volume-beeper|--volume-covox|--volume-specdrum|--volume-uspeech)
             # argument required but no completions available
             return 0
             ;;
@@ -244,7 +244,8 @@ _fuse()
             --no-sound-force-8bit --no-speccyboot --no-specdrum
             --no-spectranet --no-spectranet-disable --no-statusbar
             --no-strict-aspect-hint --no-traps --no-ttx2000s --no-unittests
-            --no-usource --no-writable-roms --no-zxatasp --no-zxatasp-upload
+            --no-usource --no-uspeech --no-writable-roms
+            --no-zxatasp --no-zxatasp-upload
             --no-zxatasp-write-protect --no-zxcf --no-zxcf-upload --no-zxmmc
             --no-zxprinter --opus --opusdisk --pal-tv2x --phantom-typist-mode
             --playback --plus3-detect-speedlock --plus3disk --plusd --plusddisk
@@ -261,10 +262,10 @@ _fuse()
             --rom-plus2a-2 --rom-plus2a-3 --rom-plus3-0 --rom-plus3-1
             --rom-plus3-2 --rom-plus3-3 --rom-plus3e-0 --rom-plus3e-1
             --rom-plus3e-2 --rom-plus3e-3 --rom-plusd --rom-scorpion-0
-            --rom-scorpion-1 --rom-scorpion-2 --rom-scorpion-3
+            --rom-scorpion-1 --rom-scorpion-2 --rom-scorpion-3 --rom-sp0256
             --rom-speccyboot --rom-spec-se-0 --rom-spec-se-1
             --rom-tc2048 --rom-tc2068-0 --rom-tc2068-1 --rom-ts2068-0
-            --rom-ts2068-1 --rom-ttx2000s --rom-usource
+            --rom-ts2068-1 --rom-ttx2000s --rom-usource --rom-uspeech
             --rs232-handshake --rs232-rx --rs232-tx
             --rzx-autosaves --sdl-fullscreen-mode --separation
             --simpleide --simpleide-masterfile --simpleide-slavefile --slt
@@ -275,8 +276,9 @@ _fuse()
             --teletext-addr-1 --teletext-addr-2 --teletext-addr-3
             --teletext-addr-4 --teletext-port-1 --teletext-port-2
             --teletext-port-3 --teletext-port-4 --textfile --traps --ttx2000s
-            --unittests --usource --version --volume-ay
-            --volume-beeper --volume-covox --volume-specdrum --writable-roms
+            --unittests --usource --uspeech --version --volume-ay
+            --volume-beeper --volume-covox --volume-specdrum --volume-uspeech
+            --writable-roms
             --zxatasp --zxatasp-masterfile --zxatasp-slavefile --zxatasp-upload
             --zxatasp-write-protect --zxcf --zxcf-cffile --zxcf-upload
             --zxmmc --zxmmc-file --zxprinter' -- "$cur" ) )

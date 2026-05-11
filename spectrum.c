@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2017 Philip Kendall, Darren Salt
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@
 #include "z80/z80.h"
 
 /* 1040 KB of RAM */
-libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
+libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000] = { { 0 } };
 
 /* How many tstates have elapsed since the last interrupt? (or more
    precisely, since the ULA last pulled the /INT line to the Z80 low) */

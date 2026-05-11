@@ -84,6 +84,7 @@ int spectranet_paged_via_io;
 int spectranet_w5100_paged_a = 0, spectranet_w5100_paged_b = 0;
 int spectranet_xfs_paged_a = 0, spectranet_xfs_paged_b = 0;
 int spectranet_spectranext_config_paged_a = 0, spectranet_spectranext_config_paged_b = 0;
+int spectranet_flash_paged_a = 0, spectranet_flash_paged_b = 0;
 
 /* Whether the programmable trap is active */
 int spectranet_programmable_trap_active;
@@ -156,6 +157,7 @@ spectranet_map_page( int dest, int source )
   int w5100_page = source >= 0x40 && source < 0x48;
   int xfs_page = (source == XFS_SPECTRANET_PAGE);
   int spectranext_config_page = (source == SPECTRANEXT_CONTROLLER_PAGE);
+  int flash_page = source >= 0x00 && source < 0x20;
 
   for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
     spectranet_current_map[dest * MEMORY_PAGES_IN_4K + i] =
@@ -167,11 +169,13 @@ spectranet_map_page( int dest, int source )
       spectranet_w5100_paged_a = w5100_page;
       spectranet_xfs_paged_a = xfs_page;
       spectranet_spectranext_config_paged_a = spectranext_config_page;
+      spectranet_flash_paged_a = flash_page;
       break;
-    case 2: 
+    case 2:
       spectranet_w5100_paged_b = w5100_page;
       spectranet_xfs_paged_b = xfs_page;
       spectranet_spectranext_config_paged_b = spectranext_config_page;
+      spectranet_flash_paged_b = flash_page;
       break;
   }
 }
@@ -196,6 +200,17 @@ spectranet_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
     spectranet_available = 0;
     spectranet_paged = 0;
+    return;
+  }
+
+  if( nic_w5100_enable( w5100 ) ) {
+    ui_error( UI_ERROR_WARNING,
+              "Networking blocked (loopback/firewall?); Spectranet disabled" );
+    settings_current.spectranet = 0;
+    settings_current.spectranet_disable = 1;
+    spectranet_available = 0;
+    spectranet_paged = 0;
+    periph_activate_type( PERIPH_TYPE_SPECTRANET, 0 );
     return;
   }
 
@@ -564,6 +579,15 @@ void
 spectranet_spectranext_config_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
 {
   spectranext_controller_write( page, address, b );
+}
+
+libspectrum_byte
+spectranet_flash_rom_read( memory_page *page, libspectrum_word address )
+{
+  int flash_page = page->page_num / 4;
+  libspectrum_word flash_address =
+    (page->page_num % 4) * SPECTRANET_PAGE_LENGTH + (address & 0xfff);
+  return flash_am29f010_read( flash_rom, flash_page, flash_address );
 }
 
 void

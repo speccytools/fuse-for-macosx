@@ -1,6 +1,6 @@
 /* sound.h: Sound support
-   Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 2000-2016 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@ void sound_ay_write( int reg, int val, libspectrum_dword now );
 void sound_ay_reset( void );
 void sound_specdrum_write( libspectrum_word port, libspectrum_byte val );
 void sound_covox_write( libspectrum_word port, libspectrum_byte val );
+void sound_sp0256_write( libspectrum_dword at_tstates,
+                         libspectrum_signed_word val );
 void sound_frame( void );
 void sound_beeper( libspectrum_dword at_tstates, int on );
 libspectrum_dword sound_get_effective_processor_speed( void );

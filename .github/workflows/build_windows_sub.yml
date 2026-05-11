@@ -1,0 +1,510 @@
+# Reusable workflow for all Windows builds
+name: Fuse App For Windows
+run-name: Build Fuse App for windows / ${{ github.actor }} /
+
+on:
+  workflow_call:
+    inputs:
+      # Name this setup (no spaces please)
+      key:
+        type: string
+        required: true
+      dependencies:
+        type: string
+        required: false
+        default: ""
+      configure_params:
+        type: string
+        required: false
+        default: ""
+      fuse_ref:
+        type: string
+        required: false
+        default: ""
+      fuse_version:
+        type: string
+        required: false
+        default: ""
+      verify_ui:
+        type: string
+        required: true
+      verify_audio:
+        type: string
+        required: false
+        default: "directsound"
+      verify_libxml2:
+        type: string
+        required: false
+        default: "no"
+      verify_other:
+        type: string
+        required: false
+        default: ""
+      upload_artifacts:
+        type: boolean
+        required: false
+        default: true
+      build_setup:
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  build:
+    name: Build App
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      CYGWIN_NOWINPATH: 1
+      
+      # Custom build libraries
+      CPPFLAGS: "-I/usr/local/i686-w64-mingw32/include"
+      LDFLAGS: "-L/usr/local/i686-w64-mingw32/lib"
+      PKG_CONFIG_LIBDIR: "/usr/local/i686-w64-mingw32/lib/pkgconfig:/usr/i686-w64-mingw32/sys-root/mingw/lib/pkgconfig"    
+      
+      # Small help when copying dlls
+      CYGWIN_LIBDIR: "/usr/i686-w64-mingw32/sys-root/mingw/bin/"
+      
+      # In case of SDL
+      SDL_CONFIG: "/usr/i686-w64-mingw32/sys-root/mingw/bin/sdl-config"
+    steps:
+      - name: (1) Prepare environment
+        run: |
+          cd ${GITHUB_WORKSPACE}
+
+          workspace_drive="$( printf '%s' "$GITHUB_WORKSPACE" | cut -d: -f1 | tr 'A-Z' 'a-z' )"
+          workspace_suffix="$( printf '%s' "$GITHUB_WORKSPACE" | cut -d: -f2- | tr '\\' '/' )"
+          workspace_cygwin="/cygdrive/${workspace_drive}${workspace_suffix}"
+
+          echo "Adjust autocrlf in git.."
+          git config --global core.autocrlf input
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$workspace_cygwin"
+
+          echo -n "Current directory: "
+          pwd
+          ls -la
+        shell: bash
+
+      - name: (2) Check out repository code
+        if: ${{ !inputs.fuse_ref }}
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: (2b) Check out repository code at requested ref
+        if: ${{ inputs.fuse_ref }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.fuse_ref }}
+          persist-credentials: false
+
+      - name: (2c) Resolve Cygwin package cache path
+        id: cygwin-cache-path
+        run: |
+          if (Test-Path -LiteralPath 'D:\') {
+            $workVol = 'D:'
+          } else {
+            $workVol = 'C:'
+          }
+
+          echo "work-vol=$workVol" >> $env:GITHUB_OUTPUT
+          echo "package-cache=$workVol\cygwin-packages" >> $env:GITHUB_OUTPUT
+        shell: powershell
+
+      - name: (2d) Restore Cygwin packages
+        id: cygwin-cache-load
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ${{ steps.cygwin-cache-path.outputs.package-cache }}
+          key: cygwin-packages-libspectrum-1
+
+      - name: (3) Install Cygwin (32 bit) with libs
+        uses: cygwin/cygwin-install-action@711d29f3da23c9f4a1798e369a6f01198c13b11a # v6
+        with:
+          work-vol: ${{ steps.cygwin-cache-path.outputs.work-vol }}
+          platform: x86
+          packages: |
+            autoconf \
+            automake \
+            bison \
+            dos2unix \
+            flex \
+            gcc-core \
+            gcc-g++ \
+            gettext-devel \
+            ghostscript \
+            groff \
+            libtool \
+            make \
+            netpbm \
+            psutils \
+            zip \
+            mingw64-i686-bzip2 \
+            mingw64-i686-gcc-core \
+            mingw64-i686-gcc-g++ \
+            mingw64-i686-libgcrypt \
+            mingw64-i686-libgpg-error \
+            mingw64-i686-libpng \
+            mingw64-i686-win-iconv \
+            mingw64-i686-winpthreads \
+            mingw64-i686-zlib \
+            mingw64-i686-audiofile \
+            pkg-config \
+            ${{ inputs.dependencies }}
+
+      - name: (3a) Mark Cygwin workspace as safe for git
+        run: |
+          $workspaceDrive = $env:GITHUB_WORKSPACE.Substring(0, 1).ToLowerInvariant()
+          $workspaceSuffix = $env:GITHUB_WORKSPACE.Substring(2).Replace('\', '/')
+          $workspaceCygwin = "/cygdrive/$workspaceDrive$workspaceSuffix"
+
+          & 'D:\cygwin\bin\git.exe' config --system --add safe.directory "$env:GITHUB_WORKSPACE"
+          & 'D:\cygwin\bin\git.exe' config --system --add safe.directory "$workspaceCygwin"
+        shell: powershell
+
+      - name: (3b) Install NSIS
+        if: ${{ inputs.build_setup }}
+        run: |
+          choco install nsis --no-progress -y
+
+      - name: (3c) Expose NSIS to Cygwin
+        if: ${{ inputs.build_setup }}
+        run: |
+          cat > /usr/local/bin/makensis <<'EOF'
+          #!/bin/sh
+          for candidate in \
+            "/cygdrive/c/ProgramData/chocolatey/bin/makensis.exe" \
+            "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe" \
+            "/cygdrive/c/Program Files/NSIS/makensis.exe"; do
+            if [ -x "$candidate" ]; then
+              exec "$candidate" "$@"
+            fi
+          done
+
+          echo "makensis executable not found" >&2
+          exit 1
+          EOF
+          chmod +x /usr/local/bin/makensis
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (4) Download libspectrum artefact
+        uses: actions/download-artifact@v8
+        with:
+          name: libspectrum-installed-windows-fuse-app
+          path: libspectrum
+
+      - name: (4b) Install libspectrum from artefact
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          # Extract (-x) files into /usr/local (cannot work with root /)
+          mkdir /usr/local/i686-w64-mingw32 || true
+          tar --directory /usr/local/i686-w64-mingw32 -xvf libspectrum/libspectrum-installed-windows.tar
+          echo "Done"
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (5a) Adjust fuse_version
+        if: ${{ inputs.fuse_version }}
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          file="configure.ac"
+          replace="${{ inputs.fuse_version }}"
+          content=`cat $file`
+          content2=${content//m4_define(\[fuse_version\], \[[0-9].[0-9].[0-9]\])/m4_define(\[fuse_version\], \[$replace\])}
+          echo "$content2" > $file
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (5b) Autogen.sh
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          echo "Running autogen.sh .."
+          ./autogen.sh
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (6) Configure for Windows
+        id: run-configure
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          echo "Running configure .."
+          ./configure \
+          --build=i686-pc-cygwin \
+          --host=i686-w64-mingw32 \
+          --prefix=/usr/local/i686-w64-mingw32 \
+          --disable-static \
+          ${{ inputs.configure_params }} \
+          |& tee ./configure.out
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (6b) Check config.log (on configure failure)
+        if: ${{ steps.run-configure.outcome == 'failure' }}
+        run: |
+          cd ${GITHUB_WORKSPACE}
+
+          echo "Reading config.log file .."
+          cat config.log
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (6c) Verify output from configure
+        # Most of the tested strings are common for all Windows builds
+        # Only the strings related to UI selection differ
+        run: |          
+          cd ${GITHUB_WORKSPACE}
+          
+          .github/scripts/in_config.sh "Fuse options"
+          .github/scripts/in_config.sh "zlib support: yes"
+          .github/scripts/in_config.sh "libpng support: yes"
+          .github/scripts/in_config.sh "Spectranet support: yes"
+          .github/scripts/in_config.sh "SpeccyBoot support: no"
+          .github/scripts/in_config.sh "TTX2000 S support: yes"
+          .github/scripts/in_config.sh "Desktop integration: no"
+          
+          .github/scripts/in_config.sh "User interface: ${{ inputs.verify_ui }}"
+          .github/scripts/in_config.sh "libxml2 support: ${{ inputs.verify_libxml2 }}"
+          .github/scripts/in_config.sh "Selected audio driver: ${{ inputs.verify_audio }}"
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (6d) Verify optional parameter
+        if: ${{ inputs.verify_other }}
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          
+          .github/scripts/in_config.sh "${{ inputs.verify_other }}"
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (7) Make
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          
+          echo "Running make .."
+          make
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (8) Copy dependency dlls
+        id: copy-dlls
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          echo "Create distrib folder if missing .."
+          
+          FUSE_VERSION=`./configure --version | grep -Eo "fuse configure (.+)"`
+          FUSE_VERSION=${FUSE_VERSION//fuse configure /}
+          echo "Fuse version: $FUSE_VERSION"
+          
+          DEST_DIR="fuse-${FUSE_VERSION}-${{ inputs.verify_ui }}"
+          echo "Dest dir: $DEST_DIR"
+          if [[ ! -d "$DEST_DIR" ]]; then 
+            mkdir $DEST_DIR
+          fi
+          
+          echo "Copying mandatory dependency dlls .."
+          cp ${CYGWIN_LIBDIR}libgcc_s_sjlj-1.dll $DEST_DIR
+          cp ${CYGWIN_LIBDIR}libwinpthread-1.dll $DEST_DIR
+          cp ${CYGWIN_LIBDIR}libgpg-error-0.dll $DEST_DIR
+          cp ${CYGWIN_LIBDIR}libstdc++-6.dll $DEST_DIR
+          cp ${CYGWIN_LIBDIR}libpng16-16.dll $DEST_DIR
+          
+          echo "Copying optional dependency dlls .."
+          # Don't have logic to check what was enabled, so copying all
+          
+          # SDL runtime selection follows the configured UI variant.
+          case "${{ inputs.verify_ui }}" in
+            sdl)
+              cp ${CYGWIN_LIBDIR}SDL.dll $DEST_DIR || true
+              ;;
+            sdl2)
+              cp ${CYGWIN_LIBDIR}SDL2.dll $DEST_DIR || true
+              ;;
+          esac
+
+          # Zlib dlls
+          cp ${CYGWIN_LIBDIR}zlib1.dll $DEST_DIR || true
+          
+          # Bzip2 dlls
+          cp ${CYGWIN_LIBDIR}libbz2-1.dll $DEST_DIR || true
+          
+          # libgcrypt dlls
+          cp ${CYGWIN_LIBDIR}libgcrypt-20.dll $DEST_DIR || true
+          
+          # Audiofile dlls
+          cp ${CYGWIN_LIBDIR}libaudiofile-1.dll $DEST_DIR || true
+          cp ${CYGWIN_LIBDIR}libFLAC-8.dll $DEST_DIR || true
+          cp ${CYGWIN_LIBDIR}libOGG-0.dll $DEST_DIR || true
+          
+          # LibXML2 dlls
+          cp ${CYGWIN_LIBDIR}libxml2-2.dll $DEST_DIR || true
+          cp ${CYGWIN_LIBDIR}iconv.dll $DEST_DIR || true
+          cp ${CYGWIN_LIBDIR}liblzma-5.dll $DEST_DIR || true
+
+          echo "Copying third-party notices .."
+          NOTICE_DIR="${DEST_DIR}/3rd-party"
+          mkdir -p "$NOTICE_DIR"
+
+          copy_notice_files() {
+            package_name="$1"
+            shift
+            package_label="${package_name#mingw64-i686-}"
+            found=0
+
+            normalise_notice_name() {
+              notice_name="$( basename "$1" )"
+
+              case "$notice_name" in
+                *.txt|*.TXT) ;;
+                *) notice_name="${notice_name}.txt" ;;
+              esac
+
+              printf '%s\n' "$notice_name"
+            }
+
+            for base_dir in \
+              "/usr/share/doc" \
+              "/usr/share/licenses" \
+              "/usr/i686-w64-mingw32/sys-root/mingw/share/doc" \
+              "/usr/i686-w64-mingw32/sys-root/mingw/share/licenses" \
+              "/usr/local/i686-w64-mingw32/share/doc" \
+              "/usr/local/i686-w64-mingw32/share/licenses"; do
+              for dir_name in "$package_name" "$package_label" "$@"; do
+                package_dir="${base_dir}/${dir_name}"
+
+                if [[ ! -d "$package_dir" ]]; then
+                  continue
+                fi
+
+                for pattern in COPYING* LICENSE* AUTHORS* README*; do
+                  for notice_file in "$package_dir"/$pattern; do
+                    if [[ ! -f "$notice_file" ]]; then
+                      continue
+                    fi
+
+                    notice_name="$( normalise_notice_name "$notice_file" )"
+                    notice_target="$NOTICE_DIR/${package_label}-${notice_name}"
+
+                    if [[ -e "$notice_target" ]] && cmp -s "$notice_file" "$notice_target"; then
+                      found=1
+                      continue
+                    fi
+
+                    cp "$notice_file" "$notice_target"
+                    found=1
+                  done
+                done
+              done
+            done
+
+            if [[ "$found" -eq 0 ]]; then
+              echo "Notice files not found for ${package_name}"
+            fi
+          }
+
+          copy_fallback_notice_file() {
+            notice_file="$1"
+            notice_target="$NOTICE_DIR/$( basename "$notice_file" )"
+
+            if [[ -f "$notice_file" ]]; then
+              cp "$notice_file" "$notice_target"
+            fi
+          }
+
+          copy_notice_files libspectrum
+          copy_notice_files mingw64-i686-gcc-core
+          copy_notice_files mingw64-i686-gcc-g++
+          copy_notice_files mingw64-i686-winpthreads
+          copy_notice_files mingw64-i686-libgpg-error
+          copy_notice_files mingw64-i686-libgcrypt
+          copy_notice_files mingw64-i686-libpng
+          copy_notice_files mingw64-i686-zlib
+          copy_notice_files mingw64-i686-bzip2
+          copy_notice_files mingw64-i686-audiofile
+          copy_notice_files mingw64-i686-flac
+          copy_notice_files mingw64-i686-libogg
+          copy_notice_files mingw64-i686-libxml2
+          copy_notice_files mingw64-i686-win-iconv
+          copy_notice_files mingw64-i686-xz
+          if [[ -f "$DEST_DIR/SDL.dll" ]]; then
+            copy_notice_files mingw64-i686-SDL SDL
+          fi
+
+          if [[ -f "$DEST_DIR/SDL2.dll" ]]; then
+            copy_notice_files mingw64-i686-SDL2 SDL2
+
+            if ! compgen -G "$NOTICE_DIR/SDL2-*" > /dev/null; then
+              copy_fallback_notice_file "${GITHUB_WORKSPACE}/data/win32/3rd-party/SDL2-LICENSE.txt"
+            fi
+          fi
+          
+          echo "Copying libspectrum dll .."
+          cp /usr/local/i686-w64-mingw32/bin/libspectrum-*.dll $DEST_DIR
+          
+          # Copy them to z80 folder as well
+          cp -r $DEST_DIR/*.dll z80/
+          
+          echo "Remember distribution path .."
+          echo "FUSE_DISTR_DIR=${DEST_DIR}" >> "$GITHUB_OUTPUT"
+          
+          echo "Done."
+          
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+          
+      - name: (9) Run tests
+        id: run-tests
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          
+          echo "Bulding and running tests .."
+          #cd z80
+          #./coretest.exe
+          echo "(skipped)"
+          
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (10) Create distribution file(s)
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          
+          echo "Running make dist-win32-zip .."
+          make dist-win32-zip
+
+          if [ "${{ inputs.build_setup }}" = "true" ]; then
+            echo "Running make dist-win32-exe .."
+            make dist-win32-exe
+          fi
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (10b) Rename distribution files, patch SHA1 file
+        id: rename-files
+        run: |
+          cd ${GITHUB_WORKSPACE}
+
+          base_name=${{ steps.copy-dlls.outputs.FUSE_DISTR_DIR }}
+          zip_to="${base_name}.zip"
+          sha1_to="${base_name}.zip.sha1"
+          setup_to="${base_name}-setup.exe"
+          setup_sha1_to="${base_name}-setup.exe.sha1"
+
+          echo "Remember new file names"
+          echo "FUSE_DISTR_BASE=${base_name}" >> "$GITHUB_OUTPUT"
+          echo "FUSE_DISTR_ZIP=${zip_to}" >> "$GITHUB_OUTPUT"
+          echo "FUSE_DISTR_SHA1=${sha1_to}" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ inputs.build_setup }}" = "true" ]; then
+            echo "FUSE_DISTR_SETUP=${setup_to}" >> "$GITHUB_OUTPUT"
+            echo "FUSE_DISTR_SETUP_SHA1=${setup_sha1_to}" >> "$GITHUB_OUTPUT"
+          fi
+
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
+
+      - name: (11) Upload generated artifact(s)
+        if: ${{ inputs.upload_artifacts }}
+        uses: actions/upload-artifact@v8
+        with: 
+          name: ${{ steps.rename-files.outputs.FUSE_DISTR_BASE }}
+          if-no-files-found: error
+          path: |
+            ${{ steps.rename-files.outputs.FUSE_DISTR_ZIP }}
+            ${{ steps.rename-files.outputs.FUSE_DISTR_SHA1 }}
+            ${{ steps.rename-files.outputs.FUSE_DISTR_SETUP }}
+            ${{ steps.rename-files.outputs.FUSE_DISTR_SETUP_SHA1 }}
+
+      - name: (12) Finish
+        run: |
+          echo "🍏 Finishing with status ${{ job.status }}."

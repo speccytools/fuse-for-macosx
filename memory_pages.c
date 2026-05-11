@@ -1,7 +1,7 @@
 /* memory_pages.c: Routines for accessing memory
-   Copyright (c) 1999-2016 Philip Kendall
-   Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 1999-2017 Philip Kendall
+   Copyright (c) 2015-2023 Stuart Brady
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 #include "memory_pages.h"
 #include "module.h"
 #include "peripherals/disk/opus.h"
+#include "peripherals/sound/uspeech.h"
 #include "peripherals/spectranet.h"
 #include "peripherals/fs/xfs.h"
 #include "peripherals/nic/spectranext_controller.h"
@@ -404,10 +405,23 @@ readbyte( libspectrum_word address )
         return spectranet_spectranext_config_read( mapping, address );
       if( spectranet_spectranext_config_paged_b && address >= 0x2000 && address < 0x3000 )
         return spectranet_spectranext_config_read( mapping, address );
+      if( address < 0x1000 )
+        return spectranet_flash_rom_read( mapping, address );
+      if( spectranet_flash_paged_a && address >= 0x1000 && address < 0x2000 )
+        return spectranet_flash_rom_read( mapping, address );
+      if( spectranet_flash_paged_b && address >= 0x2000 && address < 0x3000 )
+        return spectranet_flash_rom_read( mapping, address );
     }
 
     if( ttx2000s_paged && address >= 0x2000 )
         return ttx2000s_sram_read( address );
+
+    if( uspeech_available ) {
+      if( address == 0x0038 )
+        uspeech_toggle(); /* and return whatever is the "normal" value later */
+      else if( uspeech_active && ( address & 0xf000 ) == 0x1000 )
+        return uspeech_busy();
+    }
   }
 
   return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
@@ -527,15 +541,35 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );
-  } else if( mapping->writable ||
-             (mapping->source != memory_source_none &&
-              settings_current.writable_roms) ) {
+    return;
+  }
+
+  if( mapping->writable ||
+      ( mapping->source != memory_source_none &&
+        settings_current.writable_roms ) ) {
     libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
     libspectrum_byte *memory = mapping->page;
 
     memory_display_dirty( address, b );
 
     memory[ offset ] = b;
+  } else if( uspeech_available ) {
+    /* TODO: check if we can move this check above memory writes.
+       uSpeech is not compatible with +2A/+3 all RAM modes */
+    if( uspeech_active ) {
+      if( ( address & 0xf000 ) == 0x1000 ) {
+        uspeech_write( address & 0xf000, b );
+        return;
+      }
+
+      if( ( address & 0xf000 ) == 0x3000 ) {
+        uspeech_write( address & 0xf001, b );
+        return;
+      }
+    }
+
+    if( address == 0x0038 )
+      uspeech_toggle();
   }
 }
 
@@ -693,13 +727,10 @@ memory_to_snapshot( libspectrum_snap *snap )
 					     machine_current->ram.last_byte2 );
 
   for( i = 0; i < 64; i++ ) {
-    if( RAM[i] != NULL ) {
+    buffer = libspectrum_new( libspectrum_byte, 0x4000 );
 
-      buffer = libspectrum_new( libspectrum_byte, 0x4000 );
-
-      memcpy( buffer, RAM[i], 0x4000 );
-      libspectrum_snap_set_pages( snap, i, buffer );
-    }
+    memcpy( buffer, RAM[i], 0x4000 );
+    libspectrum_snap_set_pages( snap, i, buffer );
   }
 
   memory_rom_to_snapshot( snap );

@@ -27,7 +27,6 @@
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 
-#define GEKKO
 #include <wiiuse/wpad.h>
 
 typedef enum {

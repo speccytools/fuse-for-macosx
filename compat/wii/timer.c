@@ -1,5 +1,5 @@
 /* unix.c: UNIX speed routines for Fuse
-   Copyright (c) 1999-2007 Philip Kendall, Marek Januszewski, Fredrick Meunier
+   Copyright (c) 1999-2021 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,12 +26,10 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "compat.h"
 #include "ui/ui.h"
-
-/* FIXME: where should we get this prototype from? */
-extern int clock_gettime(struct timespec *tp);
 
 double
 compat_timer_get_time( void )
@@ -39,7 +37,7 @@ compat_timer_get_time( void )
   int error;
   struct timespec tp;
 
-  error = clock_gettime(&tp);
+  error = clock_gettime(CLOCK_REALTIME, &tp);
   if( error ) {
     ui_error( UI_ERROR_ERROR, "%s: error getting time: %s", __func__, strerror( errno ) );
     return -1;

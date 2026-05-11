@@ -101,7 +101,7 @@ compare_and_merge_rectangles( struct rectangle *source )
             rectangle_inactive[z].h == source->h )
         return 1;
 
-      if( ( rectangle_inactive[z].y < source->y && 
+      if( ( rectangle_inactive[z].y <= source->y &&
           ( source->y < ( rectangle_inactive[z].y +
             rectangle_inactive[z].h + 1 ) ) ) ||
           ( source->y < rectangle_inactive[z].y && 
@@ -119,7 +119,7 @@ compare_and_merge_rectangles( struct rectangle *source )
     if( rectangle_inactive[z].y == source->y &&
           rectangle_inactive[z].h == source->h ) {
 
-      if( (rectangle_inactive[z].x < source->x && 
+      if( (rectangle_inactive[z].x <= source->x &&
           ( source->x < ( rectangle_inactive[z].x +
             rectangle_inactive[z].w + 1 ) ) ) ||
           ( source->x < rectangle_inactive[z].x && 
@@ -186,4 +186,19 @@ rectangle_end_line( int y )
   }
 
   rectangle_active_count = ptr - rectangle_active;
+}
+
+/* Unit-test helpers — not used in normal emulation */
+
+void
+rectangle_reset( void )
+{
+  rectangle_active_count = 0;
+  rectangle_inactive_count = 0;
+}
+
+size_t
+rectangle_get_active_count( void )
+{
+  return rectangle_active_count;
 }
