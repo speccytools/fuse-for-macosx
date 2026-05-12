@@ -91,6 +91,7 @@ static uint16_t colour_values[] = {
 static uint16_t bw_values[16];
 
 static int display_updated = 0;
+static int window_resize_enabled = 0;
 
 /* This is a rule of thumb for the maximum number of rects that can be updated
    each frame. */
@@ -241,10 +242,10 @@ cocoadisplay_allocate_colours( int numColours, uint16_t *colour_values,
 static void
 cocoadisplay_resize_window( void )
 {
-  /* Skip during the very first uidisplay_init so the xib's window size is
-     preserved at launch. Subsequent inits (machine change) and every
-     hotswap will resize. */
-  if( !display_ui_initialised || settings_current.full_screen ) return;
+  /* Startup applies the saved scaler before the first rendered frame; let
+     AppKit keep the restored window frame until emulation is visibly running. */
+  if( !display_ui_initialised || !window_resize_enabled ||
+      settings_current.full_screen ) return;
 
   float factor = scaler_get_scaling_factor( current_scaler );
   NSSize size = NSMakeSize( image_width * factor, image_height * factor );
@@ -531,6 +532,8 @@ void
 uidisplay_frame_end( void )
 {
   int i;
+
+  window_resize_enabled = 1;
 
   if( display_updated ) {
     /* obtain lock for buffered screen */

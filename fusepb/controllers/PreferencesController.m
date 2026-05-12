@@ -245,12 +245,9 @@
      with a now-removed scaler) rather than show ui_error from
      scaler_select_id every time Preferences closes. */
   int new_scaler = scaler_get_type( settings_current.start_scaler_mode );
-  if( new_scaler >= 0 ) {
-    /* scaler_select_scaler is a no-op when the requested scaler is already
-       current; if it isn't supported on the current machine it returns
-       non-zero and current_scaler is left unchanged. When the scaler does
-       change, the hotswap inside picks up the new bilinear setting via
-       createTexture, so no separate hotswap call is needed for that path. */
+  if( new_scaler >= 0 && new_scaler != current_scaler ) {
+    /* Changing the scaler hotswaps graphics; selecting the current scaler
+       would also hotswap and resize the emulator window when Preferences closes. */
     scaler_select_scaler( new_scaler );
   }
 
