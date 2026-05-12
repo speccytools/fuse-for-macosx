@@ -119,7 +119,6 @@
 		B61F468B09121DF100C8096C /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = B650F73F07E7CD3F00E4F3AF /* PreferencesController.m */; };
 		B61F468C09121DF100C8096C /* ScalerNameToIdTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3C1507ED1C9D0045339F /* ScalerNameToIdTransformer.m */; };
 		B61F468D09121DF100C8096C /* MachineScalerIsEnabled.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3C5007ED34530045339F /* MachineScalerIsEnabled.m */; };
-		B61F46A009121DF100C8096C /* ScalerSupportsScanlines.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */; };
 		B61F468E09121DF100C8096C /* MachineNameToIdTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3CC407EE0A130045339F /* MachineNameToIdTransformer.m */; };
 		B61F468F09121DF100C8096C /* CAMachines.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CC83000800E408006EFFB9 /* CAMachines.m */; };
 		B61F469009121DF100C8096C /* Joysticks.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C740DA0810BB0500AB170C /* Joysticks.m */; };
@@ -129,6 +128,7 @@
 		B61F469A09121DF100C8096C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		B61F469B09121DF100C8096C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		B61F469C09121DF100C8096C /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97324FDCFA39411CA2CEA /* AppKit.framework */; };
+		B61F46A009121DF100C8096C /* ScalerSupportsScanlines.m in Sources */ = {isa = PBXBuildFile; fileRef = B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */; };
 		B6251C3E0C2EB24500BD5543 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6251C3D0C2EB24500BD5543 /* QuartzCore.framework */; };
 		B629532E114FB265007808E0 /* libspectrum.h.in in Resources */ = {isa = PBXBuildFile; fileRef = B6DCBB7A114FA0E700DC9A11 /* libspectrum.h.in */; };
 		B62B19E10DD31DF500D42AAF /* scalers16.c in Sources */ = {isa = PBXBuildFile; fileRef = B62B19E00DD31DF500D42AAF /* scalers16.c */; };
@@ -247,9 +247,6 @@
 		B6DCBBE0114FA0E700DC9A11 /* plusd.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB86114FA0E700DC9A11 /* plusd.c */; };
 		B6DCBBE2114FA0E700DC9A11 /* rzx.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB88114FA0E700DC9A11 /* rzx.c */; };
 		B6DCBBE3114FA0E700DC9A11 /* sna.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB89114FA0E700DC9A11 /* sna.c */; };
-		FE9913010000000000000001 /* dsnap.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9913020000000000000002 /* dsnap.c */; };
-		FE9913030000000000000003 /* wav_macos.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9913040000000000000004 /* wav_macos.c */; };
-		FE9913050000000000000005 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9913060000000000000006 /* AudioToolbox.framework */; };
 		B6DCBBE5114FA0E700DC9A11 /* snapshot.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB8B114FA0E700DC9A11 /* snapshot.c */; };
 		B6DCBBE6114FA0E700DC9A11 /* snp.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB8C114FA0E700DC9A11 /* snp.c */; };
 		B6DCBBE7114FA0E700DC9A11 /* sp.c in Sources */ = {isa = PBXBuildFile; fileRef = B6DCBB8D114FA0E700DC9A11 /* sp.c */; };
@@ -278,8 +275,6 @@
 		B6E1F1A514F653CE00600EB0 /* machines_periph.c in Sources */ = {isa = PBXBuildFile; fileRef = B6E1F1A314F653CE00600EB0 /* machines_periph.c */; };
 		B6E1F1AB14F653FB00600EB0 /* speccyboot.c in Sources */ = {isa = PBXBuildFile; fileRef = B6E1F1A714F653FB00600EB0 /* speccyboot.c */; };
 		B6E1F1AD14F653FB00600EB0 /* specdrum.c in Sources */ = {isa = PBXBuildFile; fileRef = B6E1F1A914F653FB00600EB0 /* specdrum.c */; };
-		FE9900010000000000000001 /* sp0256.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9900020000000000000002 /* sp0256.c */; };
-		FE9900040000000000000004 /* uspeech.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9900050000000000000005 /* uspeech.c */; };
 		B6E1F1B114F6555400600EB0 /* disciple.c in Sources */ = {isa = PBXBuildFile; fileRef = B6E1F1AF14F6555400600EB0 /* disciple.c */; };
 		B6E1F26E14F85BD500600EB0 /* speccyboot-1.4.rom in Resources */ = {isa = PBXBuildFile; fileRef = B6E1F26D14F85BD500600EB0 /* speccyboot-1.4.rom */; };
 		B6F0480F0952B597006D8005 /* dck.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F0480E0952B597006D8005 /* dck.icns */; };
@@ -323,6 +318,11 @@
 		FE9443E82F881C540059A578 /* engine_utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443E62F881C540059A578 /* engine_utf8.c */; };
 		FE9443E92F881C540059A578 /* xpath.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9443E72F881C540059A578 /* xpath.c */; };
 		FE981C372FA55F84005FE59F /* gdbserver_remote_commands.c in Sources */ = {isa = PBXBuildFile; fileRef = FE981C362FA55F84005FE59F /* gdbserver_remote_commands.c */; };
+		FE9900010000000000000001 /* sp0256.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9900020000000000000002 /* sp0256.c */; };
+		FE9900040000000000000004 /* uspeech.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9900050000000000000005 /* uspeech.c */; };
+		FE9913010000000000000001 /* dsnap.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9913020000000000000002 /* dsnap.c */; };
+		FE9913030000000000000003 /* wav_macos.c in Sources */ = {isa = PBXBuildFile; fileRef = FE9913040000000000000004 /* wav_macos.c */; };
+		FE9913050000000000000005 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE9913060000000000000006 /* AudioToolbox.framework */; };
 		FEC02C952EEF06E4008277BA /* FuseImporter.mdimporter in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FEC02C9F2EEF65D6008277BA /* spectranext_controller.c in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */; };
 		FEC02CA02EEF65D6008277BA /* spectranext.h in Sources */ = {isa = PBXBuildFile; fileRef = FEC02C9D2EEF65D5008277BA /* spectranext.h */; };
@@ -569,12 +569,12 @@
 		B67DC2180B63835100FA31B6 /* cocoastatusbar.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = cocoastatusbar.m; sourceTree = "<group>"; };
 		B67F3C1407ED1C9D0045339F /* ScalerNameToIdTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ScalerNameToIdTransformer.h; path = transformers/ScalerNameToIdTransformer.h; sourceTree = SOURCE_ROOT; };
 		B67F3C1507ED1C9D0045339F /* ScalerNameToIdTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ScalerNameToIdTransformer.m; path = transformers/ScalerNameToIdTransformer.m; sourceTree = SOURCE_ROOT; };
-		B67F3D0007ED1C9D0045339F /* ScalerSupportsScanlines.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ScalerSupportsScanlines.h; path = transformers/ScalerSupportsScanlines.h; sourceTree = SOURCE_ROOT; };
-		B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ScalerSupportsScanlines.m; path = transformers/ScalerSupportsScanlines.m; sourceTree = SOURCE_ROOT; };
 		B67F3C4F07ED34530045339F /* MachineScalerIsEnabled.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MachineScalerIsEnabled.h; path = transformers/MachineScalerIsEnabled.h; sourceTree = SOURCE_ROOT; };
 		B67F3C5007ED34530045339F /* MachineScalerIsEnabled.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MachineScalerIsEnabled.m; path = transformers/MachineScalerIsEnabled.m; sourceTree = SOURCE_ROOT; };
 		B67F3CC307EE0A130045339F /* MachineNameToIdTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MachineNameToIdTransformer.h; path = transformers/MachineNameToIdTransformer.h; sourceTree = SOURCE_ROOT; };
 		B67F3CC407EE0A130045339F /* MachineNameToIdTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MachineNameToIdTransformer.m; path = transformers/MachineNameToIdTransformer.m; sourceTree = SOURCE_ROOT; };
+		B67F3D0007ED1C9D0045339F /* ScalerSupportsScanlines.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ScalerSupportsScanlines.h; path = transformers/ScalerSupportsScanlines.h; sourceTree = SOURCE_ROOT; };
+		B67F3D0107ED1C9D0045339F /* ScalerSupportsScanlines.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ScalerSupportsScanlines.m; path = transformers/ScalerSupportsScanlines.m; sourceTree = SOURCE_ROOT; };
 		B6825547091817F30014B5EE /* divide.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = divide.c; sourceTree = "<group>"; };
 		B6825548091817F30014B5EE /* divide.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = divide.h; sourceTree = "<group>"; };
 		B684A1960E93A88200A5B097 /* mempool.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = mempool.c; sourceTree = "<group>"; };
@@ -725,10 +725,6 @@
 		B6DCBB86114FA0E700DC9A11 /* plusd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = plusd.c; sourceTree = "<group>"; };
 		B6DCBB88114FA0E700DC9A11 /* rzx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rzx.c; sourceTree = "<group>"; };
 		B6DCBB89114FA0E700DC9A11 /* sna.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sna.c; sourceTree = "<group>"; };
-		FE9913020000000000000002 /* dsnap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsnap.c; sourceTree = "<group>"; };
-		FE9913040000000000000004 /* wav_macos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wav_macos.c; sourceTree = "<group>"; };
-		FE9913060000000000000006 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
-		FE9913070000000000000007 /* wav_internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wav_internals.h; sourceTree = "<group>"; };
 		B6DCBB8B114FA0E700DC9A11 /* snapshot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = snapshot.c; sourceTree = "<group>"; };
 		B6DCBB8C114FA0E700DC9A11 /* snp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = snp.c; sourceTree = "<group>"; };
 		B6DCBB8D114FA0E700DC9A11 /* sp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sp.c; sourceTree = "<group>"; };
@@ -764,10 +760,6 @@
 		B6E1F1A814F653FB00600EB0 /* speccyboot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speccyboot.h; sourceTree = "<group>"; };
 		B6E1F1A914F653FB00600EB0 /* specdrum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = specdrum.c; path = sound/specdrum.c; sourceTree = "<group>"; };
 		B6E1F1AA14F653FB00600EB0 /* specdrum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = specdrum.h; path = sound/specdrum.h; sourceTree = "<group>"; };
-		FE9900020000000000000002 /* sp0256.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp0256.c; path = sound/sp0256.c; sourceTree = "<group>"; };
-		FE9900030000000000000003 /* sp0256.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sp0256.h; path = sound/sp0256.h; sourceTree = "<group>"; };
-		FE9900050000000000000005 /* uspeech.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uspeech.c; path = sound/uspeech.c; sourceTree = "<group>"; };
-		FE9900060000000000000006 /* uspeech.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uspeech.h; path = sound/uspeech.h; sourceTree = "<group>"; };
 		B6E1F1AF14F6555400600EB0 /* disciple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = disciple.c; sourceTree = "<group>"; };
 		B6E1F1B014F6555400600EB0 /* disciple.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disciple.h; sourceTree = "<group>"; };
 		B6E1F26D14F85BD500600EB0 /* speccyboot-1.4.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "speccyboot-1.4.rom"; path = "../roms/speccyboot-1.4.rom"; sourceTree = "<group>"; };
@@ -923,6 +915,14 @@
 		FE9443E72F881C540059A578 /* xpath.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xpath.c; sourceTree = "<group>"; };
 		FE981C352FA55F84005FE59F /* gdbserver_remote_commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gdbserver_remote_commands.h; sourceTree = "<group>"; };
 		FE981C362FA55F84005FE59F /* gdbserver_remote_commands.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gdbserver_remote_commands.c; sourceTree = "<group>"; };
+		FE9900020000000000000002 /* sp0256.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp0256.c; path = sound/sp0256.c; sourceTree = "<group>"; };
+		FE9900030000000000000003 /* sp0256.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sp0256.h; path = sound/sp0256.h; sourceTree = "<group>"; };
+		FE9900050000000000000005 /* uspeech.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uspeech.c; path = sound/uspeech.c; sourceTree = "<group>"; };
+		FE9900060000000000000006 /* uspeech.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uspeech.h; path = sound/uspeech.h; sourceTree = "<group>"; };
+		FE9913020000000000000002 /* dsnap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dsnap.c; sourceTree = "<group>"; };
+		FE9913040000000000000004 /* wav_macos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wav_macos.c; sourceTree = "<group>"; };
+		FE9913060000000000000006 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		FE9913070000000000000007 /* wav_internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wav_internals.h; sourceTree = "<group>"; };
 		FEC02C942EEF06E4008277BA /* FuseImporter.mdimporter */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.spotlight-importer"; name = FuseImporter.mdimporter; path = ../3rdparty/FuseImporter/build/Deployment/FuseImporter.mdimporter; sourceTree = "<group>"; };
 		FEC02C9C2EEF65D5008277BA /* spectranext_controller.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spectranext_controller.c; sourceTree = "<group>"; };
 		FEC02C9D2EEF65D5008277BA /* spectranext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spectranext.h; sourceTree = "<group>"; };
@@ -1033,6 +1033,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				B61F46A909121DF100C8096C /* Info-Fuse.plist */,
+				FEE30AD02FB3B25600E12D0B /* Recovered References */,
 			);
 			indentWidth = 2;
 			name = Fuse;
@@ -1837,6 +1838,14 @@
 			path = security;
 			sourceTree = "<group>";
 		};
+		FEE30AD02FB3B25600E12D0B /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				FE9913060000000000000006 /* AudioToolbox.framework */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2304,7 +2313,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
@@ -2339,7 +2348,7 @@
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = "1.7.0-fusex-0.1";
 				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
@@ -2370,7 +2379,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
@@ -2404,7 +2413,7 @@
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = "1.7.0-fusex-0.1";
 				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
@@ -2434,7 +2443,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 48UV5KV3FB;
@@ -2468,7 +2477,7 @@
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = .;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = "1.7.0-fusex-0.1";
 				OTHER_CFLAGS = "";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = (
