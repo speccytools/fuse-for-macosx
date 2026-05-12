@@ -1,5 +1,5 @@
 /* fdd.c: Routines for emulating floppy disk drives
-   Copyright (c) 2007-2016 Gergely Szasz, Philip Kendall
+   Copyright (c) 2007-2023 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 BogDan Vatra
 
@@ -133,16 +133,15 @@ fdd_set_data( fdd_t *d, int fact )
   }
 
   DISK_SET_TRACK( &d->disk, head, d->c_cylinder );
-  d->c_bpt = d->disk.track[-3] + 256 * d->disk.track[-2];
   if( fact > 0 ) {
     /* this generate a bpt/fact +-10% triangular distribution skip in bytes 
        i know, we should use the higher bits of rand(), but we not
        keen on _real_ (pseudo)random numbers... ;)
     */
-    d->disk.i += d->c_bpt / fact + d->c_bpt *
+    d->disk.i += d->disk.c_bpt / fact + d->disk.c_bpt *
 		  ( rand() % 10 + rand() % 10 - 9 ) / fact / 100;
-    while( d->disk.i >= d->c_bpt )
-      d->disk.i -= d->c_bpt;
+    while( d->disk.i >= d->disk.c_bpt )
+      d->disk.i -= d->disk.c_bpt;
   }
   d->index = d->disk.i ? 0 : 1;
 }
@@ -353,24 +352,24 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
 {
   if( !d->selected || !d->ready || !d->loadhead || d->disk.track == NULL ) {
     if( d->loaded && d->motoron ) {			/* spin the disk */
-      if( d->disk.i >= d->c_bpt ) {		/* next data byte */
+      if( d->disk.i >= d->disk.c_bpt ) {		/* next data byte */
         d->disk.i = 0;
       }
       if( !write )
         d->data = 0x100;				/* no data */
       d->disk.i++;
-      d->index = d->disk.i >= d->c_bpt ? 1 : 0;
+      d->index = d->disk.i >= d->disk.c_bpt ? 1 : 0;
     }
     return d->status = FDD_OK;
   }
 
-  if( d->disk.i >= d->c_bpt ) {		/* next data byte */
+  if( d->disk.i >= d->disk.c_bpt ) {		/* next data byte */
     d->disk.i = 0;
   }
   if( write ) {
     if( d->disk.wrprot ) {
       d->disk.i++;
-      d->index = d->disk.i >= d->c_bpt ? 1 : 0;
+      d->index = d->disk.i >= d->disk.c_bpt ? 1 : 0;
       return d->status = FDD_RDONLY;
     }
     d->disk.track[ d->disk.i ] = d->data & 0x00ff;
@@ -406,7 +405,7 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
     }
   }
   d->disk.i++;
-  d->index = d->disk.i >= d->c_bpt ? 1 : 0;
+  d->index = d->disk.i >= d->disk.c_bpt ? 1 : 0;
 
   return d->status = FDD_OK;
 }

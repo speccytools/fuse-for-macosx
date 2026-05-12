@@ -1,5 +1,5 @@
 /* win32sound.c: Win32 sound using MS Windows Multimedia API
-   Copyright (c) 2007 Marek Januszewski
+   Copyright (c) 2007-2008 Marek Januszewski
    Copyright (c) 2015 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify

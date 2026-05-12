@@ -19,18 +19,18 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.6.0])
+m4_define([fuse_version], [1.7.0])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
-m4_define([fuse_minor_version], [6])
+m4_define([fuse_minor_version], [7])
 m4_define([fuse_micro_version], [0])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
 
 dnl Package info
-m4_define([fuse_copyright], ["(c) 1999-2021 Philip Kendall and others"])
+m4_define([fuse_copyright], ["(c) 1999-2026 Philip Kendall and others"])
 m4_define([fuse_url], [http://fuse-emulator.sourceforge.net/])
 m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs/])
 
@@ -56,6 +56,23 @@ dnl Definitions for config.h
 AC_DEFINE([FUSE_RC_VERSION], [fuse_rc_version],
           [Define version information for win32 executables])
 AC_DEFINE([FUSE_COPYRIGHT], [fuse_copyright], [Define copyright of Fuse])
+
+dnl Configure option to specify testing build info
+AC_MSG_CHECKING(testing build information)
+AC_ARG_WITH(test-build,
+[  --with-test-build=INFO  specify testing build information],
+  ,
+  unset withval
+)
+if test "$withval" = ""; then
+  echo 'not a testing build'
+else
+  withval=${withval//#NOW#/`date -u`}
+  echo "$withval"
+  AC_DEFINE_UNQUOTED([FUSE_TEST_LINE], ["This is a special build for testing purposes:"], [Testing warning line])
+  AC_DEFINE_UNQUOTED([FUSE_TEST_BUILD], ["$withval"], [Testing build information])
+  test_build="$withval"
+fi
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -86,8 +103,6 @@ AC_SUBST(YFLAGS)
 dnl Check for big endianness
 AC_C_BIGENDIAN
 
-dnl Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS(
   libgen.h \
   siginfo.h \
@@ -119,7 +134,7 @@ if test "$prefix" != "NONE"; then
 fi)
 
 dnl Check that libspectrum is available and that it is new enough
-PKG_CHECK_MODULES([LIBSPECTRUM], [libspectrum >= 1.5.0])
+PKG_CHECK_MODULES([LIBSPECTRUM], [libspectrum >= 1.6.0])
 
 dnl Check if supplied libspectrum has its own internal GLib replacement
 AC_MSG_CHECKING(whether libspectrum has its own internal GLib replacement)
@@ -192,7 +207,6 @@ AC_MSG_RESULT($win32)
 
 if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
-                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
                   UI=win32,
                   AC_MSG_ERROR([Win32 UI not found]))
@@ -258,7 +272,17 @@ if test -z "$UI"; then
   fi
 fi
 
-dnl Check if the user wants the SDL UI
+dnl Check if the user wants the SDL 2 UI
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether SDL 2 UI requested)
+  AC_ARG_WITH(sdl2,
+  [  --with-sdl2             use SDL 2 for user interface],
+  if test "$withval" = no; then sdl2_ui=no; else sdl2_ui=yes; fi,
+  sdl2_ui=no)
+  AC_MSG_RESULT($sdl2_ui)
+fi
+
+dnl Check if the user wants the SDL 1 UI
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether SDL UI requested)
   AC_ARG_WITH(sdl,
@@ -270,41 +294,55 @@ fi
 
 dnl Check if the user prefers SDL 1 over SDL 2
 AC_ARG_ENABLE(sdl2,
-  AS_HELP_STRING([--disable-sdl2],[prefer SDL 1 to SDL 2]),
+  AS_HELP_STRING([--disable-sdl2],[disable SDL 2 support]),
   if test "$enableval" = yes; then sdl2=yes; else sdl2=no; fi,
   sdl2=yes
 )
 
-dnl SDL 2 is not supported for the UI yet, so warn the user
-if test "$sdl_ui" = yes -a "$sdl2" = yes; then
-  AC_MSG_WARN([SDL 2 not supported for the UI, using SDL 1 instead])
-  sdl2=no
+if test "$sdl_ui" = yes -a "$sdl2_ui" = yes; then
+  AC_MSG_ERROR([please choose either --with-sdl or --with-sdl2, not both])
 fi
+
+dnl Look for SDL 1
+SDL1_VERSION=1.2.4
+sdl1_available=no
+AM_PATH_SDL($SDL1_VERSION, sdl1_available=yes, sdl1_available=no)
+SDL1_CFLAGS="$SDL_CFLAGS"
+SDL1_LIBS="$SDL_LIBS"
+AC_SUBST(SDL1_CFLAGS)
+AC_SUBST(SDL1_LIBS)
 
 dnl Look for SDL 2
-sdl_available=no
+sdl2_available=no
 if test "$sdl2" = yes; then
-  PKG_CHECK_MODULES([SDL], [sdl2], [sdl_available=yes], [
-                    AC_MSG_WARN([SDL 2 not found, looking for SDL 1])
-                    sdl2=no])
+  PKG_CHECK_MODULES([SDL2], [sdl2], [sdl2_available=yes], [
+                     AC_MSG_WARN([SDL 2 not found, looking for SDL 1])
+                     sdl2=no])
 fi
 
-dnl Look for SDL 1 if we don't have or want SDL 2
-SDL_VERSION=1.2.4
-if test "$sdl_available" = no; then
-  AM_PATH_SDL($SDL_VERSION, sdl_available=yes, sdl_available=no)
+dnl Enable the SDL 2 UI if all conditions are met
+if test "$sdl2_ui" = yes; then
+  if test "$sdl2_available" = yes; then
+    AC_DEFINE([UI_SDL2], 1, [Defined if the SDL 2 UI is in use])
+    AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
+    UI=sdl2
+    WIDGET=widget
+    use_sdl2=yes
+  else
+    AC_MSG_ERROR([SDL 2 support requested for the UI, but SDL 2 was not found])
+  fi
 fi
 
-dnl Enable the SDL UI if all conditions are met
+dnl Enable the SDL 1 UI if all conditions are met
 if test "$sdl_ui" = yes; then
-  if test "$sdl_available" = yes; then
+  if test "$sdl1_available" = yes; then
     AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
     UI=sdl
     WIDGET=widget
-    use_sdl=yes
+    use_sdl1=yes
   else
-    AC_MSG_ERROR([SDL version $SDL_VERSION not found])
+    AC_MSG_ERROR([SDL version $SDL1_VERSION not found])
   fi
 fi
 
@@ -333,6 +371,8 @@ if test -z "$UI"; then
 
   if test "$gtk" = yes; then
 
+    UI=gtk3
+
     if test "$fakeglib" = yes; then
       AC_MSG_ERROR([libspectrum is using its own internal GLib replacement
 GTK requires the real GLib library, so the GTK UI cannot be used with
@@ -340,40 +380,13 @@ the libspectrum that was found.  Rebuild libspectrum to use the real GLib
 library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
     fi
 
-    AC_ARG_ENABLE(gtk3,
-      AS_HELP_STRING([--disable-gtk3],[prefer GTK 2 to GTK 3]),
-      if test "$enableval" = yes; then gtk3=yes; else gtk3=no; fi,
-      gtk3=auto
+    PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.20],,
+      AC_MSG_ERROR([GTK3 version >= 3.20 not found])
     )
-
-    if test "$gtk3" = yes; then
-      PKG_CHECK_MODULES(GTK, [gtk+-3.0],,
-        AC_MSG_ERROR([GTK not found])
-      )
-
-    elif test "$gtk3" = no; then
-      AM_PATH_GTK_2_0(2.18.0,,
-        AC_MSG_ERROR([GTK not found])
-      )
-
-    elif test "$gtk3" = auto; then
-      PKG_CHECK_MODULES([GTK], [gtk+-3.0], [gtk3=yes], [true])
-
-      if test "$gtk3" = auto; then
-        AM_PATH_GTK_2_0(2.18.0,
-          gtk3=no,
-          AC_MSG_WARN([GTK not found. Reverting to Xlib])
-          gtk3=no
-          gtk=no
-        )
-      fi
-    fi
-
   fi
 
   if test "$gtk" = yes; then
     AC_DEFINE([UI_GTK], 1, [Defined if GTK UI is in use])
-    UI=gtk;
     AC_MSG_CHECKING(whether GTK supports x11 backend)
     ac_save_CPPFLAGS="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $GTK_CFLAGS"
@@ -396,9 +409,9 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
   fi
 fi
 
-AM_CONDITIONAL(HAVE_GTK2, test "$gtk3" != yes)
-
-if test "$UI" = gtk; then
+if test "$UI" = gtk3; then
+  # GTK3 is in maintenance mode so we can silence the deprecation warnings
+  CPPFLAGS="$CPPFLAGS -DGLIB_DISABLE_DEPRECATION_WARNINGS -DGDK_DISABLE_DEPRECATION_WARNINGS"
   AC_PATH_XTRA
 fi
 
@@ -440,9 +453,10 @@ if test -z "$UI"; then
 fi
 
 AM_CONDITIONAL(UI_FB, test "$UI" = fb)
-AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
+AM_CONDITIONAL(UI_GTK, test "$UI" = gtk3)
 AM_CONDITIONAL(UI_NULL, test "$UI" = null)
 AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
+AM_CONDITIONAL(UI_SDL2, test "$UI" = sdl2)
 AM_CONDITIONAL(UI_WII, test "$UI" = wii)
 AM_CONDITIONAL(UI_WIN32, test "$UI" = win32)
 AM_CONDITIONAL(UI_X, test "$UI" = xlib)
@@ -487,22 +501,6 @@ AC_COMPILE_IFELSE(
 )
 CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(LIBSPEC_HAVE_BZ2)
-
-dnl Check if supplied libspectrum has support for wav files
-AC_MSG_CHECKING(whether libspectrum supports wav files)
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPECTRUM_CFLAGS"
-AC_COMPILE_IFELSE(
-  [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
-    [[
-      int test = LIBSPECTRUM_SUPPORTS_AUDIOFILE;
-    ]])
-  ],
-  [LIBSPEC_HAVE_AUDIOFILE=yes; AC_MSG_RESULT(yes)],
-  [LIBSPEC_HAVE_AUDIOFILE=""; AC_MSG_RESULT(no)]
-)
-CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(LIBSPEC_HAVE_AUDIOFILE)
 
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_MSG_CHECKING(whether PNG support requested)
@@ -566,9 +564,20 @@ AC_CHECK_HEADER(
 )
 
 dnl SDL audio
-if test "$sdl_available" = "yes"; then
-  dnl Default to SDL audio if we're using the SDL UI
-  if test "$UI" = sdl; then
+if test "$sdl2_available" = "yes"; then
+  dnl Default to SDL2 audio if we're using the SDL2 UI
+  if test "$UI" = sdl2; then
+    audio_driver_list="sdl2 $audio_driver_list"
+  else
+    audio_driver_list="$audio_driver_list sdl2"
+  fi
+fi
+
+if test "$sdl1_available" = "yes"; then
+  dnl Default to SDL audio if we're using the SDL 1 UI
+  if test "$UI" = sdl2; then
+    :
+  elif test "$UI" = sdl; then
     audio_driver_list="sdl $audio_driver_list"
   else
     audio_driver_list="$audio_driver_list sdl"
@@ -663,9 +672,13 @@ dnl
 dnl Add the necessary options for the selected audio driver
 dnl
 case $audio_driver in
+  sdl2)
+    SOUND_LIBADD='sound/sdl2sound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+    use_sdl2=yes
+    ;;
   sdl)
     SOUND_LIBADD='sound/sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
-    use_sdl=yes
+    use_sdl1=yes
     ;;
   directsound)
     SOUND_LIBADD='sound/dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
@@ -737,7 +750,7 @@ if test "$stick" = yes; then
   dnl We prefer to use UI-specific joystick code. (Default.)
   dnl If there is none, or you override this here, we use libjsw.
   case "$UI" in
-    sdl|win32)
+    sdl|sdl2|win32)
       dnl Libraries provide their own joystick code
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
@@ -751,7 +764,7 @@ if test "$stick" = yes; then
         AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
       fi
       ;;
-    gtk|xlib)
+    gtk3|xlib)
       dnl These UIs could use SDL library for handling joysticks
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
@@ -761,12 +774,12 @@ if test "$stick" = yes; then
       if test "$libjsw" = yes; then
         AC_MSG_RESULT([no, use libjsw])
       else
-        if test "$sdl_available" = yes; then
+        if test "$sdl1_available" = yes; then
           AC_MSG_RESULT(yes)
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
-          use_sdl=yes
+          use_sdl1=yes
         else
-          AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled])
+          AC_MSG_WARN([SDL version $SDL1_VERSION not found - joystick support disabled])
           stick=no
         fi
       fi
@@ -815,6 +828,9 @@ AC_SUBST(XML_LIBS)
 dnl Work out which timer routines to use
 AC_MSG_CHECKING(which timer routines to use)
 if test "$UI" = sdl; then
+  TIMER_LIBADD='timer/sdl.$(OBJEXT)'
+  AC_MSG_RESULT(SDL)
+elif test "$UI" = sdl2; then
   TIMER_LIBADD='timer/sdl.$(OBJEXT)'
   AC_MSG_RESULT(SDL)
 else
@@ -949,8 +965,9 @@ AM_CONDITIONAL(COMPAT_UNIX, test "$COMPAT_OSNAME" = 'unix')
 AM_CONDITIONAL(COMPAT_WII, test "$COMPAT_OSNAME" = 'wii')
 AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
 
-dnl This tells the Makefile to use SDL_CFLAGS and SDL_LIBS during the build
-AM_CONDITIONAL(USE_SDL, test "$use_sdl" = "yes")
+dnl These tell the Makefile to use SDL 1 and SDL 2 flags during the build
+AM_CONDITIONAL(USE_SDL1, test "$use_sdl1" = "yes")
+AM_CONDITIONAL(USE_SDL2, test "$use_sdl2" = "yes")
 
 dnl Decide whether to install desktop and mime files
 AC_ARG_ENABLE(desktop-integration,
@@ -1047,18 +1064,20 @@ echo ""
 echo "Internal GLib replacement: ${fakeglib}"
 echo "zlib support: ${LIBSPEC_HAVE_ZLIB:-no}"
 echo "bzip2 support: ${LIBSPEC_HAVE_BZ2:-no}"
-echo "audiofile support: ${LIBSPEC_HAVE_AUDIOFILE:-no}"
 echo ""
 echo "********************"
 echo "*** Fuse options ***"
 echo "********************"
 echo ""
 echo "User interface: ${UI}"
-if test "${UI}" = "gtk"; then
-   echo "Using GTK 3: ${gtk3}"
+if test "${UI}" = "gtk3"; then
+   echo "Using GTK 3: ${gtk}"
 fi
-if test "${use_sdl}" = "yes"; then
-   echo "Using SDL 2: ${sdl2}"
+if test "${use_sdl1}" = "yes"; then
+   echo "Using SDL 1: yes"
+fi
+if test "${use_sdl2}" = "yes"; then
+   echo "Using SDL 2: yes"
 fi
 if test x"${gpm}" != "x"; then
    echo "libgpm support: ${gpm}"
@@ -1076,6 +1095,17 @@ echo "Spectranet support: ${build_spectranet}"
 echo "SpeccyBoot support: ${linux_tap:-no}"
 echo "TTX2000 S support: ${build_ttx2000s}"
 echo "Desktop integration: ${desktopintegration}"
+
+if test "${test_build}" != ""; then
+  echo ""
+  echo "*********************"
+  echo "*** Testing build ***"
+  echo "*********************"
+  echo "This build will display the following information"
+  echo "  to distinguish it from official version:"
+  echo -e $test_build
+fi
+
 echo ""
 echo "Type 'make' to compile Fuse"
 echo ""

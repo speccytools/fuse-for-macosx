@@ -1,6 +1,6 @@
 /* scaler.c: code for selecting (etc) scalers
- * Copyright (C) 2003 Fredrick Meunier, Philip Kendall
- * Copyright (c) 2015 Sergio Baldoví
+ * Copyright (C) 2003-2021 Fredrick Meunier, Philip Kendall
+ * Copyright (c) 2015-2019 Sergio Baldoví
  * 
  * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus
@@ -133,7 +133,7 @@ scaler_flags_t scaler_flags;
 scaler_expand_fn *scaler_expander;
 
 int
-scaler_select_scaler( scaler_type scaler )
+scaler_activate_scaler( scaler_type scaler )
 {
   if( !scaler_is_supported( scaler ) ) return 1;
 
@@ -149,6 +149,14 @@ scaler_select_scaler( scaler_type scaler )
   scaler_proc32 = scaler_get_proc32( current_scaler );
   scaler_flags = scaler_get_flags( current_scaler );
   scaler_expander = scaler_get_expander( current_scaler );
+
+  return 0;
+}
+
+int
+scaler_select_scaler( scaler_type scaler )
+{
+  if( scaler_activate_scaler( scaler ) ) return 1;
 
   return uidisplay_hotswap_gfx_mode();
 }

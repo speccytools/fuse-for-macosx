@@ -1,5 +1,5 @@
 /* machine.h: Routines for handling the various machine types
-   Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,9 +29,9 @@
 #include "libspectrum.h"
 
 #include "display.h"
-#include "peripherals/ay.h"
-#include "peripherals/covox.h"
-#include "peripherals/specdrum.h"
+#include "peripherals/sound/ay.h"
+#include "peripherals/sound/covox.h"
+#include "peripherals/sound/specdrum.h"
 #include "spectrum.h"
 
 typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );

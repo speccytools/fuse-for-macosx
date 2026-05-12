@@ -1,5 +1,5 @@
 /* osssound.c: OSS (e.g. Linux) sound I/O
-   Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2007 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

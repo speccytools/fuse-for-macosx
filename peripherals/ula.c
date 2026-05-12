@@ -1,7 +1,7 @@
 /* ula.c: ULA routines
-   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2017 Philip Kendall, Darren Salt
    Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2016 Fredrick Meunier
+   Copyright (c) 2016-2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@
 
 static libspectrum_byte last_byte;
 
-libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ];
-libspectrum_byte ula_contention_no_mreq[ ULA_CONTENTION_SIZE ];
+libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ] = { 0 };
+libspectrum_byte ula_contention_no_mreq[ ULA_CONTENTION_SIZE ] = { 0 };
 
 /* What to return if no other input pressed; depends on the last byte
    output to the ULA; see CSS FAQ | Technical Information | Port #FE

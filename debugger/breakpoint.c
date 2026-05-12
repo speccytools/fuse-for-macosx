@@ -1,5 +1,5 @@
 /* breakpoint.c: a debugger breakpoint
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2017 Philip Kendall
    Copyright (c) 2013-2015 Sergio Baldoví
    Copyright (c) 2015 Tom Seddon
    Copyright (c) 2016 BogDan Vatra

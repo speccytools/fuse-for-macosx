@@ -291,9 +291,11 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
   case  7: menu_select_peripheral_roms( "Multiface 128",   6, 1 ); return;
   case  8: menu_select_peripheral_roms( "Multiface 3",     7, 1 ); return;
   case  9: menu_select_peripheral_roms( "Opus Discovery",  8, 1 ); return;
-  case 10: menu_select_peripheral_roms( "SpeccyBoot",      9, 1 ); return;
-  case 11: menu_select_peripheral_roms( "TTX2000S",       10, 1 ); return;
-  case 12: menu_select_peripheral_roms( "uSource",        11, 1 ); return;
+  case 10: menu_select_peripheral_roms( "SP0256",          9, 1 ); return;
+  case 11: menu_select_peripheral_roms( "SpeccyBoot",     10, 1 ); return;
+  case 12: menu_select_peripheral_roms( "TTX2000S",       11, 1 ); return;
+  case 13: menu_select_peripheral_roms( "uSource",        12, 1 ); return;
+  case 14: menu_select_peripheral_roms( "uSpeech",        13, 1 ); return;
 
   }
 

@@ -1,0 +1,14 @@
+name: Fuse App For Windows
+run-name: Build Fuse App for Windows / ${{ github.actor }} /
+
+# Executed upon each commit pushed, merge commit in PR
+on: [pull_request]
+
+jobs:
+  libspectrum:
+    # Build libspectrum from the canonical SourceForge repository.
+    name: "Libspectrum lib (Windows)"
+    uses: ./.github/workflows/build_libspectrum_windows_sub.yml
+    with:
+      key: fuse-app
+      libspectrum_ref: master

@@ -1,6 +1,6 @@
 /* pentagon1024.c: Pentagon 1024 specific routines This machine is expected to
                   be a post-1996 Pentagon (a 1024k v2.2 1024SL?).
-   Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2021 Philip Kendall and Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

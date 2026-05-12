@@ -31,6 +31,7 @@ EXTRA_DIST += \
               hacking/spectranet.txt \
               hacking/tc2048_tech_notes.txt \
               hacking/timer.txt \
+              hacking/unittests.txt \
               hacking/ui.txt \
               hacking/uncrustify.cfg \
               hacking/valgrind.supp

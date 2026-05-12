@@ -1,5 +1,6 @@
 /* binary.c: The binary load/save widgets
-   Copyright (c) 2019 Gergely Szasz
+   Copyright (c) 2019-2021 Gergely Szasz
+   Copyright (c) 2021 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

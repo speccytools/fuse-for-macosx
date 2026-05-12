@@ -1,6 +1,6 @@
 /* fileselector.c: Win32 fileselector routines
    Copyright (c) 2008 Marek Januszewski
-   Copyright (c) 2016 Sergio Baldoví
+   Copyright (c) 2016-2021 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,8 +38,12 @@ static char *current_folder;
    between UIs */
 static LPCTSTR file_filter = TEXT(
 "Supported Files\0"
-"*.mgtsnp;*.slt;*.sna;*.snapshot;*.snp;*.sp;*.szx;*.z80;*.zx-state;"
-"*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap;*.wav;"
+"*.mgtsnp;*.slt;*.sna;*.snapshot;*.snp;*.sp;*.szx;*.z80;*.zx-state;*.s;"
+"*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap"
+#ifdef LIBSPECTRUM_SUPPORTS_WAV
+";*.wav"
+#endif
+";"
 "*.d40;*.d80;*.dsk;*.fdi;*.img;*.mgt;*.opd;*.opu;*.sad;*.scl;*.td0;*.trd;*.udi;"
 "*.dck;*.rom;*.hdf;*.mdr;*.fmf;*.rzx;"
 "*.bin;*.log;*.mlt;*.png;*.pok;*.scr;*.svg"
@@ -75,9 +79,17 @@ static LPCTSTR file_filter = TEXT(
 "Recording Files (*.rzx)\0"
 "*.rzx\0"
 "Snapshot Files (*.szx;*.z80;*.sna;...)\0"
-"*.mgtsnp;*.slt;*.sna;*.snapshot;*.snp;*.sp;*.szx;*.z80;*.zx-state\0"
-"Tape Files (*.tap;*.tzx;*.pzx;*.wav;*.csw;...)\0"
-"*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap;*.wav\0"
+"*.mgtsnp;*.slt;*.sna;*.snapshot;*.snp;*.sp;*.szx;*.z80;*.zx-state;*.s\0"
+"Tape Files (*.tap;*.tzx;*.pzx"
+#ifdef LIBSPECTRUM_SUPPORTS_WAV
+";*.wav"
+#endif
+";*.csw;...)\0"
+"*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap"
+#ifdef LIBSPECTRUM_SUPPORTS_WAV
+";*.wav"
+#endif
+"\0"
 "\0" );
 
 static DWORD filter_index = 0;

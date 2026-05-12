@@ -1,5 +1,5 @@
 /* simpleide.c: Simple 8-bit IDE interface routines
-   Copyright (c) 2003-2017 Garry Lancaster, Philip Kendall, Fredrick Meunier
+   Copyright (c) 2003-2021 Garry Lancaster, Philip Kendall, Fredrick Meunier
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 

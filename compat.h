@@ -1,7 +1,7 @@
 /* compat.h: various compatibility bits
    Copyright (c) 2003-2012 Philip Kendall
    Copyright (c) 2015 Stuart Brady
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2016 Sergio Baldoví
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -117,7 +117,6 @@ typedef enum utils_aux_type {
   UTILS_AUXILIARY_LIB,		/* Something from the lib/ directory */
   UTILS_AUXILIARY_ROM,		/* Something from the roms/ directory */
   UTILS_AUXILIARY_WIDGET,	/* Something from the widget/ directory */
-  UTILS_AUXILIARY_GTK,		/* Something from the gtk/ directory */
 
 } utils_aux_type;
 
@@ -133,16 +132,12 @@ typedef struct path_context {
 int compat_osname( char *buffer, size_t length );
 const char* compat_get_temp_path( void );
 const char* compat_get_config_path( void );
+const char* compat_get_fallback_config_path( void );
 int compat_is_absolute_path( const char *path );
 int compat_get_next_path( path_context *ctx );
 
 typedef FILE* compat_fd;
-
-#ifndef GEKKO
 typedef DIR* compat_dir;
-#else                           /* #ifndef GEKKO */
-typedef DIR_ITER* compat_dir;
-#endif                          /* #ifndef GEKKO */
 
 extern const compat_fd COMPAT_FILE_OPEN_FAILED;
 
@@ -184,13 +179,18 @@ int compat_get_tap( const char *interface_name );
 
 #ifdef WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #define COMPAT_ENOTCONN WSAENOTCONN
 #define COMPAT_EWOULDBLOCK WSAEWOULDBLOCK
 #define COMPAT_EINPROGRESS WSAEINPROGRESS
 #define COMPAT_ECONNREFUSED WSAECONNREFUSED
 typedef SOCKET compat_socket_t;
 typedef SOCKADDR compat_sockaddr;
-#else  /* #ifndef WIN32 */
+#elif GEKKO
+/* no sockets under WII, just define the minimum
+   to feed the below compat_ declarations  */
+typedef int compat_socket_t;
+#else  /* #ifndef WIN32 && GEKKO */
 #include <sys/socket.h>
 #include <netdb.h>
 #include <errno.h>
@@ -209,6 +209,7 @@ void compat_socket_networking_init( void );
 void compat_socket_networking_end( void );
 
 int compat_socket_blocking_mode( compat_socket_t fd, int blocking );
+int compat_socket_get_fionread( compat_socket_t fd, u_long *bytes );
 int compat_socket_close( compat_socket_t fd );
 int compat_socket_get_error( void );
 const char *compat_socket_get_strerror( void );

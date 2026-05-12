@@ -1,5 +1,5 @@
 /* select.c: generic selection widget
-   Copyright (c) 2001-2004 Philip Kendall, Witold Filipczyk
+   Copyright (c) 2001-2007 Philip Kendall, Witold Filipczyk
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify

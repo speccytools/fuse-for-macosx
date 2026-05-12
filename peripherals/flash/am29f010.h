@@ -30,7 +30,7 @@ typedef struct flash_am29f010_t flash_am29f010_t;
 flash_am29f010_t* flash_am29f010_alloc( void );
 void flash_am29f010_free( flash_am29f010_t *self );
 void flash_am29f010_init( flash_am29f010_t *self, libspectrum_byte *memory );
-
+libspectrum_byte flash_am29f010_read( flash_am29f010_t *self, libspectrum_byte page, libspectrum_word address );
 void flash_am29f010_write( flash_am29f010_t *self, libspectrum_byte page, libspectrum_word address, libspectrum_byte b );
 
 #endif                          /* #ifndef FUSE_AM29F010_H */

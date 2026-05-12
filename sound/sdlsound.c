@@ -1,5 +1,5 @@
 /* sdlsound.c: SDL sound I/O
-   Copyright (c) 2002-2015 Alexander Yurchenko, Russell Marks, Philip Kendall,
+   Copyright (c) 2002-2007 Alexander Yurchenko, Russell Marks, Philip Kendall,
 			   Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify

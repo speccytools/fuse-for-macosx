@@ -1,5 +1,5 @@
 /* socket.c: Socket-related compatibility routines
-   Copyright (c) 2011-2015 Sergio Baldoví, Philip Kendall
+   Copyright (c) 2011-2019 Sergio Baldoví, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,12 @@ compat_socket_blocking_mode( compat_socket_t fd, int blocking )
 {
   u_long mode = blocking ? 1 : 0;
   return ( ioctlsocket( fd, FIONBIO, &mode ) );
+}
+
+int
+compat_socket_get_fionread( compat_socket_t fd, u_long *bytes)
+{
+  return ( ioctlsocket( fd, FIONREAD, bytes ) );
 }
 
 int
@@ -162,9 +168,9 @@ compat_socket_selfpipe_alloc( void )
  
   /* Test communications in order to detect blocking firewalls */
   if( selfpipe_test( self ) == -1 ) {
-    ui_error( UI_ERROR_ERROR,
-              "Networking: failed to test internal communications" );
-    fuse_abort();
+    compat_socket_close( self->self_socket );
+    libspectrum_free( self );
+    return NULL;
   }
 
   return self;
@@ -240,4 +246,3 @@ compat_socket_networking_end( void )
 {
   WSACleanup();
 }
-

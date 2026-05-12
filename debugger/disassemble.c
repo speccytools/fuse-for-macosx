@@ -1,5 +1,5 @@
 /* disassemble.c: Fuse's disassembler
-   Copyright (c) 2002-2015 Darren Salt, Philip Kendall
+   Copyright (c) 2002-2018 Darren Salt, Philip Kendall
    Copyright (c) 2016 BogDan Vatra
 
    This program is free software; you can redistribute it and/or modify
@@ -605,7 +605,7 @@ disassemble_ddfd_cb( libspectrum_word address, char offset,
     }
   } else if( b < 0x80 ) {
     ix_iy_offset( buffer2, 40, use_hl, offset );
-    snprintf( buffer, buflen, "BIT %d,%s", ( b >> 3 ) & 0x07, buffer2 );
+    snprintf( buffer, buflen, "%s %d,%s", bit_op( b ), bit_op_bit( b ), buffer2 );
     *length = 1;
   } else {
     if( ( b & 0x07 ) == 0x06 ) {
@@ -616,7 +616,7 @@ disassemble_ddfd_cb( libspectrum_word address, char offset,
     } else {
       source_reg( address, USE_HL, buffer2, 40 );
       ix_iy_offset( buffer3, 40, use_hl, offset );
-      snprintf( buffer, buflen, "LD %s,%s %s", buffer2, bit_op( b ), buffer3 );
+      snprintf( buffer, buflen, "LD %s,%s %d,%s", buffer2, bit_op( b ), bit_op_bit( b ), buffer3 );
       *length = 1;
     }
   }
@@ -854,18 +854,94 @@ libspectrum_byte test13_data[] = { 0xfd, 0xdd, 0xfd, 0xdd, 0xfd, 0xdd, 0xfd,
 libspectrum_byte test14_data[] = { 0x7e };
 libspectrum_byte test15_data[] = { 0xdd, 0x7e, 0x55 };
 
+/* CB prefix BIT/RES/SET tests */
+libspectrum_byte test16_data[] = { 0xcb, 0x47 };  /* BIT 0,A */
+libspectrum_byte test17_data[] = { 0xcb, 0x87 };  /* RES 0,A */
+libspectrum_byte test18_data[] = { 0xcb, 0xcf };  /* SET 1,A */
+
+/* DD CB prefix: BIT/RES/SET on (IX+d) */
+libspectrum_byte test19_data[] = { 0xdd, 0xcb, 0x55, 0x46 };  /* BIT 0,(IX+55) */
+libspectrum_byte test20_data[] = { 0xdd, 0xcb, 0x55, 0x86 };  /* RES 0,(IX+55) */
+libspectrum_byte test21_data[] = { 0xdd, 0xcb, 0x55, 0xc6 };  /* SET 0,(IX+55) */
+
+/* FD CB prefix: BIT/RES/SET on (IY+d) */
+libspectrum_byte test22_data[] = { 0xfd, 0xcb, 0x55, 0x46 };  /* BIT 0,(IY+55) */
+libspectrum_byte test25_data[] = { 0xfd, 0xcb, 0x55, 0x86 };  /* RES 0,(IY+55) */
+libspectrum_byte test26_data[] = { 0xfd, 0xcb, 0x55, 0xc6 };  /* SET 0,(IY+55) */
+
+/* DD CB undocumented: LD reg,RES/SET n,(IX+d) — regression for bug #515 fix */
+libspectrum_byte test23_data[] = { 0xdd, 0xcb, 0x55, 0x87 };  /* LD A,RES 0,(IX+55) */
+libspectrum_byte test24_data[] = { 0xdd, 0xcb, 0x55, 0xcf };  /* LD A,SET 1,(IX+55) */
+
+/* FD CB undocumented: LD reg,RES/SET n,(IY+d) */
+libspectrum_byte test27_data[] = { 0xfd, 0xcb, 0x55, 0x87 };  /* LD A,RES 0,(IY+55) */
+libspectrum_byte test28_data[] = { 0xfd, 0xcb, 0x55, 0xcf };  /* LD A,SET 1,(IY+55) */
+
+/* Negative (IX+d)/(IY+d) offset (offset >= 0x80) */
+libspectrum_byte test29_data[] = { 0xdd, 0xcb, 0xff, 0x46 };  /* BIT 0,(IX-01) */
+libspectrum_byte test30_data[] = { 0xfd, 0xcb, 0xff, 0x46 };  /* BIT 0,(IY-01) */
+libspectrum_byte test31_data[] = { 0xdd, 0x7e, 0xff };         /* LD A,(IX-01) */
+
+/* Relative jump instructions */
+libspectrum_byte test32_data[] = { 0x18, 0x00 };  /* JR 0 offset -> target 0x4002 */
+libspectrum_byte test33_data[] = { 0x18, 0xfe };  /* JR -2 offset -> target 0x4000 */
+libspectrum_byte test34_data[] = { 0x10, 0xfe };  /* DJNZ -2 offset -> target 0x4000 */
+libspectrum_byte test35_data[] = { 0x20, 0x04 };  /* JR NZ,+4 -> target 0x4006 */
+
+/* ED prefix: IN reg,(C) and OUT (C),reg */
+libspectrum_byte test36_data[] = { 0xed, 0x40 };  /* IN B,(C) */
+libspectrum_byte test37_data[] = { 0xed, 0x70 };  /* IN F,(C) — special case */
+libspectrum_byte test38_data[] = { 0xed, 0x41 };  /* OUT (C),B */
+libspectrum_byte test39_data[] = { 0xed, 0x71 };  /* OUT (C),0 — special case */
+
+/* ED prefix: SBC HL,rr and ADC HL,rr */
+libspectrum_byte test40_data[] = { 0xed, 0x42 };  /* SBC HL,BC */
+libspectrum_byte test41_data[] = { 0xed, 0x4a };  /* ADC HL,BC */
+
+/* ED prefix: LD (nn),rr and LD rr,(nn) */
+libspectrum_byte test42_data[] = { 0xed, 0x43, 0x56, 0x34 };  /* LD (3456),BC */
+libspectrum_byte test43_data[] = { 0xed, 0x4b, 0x56, 0x34 };  /* LD BC,(3456) */
+
+/* ED prefix: NEG, RETN, RETI */
+libspectrum_byte test44_data[] = { 0xed, 0x44 };  /* NEG */
+libspectrum_byte test45_data[] = { 0xed, 0x45 };  /* RETN */
+libspectrum_byte test46_data[] = { 0xed, 0x4d };  /* RETI */
+
+/* ED prefix: IM 0, IM 1, IM 2 */
+libspectrum_byte test47_data[] = { 0xed, 0x46 };  /* IM 0 */
+libspectrum_byte test48_data[] = { 0xed, 0x56 };  /* IM 1 */
+libspectrum_byte test49_data[] = { 0xed, 0x5e };  /* IM 2 */
+
+/* ED prefix: LD I,A and LD A,I */
+libspectrum_byte test50_data[] = { 0xed, 0x47 };  /* LD I,A */
+libspectrum_byte test51_data[] = { 0xed, 0x57 };  /* LD A,I */
+
+/* ED prefix: block instructions */
+libspectrum_byte test52_data[] = { 0xed, 0xa0 };  /* LDI */
+libspectrum_byte test53_data[] = { 0xed, 0xb0 };  /* LDIR */
+libspectrum_byte test54_data[] = { 0xed, 0xa8 };  /* LDD */
+libspectrum_byte test55_data[] = { 0xed, 0xb8 };  /* LDDR */
+
 static int
 run_test( libspectrum_byte *data, size_t data_length, const char *expected )
 {
-  char disassembly[16];
+  char disassembly[40];
   size_t length;
 
   memcpy( memory_map_read[8].page, data, data_length );
   
   debugger_disassemble( disassembly, sizeof( disassembly ), &length, 0x4000 );
 
-  if( strcmp( disassembly, expected ) ) return 1;
-  if( length != data_length ) return 1;
+  if( strcmp( disassembly, expected ) ) {
+    printf( "disassemble test: expected '%s', got '%s'\n", expected,
+            disassembly );
+    return 1;
+  }
+  if( length != data_length ) {
+    printf( "disassemble test: '%s': expected length %zu, got %zu\n", expected,
+            data_length, length );
+    return 1;
+  }
 
   return 0;
 }
@@ -895,6 +971,74 @@ debugger_disassemble_unittest( void )
 
   r += run_test( test14_data, sizeof( test14_data ), "LD A,(HL)" );
   r += run_test( test15_data, sizeof( test15_data ), "LD A,(IX+55)" );
+
+  /* CB prefix BIT/RES/SET */
+  r += run_test( test16_data, sizeof( test16_data ), "BIT 0,A" );
+  r += run_test( test17_data, sizeof( test17_data ), "RES 0,A" );
+  r += run_test( test18_data, sizeof( test18_data ), "SET 1,A" );
+
+  /* DD CB prefix BIT/RES/SET on (IX+d) */
+  r += run_test( test19_data, sizeof( test19_data ), "BIT 0,(IX+55)" );
+  r += run_test( test20_data, sizeof( test20_data ), "RES 0,(IX+55)" );
+  r += run_test( test21_data, sizeof( test21_data ), "SET 0,(IX+55)" );
+
+  /* FD CB prefix BIT/RES/SET on (IY+d) */
+  r += run_test( test22_data, sizeof( test22_data ), "BIT 0,(IY+55)" );
+  r += run_test( test25_data, sizeof( test25_data ), "RES 0,(IY+55)" );
+  r += run_test( test26_data, sizeof( test26_data ), "SET 0,(IY+55)" );
+
+  /* DD CB undocumented LD reg,RES/SET n,(IX+d) — regression for bug #515 */
+  r += run_test( test23_data, sizeof( test23_data ), "LD A,RES 0,(IX+55)" );
+  r += run_test( test24_data, sizeof( test24_data ), "LD A,SET 1,(IX+55)" );
+
+  /* FD CB undocumented LD reg,RES/SET n,(IY+d) */
+  r += run_test( test27_data, sizeof( test27_data ), "LD A,RES 0,(IY+55)" );
+  r += run_test( test28_data, sizeof( test28_data ), "LD A,SET 1,(IY+55)" );
+
+  /* Negative (IX+d)/(IY+d) offsets */
+  r += run_test( test29_data, sizeof( test29_data ), "BIT 0,(IX-01)" );
+  r += run_test( test30_data, sizeof( test30_data ), "BIT 0,(IY-01)" );
+  r += run_test( test31_data, sizeof( test31_data ), "LD A,(IX-01)" );
+
+  /* Relative jump instructions */
+  r += run_test( test32_data, sizeof( test32_data ), "JR 4002" );
+  r += run_test( test33_data, sizeof( test33_data ), "JR 4000" );
+  r += run_test( test34_data, sizeof( test34_data ), "DJNZ 4000" );
+  r += run_test( test35_data, sizeof( test35_data ), "JR NZ,4006" );
+
+  /* ED prefix: IN reg,(C) and OUT (C),reg */
+  r += run_test( test36_data, sizeof( test36_data ), "IN B,(C)" );
+  r += run_test( test37_data, sizeof( test37_data ), "IN F,(C)" );
+  r += run_test( test38_data, sizeof( test38_data ), "OUT (C),B" );
+  r += run_test( test39_data, sizeof( test39_data ), "OUT (C),0" );
+
+  /* ED prefix: SBC HL,rr and ADC HL,rr */
+  r += run_test( test40_data, sizeof( test40_data ), "SBC HL,BC" );
+  r += run_test( test41_data, sizeof( test41_data ), "ADC HL,BC" );
+
+  /* ED prefix: LD (nn),rr and LD rr,(nn) */
+  r += run_test( test42_data, sizeof( test42_data ), "LD (3456),BC" );
+  r += run_test( test43_data, sizeof( test43_data ), "LD BC,(3456)" );
+
+  /* ED prefix: NEG, RETN, RETI */
+  r += run_test( test44_data, sizeof( test44_data ), "NEG" );
+  r += run_test( test45_data, sizeof( test45_data ), "RETN" );
+  r += run_test( test46_data, sizeof( test46_data ), "RETI" );
+
+  /* ED prefix: IM 0, IM 1, IM 2 */
+  r += run_test( test47_data, sizeof( test47_data ), "IM 0" );
+  r += run_test( test48_data, sizeof( test48_data ), "IM 1" );
+  r += run_test( test49_data, sizeof( test49_data ), "IM 2" );
+
+  /* ED prefix: LD I,A and LD A,I */
+  r += run_test( test50_data, sizeof( test50_data ), "LD I,A" );
+  r += run_test( test51_data, sizeof( test51_data ), "LD A,I" );
+
+  /* ED prefix: block instructions */
+  r += run_test( test52_data, sizeof( test52_data ), "LDI" );
+  r += run_test( test53_data, sizeof( test53_data ), "LDIR" );
+  r += run_test( test54_data, sizeof( test54_data ), "LDD" );
+  r += run_test( test55_data, sizeof( test55_data ), "LDDR" );
 
   return r;
 }

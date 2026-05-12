@@ -34,6 +34,8 @@ typedef struct nic_w5100_t nic_w5100_t;
 nic_w5100_t* nic_w5100_alloc( void );
 void nic_w5100_free( nic_w5100_t *self );
 
+int nic_w5100_enable( nic_w5100_t *self );
+
 void nic_w5100_reset( nic_w5100_t *self );
 
 libspectrum_byte nic_w5100_read( nic_w5100_t *self, libspectrum_word reg);

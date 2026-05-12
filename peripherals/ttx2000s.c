@@ -1,5 +1,6 @@
 /* ttx2000s.c: Routines for handling the TTX2000S teletext adapter
    Copyright (c) 2018 Alistair Cree
+   Copyright (c) 2024 ZXGuesser
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -348,43 +349,79 @@ ttx2000s_field_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
 {
   int bytes_read;
   int i;
-  libspectrum_byte ttx2000s_socket_buffer[672];
+  libspectrum_byte ttx2000s_socket_buffer[672*25]; /* space for 25 fields */
 
   /* do stuff */
   if( teletext_socket != compat_socket_invalid && ttx2000s_connected ) {
-    bytes_read =
-      recv( teletext_socket, (char *)ttx2000s_socket_buffer, 672, 0 );
-    /* packet server sends 16 lines of 42 bytes, unused lines are padded with 0x00 */
-    if( bytes_read == 672 ) {
-      /* 11 line syncs occur before the first teletext line */
-      ttx2000s_line_counter = ( ttx2000s_line_counter + 11 ) & 0xF;
-      i = 0;
-      while( 1 )
-      {
-        if( ttx2000s_socket_buffer[i * 42] != 0 ) /* packet isn't blank */
-          ttx2000s_ram[ ttx2000s_line_counter << 6 ] = 0x27; /* framing code */
-        memcpy( ttx2000s_ram + (ttx2000s_line_counter << 6) + 1,
-                  ttx2000s_socket_buffer + (i * 42), 42 );
-        i++;
-        if( ++ttx2000s_line_counter > 15 )
-          break; /* ignore packets once line counter overflows */
-      }
-      
-      /* only generate NMI when ROM is paged in and there is signal */
-      if( ttx2000s_paged )
-        event_add( 0, z80_nmi_event );    /* pull /NMI */
-    } else if( bytes_read == -1 ) {
-      errno = compat_socket_get_error();
-      if( errno == COMPAT_ECONNREFUSED ) {
-        /* the connection was refused */
-        ttx2000s_connected = 0;
-      } else if( errno == COMPAT_ENOTCONN || errno == COMPAT_EWOULDBLOCK ) {
-        /* just ignore if the socket is not connected or recv would block */
-      } else {
-        /* TODO: what should we do when there's an unexpected error */
+    u_long n;
+    /* try to determine the amount of data available in socket read buffer */
+    if( compat_socket_get_fionread( teletext_socket, &n ) == -1) {
+      ui_error( UI_ERROR_ERROR,
+                "ttx2000s: FIONREAD failed with errno %d: %s\n", errno,
+                compat_socket_get_strerror() );
+    } else if ( n > (672 * 50) ) {
+      /* over 50 fields of data are queued on the socket. Discard 25 fields */
+      bytes_read =
+        recv( teletext_socket, (char *)ttx2000s_socket_buffer, 672*25, 0 );
+      if( bytes_read != 672*25 ) {
+        /* something failed and is probably a fatal issue */
         ui_error( UI_ERROR_ERROR,
-                  "ttx2000s: recv returned unexpected errno %d: %s\n", errno,
-                  compat_socket_get_strerror() );
+                    "ttx2000s: recv returned unexpected errno %d: %s\n", errno,
+                    compat_socket_get_strerror() );
+        if( compat_socket_close( teletext_socket ) ) {
+          ui_error( UI_ERROR_ERROR,
+                    "ttx2000s: close returned unexpected errno %d: %s\n",
+                    compat_socket_get_error(), compat_socket_get_strerror() );
+        }
+        ttx2000s_connected = 0; /* the connection has failed */
+      }
+    } else if ( n > 675 ) {
+      /* a complete field is immediately available to read */
+      bytes_read =
+        recv( teletext_socket, (char *)ttx2000s_socket_buffer, 672, 0 );
+      /* read a complete field (16 lines of 42 bytes) */
+      if( bytes_read == 672 ) {
+        /* 11 line syncs occur before the first teletext line */
+        ttx2000s_line_counter = ( ttx2000s_line_counter + 11 ) & 0xF;
+        i = 0;
+        while( 1 )
+        {
+          if( ttx2000s_socket_buffer[i * 42] != 0 ) /* packet isn't blank */
+            ttx2000s_ram[ ttx2000s_line_counter << 6 ] = 0x27; /* framing 
+code */
+          memcpy( ttx2000s_ram + (ttx2000s_line_counter << 6) + 1,
+                    ttx2000s_socket_buffer + (i * 42), 42 );
+          i++;
+          if( ++ttx2000s_line_counter > 15 )
+            break; /* ignore packets once line counter overflows */
+        }
+        
+        /* only generate NMI when ROM is paged in and there is signal */
+        if( ttx2000s_paged )
+          event_add( 0, z80_nmi_event );    /* pull /NMI */
+      } else if( bytes_read == -1 ) {
+        errno = compat_socket_get_error();
+        if( errno == COMPAT_ECONNREFUSED ) {
+          /* the connection was refused */
+          ttx2000s_connected = 0;
+        } else if( errno == COMPAT_ENOTCONN || errno == COMPAT_EWOULDBLOCK ) {
+          /* just ignore if the socket is not connected or recv would block */
+        } else {
+          /* TODO: what should we do when there's an unexpected error */
+          ui_error( UI_ERROR_ERROR,
+                    "ttx2000s: recv returned unexpected errno %d: %s\n", errno,
+                    compat_socket_get_strerror() );
+          ttx2000s_connected = 0; /* the connection has failed */
+        }
+      } else {
+        /* failed to read a whole field at once. This means a partial field
+        has been removed from buffer and packets will now be desynchronized */
+        
+        if( compat_socket_close( teletext_socket ) ) {
+          ui_error( UI_ERROR_ERROR,
+                    "ttx2000s: close returned unexpected errno %d: %s\n",
+                    compat_socket_get_error(), compat_socket_get_strerror() );
+        }
         ttx2000s_connected = 0; /* the connection has failed */
       }
     }

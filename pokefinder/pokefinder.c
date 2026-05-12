@@ -1,5 +1,5 @@
 /* pokefinder.c: help with finding pokes
-   Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2003-2012 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@
 #include "pokefinder.h"
 #include "spectrum.h"
 
-libspectrum_byte pokefinder_possible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE ];
-libspectrum_byte pokefinder_impossible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE / 8 ];
+libspectrum_byte pokefinder_possible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE ] = { { 0 } };
+libspectrum_byte pokefinder_impossible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE / 8 ] = { { 0 } };
 size_t pokefinder_count;
 
 void

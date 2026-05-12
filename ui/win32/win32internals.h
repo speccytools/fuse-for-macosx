@@ -1,5 +1,5 @@
 /* win32internals.h: stuff internal to the Win32 UI
-   Copyright (c) 2004 Marek Januszewski
+   Copyright (c) 2004-2008 Marek Januszewski
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

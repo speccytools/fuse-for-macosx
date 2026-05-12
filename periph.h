@@ -1,5 +1,5 @@
 /* periph.h: code for handling peripherals
-   Copyright (c) 2004-2018 Philip Kendall, Stuart Brady, Gergely Szasz,
+   Copyright (c) 2004-2023 Philip Kendall, Stuart Brady, Gergely Szasz,
      Alistair Cree
 
    This program is free software; you can redistribute it and/or modify
@@ -76,6 +76,7 @@ typedef enum periph_type {
   PERIPH_TYPE_ULA_FULL_DECODE,/* Standard ULA responding only to 0xfe */
   PERIPH_TYPE_UPD765,         /* +3 uPD765 FDC */
   PERIPH_TYPE_USOURCE,        /* Currah uSource interface */
+  PERIPH_TYPE_USPEECH,        /* Currah uSpeech interface */
   PERIPH_TYPE_ZXATASP,        /* ZXATASP IDE interface */
   PERIPH_TYPE_ZXCF,           /* ZXCF IDE interface */
   PERIPH_TYPE_ZXMMC,          /* ZXMMC interface */

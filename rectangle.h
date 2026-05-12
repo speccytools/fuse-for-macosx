@@ -36,4 +36,8 @@ extern size_t rectangle_inactive_count, rectangle_inactive_allocated;
 void rectangle_add( int y, int x, int w );
 void rectangle_end_line( int y );
 
+/* Unit-test helpers */
+void   rectangle_reset( void );
+size_t rectangle_get_active_count( void );
+
 #endif				/* #ifndef FUSE_RECTANGLE_H */

@@ -1,5 +1,5 @@
 /* dxsound.c: DirectX sound I/O
-   Copyright (c) 2003-2004 Marek Januszewski, Philip Kendall
+   Copyright (c) 2003-2008 Marek Januszewski, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

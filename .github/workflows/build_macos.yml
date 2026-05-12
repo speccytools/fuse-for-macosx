@@ -1,0 +1,14 @@
+name: Fuse App For MacOS
+run-name: Build Fuse App for MacOS / ${{ github.actor }} /
+
+# Executed upon each commit pushed, merge commit in PR
+on: [pull_request]
+
+jobs:
+  libspectrum:
+    # Build libspectrum from the canonical SourceForge repository.
+    name: "Libspectrum lib (MacOS)"
+    uses: ./.github/workflows/build_libspectrum_macos_sub.yml
+    with:
+      key: fuse-app
+      libspectrum_ref: master

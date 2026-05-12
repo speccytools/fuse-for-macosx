@@ -3,7 +3,7 @@
      Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
-   Modifications copyright (c) 2003 Philip Kendall
+   Modifications copyright (c) 2003-2007 Philip Kendall
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public

@@ -1,0 +1,102 @@
+name: Windows release build
+run-name: Build Windows release / ${{ github.actor }} /
+
+on:
+  workflow_dispatch:
+    inputs:
+      fuse_tag:
+        type: string
+        required: false
+        default: ""
+        description: Fuse tag to build. Leave empty to use the current workflow revision.
+      libspectrum_tag:
+        type: string
+        required: false
+        default: ""
+        description: Libspectrum tag to build. Leave empty to use master from the canonical SourceForge repository.
+
+jobs:
+  resolve-refs:
+    name: "Resolve source refs"
+    runs-on: ubuntu-latest
+    outputs:
+      fuse_ref: ${{ steps.resolve.outputs.fuse_ref }}
+      libspectrum_ref: ${{ steps.resolve.outputs.libspectrum_ref }}
+    steps:
+      - name: Resolve selected refs
+        id: resolve
+        run: |
+          if [ -n "${{ inputs.fuse_tag }}" ]; then
+            fuse_ref="refs/tags/${{ inputs.fuse_tag }}"
+          else
+            fuse_ref="current workflow revision (${{ github.sha }})"
+          fi
+
+          if [ -n "${{ inputs.libspectrum_tag }}" ]; then
+            libspectrum_ref="refs/tags/${{ inputs.libspectrum_tag }}"
+          else
+            libspectrum_ref="master"
+          fi
+
+          echo "Fuse ref: ${fuse_ref}"
+          echo "Libspectrum ref: ${libspectrum_ref}"
+
+          if [ -n "${{ inputs.fuse_tag }}" ]; then
+            echo "fuse_ref=${fuse_ref}" >> "$GITHUB_OUTPUT"
+          else
+            echo "fuse_ref=" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "libspectrum_ref=${libspectrum_ref}" >> "$GITHUB_OUTPUT"
+
+  libspectrum:
+    name: "Libspectrum (Windows)"
+    needs: [resolve-refs]
+    uses: ./.github/workflows/build_libspectrum_windows_sub.yml
+    with:
+      key: fuse-app
+      libspectrum_ref: ${{ needs.resolve-refs.outputs.libspectrum_ref }}
+
+  fuse:
+    name: "${{ matrix.build.name }}"
+    needs: [resolve-refs, libspectrum]
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - name: "Fuse Win32 build"
+            key: "win32-ui-default"
+            dependencies: "mingw64-i686-libxml2"
+            configure_params: "--with-win32"
+            verify_ui: "win32"
+            verify_libxml2: "yes"
+            verify_audio: "directsound"
+            verify_other: ""
+          - name: "Fuse SDL 1 build"
+            key: "sdl1-ui-sdl1-sound"
+            dependencies: "mingw64-i686-SDL"
+            configure_params: "--without-win32 --with-sdl --disable-sdl2 --with-audio-driver=sdl"
+            verify_ui: "sdl"
+            verify_libxml2: "no"
+            verify_audio: "sdl"
+            verify_other: "Using SDL 1: yes"
+          - name: "Fuse SDL 2 build"
+            key: "sdl2-ui-sdl2-sound"
+            dependencies: "mingw64-i686-SDL2"
+            configure_params: "--without-win32 --with-sdl2 --with-audio-driver=sdl2"
+            verify_ui: "sdl2"
+            verify_libxml2: "no"
+            verify_audio: "sdl2"
+            verify_other: "Using SDL 2: yes"
+    uses: ./.github/workflows/build_windows_sub.yml
+    with:
+      key: ${{ matrix.build.key }}
+      fuse_ref: ${{ needs.resolve-refs.outputs.fuse_ref }}
+      dependencies: ${{ matrix.build.dependencies }}
+      configure_params: ${{ matrix.build.configure_params }}
+      verify_ui: ${{ matrix.build.verify_ui }}
+      verify_libxml2: ${{ matrix.build.verify_libxml2 }}
+      verify_audio: ${{ matrix.build.verify_audio }}
+      verify_other: ${{ matrix.build.verify_other }}
+      upload_artifacts: true
+      build_setup: true

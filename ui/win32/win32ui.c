@@ -182,6 +182,10 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       if( paused ) menu_machine_pause( 0 );
       return 0;
 
+    case WM_NCLBUTTONDBLCLK:
+      /* Don't allow double click on title bar, suppressing window maximizing */
+      return 0;
+
     case WM_ENTERMENULOOP:
     case WM_ENTERSIZEMOVE:
     {
@@ -1072,7 +1076,7 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 static BOOL
 win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  RECT *selr, wr, cr, statr, or;
+  RECT *selr, wr, cr, statr;
   int width, height, w_ofs, h_ofs, w_max, h_max;
 
   selr = (RECT *)lParam;
@@ -1084,11 +1088,17 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
   if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
 
+  /* Determine current screen from window */
+  MONITORINFO mi;
+	mi.cbSize = sizeof (MONITORINFO);
+  if (!GetMonitorInfoA(MonitorFromWindow(fuse_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
+    return FALSE;
+  }
+
   /* max scaler size in desktop workarea */
-  SystemParametersInfo( SPI_GETWORKAREA, 0, &or, 0 );
-  w_max = ( or.right - or.left ) - w_ofs + DISPLAY_ASPECT_WIDTH / 2;
+  w_max = ( mi.rcWork.right - mi.rcWork.left ) - w_ofs + DISPLAY_ASPECT_WIDTH / 2;
   w_max /= DISPLAY_ASPECT_WIDTH;
-  h_max = ( or.bottom - or.top ) - h_ofs + DISPLAY_SCREEN_HEIGHT / 2;
+  h_max = ( mi.rcWork.bottom - mi.rcWork.top ) - h_ofs + DISPLAY_SCREEN_HEIGHT / 2;
   h_max /= DISPLAY_SCREEN_HEIGHT;
 
   if( w_max < h_max ) {
@@ -1155,7 +1165,7 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 void
 win32ui_fuse_resize( int width, int height )
 {
-  RECT wr, cr, statr, or;
+  RECT wr, cr, statr;
   int w_ofs, h_ofs;
 
   /* Calculate decorations before resizing */
@@ -1167,12 +1177,18 @@ win32ui_fuse_resize( int width, int height )
   h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
   if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
 
+  /* Determine current screen from window */
+  MONITORINFO mi;
+	mi.cbSize = sizeof (MONITORINFO);
+  if (!GetMonitorInfoA(MonitorFromWindow(fuse_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
+    return;
+  }
+
   /* Set position inside workarea */
-  SystemParametersInfo( SPI_GETWORKAREA, 0, &or, 0 );
-  if( wr.left + width + w_ofs > or.right ) wr.left = or.right - width - w_ofs;
-  if( wr.top + height + h_ofs > or.bottom ) wr.top = or.bottom - height - h_ofs;
-  if( wr.left < or.left ) wr.left = or.left;
-  if( wr.top < or.top ) wr.top = or.top;
+  if( wr.left + width + w_ofs > mi.rcWork.right ) wr.left = mi.rcWork.right - width - w_ofs;
+  if( wr.top + height + h_ofs > mi.rcWork.bottom ) wr.top = mi.rcWork.bottom - height - h_ofs;
+  if( wr.left < mi.rcWork.left ) wr.left = mi.rcWork.left;
+  if( wr.top < mi.rcWork.top ) wr.top = mi.rcWork.top;
 
   MoveWindow( fuse_hWnd, wr.left, wr.top,
               width + w_ofs,

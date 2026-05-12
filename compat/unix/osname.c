@@ -1,5 +1,5 @@
 /* osname.c: Get a representation of the OS we're running on
-   Copyright (c) 1999-2007 Philip Kendall
+   Copyright (c) 1999-2008 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

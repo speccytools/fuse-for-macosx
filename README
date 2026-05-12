@@ -1,4 +1,4 @@
-The Free Unix Spectrum Emulator (Fuse) 1.6.0
+The Free Unix Spectrum Emulator (Fuse) 1.7.0
 ============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
@@ -26,8 +26,8 @@ What Fuse does have:
   rollback and 'competition mode'.
 * Emulation of the Currah µSource, Interface 1, Kempston mouse,
   Multiface One/128/3 and TTX2000S interfaces.
-* Emulation of the Covox, Fuller audio box, Melodik and SpecDrum audio
-  interfaces.
+* Emulation of the Covox, Currah µSpeech, Fuller audio box, Melodik and
+  SpecDrum audio interfaces.
 * Emulation of the DivIDE, DivMMC, Spectrum +3e, ZXATASP, ZXCF and ZXMMC
   storage interfaces.
 * Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery
@@ -114,4 +114,4 @@ Usenet newsgroup `comp.sys.sinclair' or the World of Spectrum forums
 <http://www.worldofspectrum.org/forums/>.
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-27th February, 2021
+10th March, 2026

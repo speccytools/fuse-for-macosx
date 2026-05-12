@@ -1,5 +1,5 @@
 /* sdldisplay.c: Routines for dealing with the SDL display
-   Copyright (c) 2000-2006 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2021 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
    Copyright (c) 2015 Adrien Destugues
 
    This program is free software; you can redistribute it and/or modify
