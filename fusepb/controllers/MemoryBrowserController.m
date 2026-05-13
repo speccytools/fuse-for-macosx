@@ -31,7 +31,7 @@
 
 @implementation MemoryBrowserController
 
-id notificationObserver;
+static id notificationObserver;
 
 - (id)init
 {

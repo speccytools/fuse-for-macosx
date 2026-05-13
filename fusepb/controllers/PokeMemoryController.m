@@ -33,7 +33,7 @@ static void trainer_add( gpointer data, gpointer user_data );
 
 @implementation PokeMemoryController
 
-id notificationObserver;
+static id notificationObserver;
 
 - (id)init
 {
