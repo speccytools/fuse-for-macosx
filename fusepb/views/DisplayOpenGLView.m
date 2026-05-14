@@ -508,20 +508,19 @@ static DisplayOpenGLView *instance = nil;
     return;
   }
 
-  int border_x_offset = 0;
-  int border_y_offset = 0;
-  if( settings_current.full_screen ) {
-    /* how much of the top and bottom borders should be eliminated? */
-    NSRect rect = [self bounds];
-    float width_adjustment = 0.0;
-
-    border_x_offset =
-      get_offset( rect.size.width, rect.size.height,
-                  screenTex[currentScreenTex].image_width,
-                  screenTex[currentScreenTex].image_height,
-                  &width_adjustment );
-    border_y_offset = width_adjustment;
-  }
+  /* Letterbox the emulated 4:3 image inside the view's current bounds.
+     In windowed mode the window's contentAspectRatio constraint keeps
+     the view 4:3 and get_offset returns zero margins (no-op). In any
+     fullscreen mode the view fills the display and get_offset produces
+     pillarbox or letterbox margins as appropriate. */
+  NSRect rect = [self bounds];
+  float width_adjustment = 0.0;
+  int border_x_offset =
+    get_offset( rect.size.width, rect.size.height,
+                screenTex[currentScreenTex].image_width,
+                screenTex[currentScreenTex].image_height,
+                &width_adjustment );
+  int border_y_offset = width_adjustment;
 
   /* Bind, update and draw new image */
   glBindTexture( GL_TEXTURE_RECTANGLE_ARB, screenTexId[currentScreenTex] );
