@@ -134,51 +134,6 @@ static DisplayOpenGLView *instance = nil;
   return instance;
 }
 
--(IBAction) fullscreen:(id)sender
-{
-  /* don't want to get a callback to display the screen while we are
-   * fiddling with the window to draw into!
-   */
-  [self displayLinkStop];
-
-  if( settings_current.full_screen ) {
-    /* we need to go back to non-full screen */
-    [fullscreenWindow close];
-    [windowedWindow setContentView: self];
-    [windowedWindow makeKeyAndOrderFront: self];
-    [windowedWindow makeFirstResponder: self];
-    settings_current.full_screen = 0;
-    if( ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_release( 0 );
-  } else {
-    unsigned int windowStyle;
-    NSRect       contentRect;
-
-    windowedWindow = [self window];
-    windowStyle    = NSBorderlessWindowMask;
-    contentRect    = [[NSScreen mainScreen] frame];
-    fullscreenWindow = [[NSWindow alloc] initWithContentRect:contentRect
-                                         styleMask: windowStyle
-                                         backing:NSBackingStoreBuffered
-                                         defer: NO];
-    if( fullscreenWindow != nil ) {
-      settings_current.full_screen = 1;
-      [fullscreenWindow setTitle: @"Fuse"];
-      [fullscreenWindow setReleasedWhenClosed: YES];
-      [fullscreenWindow setContentView: self];
-      [fullscreenWindow makeKeyAndOrderFront:self ];
-      [fullscreenWindow setLevel: NSScreenSaverWindowLevel - 1];
-      [fullscreenWindow makeFirstResponder:self];
-      if( !ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_grab( 0 );
-    }
-  }
-
-  [self displayLinkStart];
-
-  [view_lock lock];
-  statusbar_updated = YES;
-  [view_lock unlock];
-}
-
 -(IBAction) zoom:(id)sender
 {
   NSSize size;
@@ -876,11 +831,6 @@ static DisplayOpenGLView *instance = nil;
 -(void) settingsResetDefaults
 {
   [proxy_emulator settingsResetDefaults];
-}
-
--(void) fullscreen
-{
-  [proxy_emulator fullscreen];
 }
 
 -(void) joystickToggleKeyboard

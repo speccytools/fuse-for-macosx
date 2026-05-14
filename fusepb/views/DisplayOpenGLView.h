@@ -64,9 +64,6 @@
 
   NSLock *view_lock;
 
-  NSWindow *fullscreenWindow;
-  NSWindow *windowedWindow;
-
   float target_ratio;
 
   Emulator *real_emulator;
@@ -80,7 +77,6 @@
 }
 +(DisplayOpenGLView *) instance;
 
--(IBAction) fullscreen:(id)sender;
 -(IBAction) zoom:(id)sender;
 
 -(void) createTexture:(Cocoa_Texture*)newScreen;
@@ -139,8 +135,6 @@
 
 -(void) settingsSave;
 -(void) settingsResetDefaults;
-
--(void) fullscreen;
 
 -(void) joystickToggleKeyboard;
 -(void) keyboardToggleRecreatedZXSpectrum;
