@@ -320,9 +320,54 @@ static NSMutableArray *recentSnapFileNames = nil;
 
     recentSnapFileNames = [NSMutableArray arrayWithCapacity:NUM_RECENT_ITEMS];
     [recentSnapFileNames retain];
+
+    /* Resync the emulator's modifier ivars whenever the main window
+       regains key status. AppKit delivers NSFlagsChanged to the key
+       window's first responder, so a modifier release while a utility
+       window was key never reaches DisplayOpenGLView and
+       Emulator.commandDown stays stuck — dropping every subsequent
+       keystroke in Emulator.keyDown:. The user-visible form is the
+       Cmd+, → Preferences flow: open Settings, close, then the
+       Spectrum keyboard ignores everything until the next modifier
+       press triggers a real NSFlagsChanged on the main window. The
+       filter inside the handler skips notifications for other
+       windows. */
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self
+         selector:@selector(mainWindowDidBecomeKey:)
+             name:NSWindowDidBecomeKeyNotification
+           object:nil];
   }
 
   return singleton;
+}
+
+- (void)mainWindowDidBecomeKey:(NSNotification *)note
+{
+  /* The observer is registered with object:nil because the main window
+     does not yet exist when the FuseController singleton is constructed
+     during MainMenu.xib load. Filter to the main emulator window inside
+     the handler — and bail out early if the main window does not yet
+     exist, otherwise a non-nil note object would falsely pass the !=
+     comparison against nil during startup. */
+  NSWindow *mainWindow = [[DisplayOpenGLView instance] window];
+  if( !mainWindow ) return;
+  if( [note object] != mainWindow ) return;
+
+  Emulator *emu = [Emulator instance];
+  if( !emu ) return;
+
+  NSEvent *sync = [NSEvent keyEventWithType:NSFlagsChanged
+                                   location:NSZeroPoint
+                              modifierFlags:[NSEvent modifierFlags]
+                                  timestamp:0
+                               windowNumber:0
+                                    context:nil
+                                 characters:@""
+                charactersIgnoringModifiers:@""
+                                  isARepeat:NO
+                                    keyCode:0];
+  [emu flagsChanged:sync];
 }
 
 - (IBAction)disk_eject_a:(id)sender
@@ -652,7 +697,6 @@ error:
 
     [[DisplayOpenGLView instance] unpause];
   }
-  [self releaseCmdKeys:@"o" withCode:QZ_o];
 }
 
 - (IBAction)reset:(id)sender
@@ -697,13 +741,11 @@ error:
 - (IBAction)rzx_insert_snap:(id)sender
 {
   [[DisplayOpenGLView instance] rzxInsertSnap];
-  [self releaseCmdKeys:@"b" withCode:QZ_b];
 }
 
 - (IBAction)rzx_rollback:(id)sender
 {
   [[DisplayOpenGLView instance] rzxRollback];
-  [self releaseCmdKeys:@"z" withCode:QZ_z];
 }
 
 - (IBAction)rzx_start:(id)sender
@@ -863,7 +905,6 @@ error:
 save_as_exit:
     [[DisplayOpenGLView instance] unpause];
   }
-  [self releaseCmdKeys:@"s" withCode:QZ_s];
 }
 
 - (IBAction)open_screen:(id)sender
@@ -991,13 +1032,11 @@ save_as_exit:
 - (IBAction)joystick_keyboard:(id)sender
 {
   [[DisplayOpenGLView instance] joystickToggleKeyboard];
-  [self releaseCmdKeys:@"j" withCode:QZ_j];
 }
 
 - (IBAction)keyboard_recreated:(id)sender
 {
   [[DisplayOpenGLView instance] keyboardToggleRecreatedZXSpectrum];
-  [self releaseCmdKeys:@"r" withCode:QZ_r];
 }
 
 - (IBAction)keyboard_arrows_shifted:(id)sender
@@ -1032,7 +1071,6 @@ save_as_exit:
 - (IBAction)tape_play:(id)sender
 {
   [[DisplayOpenGLView instance] tapeTogglePlay];
-  [self releaseCmdKeys:@"p" withCode:QZ_p];
 }
 
 - (IBAction)tape_rewind:(id)sender
@@ -1124,13 +1162,11 @@ save_as_exit:
   if( !settings_current.full_screen ) {
     [[NSApp keyWindow] performClose:self];
   }
-  [self releaseCmdKeys:@"q" withCode:QZ_q];
 }
 
 - (IBAction)hide:(id)sender
 {
   [NSApp hide:self];
-  [self releaseCmdKeys:@"h" withCode:QZ_h];
 }
 
 - (IBAction)help:(id)sender
@@ -1138,7 +1174,6 @@ save_as_exit:
   if( !settings_current.full_screen ) {
     [NSApp showHelp:self];
   }
-  [self releaseCmdKeys:@"?" withCode:QZ_SLASH];
 }
 
 - (IBAction)cocoa_break:(id)sender
@@ -1146,13 +1181,30 @@ save_as_exit:
   if ( gdbserver_debugging_enabled ) {
     return;
   }
-  if ( paused ) {
-    debugger_mode = DEBUGGER_MODE_HALTED;
-    paused = 0;
-    [[DebuggerController singleton] debugger_activate:nil];
-  } else {
-    [[DisplayOpenGLView instance] cocoaBreak];
+
+  /* Re-entry: if the Debugger is already showing, bring it forward and
+     leave state alone. Calling debugger_activate: a second time would
+     double-pause and unbalance the counter. */
+  DebuggerController *dbg = [DebuggerController loadedSingleton];
+  if ( dbg && [[dbg window] isVisible] ) {
+    [[dbg window] makeKeyAndOrderFront:nil];
+    return;
   }
+
+  if ( paused ) {
+    /* User-pause: release the user-pause contribution so the timer can
+       run, then set HALTED. The emulator detects HALTED on the next
+       instruction and ui_debugger_activate parks the thread on the
+       semaphore via the proper path. The user-pause is not restored on
+       dismissal — the user explicitly opened the Debugger from a paused
+       state, and Continue means "resume." */
+    paused = 0;
+    [[DisplayOpenGLView instance] unpause];
+  }
+  /* The utility-window case (fuse_emulation_paused > 0 && !paused) is
+     unreachable: validateMenuItem: disables the Debugger menu item in
+     that state. */
+  [[DisplayOpenGLView instance] cocoaBreak];
   [self setPauseState];
 }
 
@@ -1186,7 +1238,6 @@ save_as_exit:
       [keyboardController showCloseWindow:self];
     }
   }
-  [self releaseCmdKeys:@"k" withCode:QZ_k];
 }
 
 - (IBAction)showLoadBinaryPane:(id)sender
@@ -1248,7 +1299,6 @@ save_as_exit:
     }
     [preferencesController showWindow:self];
   }
-  [self releaseCmdKeys:@"." withCode:QZ_PERIOD];
 }
 
 - (IBAction)saveFileTypeClicked:(id)sender;
@@ -1280,6 +1330,8 @@ save_as_exit:
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
   [tapeBrowserController release];
   [keyboardController release];
   [saveBinaryController release];
@@ -1289,55 +1341,6 @@ save_as_exit:
   [rollbackController release];
   [savePanelAccessoryView release];
   [super dealloc];
-}
-
-/*------------------------------------------------------------------------------
- *  releaseCmdKeys - This method fixes an issue when modal windows are used with
- *    the Mac OSX version of the SDL library.
- *    As the SDL normally captures all keystrokes, but we need to type in some
- *    Mac windows, all of the control menu windows run in modal mode.  However,
- *    when this happens, the release of the command key and the shortcut key
- *    are not sent to SDL.  We have to manually cause these events to happen
- *    to keep the SDL library in a sane state, otherwise only every other
- *    shortcut keypress will work.
- *-----------------------------------------------------------------------------*/
-- (void) releaseCmdKeys:(NSString *)character withCode:(int)keyCode
-{
-    NSEvent *event1, *event2;
-    NSPoint point = { 0, 0 };
-
-    event1 = [NSEvent keyEventWithType:NSKeyUp location:point modifierFlags:0
-                timestamp:0 windowNumber:0 context:nil characters:character
-                charactersIgnoringModifiers:character isARepeat:NO
-                keyCode:keyCode];
-    [NSApp postEvent:event1 atStart:NO];
-
-    event2 = [NSEvent keyEventWithType:NSFlagsChanged location:point
-                modifierFlags:0 timestamp:0 windowNumber:0 context:nil
-                characters:nil charactersIgnoringModifiers:nil isARepeat:NO
-                keyCode:0];
-    [NSApp postEvent:event2 atStart:NO];
-}
-
-/*------------------------------------------------------------------------------
- *  releaseKey - This method fixes an issue when modal windows are used with
- *    the Mac OSX version of the SDL library.
- *    As the SDL normally captures all keystrokes, but we need to type in some
- *    Mac windows, all of the control menu windows run in modal mode.  However,
- *    when this happens, the release of function key which started the process
- *    is not sent to SDL.  We have to manually cause these events to happen
- *    to keep the SDL library in a sane state, otherwise only everyother shortcut
- *    keypress will work.
- *-----------------------------------------------------------------------------*/
-- (void) releaseKey:(int)keyCode
-{
-  NSEvent *event1;
-  NSPoint point = { 0, 0 };
-
-  event1 = [NSEvent keyEventWithType:NSKeyUp location:point modifierFlags:0
-              timestamp:0 windowNumber:0 context:nil characters:@" "
-              charactersIgnoringModifiers:@" " isARepeat:NO keyCode:keyCode];
-  [NSApp postEvent:event1 atStart:NO];
 }
 
 - (void)ui_menu_activate_media_cartridge:(NSNumber*)active
@@ -2112,7 +2115,22 @@ save_as_exit:
     return multiface == 0 ? NO : YES;
     break;
   case 176:
-    return debuggerEnabled == 0 ? NO : YES;
+    if( !debuggerEnabled ) return NO;
+    /* Disable Machine→Debugger when a utility window is holding the
+       emulator paused and the Debugger itself is not already up. The
+       menu cannot do anything useful in that state: cocoa_break: sets
+       HALTED, but z80 is not executing because the utility window's
+       pause stopped the timer, so no trap fires and the Debugger
+       window never appears until the user closes the utility. The
+       comparison must subtract the user-pause contribution so the
+       guard fires regardless of whether Machine→Pause is also set —
+       the utility-window holds are the part that breaks the trap
+       path. */
+    if( fuse_emulation_paused > (paused ? 1 : 0) ) {
+      DebuggerController *dbg = [DebuggerController loadedSingleton];
+      if( !dbg || ![[dbg window] isVisible] ) return NO;
+    }
+    return YES;
     break;
   default:
     return YES;

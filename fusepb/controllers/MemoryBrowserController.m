@@ -31,7 +31,7 @@
 
 @implementation MemoryBrowserController
 
-id notificationObserver;
+static id notificationObserver;
 
 - (id)init
 {
@@ -59,14 +59,17 @@ id notificationObserver;
   NSString *address;
   NSMutableString *hex, *data;
 
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
+
   notificationObserver =
     [nc addObserverForName:@"NSWindowWillCloseNotification"
                     object:[self window]
                      queue:mainQueue
                 usingBlock:^(NSNotification *note) {
                   [nc removeObserver:notificationObserver];
-                
-                  [NSApp stopModal];
                 
                   [tableContents removeAllObjects];
                 
@@ -75,7 +78,9 @@ id notificationObserver;
                   tableContents = nil;
                 
                   [memoryBrowser reloadData];
-                
+
+                  [[self window] unpinFromParent];
+
                   [[DisplayOpenGLView instance] unpause];
                 }];
   
@@ -105,9 +110,9 @@ id notificationObserver;
 
   [super showWindow:sender];
 
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
+
   [memoryBrowser reloadData];
-  
-  [NSApp runModalForWindow:[self window]];
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)table

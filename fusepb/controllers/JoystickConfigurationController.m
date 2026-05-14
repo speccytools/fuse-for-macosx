@@ -154,8 +154,22 @@ static const unsigned int key_menu_count = sizeof( key_menu ) / sizeof( key_menu
 
 - (IBAction)cancel:(id)sender
 {
-  [NSApp stopModal];
+  /* All dismissal paths (Apply, Cancel, red X, Preferences close
+     cascade) funnel through handleWillClose: via the
+     NSWindowWillCloseNotification observer registered in showWindow:,
+     so this just closes the window and lets the observer do the
+     parent-child teardown. */
   [[self window] close];
+}
+
+- (void)handleWillClose:(NSNotification *)note
+{
+  [[NSNotificationCenter defaultCenter]
+    removeObserver:self
+              name:@"NSWindowWillCloseNotification"
+            object:[self window]];
+
+  [[self window] unpinFromParent];
 }
 
 - (void)showWindow:(id)sender
@@ -165,7 +179,30 @@ static const unsigned int key_menu_count = sizeof( key_menu ) / sizeof( key_menu
 
   joyNum = [sender tag];
 
+  /* Capture the parent before [super showWindow:] takes key status away. */
+  NSWindow *parent = [NSApp keyWindow];
+
   [super showWindow:sender];
+
+  /* Pin to the parent (Preferences) so this sub-dialog cannot be hidden
+     behind it. Preferences is itself a child of the main emulator window,
+     making this a grandchild — addChildWindow: is the only mechanism that
+     enforces z-order for two windows at the same level. */
+  [[self window] pinAsChildOf:parent];
+
+  /* Register the close observer here. Joystick is reused across Joy1
+     and Joy2 invocations on the same open window (the spec disallows a
+     singleton early-return guard for that reason), so showWindow: may
+     run a second time without an intervening close — remove any prior
+     registration before adding to keep this idempotent. */
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  [nc removeObserver:self
+                name:@"NSWindowWillCloseNotification"
+              object:[self window]];
+  [nc addObserver:self
+        selector:@selector(handleWillClose:)
+            name:@"NSWindowWillCloseNotification"
+          object:[self window]];
 
   [joyXAxis removeAllItems];
   [joyYAxis removeAllItems];
@@ -375,8 +412,6 @@ static const unsigned int key_menu_count = sizeof( key_menu ) / sizeof( key_menu
   default:
     assert(0);
   }
-
-  [NSApp runModalForWindow:[self window]];
 }
 
 @end

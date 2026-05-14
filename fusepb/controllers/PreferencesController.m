@@ -60,6 +60,32 @@
 
 @implementation PreferencesController
 
+/* Set on NSApplicationWillTerminateNotification so handleWillClose:
+   can skip the settings-apply / KVO-teardown work when the close is
+   part of [NSApp terminate:]'s cascade. Touching NSArrayController
+   content or driving graphics hotswaps from inside that cascade
+   reaches the notification observer table while NSWindow is still
+   walking it, producing the strcmp crash in
+   __CFNOTIFICATIONCENTER_IS_CALLING_OUT_TO_AN_OBSERVER__. The work
+   skipped here only matters when the emulator continues running
+   after the window closes; at quit time the settings have already
+   been persisted to NSUserDefaults via the binding chain. */
+static BOOL appTerminating = NO;
+
++ (void)load
+{
+  [[NSNotificationCenter defaultCenter]
+    addObserver:self
+       selector:@selector(handleAppWillTerminate:)
+           name:NSApplicationWillTerminateNotification
+         object:nil];
+}
+
++ (void)handleAppWillTerminate:(NSNotification *)note
+{
+  appTerminating = YES;
+}
+
 +(void) initialize
 {
   ScalerNameToIdTransformer *sNToITransformer;
@@ -161,6 +187,11 @@
 
 - (void)showWindow:(id)sender
 {
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
+
   [[DisplayOpenGLView instance] pause];
 
   [machineRomsController setContent:nil];
@@ -176,6 +207,11 @@
 
   [super showWindow:sender];
 
+  /* Pin to the main emulator window. The Joystick sub-dialog adds
+     itself as a child of Preferences when opened, producing a
+     main → Preferences → Joystick chain. */
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
+
   [self setMassStorageType];
   [self setExternalSoundType];
   
@@ -185,12 +221,6 @@
 		 selector:@selector(handleWillClose:)
 			 name:@"NSWindowWillCloseNotification"
 		   object:[self window]];
-
-  [NSApp runModalForWindow:[self window]];
-
-  [machineRomsController setContent:nil];
-  [machineRoms release];
-  machineRoms = nil;
 }
 
 - (void)fixPhantomTypistMode
@@ -219,9 +249,9 @@
 
 - (void)handleWillClose:(NSNotification *)note
 {
-  [NSApp stopModal];
-
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  if( appTerminating ) return;
 
   int old_bilinear = settings_current.bilinear_filter;
   int old_joy1_number = settings_current.joy1_number;
@@ -273,6 +303,12 @@
     periph_posthook();
     [Emulator endROMScopedAccess:romURLs];
   }
+
+  [machineRomsController setContent:nil];
+  [machineRoms release];
+  machineRoms = nil;
+
+  [[self window] unpinFromParent];
 
   [[DisplayOpenGLView instance] unpause];
 }

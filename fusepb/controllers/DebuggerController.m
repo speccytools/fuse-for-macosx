@@ -58,6 +58,10 @@ static libspectrum_word disassembly_top;
 /* Is the debugger window active (as opposed to the debugger itself)? */
 static int debugger_active;
 
+/* Semaphore that blocks the emulation thread inside ui_debugger_activate()
+   until the user dismisses the debugger (Continue / close). */
+static dispatch_semaphore_t debugger_semaphore;
+
 @implementation DebuggerController
 
 static DebuggerController *singleton = nil;
@@ -102,6 +106,7 @@ static DebuggerController *singleton = nil;
     [super init];
     self = [super initWithWindowNibName:@"Debugger"];
     singleton = self;
+    debugger_semaphore = dispatch_semaphore_create( 0 );
 
     [self performSelectorOnMainThread:@selector(habdleCloseNotification) withObject:nil waitUntilDone:YES];
     [self performSelectorOnMainThread:@selector(setWindowFrameAutosaveName:) withObject:@"DebuggerWindow" waitUntilDone:YES];
@@ -142,7 +147,13 @@ static DebuggerController *singleton = nil;
   [memoryMapContents release];
   memoryMapContents = nil;
 
-  debugger_run();
+  [[self window] unpinFromParent];
+
+  /* Only resume execution when the user dismissed the window directly.
+     If we arrived via deactivate_debugger(), debugger_active is already
+     0 and the caller has set debugger_mode; calling debugger_run() now
+     would overwrite a HALTED set by debugger_step(). */
+  if( debugger_active ) debugger_run();
 }
 
 - (void)eventsDoubleAction:(id)sender
@@ -191,20 +202,36 @@ static DebuggerController *singleton = nil;
 {
   [[DisplayOpenGLView instance] pause];
 
+  /* Breakpoints fire unprompted. Bring FuseX (and the main window) back
+     into view if the user has Cmd-Tabbed away, hidden the app, or
+     minimized the main window — otherwise the Debugger window, as a
+     child of main, would not be visible. After this point the panel
+     behaves like any other child window: it sinks with FuseX when the
+     user switches to another app, and rises with FuseX on return. */
+  [NSApp activateIgnoringOtherApps:YES];
+  NSWindow *mainWindow = [[DisplayOpenGLView instance] window];
+  if( [mainWindow isMiniaturized] ) {
+    [mainWindow deminiaturize:nil];
+  }
+
+  BOOL wasVisible = [[singleton window] isVisible];
   [singleton showWindow:nil];
+  if( !wasVisible ) {
+    [[singleton window] makeFirstResponder:entry];
+  }
+
+  [[singleton window] pinAsChildOf:mainWindow];
 
   [continueButton setEnabled:YES];
   [breakButton setEnabled:NO];
-  if( !debugger_active ) activate_debugger();
-
-  [NSApp runModalForWindow:[self window]];
+  activate_debugger();
 }
 
 - (void)debugger_deactivate:(int)interruptable
 {
   if( debugger_active ) deactivate_debugger();
 
-  [continueButton setEnabled:!interruptable ? YES : NO];
+  [continueButton setEnabled:interruptable ? NO : YES];
   [breakButton setEnabled:interruptable ? YES : NO];
 }
  
@@ -651,7 +678,11 @@ static DebuggerController *singleton = nil;
 int
 ui_debugger_activate( void )
 {
-  [[Emulator instance] debuggerActivate];
+  [[Emulator instance] performSelectorOnMainThread:@selector(debuggerActivate)
+                                        withObject:nil
+                                     waitUntilDone:YES];
+
+  dispatch_semaphore_wait( debugger_semaphore, DISPATCH_TIME_FOREVER );
 
   return 0;
 }
@@ -721,10 +752,10 @@ activate_debugger( void )
 
 static int
 deactivate_debugger( void )
-{ 
-  [NSApp stopModal];
+{
   debugger_active = 0;
   [[DisplayOpenGLView instance] unpause];
+  dispatch_semaphore_signal( debugger_semaphore );
   return 0;
 }
 

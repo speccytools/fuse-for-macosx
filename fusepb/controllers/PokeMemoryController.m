@@ -33,7 +33,7 @@ static void trainer_add( gpointer data, gpointer user_data );
 
 @implementation PokeMemoryController
 
-id notificationObserver;
+static id notificationObserver;
 
 - (id)init
 {
@@ -51,8 +51,6 @@ id notificationObserver;
                     object:[self window]
                      queue:mainQueue
                 usingBlock:^(NSNotification *note) {
-                  [NSApp stopModal];
-                
                   for( NSMutableDictionary* trainerModel in [trainersController content] ) {
                     trainer_t* trainer =
                       (trainer_t*)[[trainerModel valueForKey:@"trainerVal"] pointerValue];
@@ -66,7 +64,9 @@ id notificationObserver;
                   [trainersController setContent:nil];
                   
                   [trainers reloadData];
-                
+
+                  [[self window] unpinFromParent];
+
                   [[DisplayOpenGLView instance] unpause];
                 }];
   
@@ -88,6 +88,11 @@ id notificationObserver;
 
 - (void)showWindow:(id)sender
 {
+  if( [[self window] isVisible] ) {
+    [[self window] makeKeyAndOrderFront:sender];
+    return;
+  }
+
   [[DisplayOpenGLView instance] pause];
 
   if( trainer_list ) {
@@ -96,9 +101,9 @@ id notificationObserver;
 
   [super showWindow:sender];
 
+  [[self window] pinAsChildOf:[[DisplayOpenGLView instance] window]];
+
   [trainers reloadData];
-  
-  [NSApp runModalForWindow:[self window]];
 }
 
 - (void)addObjectToPokeList:(NSDictionary*)poke
