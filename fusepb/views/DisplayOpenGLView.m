@@ -1284,14 +1284,12 @@ static DisplayOpenGLView *instance = nil;
 
 -(BOOL) windowShouldClose:(id)window
 {
-  if( cocoaui_confirm( "Exit Fuse?" ) ) {
-    int error = [self checkMediaChanged];
-    if( error ) return NO;
-
-    [self displayLinkStop];
-
-    return YES;
-  }
+  /* Funnel the red-button / Cmd+W close through the same exit path as Cmd+Q
+     so the "Exit Fuse?" confirm and the unsaved-media check live in one
+     place (FuseController -applicationShouldTerminate:). Returning NO lets
+     terminate: take over: if the user confirms, AppKit closes every window
+     itself; if the user cancels, the window stays open. */
+  [NSApp terminate:self];
   return NO;
 }
 

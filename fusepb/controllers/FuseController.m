@@ -1150,7 +1150,7 @@ save_as_exit:
 
 - (IBAction)quit:(id)sender
 {
-  [[NSApp keyWindow] performClose:self];
+  [NSApp terminate:self];
 }
 
 - (IBAction)hide:(id)sender
@@ -2611,6 +2611,19 @@ save_as_exit:
   [[DisplayOpenGLView instance] unpause];
 
   return confirm;
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+  /* The user-facing prompts live here, not in -windowShouldClose:, so Cmd+Q
+     (-quit: → [NSApp terminate:]) and red-button / Cmd+W (windowShouldClose:
+     → [NSApp terminate:]) share one path. AppKit calls close (not
+     performClose:) on each window during termination, so windowShouldClose:
+     would be bypassed on the Cmd+Q path otherwise. */
+  if( !cocoaui_confirm( "Exit Fuse?" ) ) return NSTerminateCancel;
+  if( [[DisplayOpenGLView instance] checkMediaChanged] ) return NSTerminateCancel;
+  [[DisplayOpenGLView instance] displayLinkStop];
+  return NSTerminateNow;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication
