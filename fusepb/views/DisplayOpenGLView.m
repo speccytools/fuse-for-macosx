@@ -345,6 +345,13 @@ static DisplayOpenGLView *instance = nil;
   /* keep the window in the standard aspect ratio if the user resizes */
   [[self window] setContentAspectRatio:NSMakeSize(4.0,3.0)];
 
+  /* Opt into AppKit native fullscreen so the green traffic-light
+     button acts as a fullscreen toggle (the standard arrows icon)
+     rather than a zoom. */
+  [[self window] setCollectionBehavior:
+    [[self window] collectionBehavior] |
+    NSWindowCollectionBehaviorFullScreenPrimary];
+
   view_lock = [[NSLock alloc] init];
 
   CVReturn            error = kCVReturnSuccess;
