@@ -30,7 +30,6 @@ fuse_SOURCES += \
                 peripherals/printer.c \
                 peripherals/scld.c \
                 peripherals/speccyboot.c \
-                peripherals/spectranet.c \
                 peripherals/ula.c \
                 peripherals/usource.c \
                 peripherals/ttx2000s.c \
@@ -59,7 +58,8 @@ fuse_SOURCES += \
                 peripherals/ide/simpleide.c \
                 peripherals/ide/zxatasp.c \
                 peripherals/ide/zxcf.c \
-                peripherals/ide/zxmmc.c
+                peripherals/ide/zxmmc.c \
+                peripherals/spectranet.c
 
 if BUILD_SPECCYBOOT
 fuse_SOURCES += peripherals/nic/enc28j60.c
@@ -70,6 +70,26 @@ fuse_SOURCES += \
                 peripherals/flash/am29f010.c \
                 peripherals/nic/w5100.c \
                 peripherals/nic/w5100_socket.c \
+                peripherals/nic/dns_resolver.c \
+                peripherals/nic/dns_processor.c \
+                peripherals/nic/engines/engine_argv.c \
+                peripherals/nic/engines/engine_fs.c \
+                peripherals/nic/engines/engine_utf8.c \
+                peripherals/nic/engines/json.c \
+                peripherals/nic/engines/xpath.c \
+                peripherals/nic/engines/jsonpath/ast.c \
+                peripherals/nic/engines/jsonpath/lexer.c \
+                peripherals/nic/engines/jsonpath/matcher.c \
+                peripherals/nic/engines/jsonpath/parser.c \
+                peripherals/nic/engines/parson.c \
+                peripherals/nic/spectranext_controller.c \
+                peripherals/nic/spectranext_stdout.c \
+                peripherals/fs/xfs.c \
+                peripherals/fs/xfs_worker.c \
+                peripherals/fs/xfs_fs.c \
+                peripherals/fs/xfs_https.c \
+                peripherals/http/httpc.c \
+                peripherals/http/http_sck.c \
                 peripherals/security/tls.c
 endif
 

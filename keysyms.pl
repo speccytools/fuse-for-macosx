@@ -270,6 +270,7 @@ while(<>) {
     next if /^\s*\#/;
 
     chomp;
+    s/\r$//;
 
     my( $keysym, $key1, $key2 ) = split /\s*,\s*/;
 
@@ -343,7 +344,7 @@ foreach( @keys ) {
 
 print << "CODE";
 
-  { 0, 0 }			/* End marker: DO NOT MOVE! */
+  { 0xff, INPUT_KEY_NONE }			/* End marker: DO NOT MOVE! */
 
 };
 
@@ -373,7 +374,7 @@ print "\nkeysyms_map_t unicode_keysyms_map[] = {\n\n";
 
 print << "CODE";
 
-  { 0, 0 }			/* End marker: DO NOT MOVE! */
+  { 0xff, INPUT_KEY_NONE }			/* End marker: DO NOT MOVE! */
 
 };
 

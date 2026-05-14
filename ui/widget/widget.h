@@ -48,6 +48,7 @@ typedef enum widget_type {
   WIDGET_TYPE_ERROR,		/* Error report */
   WIDGET_TYPE_RZX,		/* RZX options */
   WIDGET_TYPE_MOVIE,		/* Movie options */
+  WIDGET_TYPE_GDBSERVER,	/* GDBServer */
   WIDGET_TYPE_BROWSE,		/* Browse tape */
   WIDGET_TYPE_TEXT,		/* Text entry widget */
   WIDGET_TYPE_DEBUGGER,		/* Debugger widget */
@@ -195,6 +196,12 @@ static inline int widget_do_rzx( void )
 static inline int widget_do_movie( void )
 {
   return widget_do( WIDGET_TYPE_MOVIE, NULL );
+}
+
+/* GDB server options */
+static inline int widget_do_gdbserver( void )
+{
+  return widget_do( WIDGET_TYPE_GDBSERVER, NULL );
 }
 
 /* Browse tape */

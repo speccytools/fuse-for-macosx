@@ -37,15 +37,15 @@ while(<>) {
 
     chomp;
 
-    my( $name, $type, $default, $short, $commandline, $configfile ) =
+    my( $name, $type, $default, $funcn, $short, $commandline, $configfile ) =
 	split /\s*,\s*/;
 
-    if( not defined $commandline ) {
+    if( ( not defined $commandline ) || ( $commandline eq '' ) ) {
 	$commandline = $name;
 	$commandline =~ s/_/-/g;
     }
 
-    if( not defined $configfile ) {
+    if( ( not defined $configfile ) || ( $configfile eq '' ) ) {
 	$configfile = $commandline;
 	$configfile =~ s/-//g;
     }

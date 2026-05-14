@@ -66,6 +66,7 @@
 /roms/usource.rom
 /settings.c
 /settings.h
+/ui_menu_item_lookup_gen.c
 /stamp-h
 /stamp-h1
 /stamp-h.in
@@ -124,3 +125,8 @@ xcuserdata
 /fusepb/FuseX.xcodeproj/xcshareddata
 /FuseX.dmg
 /dist
+/3rdparty/dist
+*.dll
+*.exe
+/fusex-*
+.idea/

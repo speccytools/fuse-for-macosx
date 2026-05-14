@@ -8,8 +8,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include <unistd.h>
 #include <sys/stat.h>
+#if defined(WIN32) || defined(_WIN32)
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
 
 #include "libspectrum.h"
 #include "memory_pages.h"
@@ -43,7 +47,11 @@ void xfs_init()
     snprintf(xfs_base_path, sizeof(xfs_base_path), "%s/xfs", compat_get_config_path());
     
     // Create "xfs" directory in Application Support directory
+#if defined(WIN32) || defined(_WIN32)
+    if (_mkdir(xfs_base_path) != 0 && errno != EEXIST)
+#else
     if (mkdir(xfs_base_path, 0755) != 0 && errno != EEXIST)
+#endif
     {
         ui_error( UI_ERROR_WARNING, "xfs: failed to create xfs directory: %s\n", strerror(errno) );
     }

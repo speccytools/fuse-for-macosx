@@ -144,6 +144,11 @@ Checkbox, ZXMMC i(n)terface, zxmmc_enabled, INPUT_KEY_n
 Postcheck, periph_postcheck
 Posthook, periph_posthook
 
+gdbserver
+Advanced Debugger (gdbserver)
+Checkbox, (E)nable (replaces regular Debugger), gdbserver_enable, INPUT_KEY_e
+Entry, GDBServer (P)ort, gdbserver_port, INPUT_KEY_p, 5,
+
 rzx
 RZX Options
 Checkbox, Create (a)utosaves, rzx_autosaves, INPUT_KEY_a

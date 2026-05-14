@@ -58,8 +58,55 @@ install-win32: all
 install-win32-strip: install-win32
 	test -z "$(STRIP)" || $(STRIP) $(DESTDIR)/fuse$(EXEEXT)
 
-dist-win32-dir:
-	$(MAKE) DESTDIR="$(top_win32dir)" install-win32-strip
+# Build local 3rdparty tree (MSYS2) if missing — provides DLLs for dist-win32-*.
+3rdparty-dist:
+	@if test ! -d "$(top_srcdir)/3rdparty/dist/bin"; then \
+	  echo "Building 3rdparty dependencies into $(top_srcdir)/3rdparty/dist ..."; \
+	  cd "$(top_srcdir)/3rdparty" && $(MAKE) || { echo "Error: 3rdparty build failed"; exit 1; }; \
+	else \
+	  echo "Using existing $(top_srcdir)/3rdparty/dist"; \
+	fi
+
+dist-win32-dir: 3rdparty-dist
+	$(MAKE) DESTDIR="$(top_win32dir)" STRIP="$(STRIP)" install-win32-strip
+	@if test -d "$(top_srcdir)/3rdparty/dist/bin"; then \
+	  echo "Copying DLLs from 3rdparty/dist/bin ..."; \
+	  for dll in "$(top_srcdir)/3rdparty/dist/bin"/*.dll; do \
+	    if test -f "$$dll"; then \
+	      cp "$$dll" "$(top_win32dir)/"; \
+	      echo "  copied $$(basename $$dll)"; \
+	    fi; \
+	  done; \
+	fi
+	@MINGW_BIN=""; \
+	if test -n "$$MSYSTEM"; then \
+	  if test "$$MSYSTEM" = "MINGW64"; then \
+	    MINGW_BIN="/mingw64/bin"; \
+	  elif test "$$MSYSTEM" = "MINGW32"; then \
+	    MINGW_BIN="/mingw32/bin"; \
+	  elif test "$$MSYSTEM" = "UCRT64"; then \
+	    MINGW_BIN="/ucrt64/bin"; \
+	  fi; \
+	fi; \
+	if test -z "$$MINGW_BIN" && test -d "/mingw64/bin"; then \
+	  MINGW_BIN="/mingw64/bin"; \
+	elif test -z "$$MINGW_BIN" && test -d "/ucrt64/bin"; then \
+	  MINGW_BIN="/ucrt64/bin"; \
+	elif test -z "$$MINGW_BIN" && test -d "/mingw32/bin"; then \
+	  MINGW_BIN="/mingw32/bin"; \
+	fi; \
+	if test -n "$$MINGW_BIN"; then \
+	  echo "Copying MinGW runtime DLLs from $$MINGW_BIN ..."; \
+	  for dll in libwinpthread-1.dll libstdc++-6.dll libgcc_s_seh-1.dll libgcc_s_dw2-1.dll; do \
+	    if test -f "$$MINGW_BIN/$$dll"; then \
+	      cp "$$MINGW_BIN/$$dll" "$(top_win32dir)/"; \
+	      echo "  copied $$dll"; \
+	    fi; \
+	  done; \
+	fi
+
+dist-win32-dir-debug:
+	$(MAKE) DESTDIR="$(top_win32dir)" install-win32
 
 dist-win32-zip: dist-win32-dir
 	rm -f -- $(top_builddir)/$(package_win32).zip
@@ -89,22 +136,34 @@ dist-win32-exe: dist-win32-dir
 	test -n "$(top_win32dir)" || exit 1
 	@test `find $(top_win32dir) -type f -name \*.dll -print | wc -l` -ne 0 || \
 	{ echo "ERROR: external libraries not found in $(top_win32dir). Please, manually copy them."; exit 1; }
-#	Locate NSIS in system path, MSYS drive or Cygwin drive
+#	Locate NSIS in PATH, MSYS /mingw64, or standard Windows install dirs (with or without .exe)
 	@NSISFILE="$(abs_top_builddir)/data/win32/installer.nsi"; \
 	if makensis -VERSION > /dev/null 2>&1; then \
 	  MAKENSIS="makensis"; \
+	elif [ -x "/mingw64/bin/makensis" ] || [ -x "/mingw64/bin/makensis.exe" ]; then \
+	  MAKENSIS="/mingw64/bin/makensis"; \
+	elif [ -x "/ucrt64/bin/makensis" ] || [ -x "/ucrt64/bin/makensis.exe" ]; then \
+	  MAKENSIS="/ucrt64/bin/makensis"; \
+	elif [ -x "/c/Program Files/NSIS/makensis.exe" ]; then \
+	  MAKENSIS='/c/Program Files/NSIS/makensis.exe'; \
 	elif [ -x "/c/Program Files/NSIS/makensis" ]; then \
-	  MAKENSIS="/c/Program\ Files/NSIS/makensis"; \
-	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
-	  MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis"; \
+	  MAKENSIS='/c/Program Files/NSIS/makensis'; \
+	elif [ -x "/c/Program Files (x86)/NSIS/makensis.exe" ]; then \
+	  MAKENSIS='/c/Program Files (x86)/NSIS/makensis.exe'; \
+	elif [ -x "/c/Program Files (x86)/NSIS/makensis" ]; then \
+	  MAKENSIS='/c/Program Files (x86)/NSIS/makensis'; \
+	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis.exe" ]; then \
+	  MAKENSIS='/cygdrive/c/Program Files/NSIS/makensis.exe'; \
+	elif [ -x "/cygdrive/c/Program Files (x86)/NSIS/makensis.exe" ]; then \
+	  MAKENSIS='/cygdrive/c/Program Files (x86)/NSIS/makensis.exe'; \
 	else \
-	  echo 'ERROR: cannot locate makensis tool'; exit 1; \
+	  echo 'ERROR: cannot locate makensis (install NSIS or: pacman -S mingw-w64-x86_64-nsis)'; exit 1; \
 	fi; \
 	case "`uname -s`" in \
 	  CYGWIN*) NSISFILE=`cygpath -m $$NSISFILE`;; \
 	esac; \
 	cd $(top_win32dir); \
-	eval "$$MAKENSIS -V2 -NOCD $$NSISFILE"
+	"$$MAKENSIS" -V2 -NOCD "$$NSISFILE"
 	mv $(top_win32dir)/$(package_win32)-setup.exe $(top_builddir)
 	-sha1sum $(top_builddir)/$(package_win32)-setup.exe > $(top_builddir)/$(package_win32)-setup.exe.sha1 && \
 	{ test -z "$(UNIX2DOS)" || $(UNIX2DOS) $(top_builddir)/$(package_win32)-setup.exe.sha1; }
@@ -123,4 +182,5 @@ distclean-win32:
 	rm -f -- $(top_builddir)/$(package_win32)-setup.exe.sha1
 
 .PHONY: install-win32 install-win32-strip dist-win32 dist-win32-dir \
-	dist-win32-zip dist-win32-7z dist-win32-exe distclean-win32
+	dist-win32-dir-debug dist-win32-zip dist-win32-7z dist-win32-exe \
+	distclean-win32 3rdparty-dist

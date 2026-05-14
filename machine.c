@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "FuseMenus.h"
 #include "event.h"
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
@@ -64,6 +63,8 @@ static int machine_add_machine( int (*init_function)(fuse_machine_info *machine)
 static int machine_select_machine( fuse_machine_info *machine );
 static void machine_set_const_timings( fuse_machine_info *machine );
 static void machine_set_variable_timings( fuse_machine_info *machine );
+
+void SetEmulationHz( float hz );
 
 static int
 machine_init_machines( void *context )
@@ -491,3 +492,11 @@ machine_register_startup( void )
                             ARRAY_SIZE( dependencies ), machine_init_machines,
                             NULL, machine_end );
 }
+
+#ifndef __APPLE__
+void
+SetEmulationHz( float hz )
+{
+  (void)hz;
+}
+#endif

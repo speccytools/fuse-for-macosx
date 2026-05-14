@@ -22,10 +22,10 @@
 
 !define FUSE_VERSION "@PACKAGE_VERSION@" ; could have letters like -RC1
 !define FUSE_FULL_VERSION "@FUSE_FULL_VERSION@" ; must have four numeric tokens
-!define DISPLAY_NAME "the Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
+!define DISPLAY_NAME "FuseX ${FUSE_VERSION} — ZX Spectrum emulator"
 !define SETUP_FILENAME "@PACKAGE@-${FUSE_VERSION}-win32-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
-!define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
+!define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\FuseX"
 !define PROG_ID "Fuse.Files.1"
 
 ;Include Modern UI
@@ -40,7 +40,7 @@ Name "${DISPLAY_NAME}"
 outFile "${SETUP_FILE}"
 Caption "${DISPLAY_NAME}"
  
-installDir "$PROGRAMFILES\Fuse"
+installDir "$PROGRAMFILES\FuseX"
 
 ; [Additional Installer Settings ]
 XPStyle on
@@ -87,10 +87,10 @@ SetCompressor lzma
   VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" ""
   VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "${SETUP_FILENAME}"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "@FUSE_COPYRIGHT@"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Fuse"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "FuseX"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${FUSE_VERSION}"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "${SETUP_FILE}"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "Fuse - the Free Unix Spectrum Emulator"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "FuseX"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${FUSE_VERSION}"
 
 ;--------------------------------
@@ -249,7 +249,7 @@ section "!Fuse Core Files (required)" SecCore
     File "ChangeLog.txt"
     File "COPYING.txt"
     File "fuse.exe"
-    File "fuse.html"
+    File /nonfatal "fuse.html"
     File /nonfatal "LICENSES.txt"
     File /nonfatal "manual*.png"
     File "README.txt"
@@ -283,12 +283,15 @@ sectionEnd
 section "Start Menu and Desktop links" SecShortcuts
 
     DetailPrint "Creating Shortcuts..."
-    CreateDirectory "$SMPROGRAMS\Fuse"
-    CreateShortCut "$SMPROGRAMS\Fuse\Fuse.lnk" "$INSTDIR\fuse.exe"
-    CreateShortCut "$SMPROGRAMS\Fuse\Manual.lnk" "$INSTDIR\fuse.html"
-    CreateShortCut "$SMPROGRAMS\Fuse\Readme.lnk" "$INSTDIR\README.txt"
-    CreateShortCut "$SMPROGRAMS\Fuse\Uninstall.lnk" "$INSTDIR\uninstall.exe"
-    CreateShortCut "$DESKTOP\Fuse.lnk" "$INSTDIR\fuse.exe"
+    CreateDirectory "$SMPROGRAMS\FuseX"
+    CreateShortCut "$SMPROGRAMS\FuseX\FuseX.lnk" "$INSTDIR\fuse.exe"
+    IfFileExists "$INSTDIR\fuse.html" ManualShortcut AfterManual
+ManualShortcut:
+    CreateShortCut "$SMPROGRAMS\FuseX\Manual.lnk" "$INSTDIR\fuse.html"
+AfterManual:
+    CreateShortCut "$SMPROGRAMS\FuseX\Readme.lnk" "$INSTDIR\README.txt"
+    CreateShortCut "$SMPROGRAMS\FuseX\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+    CreateShortCut "$DESKTOP\FuseX.lnk" "$INSTDIR\fuse.exe"
 
 sectionEnd
 
@@ -348,12 +351,12 @@ section "uninstall"
 	
     ; Delete the links
     DetailPrint "Deleting Shortcuts..."
-    Delete "$SMPROGRAMS\Fuse\Fuse.lnk"
-    Delete "$SMPROGRAMS\Fuse\Manual.lnk"
-    Delete "$SMPROGRAMS\Fuse\Readme.lnk"
-    Delete "$SMPROGRAMS\Fuse\Uninstall.lnk"
-    RMDir  "$SMPROGRAMS\Fuse"
-    Delete "$DESKTOP\Fuse.lnk"
+    Delete "$SMPROGRAMS\FuseX\FuseX.lnk"
+    Delete "$SMPROGRAMS\FuseX\Manual.lnk"
+    Delete "$SMPROGRAMS\FuseX\Readme.lnk"
+    Delete "$SMPROGRAMS\FuseX\Uninstall.lnk"
+    RMDir  "$SMPROGRAMS\FuseX"
+    Delete "$DESKTOP\FuseX.lnk"
 
     ; Installation files
     DetailPrint "Deleting Files..."

@@ -65,6 +65,10 @@ fuse_LDADD = \
              $(X_LIBS) \
              $(XML_LIBS)
 
+if BUILD_SPECTRANET
+fuse_LDADD += $(MBEDTLS_LIBS)
+endif
+
 if USE_SDL1
 fuse_LDADD += $(SDL1_LIBS)
 endif
@@ -77,10 +81,16 @@ fuse_DEPENDENCIES =
 
 EXTRA_fuse_SOURCES =
 
-BUILT_SOURCES = options.h settings.c settings.h
+BUILT_SOURCES = options.h settings.c settings.h \
+		debugger/commandy.c debugger/commandy.h debugger/commandl.c
 
+if COMPAT_WIN32
+settings.c: settings-win32.pl settings.dat
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/settings-win32.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+else
 settings.c: settings.pl settings.dat
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+endif
 
 settings.h: settings-header.pl settings.dat
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
@@ -102,6 +112,10 @@ endif
 
 if USE_SDL2
 AM_CPPFLAGS += $(SDL2_CFLAGS)
+endif
+
+if BUILD_SPECTRANET
+AM_CPPFLAGS += $(MBEDTLS_CFLAGS)
 endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(PTHREAD_CFLAGS)
@@ -154,6 +168,7 @@ EXTRA_DIST = AUTHORS \
 	     menu_data.pl \
 	     settings.dat \
 	     settings.pl \
+	     settings-win32.pl \
 	     settings-header.pl
 
 CLEANFILES = options.h \

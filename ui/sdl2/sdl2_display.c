@@ -113,11 +113,8 @@ init_scalers( void )
     scaler_register( SCALER_HQ4X );
   }
 
-  if( scaler_is_supported( current_scaler ) ) {
-    scaler_select_scaler( current_scaler );
-  } else {
-    scaler_select_scaler( SCALER_NORMAL );
-  }
+  if( scaler_activate_scaler( current_scaler ) )
+    scaler_activate_scaler( SCALER_NORMAL );
 }
 
 static int
@@ -723,8 +720,8 @@ uidisplay_init( int width, int height )
 
   sdl2display_init_fullscreen_mode();
   if( fuse_exiting ) return 0;
-  if( scaler_select_scaler( current_scaler ) )
-    scaler_select_scaler( SCALER_NORMAL );
+  if( scaler_activate_scaler( current_scaler ) )
+    scaler_activate_scaler( SCALER_NORMAL );
 
   sdl2display_recreate();
   display_ui_initialised = 1;
@@ -735,6 +732,7 @@ uidisplay_init( int width, int height )
 int
 uidisplay_hotswap_gfx_mode( void )
 {
+  (void)uidisplay_take_next_hotswap_reason();
   sdl2display_recreate();
   return 0;
 }

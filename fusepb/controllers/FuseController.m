@@ -2386,7 +2386,7 @@ save_as_exit:
     fileTypes = plusdFileTypes;
   }
 
-  drive_info = ui_media_drive_find( drive );
+  drive_info = ui_media_drive_find( ui_media_active_disk_controller(), drive );
   if( !drive_info ) {
     [[DisplayOpenGLView instance] unpause];
     return;
@@ -2516,7 +2516,7 @@ save_as_exit:
     fileTypes = @[@"mgt", @"img"];
   }
   
-  drive_info = ui_media_drive_find( which );
+  drive_info = ui_media_drive_find( ui_media_active_disk_controller(), which );
   if( !drive_info )  { [[DisplayOpenGLView instance] unpause]; return 1; }
 
   if( drive_info->fdd->disk.filename == NULL )
@@ -3314,6 +3314,9 @@ ui_menu_activate( ui_menu_item item, int active )
     
   case UI_MENU_ITEM_MACHINE_DEBUGGER:
     method = @selector(ui_menu_activate_debugger:);
+    break;
+
+  case UI_MENU_ITEM_MACHINE_DEBUG_LOG:
     break;
       
   default:

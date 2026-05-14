@@ -31,7 +31,7 @@
 #include "debugger/debugger_internals.h"
 #include "mempool.h"
 
-#include "commandy.tab.h"
+#include "commandy.h"
 
 #define YY_INPUT(buf,result,max_size) \
 { \

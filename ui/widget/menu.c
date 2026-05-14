@@ -514,6 +514,12 @@ menu_options_movie( int action )
 }
 
 void
+menu_options_gdbserver( int action )
+{
+  widget_do_gdbserver();
+}
+
+void
 menu_options_diskoptions( int action )
 {
   widget_do_diskoptions();

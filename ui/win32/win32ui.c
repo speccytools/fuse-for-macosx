@@ -45,6 +45,7 @@
 #include "utils.h"
 #include "win32internals.h"
 #include "win32joystick.h"
+#include "debuglog.h"
 
 /* Window handler */
 HWND fuse_hWnd;
@@ -180,10 +181,6 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       /* Stop the paused state to allow us to exit (occurs from main
          emulation loop) */
       if( paused ) menu_machine_pause( 0 );
-      return 0;
-
-    case WM_NCLBUTTONDBLCLK:
-      /* Don't allow double click on title bar, suppressing window maximizing */
       return 0;
 
     case WM_ENTERMENULOOP:
@@ -339,7 +336,7 @@ ui_init( int *argc, char ***argv )
   }
 
   /* create the window */
-  fuse_hWnd = CreateWindow( "Fuse", "Fuse", WS_OVERLAPPED | WS_CAPTION |
+  fuse_hWnd = CreateWindow( "Fuse", "FuseX", WS_OVERLAPPED | WS_CAPTION |
     WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_CLIPCHILDREN,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
     NULL, NULL, fuse_hInstance, NULL );
@@ -357,8 +354,10 @@ ui_init( int *argc, char ***argv )
   win32statusbar_create( fuse_hWnd );
 
   /* set the initial size of the drawing area */
-  RECT wr, cr, statr;
+  RECT wr, cr, statr, workarea;
   int w_ofs, h_ofs;
+  int window_width, window_height;
+  int center_x, center_y;
   
   GetWindowRect( fuse_hWnd, &wr );
   GetClientRect( fuse_hWnd, &cr );
@@ -368,9 +367,17 @@ ui_init( int *argc, char ***argv )
   h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
   if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
 
-  MoveWindow( fuse_hWnd, wr.left, wr.top,
-              DISPLAY_ASPECT_WIDTH + w_ofs,
-              DISPLAY_SCREEN_HEIGHT + h_ofs,
+  window_width = DISPLAY_ASPECT_WIDTH + w_ofs;
+  window_height = DISPLAY_SCREEN_HEIGHT + h_ofs;
+
+  /* Get work area (screen excluding taskbar) and center the window */
+  SystemParametersInfo( SPI_GETWORKAREA, 0, &workarea, 0 );
+  center_x = workarea.left + ( workarea.right - workarea.left - window_width ) / 2;
+  center_y = workarea.top + ( workarea.bottom - workarea.top - window_height ) / 2;
+
+  MoveWindow( fuse_hWnd, center_x, center_y,
+              window_width,
+              window_height,
               FALSE );
 
   /* init the display area */
@@ -422,6 +429,8 @@ ui_end( void )
   win32keyboard_end();
 
   error = win32display_end(); if( error ) return error;
+
+  win32_debuglog_end();
 
   /* close the monospaced font handle */     
   if( monospaced_font ) {
@@ -1076,7 +1085,7 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 static BOOL
 win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  RECT *selr, wr, cr, statr;
+  RECT *selr, wr, cr, statr, or;
   int width, height, w_ofs, h_ofs, w_max, h_max;
 
   selr = (RECT *)lParam;
@@ -1088,17 +1097,11 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
   if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
 
-  /* Determine current screen from window */
-  MONITORINFO mi;
-	mi.cbSize = sizeof (MONITORINFO);
-  if (!GetMonitorInfoA(MonitorFromWindow(fuse_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
-    return FALSE;
-  }
-
   /* max scaler size in desktop workarea */
-  w_max = ( mi.rcWork.right - mi.rcWork.left ) - w_ofs + DISPLAY_ASPECT_WIDTH / 2;
+  SystemParametersInfo( SPI_GETWORKAREA, 0, &or, 0 );
+  w_max = ( or.right - or.left ) - w_ofs + DISPLAY_ASPECT_WIDTH / 2;
   w_max /= DISPLAY_ASPECT_WIDTH;
-  h_max = ( mi.rcWork.bottom - mi.rcWork.top ) - h_ofs + DISPLAY_SCREEN_HEIGHT / 2;
+  h_max = ( or.bottom - or.top ) - h_ofs + DISPLAY_SCREEN_HEIGHT / 2;
   h_max /= DISPLAY_SCREEN_HEIGHT;
 
   if( w_max < h_max ) {
@@ -1165,8 +1168,10 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 void
 win32ui_fuse_resize( int width, int height )
 {
-  RECT wr, cr, statr;
+  RECT wr, cr, statr, workarea;
   int w_ofs, h_ofs;
+  int window_width, window_height;
+  int center_x, center_y;
 
   /* Calculate decorations before resizing */
   GetWindowRect( fuse_hWnd, &wr );
@@ -1177,22 +1182,23 @@ win32ui_fuse_resize( int width, int height )
   h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
   if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
 
-  /* Determine current screen from window */
-  MONITORINFO mi;
-	mi.cbSize = sizeof (MONITORINFO);
-  if (!GetMonitorInfoA(MonitorFromWindow(fuse_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
-    return;
-  }
+  window_width = width + w_ofs;
+  window_height = height + h_ofs;
 
-  /* Set position inside workarea */
-  if( wr.left + width + w_ofs > mi.rcWork.right ) wr.left = mi.rcWork.right - width - w_ofs;
-  if( wr.top + height + h_ofs > mi.rcWork.bottom ) wr.top = mi.rcWork.bottom - height - h_ofs;
-  if( wr.left < mi.rcWork.left ) wr.left = mi.rcWork.left;
-  if( wr.top < mi.rcWork.top ) wr.top = mi.rcWork.top;
+  /* Get work area (screen excluding taskbar) and center the window */
+  SystemParametersInfo( SPI_GETWORKAREA, 0, &workarea, 0 );
+  center_x = workarea.left + ( workarea.right - workarea.left - window_width ) / 2;
+  center_y = workarea.top + ( workarea.bottom - workarea.top - window_height ) / 2;
 
-  MoveWindow( fuse_hWnd, wr.left, wr.top,
-              width + w_ofs,
-              height + h_ofs,
+  /* Ensure window stays within work area */
+  if( center_x + window_width > workarea.right ) center_x = workarea.right - window_width;
+  if( center_y + window_height > workarea.bottom ) center_y = workarea.bottom - window_height;
+  if( center_x < workarea.left ) center_x = workarea.left;
+  if( center_y < workarea.top ) center_y = workarea.top;
+
+  MoveWindow( fuse_hWnd, center_x, center_y,
+              window_width,
+              window_height,
               TRUE );
 }
 

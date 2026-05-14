@@ -440,6 +440,21 @@ debugger_trap( void )
 }
 
 int
+is_debugger_enabled( void )
+{
+  return 0;
+}
+
+uint32_t
+debugger_track_tstates( void )
+{
+  static libspectrum_dword last_tstates;
+  uint32_t diff = (uint32_t)( tstates - last_tstates );
+  last_tstates = tstates;
+  return diff;
+}
+
+int
 slt_trap( libspectrum_word address GCC_UNUSED, libspectrum_byte level GCC_UNUSED )
 {
   return 0;

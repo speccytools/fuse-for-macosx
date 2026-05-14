@@ -24,9 +24,15 @@
 
 #include "config.h"
 
+#include <stddef.h>
 #include <string.h>
 
 #include "compat.h"
+#include "libspectrum.h"
+#include "peripherals/spectranet.h"
+
+#ifdef BUILD_SPECTRANET
+
 #include "debugger/debugger.h"
 #include "flash/am29f010.h"
 #include "infrastructure/startup_manager.h"
@@ -42,18 +48,8 @@
 #include "peripherals/nic/spectranext_controller.h"
 #include "peripherals/nic/spectranext_stdout.h"
 #include "settings.h"
-#include "spectranet.h"
 #include "utils.h"
 #include "ui/ui.h"
-
-#include "config.h"
-
-#include "peripherals/spectranet.h"
-
-#include <string.h>
-#include <stddef.h>
-
-#ifdef BUILD_SPECTRANET
 
 #define SPECTRANET_PAGES 256
 #define SPECTRANET_PAGE_LENGTH 0x1000
@@ -76,7 +72,7 @@ static int spectranet_memory_allocated = 0;
 static nic_w5100_t *w5100;
 static flash_am29f010_t *flash_rom;
 
-#endif
+#endif /* BUILD_SPECTRANET */
 
 int spectranet_available = 0;
 int spectranet_paged;
@@ -91,6 +87,8 @@ int spectranet_programmable_trap_active;
 
 /* Where the programmable trap will trigger if active */
 libspectrum_word spectranet_programmable_trap;
+
+#ifdef BUILD_SPECTRANET
 
 /* True if the next write to 0x023b will set the MSB of the programmable trap */
 static int trap_write_msb;
@@ -502,7 +500,7 @@ static int
 spectranet_init( void *context )
 {
   module_register( &spectranet_module_info );
-  spectranet_source = memory_source_register( "Spectranet" );
+  spectranet_source = memory_source_register( "Spectranext" );
   periph_register( PERIPH_TYPE_SPECTRANET, &spectranet_periph );
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
@@ -1136,3 +1134,159 @@ int spectranet_config_set_int(uint16_t section_id, uint8_t item_id, uint16_t val
     write_uint16(item_data, 0, value);
     return 0;
 }
+
+#else /* !BUILD_SPECTRANET */
+
+void
+spectranet_register_startup( void )
+{
+}
+
+void
+spectranet_page( int via_io GCC_UNUSED )
+{
+}
+
+void
+spectranet_nmi( void )
+{
+}
+
+void
+spectranet_unpage( void )
+{
+}
+
+void
+spectranet_retn( void )
+{
+}
+
+int
+spectranet_nmi_flipflop( void )
+{
+  return 0;
+}
+
+libspectrum_byte
+spectranet_w5100_read( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED )
+{
+  return 0xff;
+}
+
+void
+spectranet_w5100_write( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
+{
+}
+
+libspectrum_byte
+spectranet_xfs_read( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED )
+{
+  return 0xff;
+}
+
+void
+spectranet_xfs_write( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
+{
+}
+
+libspectrum_byte
+spectranet_spectranext_config_read( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED )
+{
+  return 0xff;
+}
+
+void
+spectranet_spectranext_config_write( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
+{
+}
+
+libspectrum_byte
+spectranet_flash_rom_read( memory_page *page GCC_UNUSED,
+  libspectrum_word address GCC_UNUSED )
+{
+  return 0xff;
+}
+
+void
+spectranet_flash_rom_write( libspectrum_word address GCC_UNUSED,
+  libspectrum_byte b GCC_UNUSED )
+{
+}
+
+libspectrum_byte *
+spectranet_get_config_page( void )
+{
+  return NULL;
+}
+
+const uint8_t *
+spectranet_config_get_memory( void )
+{
+  return NULL;
+}
+
+int
+spectranet_config_get_string( uint16_t section_id GCC_UNUSED,
+  uint8_t item_id GCC_UNUSED, char *buffer, size_t buffer_size )
+{
+  if( buffer && buffer_size ) buffer[0] = '\0';
+  return -1;
+}
+
+int
+spectranet_config_get_byte( uint16_t section_id GCC_UNUSED,
+  uint8_t item_id GCC_UNUSED, uint8_t *value )
+{
+  if( value ) *value = 0;
+  return -1;
+}
+
+int
+spectranet_config_get_int( uint16_t section_id GCC_UNUSED,
+  uint8_t item_id GCC_UNUSED, uint16_t *value )
+{
+  if( value ) *value = 0;
+  return -1;
+}
+
+int
+spectranet_config_set_string( uint16_t section_id GCC_UNUSED,
+  uint8_t item_id GCC_UNUSED, const char *value GCC_UNUSED )
+{
+  return -1;
+}
+
+int
+spectranet_config_set_byte( uint16_t section_id GCC_UNUSED,
+  uint8_t item_id GCC_UNUSED, uint8_t value GCC_UNUSED )
+{
+  return -1;
+}
+
+int
+spectranet_config_set_int( uint16_t section_id GCC_UNUSED,
+  uint8_t item_id GCC_UNUSED, uint16_t value GCC_UNUSED )
+{
+  return -1;
+}
+
+uint16_t
+spectranet_config_get_total_size( void )
+{
+  return 0;
+}
+
+bool
+spectranet_config_is_valid( void )
+{
+  return false;
+}
+
+#endif /* BUILD_SPECTRANET */
