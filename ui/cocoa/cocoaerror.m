@@ -37,7 +37,6 @@
 
 #include "fuse.h"
 #include "ui/ui.h"
-#include "settings.h"
 
 static int
 aqua_verror( ui_error_level severity, const char *message )
@@ -66,8 +65,5 @@ aqua_verror( ui_error_level severity, const char *message )
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
-  if ( !settings_current.full_screen ) {
-    return aqua_verror( severity, message );
-  }
-  return 0;
+  return aqua_verror( severity, message );
 }
