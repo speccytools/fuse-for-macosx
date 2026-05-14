@@ -22,7 +22,7 @@
 
 !define FUSE_VERSION "@PACKAGE_VERSION@" ; could have letters like -RC1
 !define FUSE_FULL_VERSION "@FUSE_FULL_VERSION@" ; must have four numeric tokens
-!define DISPLAY_NAME "FuseX ${FUSE_VERSION} — ZX Spectrum emulator"
+!define DISPLAY_NAME "FuseX ${FUSE_VERSION} - ZX Spectrum emulator"
 !define SETUP_FILENAME "@PACKAGE@-${FUSE_VERSION}-win32-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
 !define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\FuseX"
