@@ -360,6 +360,16 @@ static DisplayOpenGLView *instance = nil;
   [proxy_emulator keyboardReleaseAll];
 }
 
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+  /* Release the emulator's mouse grab on fullscreen exit so a user who
+     entered fullscreen with the cursor grabbed regains it. The entry side
+     is deliberately not symmetric: auto-grabbing would hide the cursor
+     and block the menu-bar-on-hover reveal that exposes Open, Preferences,
+     and the rest of the menu in fullscreen. */
+  if( ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_release( 0 );
+}
+
 -(void) loadPicture: (NSString *) name
                       greenTex:(Texture*) greenTexture
                       redTex:(Texture*) redTexture
