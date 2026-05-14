@@ -1015,11 +1015,6 @@ save_as_exit:
   [[DisplayOpenGLView instance] settingsSave];
 }
 
-- (IBAction)fullscreen:(id)sender
-{
-  [[DisplayOpenGLView instance] fullscreen];
-}
-
 - (IBAction)hard_reset:(id)sender
 {
   [[DisplayOpenGLView instance] pause];
