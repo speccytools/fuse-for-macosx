@@ -1433,6 +1433,13 @@ static DisplayOpenGLView *instance = nil;
 - (void)pinAsChildOf:(NSWindow *)parent
 {
   if( !parent || parent == self ) return;
+  /* Without FullScreenAuxiliary, adding self as a child of a fullscreen
+     parent forces AppKit to exit fullscreen so the two can coexist on
+     the regular desktop. With it, both windows share the parent's
+     fullscreen Space. Harmless when the parent is windowed. */
+  [self setCollectionBehavior:
+    [self collectionBehavior] |
+    NSWindowCollectionBehaviorFullScreenAuxiliary];
   NSWindow *currentParent = [self parentWindow];
   if( currentParent == parent ) return;
   if( currentParent ) {
