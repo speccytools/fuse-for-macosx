@@ -1,4 +1,4 @@
-﻿/* ui.c: User interface routines, but those which are independent of any UI
+/* ui.c: User interface routines, but those which are independent of any UI
    Copyright (c) 2002-2017 Philip Kendall
    Copyright (c) 2016-2021 Sergio Baldoví
 
@@ -697,6 +697,7 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
 };
 
+#ifndef __APPLE__
 int
 ui_menu_activate( ui_menu_item item, int active )
 {
@@ -732,6 +733,7 @@ ui_menu_activate( ui_menu_item item, int active )
   ui_error( UI_ERROR_ERROR, "ui_menu_activate: unknown item %d", item );
   return 1;
 }
+#endif			/* #ifndef __APPLE__ */
 
 void
 ui_menu_disk_update( void )
@@ -754,6 +756,7 @@ ui_menu_disk_update( void )
   ui_media_drive_update_parent_menus();
 }
 
+#ifndef __APPLE__
 int
 ui_tape_write( void )
 {
@@ -796,6 +799,7 @@ ui_mdr_write( int which, int saveas )
 
   return err;
 }
+#endif			/* #ifndef __APPLE__ */
 
 #ifdef USE_WIDGET
 int
