@@ -1207,16 +1207,6 @@ static DisplayOpenGLView *instance = nil;
 
 -(void) keyDown:(NSEvent *)theEvent
 {
-  if( settings_current.full_screen ) {
-    unichar c = [[theEvent charactersIgnoringModifiers] characterAtIndex:0];
-    switch (c) {
-    /* [Esc] exits fullScreen mode */
-    case 27:
-      [self fullscreen:nil];
-      return;
-      break;
-    }
-  }
   [proxy_emulator keyDown:theEvent];
 }
 
