@@ -95,7 +95,6 @@
 - (IBAction)cart_eject:(id)sender;
 - (IBAction)cart_open:(id)sender;
 - (IBAction)export_screen:(id)sender;
-- (IBAction)fullscreen:(id)sender;
 - (IBAction)hard_reset:(id)sender;
 - (IBAction)ide_commit:(id)sender;
 - (IBAction)ide_eject:(id)sender;

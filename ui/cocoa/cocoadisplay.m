@@ -244,20 +244,22 @@ cocoadisplay_resize_window( void )
 {
   /* Startup applies the saved scaler before the first rendered frame; let
      AppKit keep the restored window frame until emulation is visibly running. */
-  if( !display_ui_initialised || !window_resize_enabled ||
-      settings_current.full_screen ) return;
+  if( !display_ui_initialised || !window_resize_enabled ) return;
 
   float factor = scaler_get_scaling_factor( current_scaler );
   NSSize size = NSMakeSize( image_width * factor, image_height * factor );
 
   dispatch_async( dispatch_get_main_queue(), ^{
-    /* Re-check after the hop in case the user entered fullscreen between
-       enqueue and execute. */
-    if( settings_current.full_screen ) return;
+    NSWindow *win = [[DisplayOpenGLView instance] window];
+    /* AppKit's fullscreen Space owns the window frame; application code
+       cannot resize a fullscreen window. The pre-dispatch check was
+       previously a worker-thread-safe read of a mirrored flag; the
+       authoritative state lives in the window's styleMask, which must be
+       read on main. */
+    if( ( [win styleMask] & NSWindowStyleMaskFullScreen ) != 0 ) return;
 
     /* Preserve the window's perceived centre; setContentSize: would anchor
        the top-left and drift the centre across repeated scaler changes. */
-    NSWindow *win = [[DisplayOpenGLView instance] window];
     NSRect old = [win frame];
     NSRect frame = [win frameRectForContentRect:
                             NSMakeRect( 0, 0, size.width, size.height )];

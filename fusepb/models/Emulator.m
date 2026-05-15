@@ -562,11 +562,6 @@ static Emulator *instance = nil;
   settings_defaults( &settings_current );
 }
 
--(void) fullscreen
-{
-  settings_current.full_screen = 1;
-}
-
 -(void) joystickToggleKeyboard
 {
   settings_current.joy_keyboard = !settings_current.joy_keyboard;

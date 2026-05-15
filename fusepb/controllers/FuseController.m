@@ -682,21 +682,19 @@ error:
 {
   char *filename = NULL;
 
-  if( !settings_current.full_screen ) {
-    [[DisplayOpenGLView instance] pause];
-    
-    filename = cocoaui_openpanel_get_filename( @"Open Spectrum File", allFileTypes );
+  [[DisplayOpenGLView instance] pause];
 
-    if( !filename ) { [[DisplayOpenGLView instance] unpause]; return; }
+  filename = cocoaui_openpanel_get_filename( @"Open Spectrum File", allFileTypes );
 
-    [self addRecentSnapshot:filename];
+  if( !filename ) { [[DisplayOpenGLView instance] unpause]; return; }
 
-    [self openFile:filename];
+  [self addRecentSnapshot:filename];
 
-    free(filename);
+  [self openFile:filename];
 
-    [[DisplayOpenGLView instance] unpause];
-  }
+  free(filename);
+
+  [[DisplayOpenGLView instance] unpause];
 }
 
 - (IBAction)reset:(id)sender
@@ -889,22 +887,20 @@ error:
 {
   char *filename = NULL;
 
-  if( !settings_current.full_screen ) {
-    [[DisplayOpenGLView instance] pause];
+  [[DisplayOpenGLView instance] pause];
 
-    filename = cocoaui_savepanel_get_filename( @"Save Snapshot As", @[@"szx", @"z80", @"sna"] );
+  filename = cocoaui_savepanel_get_filename( @"Save Snapshot As", @[@"szx", @"z80", @"sna"] );
 
-    if( !filename ) goto save_as_exit;
+  if( !filename ) goto save_as_exit;
 
-    [[DisplayOpenGLView instance] snapshotWrite:filename];
+  [[DisplayOpenGLView instance] snapshotWrite:filename];
 
-    [self addRecentSnapshot:filename];
+  [self addRecentSnapshot:filename];
 
-    free( filename );
+  free( filename );
 
 save_as_exit:
-    [[DisplayOpenGLView instance] unpause];
-  }
+  [[DisplayOpenGLView instance] unpause];
 }
 
 - (IBAction)open_screen:(id)sender
@@ -1013,11 +1009,6 @@ save_as_exit:
 - (IBAction)save_options:(id)sender
 {
   [[DisplayOpenGLView instance] settingsSave];
-}
-
-- (IBAction)fullscreen:(id)sender
-{
-  [[DisplayOpenGLView instance] fullscreen];
 }
 
 - (IBAction)hard_reset:(id)sender
@@ -1159,9 +1150,7 @@ save_as_exit:
 
 - (IBAction)quit:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    [[NSApp keyWindow] performClose:self];
-  }
+  [NSApp terminate:self];
 }
 
 - (IBAction)hide:(id)sender
@@ -1171,9 +1160,7 @@ save_as_exit:
 
 - (IBAction)help:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    [NSApp showHelp:self];
-  }
+  [NSApp showHelp:self];
 }
 
 - (IBAction)cocoa_break:(id)sender
@@ -1210,95 +1197,75 @@ save_as_exit:
 
 - (IBAction)showRollbackPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !rollbackController ) {
-      rollbackController = [[RollbackController alloc] init];
-    }
-    [rollbackController showWindow:self];
+  if( !rollbackController ) {
+    rollbackController = [[RollbackController alloc] init];
   }
+  [rollbackController showWindow:self];
 }
 
 - (IBAction)showTapeBrowserPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !tapeBrowserController ) {
-      tapeBrowserController = [[TapeBrowserController alloc] init];
-    }
-    [tapeBrowserController showWindow:self];
+  if( !tapeBrowserController ) {
+    tapeBrowserController = [[TapeBrowserController alloc] init];
   }
+  [tapeBrowserController showWindow:self];
 }
 
 - (IBAction)showKeyboardPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !settings_current.full_screen ) {
-      if( !keyboardController ) {
-        keyboardController = [[KeyboardController alloc] init];
-      }
-      [keyboardController showCloseWindow:self];
-    }
+  if( !keyboardController ) {
+    keyboardController = [[KeyboardController alloc] init];
   }
+  [keyboardController showCloseWindow:self];
 }
 
 - (IBAction)showLoadBinaryPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !loadBinaryController ) {
-      loadBinaryController = [[LoadBinaryController alloc] init];
-    }
-
-    [loadBinaryController showWindow:self];
+  if( !loadBinaryController ) {
+    loadBinaryController = [[LoadBinaryController alloc] init];
   }
+
+  [loadBinaryController showWindow:self];
 }
 
 - (IBAction)showSaveBinaryPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !saveBinaryController ) {
-      saveBinaryController = [[SaveBinaryController alloc] init];
-    }
-    [saveBinaryController showWindow:self];
+  if( !saveBinaryController ) {
+    saveBinaryController = [[SaveBinaryController alloc] init];
   }
+  [saveBinaryController showWindow:self];
 }
 
 - (IBAction)showPokeFinderPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !pokeFinderController ) {
-      pokeFinderController = [[PokeFinderController alloc] init];
-    }
-    [pokeFinderController showWindow:self];
+  if( !pokeFinderController ) {
+    pokeFinderController = [[PokeFinderController alloc] init];
   }
+  [pokeFinderController showWindow:self];
 }
 
 - (IBAction)showPokeMemoryPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !pokeMemoryController ) {
-      pokeMemoryController = [[PokeMemoryController alloc] init];
-    }
-    [pokeMemoryController showWindow:self];
+  if( !pokeMemoryController ) {
+    pokeMemoryController = [[PokeMemoryController alloc] init];
   }
+  [pokeMemoryController showWindow:self];
 }
 
 - (IBAction)showMemoryBrowserPane:(id)sender
 {
-  if( !settings_current.full_screen ) {
-    if( !memoryBrowserController ) {
-      memoryBrowserController = [[MemoryBrowserController alloc] init];
-    }
+  if( !memoryBrowserController ) {
+    memoryBrowserController = [[MemoryBrowserController alloc] init];
   }
   [memoryBrowserController showWindow:self];
 }
 
 - (IBAction)showPreferencesPane:(id)sender;
 {
-  if( !settings_current.full_screen ) {
-    if( !preferencesController ) {
-      preferencesController = [[PreferencesController alloc] init];
-    }
-    [preferencesController showWindow:self];
+  if( !preferencesController ) {
+    preferencesController = [[PreferencesController alloc] init];
   }
+  [preferencesController showWindow:self];
 }
 
 - (IBAction)saveFileTypeClicked:(id)sender;
@@ -2644,6 +2611,19 @@ save_as_exit:
   [[DisplayOpenGLView instance] unpause];
 
   return confirm;
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+  /* The user-facing prompts live here, not in -windowShouldClose:, so Cmd+Q
+     (-quit: → [NSApp terminate:]) and red-button / Cmd+W (windowShouldClose:
+     → [NSApp terminate:]) share one path. AppKit calls close (not
+     performClose:) on each window during termination, so windowShouldClose:
+     would be bypassed on the Cmd+Q path otherwise. */
+  if( !cocoaui_confirm( "Exit Fuse?" ) ) return NSTerminateCancel;
+  if( [[DisplayOpenGLView instance] checkMediaChanged] ) return NSTerminateCancel;
+  [[DisplayOpenGLView instance] displayLinkStop];
+  return NSTerminateNow;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication

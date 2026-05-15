@@ -694,9 +694,9 @@
                                     <action selector="performMiniaturize:" target="-1" id="932"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Fullscreen" keyEquivalent="f" id="461">
+                            <menuItem title="Enter Full Screen" keyEquivalent="f" id="461">
                                 <connections>
-                                    <action selector="fullscreen:" target="879" id="883"/>
+                                    <action selector="toggleFullScreen:" target="877" id="883"/>
                                 </connections>
                             </menuItem>
                         </items>

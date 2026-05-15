@@ -134,51 +134,6 @@ static DisplayOpenGLView *instance = nil;
   return instance;
 }
 
--(IBAction) fullscreen:(id)sender
-{
-  /* don't want to get a callback to display the screen while we are
-   * fiddling with the window to draw into!
-   */
-  [self displayLinkStop];
-
-  if( settings_current.full_screen ) {
-    /* we need to go back to non-full screen */
-    [fullscreenWindow close];
-    [windowedWindow setContentView: self];
-    [windowedWindow makeKeyAndOrderFront: self];
-    [windowedWindow makeFirstResponder: self];
-    settings_current.full_screen = 0;
-    if( ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_release( 0 );
-  } else {
-    unsigned int windowStyle;
-    NSRect       contentRect;
-
-    windowedWindow = [self window];
-    windowStyle    = NSBorderlessWindowMask;
-    contentRect    = [[NSScreen mainScreen] frame];
-    fullscreenWindow = [[NSWindow alloc] initWithContentRect:contentRect
-                                         styleMask: windowStyle
-                                         backing:NSBackingStoreBuffered
-                                         defer: NO];
-    if( fullscreenWindow != nil ) {
-      settings_current.full_screen = 1;
-      [fullscreenWindow setTitle: @"Fuse"];
-      [fullscreenWindow setReleasedWhenClosed: YES];
-      [fullscreenWindow setContentView: self];
-      [fullscreenWindow makeKeyAndOrderFront:self ];
-      [fullscreenWindow setLevel: NSScreenSaverWindowLevel - 1];
-      [fullscreenWindow makeFirstResponder:self];
-      if( !ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_grab( 0 );
-    }
-  }
-
-  [self displayLinkStart];
-
-  [view_lock lock];
-  statusbar_updated = YES;
-  [view_lock unlock];
-}
-
 -(IBAction) zoom:(id)sender
 {
   NSSize size;
@@ -345,6 +300,13 @@ static DisplayOpenGLView *instance = nil;
   /* keep the window in the standard aspect ratio if the user resizes */
   [[self window] setContentAspectRatio:NSMakeSize(4.0,3.0)];
 
+  /* Opt into AppKit native fullscreen so the green traffic-light
+     button acts as a fullscreen toggle (the standard arrows icon)
+     rather than a zoom. */
+  [[self window] setCollectionBehavior:
+    [[self window] collectionBehavior] |
+    NSWindowCollectionBehaviorFullScreenPrimary];
+
   view_lock = [[NSLock alloc] init];
 
   CVReturn            error = kCVReturnSuccess;
@@ -396,6 +358,16 @@ static DisplayOpenGLView *instance = nil;
 - (void)windowDidResignKey:(NSNotification *)notification
 {
   [proxy_emulator keyboardReleaseAll];
+}
+
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+  /* Release the emulator's mouse grab on fullscreen exit so a user who
+     entered fullscreen with the cursor grabbed regains it. The entry side
+     is deliberately not symmetric: auto-grabbing would hide the cursor
+     and block the menu-bar-on-hover reveal that exposes Open, Preferences,
+     and the rest of the menu in fullscreen. */
+  if( ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_release( 0 );
 }
 
 -(void) loadPicture: (NSString *) name
@@ -508,20 +480,19 @@ static DisplayOpenGLView *instance = nil;
     return;
   }
 
-  int border_x_offset = 0;
-  int border_y_offset = 0;
-  if( settings_current.full_screen ) {
-    /* how much of the top and bottom borders should be eliminated? */
-    NSRect rect = [self bounds];
-    float width_adjustment = 0.0;
-
-    border_x_offset =
-      get_offset( rect.size.width, rect.size.height,
-                  screenTex[currentScreenTex].image_width,
-                  screenTex[currentScreenTex].image_height,
-                  &width_adjustment );
-    border_y_offset = width_adjustment;
-  }
+  /* Letterbox the emulated 4:3 image inside the view's current bounds.
+     In windowed mode the window's contentAspectRatio constraint keeps
+     the view 4:3 and get_offset returns zero margins (no-op). In any
+     fullscreen mode the view fills the display and get_offset produces
+     pillarbox or letterbox margins as appropriate. */
+  NSRect rect = [self bounds];
+  float width_adjustment = 0.0;
+  int border_x_offset =
+    get_offset( rect.size.width, rect.size.height,
+                screenTex[currentScreenTex].image_width,
+                screenTex[currentScreenTex].image_height,
+                &width_adjustment );
+  int border_y_offset = width_adjustment;
 
   /* Bind, update and draw new image */
   glBindTexture( GL_TEXTURE_RECTANGLE_ARB, screenTexId[currentScreenTex] );
@@ -872,11 +843,6 @@ static DisplayOpenGLView *instance = nil;
   [proxy_emulator settingsResetDefaults];
 }
 
--(void) fullscreen
-{
-  [proxy_emulator fullscreen];
-}
-
 -(void) joystickToggleKeyboard
 {
   [proxy_emulator joystickToggleKeyboard];
@@ -1201,16 +1167,6 @@ static DisplayOpenGLView *instance = nil;
 
 -(void) keyDown:(NSEvent *)theEvent
 {
-  if( settings_current.full_screen ) {
-    unichar c = [[theEvent charactersIgnoringModifiers] characterAtIndex:0];
-    switch (c) {
-    /* [Esc] exits fullScreen mode */
-    case 27:
-      [self fullscreen:nil];
-      return;
-      break;
-    }
-  }
   [proxy_emulator keyDown:theEvent];
 }
 
@@ -1338,14 +1294,12 @@ static DisplayOpenGLView *instance = nil;
 
 -(BOOL) windowShouldClose:(id)window
 {
-  if( cocoaui_confirm( "Exit Fuse?" ) ) {
-    int error = [self checkMediaChanged];
-    if( error ) return NO;
-
-    [self displayLinkStop];
-
-    return YES;
-  }
+  /* Funnel the red-button / Cmd+W close through the same exit path as Cmd+Q
+     so the "Exit Fuse?" confirm and the unsaved-media check live in one
+     place (FuseController -applicationShouldTerminate:). Returning NO lets
+     terminate: take over: if the user confirms, AppKit closes every window
+     itself; if the user cancels, the window stays open. */
+  [NSApp terminate:self];
   return NO;
 }
 
@@ -1489,6 +1443,13 @@ static DisplayOpenGLView *instance = nil;
 - (void)pinAsChildOf:(NSWindow *)parent
 {
   if( !parent || parent == self ) return;
+  /* Without FullScreenAuxiliary, adding self as a child of a fullscreen
+     parent forces AppKit to exit fullscreen so the two can coexist on
+     the regular desktop. With it, both windows share the parent's
+     fullscreen Space. Harmless when the parent is windowed. */
+  [self setCollectionBehavior:
+    [self collectionBehavior] |
+    NSWindowCollectionBehaviorFullScreenAuxiliary];
   NSWindow *currentParent = [self parentWindow];
   if( currentParent == parent ) return;
   if( currentParent ) {
