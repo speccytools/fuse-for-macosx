@@ -1,11 +1,24 @@
+#include "config.h"
+#include "compat.h"  /* Include before system headers to get compat/getopt.h */
 #include "xfs.h"
 #include "xfs_worker.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#ifdef WIN32
+#include <io.h>
+#include <fcntl.h>  /* For O_* constants */
+#include <direct.h>
+#define mkdir(path, mode) _mkdir(path)
+#ifndef O_BINARY
+#define O_BINARY 0  /* Fallback if not defined (Unix doesn't need it) */
+#endif
+#else
 #include <unistd.h>
 #include <fcntl.h>
+#define O_BINARY 0  /* Not needed on Unix */
+#endif
 #include <sys/stat.h>
 #include <dirent.h>
 #include <limits.h>
@@ -31,7 +44,7 @@ static char* build_path(const char* path)
     if (path[0] != '/')
     {
         // Prepend / if missing
-        if (xfs_base_path)
+        if (xfs_base_path[0] != '\0')
         {
             snprintf(full_path, sizeof(full_path), "%s/%s", xfs_base_path, path);
         }
@@ -44,7 +57,7 @@ static char* build_path(const char* path)
     }
     else
     {
-        if (xfs_base_path)
+        if (xfs_base_path[0] != '\0')
         {
             snprintf(full_path, sizeof(full_path), "%s%s", xfs_base_path, path);
         }
@@ -101,7 +114,7 @@ static int16_t fs_mount(const struct xfs_engine_t* engine, const char* hostname,
     }
     
     // Store base path
-    if (xfs_base_path) {
+    if (xfs_base_path[0] != '\0') {
         strncpy(mount_data->base_path, xfs_base_path, sizeof(mount_data->base_path) - 1);
         mount_data->base_path[sizeof(mount_data->base_path) - 1] = '\0';
     } else {
@@ -160,6 +173,11 @@ static int16_t fs_open(const struct xfs_engine_mount_t* engine, struct xfs_handl
         open_flags |= O_CREAT;
     if (flags & XFS_O_TRUNC)
         open_flags |= O_TRUNC;
+    
+#ifdef WIN32
+    // On Windows, open files in binary mode to prevent \n -> \r\n conversion
+    open_flags |= O_BINARY;
+#endif
     
     XFS_DEBUG("fs: open open_flags=0x%x (O_RDONLY=0x%x O_WRONLY=0x%x O_RDWR=0x%x O_CREAT=0x%x O_TRUNC=0x%x)\n",
               open_flags, O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC);
@@ -236,6 +254,11 @@ static int16_t fs_write(const struct xfs_engine_mount_t* engine, struct xfs_hand
     }
     
     // Verify file descriptor is still valid by checking its flags
+#ifdef WIN32
+    // Windows doesn't have fcntl, assume file is writable if opened
+    // We can't check the actual flags, so we'll trust the file handle state
+    (void)0;  // No-op on Windows - skip flag check
+#else
     int fd_flags = fcntl(file_handle->fd, F_GETFL);
     if (fd_flags < 0) {
         XFS_DEBUG("fs: write failed: fd=%d is invalid (fcntl F_GETFL failed: %s)\n", file_handle->fd, strerror(errno));
@@ -252,6 +275,7 @@ static int16_t fs_write(const struct xfs_engine_mount_t* engine, struct xfs_hand
         XFS_DEBUG("fs: write failed: fd=%d opened read-only (accmode=0x%x)\n", file_handle->fd, accmode);
         return XFS_ERR_BADF;
     }
+#endif
     
     ssize_t bytes_written = write(file_handle->fd, buffer, size);
     
@@ -468,7 +492,7 @@ static int16_t fs_stat(const struct xfs_engine_mount_t* engine, const char* path
         stat_info->size = (uint32_t)st.st_size;
     }
     
-    XFS_DEBUG("fs: stat success name=%s type=%d size=%lu\n", stat_info->name, stat_info->type, stat_info->size);
+    XFS_DEBUG("fs: stat success name=%s type=%d size=%u\n", stat_info->name, stat_info->type, stat_info->size);
     return XFS_ERR_OK;
 }
 

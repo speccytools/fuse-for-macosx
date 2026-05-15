@@ -23,6 +23,7 @@
 */
 
 #include "config.h"
+#include <stdio.h>
 #include <string.h>
 
 #ifdef HAVE_LIB_GLIB
@@ -30,7 +31,10 @@
 #endif
 
 #include "fuse.h"
+#include "machine.h"
 #include "options.h"
+#include "periph.h"
+#include "peripherals/disk/beta.h"
 #include "ui/ui.h"
 #include "ui/uimedia.h"
 #include "utils.h"
@@ -62,6 +66,7 @@ ui_media_drive_end( void )
 }
 
 struct find_info {
+  int controller;
   int drive;
 };
 
@@ -72,13 +77,32 @@ find_drive( gconstpointer data, gconstpointer user_data )
   const struct find_info *info = user_data;
 
   return !( drive->is_available && drive->is_available()
+            && drive->controller_index == info->controller
             && drive->drive_index == info->drive );
 }
 
+int
+ui_media_active_disk_controller( void )
+{
+  if( machine_current->capabilities &
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
+    return UI_MEDIA_CONTROLLER_PLUS3;
+  if( beta_active )
+    return UI_MEDIA_CONTROLLER_BETA;
+  if( periph_is_active( PERIPH_TYPE_OPUS ) )
+    return UI_MEDIA_CONTROLLER_OPUS;
+  if( periph_is_active( PERIPH_TYPE_DIDAKTIK80 ) )
+    return UI_MEDIA_CONTROLLER_DIDAKTIK;
+  if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
+    return UI_MEDIA_CONTROLLER_DISCIPLE;
+  return UI_MEDIA_CONTROLLER_PLUSD;
+}
+
 ui_media_drive_info_t *
-ui_media_drive_find( int drive )
+ui_media_drive_find( int controller, int drive )
 {
   struct find_info info = {
+    /* .controller = */ controller,
     /* .drive = */ drive,
   };
   GSList *item;
@@ -146,11 +170,11 @@ ui_media_drive_update_menus( const ui_media_drive_info_t *drive,
 }
 
 int
-ui_media_drive_flip( int which, int flip )
+ui_media_drive_flip( int controller, int which, int flip )
 {
   ui_media_drive_info_t *drive;
 
-  drive = ui_media_drive_find( which );
+  drive = ui_media_drive_find( controller, which );
   if( !drive )
     return -1;
   if( !drive->fdd->loaded )
@@ -162,11 +186,11 @@ ui_media_drive_flip( int which, int flip )
 }
 
 int
-ui_media_drive_writeprotect( int which, int wrprot )
+ui_media_drive_writeprotect( int controller, int which, int wrprot )
 {
   ui_media_drive_info_t *drive;
 
-  drive = ui_media_drive_find( which );
+  drive = ui_media_drive_find( controller, which );
   if( !drive )
     return -1;
   if( !drive->fdd->loaded )
@@ -242,9 +266,50 @@ ui_media_drive_save_with_filename( const ui_media_drive_info_t *drive,
 }
 
 int
-ui_media_drive_save( int which, int saveas )
+ui_media_drive_save( int controller, int which, int saveas )
 {
+  ui_media_drive_info_t *drive;
+  char *filename = NULL;
+  char title[128];
+  int err;
+
+  drive = ui_media_drive_find( controller, which );
+  if( !drive )
+    return -1;
+
+#ifdef __APPLE__
+  /* Native save panel and file-type filtering (cocoaui -> FuseController). */
   return ui_disk_write( which, saveas );
+#else
+  if( !drive->fdd->loaded )
+    return 1;
+
+  if( !drive->fdd->disk.filename )
+    saveas = 1;
+
+  fuse_emulation_pause();
+
+  if( saveas ) {
+    snprintf( title, sizeof(title), "Fuse - Write %s As", drive->name );
+    filename = ui_get_save_filename( title );
+    if( !filename ) {
+      fuse_emulation_unpause();
+      return 1;
+    }
+  }
+
+  err = drive_disk_write( drive, filename );
+  if( filename )
+    libspectrum_free( filename );
+
+  fuse_emulation_unpause();
+
+  if( err == -1 || err == 1 || err == 2 )
+    return 1;
+
+  drive->fdd->disk.dirty = 0;
+  return 0;
+#endif
 }
 
 static int
@@ -263,10 +328,14 @@ drive_eject( const ui_media_drive_info_t *drive )
 
     switch( confirm ) {
 
-    case UI_CONFIRM_SAVE_SAVE:
-      if( ui_disk_write( drive, 0 ) )
-        return 1;   /* first save it...*/
+    case UI_CONFIRM_SAVE_SAVE: {
+      int werr = drive_disk_write( drive, NULL );
+      if( werr == -1 )
+        return 1;
+      if( werr == 1 )
+        return 1;
       break;
+    }
 
     case UI_CONFIRM_SAVE_DONTSAVE: break;
     case UI_CONFIRM_SAVE_CANCEL: return 1;
@@ -281,11 +350,11 @@ drive_eject( const ui_media_drive_info_t *drive )
 }
 
 int
-ui_media_drive_eject( int which )
+ui_media_drive_eject( int controller, int which )
 {
   ui_media_drive_info_t *drive;
 
-  drive = ui_media_drive_find( which );
+  drive = ui_media_drive_find( controller, which );
   if( !drive )
     return -1;
   return drive_eject( drive );

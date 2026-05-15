@@ -43,6 +43,7 @@ slt_traps, boolean, 1,,, slt, slttraps
 double_screen, null, 0
 full_screen, boolean, 0
 writable_roms, boolean, 0
+auto_load, boolean, 1
 autosave_settings, boolean, 1
 bw_tv, boolean, 0
 recreated_spectrum, boolean, 0

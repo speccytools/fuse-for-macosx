@@ -20,6 +20,19 @@
 
 #include "config.h"
 
+#ifdef WIN32
+#define _WIN32_WINNT 0x0501
+
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h>
+
+#ifdef _MSC_VER
+#pragma comment (lib, "Ws2_32.lib")
+#endif
+
+#endif
+
 #include "libspectrum.h"
 
 #include "compat.h"

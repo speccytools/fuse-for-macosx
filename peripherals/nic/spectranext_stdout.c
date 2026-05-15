@@ -2,6 +2,7 @@
 
 #include "debugger/gdbserver.h"
 #include "spectranext_stdout.h"
+#include "ui/ui.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -31,6 +32,10 @@ spectranext_stdout_flush_buffer( void )
 void spectranext_stdout_write(libspectrum_word port, libspectrum_byte data)
 {
     (void)port;
+
+#ifdef UI_WIN32
+    ui_spectranext_debug_log_byte( (int)data );
+#endif
 
     if( spectranext_stdout_buffer_length >= SPECTRANEXT_STDOUT_BUFFER_SIZE - 1 )
         spectranext_stdout_flush_buffer();

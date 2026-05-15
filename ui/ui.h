@@ -138,6 +138,7 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_MACHINE_MULTIFACE,
   UI_MENU_ITEM_MACHINE_DIDAKTIK80_SNAP,
   UI_MENU_ITEM_MACHINE_DEBUGGER,
+  UI_MENU_ITEM_MACHINE_DEBUG_LOG,
   UI_MENU_ITEM_MEDIA_CARTRIDGE,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT,
@@ -315,5 +316,8 @@ void ui_popup_menu( int native_key );
 void ui_widget_keyhandler( int native_key );
 
 void ui_pokemem_selector( const char *filename );
+
+/* Spectranext debug port (0x043b) → host debug log (Win32) or no-op */
+void ui_spectranext_debug_log_byte( int c );
 
 #endif			/* #ifndef FUSE_UI_H */

@@ -26,6 +26,11 @@
 
 #include "libspectrum.h"
 
+typedef enum uidisplay_hotswap_reason {
+  UIDISPLAY_HOTSWAP_REASON_NONE = 0,
+  UIDISPLAY_HOTSWAP_REASON_SCALER_EXPLICIT
+} uidisplay_hotswap_reason;
+
 /* User interface specific functions */
 
 int uidisplay_init( int width, int height );
@@ -33,6 +38,8 @@ int uidisplay_init( int width, int height );
 void uidisplay_area( int x, int y, int w, int h );
 void uidisplay_frame_end( void );
 int uidisplay_hotswap_gfx_mode( void );
+void uidisplay_set_next_hotswap_reason( uidisplay_hotswap_reason reason );
+uidisplay_hotswap_reason uidisplay_take_next_hotswap_reason( void );
 
 #ifdef USE_WIDGET
 /* Routines for backing up and restoring the frame buffer as the widget UI does

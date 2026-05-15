@@ -31,7 +31,11 @@
 #include "debugger/debugger_internals.h"
 #include "mempool.h"
 
+#ifdef __APPLE__
 #include "commandy.tab.h"
+#else
+#include "commandy.h"
+#endif
 
 #define YY_INPUT(buf,result,max_size) \
 { \

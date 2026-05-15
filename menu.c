@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "movie.h"
 #include "machines/specplus3.h"
+#include "ui/uidisplay.h"
 #include "peripherals/dck.h"
 #include "peripherals/disk/beta.h"
 #include "peripherals/disk/didaktik.h"
@@ -312,8 +313,11 @@ MENU_CALLBACK( menu_options_filter )
   fuse_emulation_pause();
 
   scaler = menu_get_scaler( scaler_is_supported );
-  if( scaler != SCALER_NUM && scaler != current_scaler )
+  if( scaler != SCALER_NUM && scaler != current_scaler ) {
+    uidisplay_set_next_hotswap_reason(
+      UIDISPLAY_HOTSWAP_REASON_SCALER_EXPLICIT );
     scaler_select_scaler( scaler );
+  }
 
   /* Carry on with emulation again */
   fuse_emulation_unpause();
@@ -352,6 +356,13 @@ MENU_CALLBACK( menu_machine_profiler_stop )
 
   fuse_emulation_unpause();
 }
+
+#if !defined( UI_WIN32 )
+MENU_CALLBACK( menu_machine_debuglog )
+{
+  (void)action;
+}
+#endif				/* !defined( UI_WIN32 ) */
 
 MENU_CALLBACK( menu_machine_nmi )
 {

@@ -1234,9 +1234,10 @@ static void yy_syntax_error(
 #line 41 "parser.y"
 
 	int i;
+	YYACTIONTYPE stateno = yypParser->yytos->stateno;
 
-	for (i = 0; i < sizeof(tokennames) / sizeof(tokennames[0]); i++)
-		if (yy_find_shift_action(yypParser, (YYCODETYPE)i) < YYNSTATE + YYNRULE)
+	for (i = 0; i < YYNTOKEN; i++)
+		if (yy_find_shift_action((YYCODETYPE)i, stateno) < YYNSTATE + YYNRULE)
 			s->error_code |= (1 << i);
 
 	s->error_pos = s->off;

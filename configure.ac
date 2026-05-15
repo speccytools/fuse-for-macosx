@@ -18,14 +18,15 @@ dnl Author contact information:
 dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
-dnl Package version
-m4_define([fuse_version], [1.7.0])
+dnl Package version (user-visible: tarballs, fuse --version, NSIS text).
+dnl Keep README, man/fuse.1 (.TH third field), metainfo.xml, and fusepb MARKETING_VERSION in sync.
+m4_define([fuse_version], [1.7.0-fusex-0.1])
 
-dnl Product full version
+dnl Win32 FILEVERSION / NSIS VIProductVersion require four integers only; map fusex-0.1 -> fourth field 1.
 m4_define([fuse_major_version], [1])
 m4_define([fuse_minor_version], [7])
 m4_define([fuse_micro_version], [0])
-m4_define([fuse_nano_version],  [0])
+m4_define([fuse_nano_version],  [1])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
 
@@ -34,7 +35,7 @@ m4_define([fuse_copyright], ["(c) 1999-2026 Philip Kendall and others"])
 m4_define([fuse_url], [http://fuse-emulator.sourceforge.net/])
 m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs/])
 
-AC_INIT([fuse],[fuse_version],[fuse_bugreport],[fuse],[fuse_url])
+AC_INIT([fusex],[fuse_version],[fuse_bugreport],[fusex],[fuse_url])
 AC_CONFIG_SRCDIR(fuse.c)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS(config.h)
@@ -884,6 +885,24 @@ else
   build_spectranet=no
 fi
 AM_CONDITIONAL(BUILD_SPECTRANET, test "$build_spectranet" = yes)
+
+MBEDTLS_CFLAGS=
+MBEDTLS_LIBS=
+if test "$build_spectranet" = yes; then
+  mbedtls_libdir="$srcdir/3rdparty/dist/lib"
+  mbedtls_incdir="$srcdir/3rdparty/dist/include"
+  AC_MSG_CHECKING([for mbedTLS (Spectranet TLS)])
+  if test -f "$mbedtls_libdir/libmbedtls.a" && test -f "$mbedtls_incdir/mbedtls/ssl.h"; then
+    MBEDTLS_CFLAGS="-I$mbedtls_incdir"
+    MBEDTLS_LIBS="-L$mbedtls_libdir -lmbedtls -lmbedx509 -lmbedcrypto"
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([Spectranet needs mbedTLS in 3rdparty/dist (headers + libmbedtls.a). From the repo: cd 3rdparty && make mbedtls])
+  fi
+fi
+AC_SUBST(MBEDTLS_CFLAGS)
+AC_SUBST(MBEDTLS_LIBS)
 
 dnl See if Linux TAP devices are supported
 AC_MSG_CHECKING(whether Linux TAP devices are supported)

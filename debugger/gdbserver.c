@@ -1,6 +1,18 @@
 
 #include "config.h"
 
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#else
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <sched.h>
+#endif
+
 #include "debugger.h"
 #include "gdbserver.h"
 #include "gdbserver_remote_commands.h"
@@ -46,6 +58,8 @@ static int gdbserver_requested_port = 0;
 static int gdbserver_last_trap_reason = DEBUG_TRAP_REASON_SIGNAL_RECEIVED;
 
 static pthread_t network_thread_id;
+/** Set while tearing the listener down; unblocks gdbserver_execute_on_main_thread and gdbserver_activate_with_reason. */
+static volatile int gdbserver_shutting_down;
 static trapped_action_t scheduled_action = NULL;
 static const void* scheduled_action_data = NULL;
 static void* scheduled_action_response = NULL;
@@ -840,19 +854,51 @@ void gdbserver_stop()
         return;
     }
 
+    /* Wake the main thread and any network-thread waiters before we touch
+     * sockets. Otherwise pthread_join can deadlock: e.g. UI shows a modal
+     * dialog so the CPU thread never services scheduled_action, while the
+     * network thread blocks in gdbserver_execute_on_main_thread; or the
+     * network thread holds network_read_mutex across recv(). */
+    pthread_mutex_lock(&trap_process_mutex);
+    gdbserver_shutting_down = 1;
+    scheduled_action = NULL;
+    pthread_cond_broadcast(&response_cond);
+    pthread_cond_broadcast(&trapped_cond);
+    pthread_mutex_unlock(&trap_process_mutex);
+
+#ifdef WIN32
+    if (gdbserver_client_socket != -1)
+        (void)shutdown(gdbserver_client_socket, SD_BOTH);
+    if (gdbserver_socket != -1)
+        (void)shutdown(gdbserver_socket, SD_BOTH);
+#else
+    if (gdbserver_client_socket != -1)
+        (void)shutdown(gdbserver_client_socket, SHUT_RDWR);
+    if (gdbserver_socket != -1)
+        (void)shutdown(gdbserver_socket, SHUT_RDWR);
+#endif
+
+    gdbserver_debugging_enabled = 0;
+    gdbserver_port = 0;
+    gdbserver_requested_port = 0;
+
+    pthread_join(network_thread_id, NULL);
+
     pthread_mutex_lock(&network_read_mutex);
     if (gdbserver_socket != -1)
     {
         compat_socket_close(gdbserver_socket);
         gdbserver_socket = -1;
     }
-    
+    if (gdbserver_client_socket != -1)
+    {
+        compat_socket_close(gdbserver_client_socket);
+        gdbserver_client_socket = -1;
+    }
+
     pthread_mutex_unlock(&network_read_mutex);
 
-    gdbserver_debugging_enabled = 0;
-    gdbserver_port = 0;
-    gdbserver_requested_port = 0;
-    pthread_join(network_thread_id, NULL);
+    gdbserver_shutting_down = 0;
     utils_networking_end();
 }
 
@@ -874,7 +920,6 @@ void gdbserver_refresh_status()
     {
         if (settings_current.gdbserver_enable)
         {
-            // we've been turned off, now must turn on
             int code = gdbserver_start(settings_current.gdbserver_port);
             if (code)
             {
@@ -889,25 +934,20 @@ void gdbserver_refresh_status()
         }
         else
         {
-            // we've been turned on, now must turn off
             gdbserver_stop();
             ui_menu_activate( UI_MENU_ITEM_MACHINE_DEBUGGER, 1 );
         }
     }
-    else
-    {
-        if (gdbserver_debugging_enabled &&
+    else if (gdbserver_debugging_enabled &&
             (gdbserver_requested_port != settings_current.gdbserver_port))
+    {
+        gdbserver_stop();
+        int code = gdbserver_start(settings_current.gdbserver_port);
+        if (code)
         {
-            // we need to restart
-            gdbserver_stop();
-            int code = gdbserver_start(settings_current.gdbserver_port);
-            if (code)
-            {
-                ui_error(UI_ERROR_ERROR, "Cannot restart gdbserver on port %d, code: %d", settings_current.gdbserver_port, code);
-                settings_current.gdbserver_enable = 0;
-                ui_menu_activate( UI_MENU_ITEM_MACHINE_DEBUGGER, 1 );
-            }
+            ui_error(UI_ERROR_ERROR, "Cannot restart gdbserver on port %d, code: %d", settings_current.gdbserver_port, code);
+            settings_current.gdbserver_enable = 0;
+            ui_menu_activate( UI_MENU_ITEM_MACHINE_DEBUGGER, 1 );
         }
     }
 }
@@ -933,6 +973,12 @@ uint8_t gdbserver_execute_on_main_thread(trapped_action_t call, const void* data
 {
     pthread_mutex_lock(&trap_process_mutex);
 
+    if (gdbserver_shutting_down)
+    {
+        pthread_mutex_unlock(&trap_process_mutex);
+        return 0;
+    }
+
     if (gdbserver_trapped != 1 && debugger_mode != DEBUGGER_MODE_HALTED)
     {
         pthread_mutex_unlock(&trap_process_mutex);
@@ -948,14 +994,28 @@ uint8_t gdbserver_execute_on_main_thread(trapped_action_t call, const void* data
     // execute
     pthread_cond_signal(&trapped_cond);
     pthread_mutex_unlock(&trap_process_mutex);
-    
+
+#if defined(__APPLE__)
     pthread_yield_np();
+#elif defined(WIN32)
+    SwitchToThread();
+#else
+    sched_yield();
+#endif
 
     pthread_mutex_lock(&trap_process_mutex);
     // wait for the response
-    while (scheduled_action_response_delivered == 0)
+    while (scheduled_action_response_delivered == 0 && !gdbserver_shutting_down)
     {
         pthread_cond_wait(&response_cond, &trap_process_mutex);
+    }
+    if (gdbserver_shutting_down && !scheduled_action_response_delivered)
+    {
+        scheduled_action = NULL;
+        scheduled_action_data = NULL;
+        scheduled_action_response = NULL;
+        pthread_mutex_unlock(&trap_process_mutex);
+        return 0;
     }
     pthread_mutex_unlock(&trap_process_mutex);
     return 1;
@@ -1201,6 +1261,12 @@ int gdbserver_activate_with_reason(int trap_reason)
 
         pthread_cond_wait(&trapped_cond, &trap_process_mutex);
 
+        if (gdbserver_shutting_down)
+        {
+            gdbserver_trapped = 0;
+            break;
+        }
+
         if (scheduled_action != NULL)
         {
             halt = scheduled_action(scheduled_action_data, scheduled_action_response);
@@ -1213,7 +1279,12 @@ int gdbserver_activate_with_reason(int trap_reason)
       
     } while (1);
 
-    if (halt == 0)
+    if (gdbserver_shutting_down)
+    {
+        debugger_mode = DEBUGGER_MODE_ACTIVE;
+        gdbserver_trapped = 0;
+    }
+    else if (halt == 0)
     {
         debugger_mode = DEBUGGER_MODE_ACTIVE;
         // printf("Execution resumed.\n");

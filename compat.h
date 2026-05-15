@@ -31,13 +31,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#endif
-
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
 
@@ -179,7 +172,6 @@ int compat_get_tap( const char *interface_name );
 
 #ifdef WIN32
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #define COMPAT_ENOTCONN WSAENOTCONN
 #define COMPAT_EWOULDBLOCK WSAEWOULDBLOCK
 #define COMPAT_EINPROGRESS WSAEINPROGRESS
@@ -192,6 +184,7 @@ typedef SOCKADDR compat_sockaddr;
 typedef int compat_socket_t;
 #else  /* #ifndef WIN32 && GEKKO */
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #include <errno.h>
 #define COMPAT_ENOTCONN ENOTCONN

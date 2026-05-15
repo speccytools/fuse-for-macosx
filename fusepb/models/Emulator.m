@@ -450,8 +450,10 @@ static Emulator *instance = nil;
 -(void) diskInsertNew:(int)which
 {
   ui_media_drive_info_t *drive;
-  
-  drive = ui_media_drive_find( which );
+  int ctrl;
+
+  ctrl = ui_media_active_disk_controller();
+  drive = ui_media_drive_find( ctrl, which );
   if( !drive )
     return;
   ui_media_drive_insert( drive, NULL, 0 );
@@ -460,8 +462,10 @@ static Emulator *instance = nil;
 -(void) diskInsert:(const char *)filename inDrive:(int)which
 {
   ui_media_drive_info_t *drive;
-  
-  drive = ui_media_drive_find( which );
+  int ctrl;
+
+  ctrl = ui_media_active_disk_controller();
+  drive = ui_media_drive_find( ctrl, which );
   if( !drive )
     return;
   ui_media_drive_insert( drive, filename, 0 );
@@ -469,22 +473,22 @@ static Emulator *instance = nil;
 
 -(void) diskEject:(int)drive
 {
-  ui_media_drive_eject( drive );
+  ui_media_drive_eject( ui_media_active_disk_controller(), drive );
 }
 
 -(void) diskSave:(int)drive saveAs:(bool)saveas
 {
-  ui_media_drive_save( drive, saveas );
+  ui_media_drive_save( ui_media_active_disk_controller(), drive, saveas );
 }
 
 -(void) diskFlip:(int)which side:(int)flip
 {
-  ui_media_drive_flip( which, flip );
+  ui_media_drive_flip( ui_media_active_disk_controller(), which, flip );
 }
 
 -(void) diskWriteProtect:(int)which protect:(int)write
 {
-  ui_media_drive_writeprotect( which, write );
+  ui_media_drive_writeprotect( ui_media_active_disk_controller(), which, write );
 }
 
 -(void) snapshotWrite:(const char *)filename

@@ -25,7 +25,6 @@
 #define FUSE_FUSE_H
 
 #include <limits.h>
-#include <sys/syslimits.h>
 
 #include "libspectrum.h"
 
